@@ -1,22 +1,39 @@
 # uhppoted-breakout
 
-Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers.
+Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers. 
 
+Replaces the removable CPU board with a development board that exposes the interface connector pins
+as a header.
 
 ## Raison d'être
 
-Mostly curiosity? But it would be nice to have an access controller that is completely open source and
-customisable to the limits of your ability and that perhaps runs a standard embedded OS so that you 
-can do cute and/or clever things with it. And being able to run a RaspberryPi or somesuch directly on
-the base board opens up a world of possibilities - to the least of which is no longer needing an external
-host for all the uhppoted stuff.
+Mostly curiosity? 
 
-Also - as per the manufacturer, the firmware on the access controllers is not updatable by the end user
-so once you've bought a board you're stuck with that version till the end of time. Well, at least until
-the onboard calendar runs out and the SDK suggests that the dates supported by the controllers may only
-go up to about 2027 (at least in older controllers - presumably newer controllers have that date pushed
-out a bit further).
+But .. it would be nice to have an access controller:
+- that is completely open source and customisable to the limits of your ability
+- that runs a standard embedded OS so that you can do cute and/or clever things with it
+- can host something a RaspberryPi or somesuch directly on the base board so that you don't necessarily
+  have to have an external host
 
+Also, the manufacturer has stated [categorically](https://github.com/uhppoted/uhppoted/blob/main/documentation/FAQ.md#faq)
+that the firmware on the access controllers is not updatable by the end user. Which is quite reasonable but does mean that
+older controllers which are otherwise running just fine have to be replaced to get upgraded functionality. And some 
+installations have a **lot** of controllers.
+
+## Roadmap
+
+### Rev.0
+
+** IN DEVELOPMENT **
+
+Initial breakout board. Designed to be relatively easy to hand solder and debug - all the components are on the front (top)
+of the PCB and it uses a WaveShare RP2040-Zero module.
+
+### Rev.1
+
+### Rev.2
+
+### Rev.3
 
 ## Notes
 
