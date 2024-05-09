@@ -1,9 +1,7 @@
 # uhppoted-breakout
 
-Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers. 
-
-Replaces the removable CPU board with a development board that exposes the interface connector pins
-as a header.
+Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers. Replaces the removable CPU board with a
+hackable board that exposes the interface connector pins as a header.
 
 ## Raison d'être
 
