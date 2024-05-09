@@ -7,13 +7,13 @@ as a header.
 
 ## Raison d'être
 
-Mostly curiosity? 
+Mostly curiosity?
 
 But .. it would be nice to have an access controller:
 - that is completely open source and customisable to the limits of your ability
-- that runs a standard embedded OS so that you can do cute and/or clever things with it
-- can host something a RaspberryPi or somesuch directly on the base board so that you don't necessarily
-  have to have an external host
+- that runs a standard embedded RTOS so that you can do cute and/or clever things with it
+- can host something a _RaspberryPi_ or somesuch directly on the base board obviating the need
+  for an external host
 
 Also, the manufacturer has stated [categorically](https://github.com/uhppoted/uhppoted/blob/main/documentation/FAQ.md#faq)
 that the firmware on the access controllers is not updatable by the end user. Which is quite reasonable but does mean that
@@ -24,7 +24,7 @@ installations have a **lot** of controllers.
 
 ### Rev.0
 
-** IN DEVELOPMENT **
+**IN DEVELOPMENT**
 
 Initial breakout board. Designed to be relatively easy to hand solder and debug - all the components are on the front (top)
 of the PCB and it uses a WaveShare RP2040-Zero module.
