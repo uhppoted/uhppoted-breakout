@@ -4,19 +4,9 @@
    - [x] mouser.ca
    - [x] Fix RP2040Z symbol + footprint
    - [x] Fix RX8900SA footprint
-         - https://www5.epsondevice.com/en/products/rtc/rx8900sa.html
-   - [x] Shopping
-         - Liquid flux
-         - Tweezers
-         - 10 x 0.1uF 0805 SMD capacitors
-         - 10 x 2.2k resistors
-         - 10 x 10k resistors
-         - 5 x jumpers
-         - 2 x 2x10p headers
-         - CR1220
-
-      - [ ] README image
-            - https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/
+   - [ ] README image
+         - https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/
+   - [ ] BOM
 
 ## R&D
 - [ ] Document pin voltage levels

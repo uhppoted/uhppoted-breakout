@@ -1,22 +1,16 @@
 # uhppoted-breakout
 
-Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers. Replaces the removable CPU board with a
-hackable board that exposes the interface connector pins as a header.
+Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers. 
+
+The breakout board substitutes the removable CPU board with a hackable board that:
+- exposes the interface connector pins as a pair of standard 2.54mm (0.1") headers
+- serialises card swipes and I/O events out to an SPI interface
+- has mounting holes for a RaspberryPi ZeroW
+- includes an onboard RTC
 
 ## Raison d'être
 
 Mostly curiosity?
-
-But .. it would be nice to have an access controller:
-- that is completely open source and customisable to the limits of your ability
-- that runs a standard embedded RTOS so that you can do cute and/or clever things with it
-- can host something a _RaspberryPi_ or somesuch directly on the base board obviating the need
-  for an external host
-
-Also, the manufacturer has stated [categorically](https://github.com/uhppoted/uhppoted/blob/main/documentation/FAQ.md#faq)
-that the firmware on the access controllers is not updatable by the end user. Which is quite reasonable but does mean that
-older controllers which are otherwise running just fine have to be replaced to get upgraded functionality. And some 
-installations have a **lot** of controllers.
 
 ## Roadmap
 
@@ -24,8 +18,11 @@ installations have a **lot** of controllers.
 
 **IN DEVELOPMENT**
 
-Initial breakout board. Designed to be relatively easy to hand solder and debug - all the components are on the front (top)
-of the PCB and it uses a WaveShare RP2040-Zero module.
+Initial proof of concept. 
+
+Designed to be relatively easy to hand solder and debug:
+- all the components are on the front (top) of the PCB
+- it uses the ever-so-cute WaveShare RP2040-Zero module
 
 ### Rev.1
 

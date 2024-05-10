@@ -1,5 +1,7 @@
 .DS_Store
 kicad/Rev.0/breakout-backups
+kicad/Rev.0/breakout.csv
+kicad/Rev.0/breakout.xml
 kicad/Rev.0/~*
 kicad/library/custom/uhppoted.bak
 fp-info-cache
