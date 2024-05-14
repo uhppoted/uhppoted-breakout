@@ -24,6 +24,9 @@ Designed to be relatively easy to hand solder and debug:
 - All the components are on the front (top) of the PCB
 - It uses the ever-so-cute WaveShare RP2040-Zero module
 
+<img width="640" src="documentation/images/front.png">
+<img width="640" src="documentation/images/back.png">
+
 ### Rev.1
 
 ### Rev.2

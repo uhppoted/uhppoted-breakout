@@ -7,6 +7,9 @@
    - [ ] README image
          - https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/
    - [ ] BOM
+   - [ ] Shopping list
+         - [ ] 1.6mm x 6.5mm dia. washers
+         - [ ] small jumpers
 
 ## R&D
 - [ ] Document pin voltage levels
