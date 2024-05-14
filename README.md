@@ -3,10 +3,10 @@
 Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers. 
 
 The breakout board substitutes the removable CPU board with a hackable board that:
-- exposes the interface connector pins as a pair of standard 2.54mm (0.1") headers
-- serialises card swipes and I/O events out to an SPI interface
-- has mounting holes for a RaspberryPi ZeroW
-- includes an onboard RTC
+- Exposes the interface connector pins as a pair of standard 2.54mm (0.1") headers
+- Serialises card swipes and I/O events out to an SPI interface
+- Has mounting holes for a RaspberryPi ZeroW
+- Includes an onboard RTC
 
 ## Raison d'être
 
@@ -21,8 +21,8 @@ Mostly curiosity?
 Initial proof of concept. 
 
 Designed to be relatively easy to hand solder and debug:
-- all the components are on the front (top) of the PCB
-- it uses the ever-so-cute WaveShare RP2040-Zero module
+- All the components are on the front (top) of the PCB
+- It uses the ever-so-cute WaveShare RP2040-Zero module
 
 ### Rev.1
 
