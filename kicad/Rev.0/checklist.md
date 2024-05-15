@@ -53,4 +53,19 @@
       - [x] pin 19 (GND)
       - [x] pin 20 (VREF)
 
+## J1/JP1
+
+- [x] +5V
+
+## J3/JP2 
+
+- [x] +5V
+- [x] GND
+
+## U1
+
+- [x] short circuits
+- [x] +5V
+- [x] GND
+- [ ] 3.3V
 

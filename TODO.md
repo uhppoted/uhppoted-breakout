@@ -10,6 +10,9 @@
    - [ ] Shopping list
          - [ ] 1.6mm x 6.5mm dia. washers
          - [ ] small jumpers
+         - [ ] tall socket headers for RP2040Z
+         - [ ] ordinary socket headers for RP2040Z
+         - [ ] 2-,3- and 5-pin connectors
 
 ## R&D
 - [ ] Document pin voltage levels
