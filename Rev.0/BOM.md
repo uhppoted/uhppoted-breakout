@@ -13,7 +13,7 @@
 | 9    | 2   | R1-2      | 4x1k            | 4x1k SIP5 resistor array            | [652-4605X-AP1-102LF](https://www.mouser.ca/ProductDetail/652-4605X-AP1-102LF) |
 | 10   | 4   | R3-6      | 2.2k            | 1/8W TH 2.2k pullup resistors       |                                                                                |
 | 11   | 1   | R7        | 10k             | 1/8W TH 10k resistor                |                                                                                |
-| 12   | 1   | U1        | RP2040          | Waveshare RP2020-Zero               | [WaveShare RP2040-Zero](https://www.waveshare.com/rp2040-zero.htm)             |
+| 12   | 1   | U1        | RP2040          | Waveshare RP2020-Tiny               | [WaveShare RP2040-Tiny](https://www.waveshare.com/wiki/RP2040-Tiny)            |
 | 13   | 2   | U2-3      | PCAL6408APW     | 8 pin I2C I/O expander              | [771-PCAL6408APWJ](https://www.mouser.ca/ProductDetail/771-PCAL6408APWJ)       |
 | 14   | 1   | U4        | PI4IOE5V6416LEX | 16 pin I2C I/O expander             | [729-PI4IOE5V6416LEX](https://www.mouser.ca/ProductDetail/729-PI4IOE5V6416LEX) |
 | 15   | 1   | U5        | RX8900SA        | Epson-Seiko RTC                     | [732-RX8900SAUA0SN](https://www.mouser.ca/ProductDetail/732-RX8900SAUA0SN)     |

@@ -20,7 +20,7 @@ Mostly curiosity?
 
 Initial proof of concept, designed to be relatively easy to hand solder and debug:
 - All the components are on the front (top) of the PCB
-- It uses the ever-so-cute _WaveShare_ _RP2040-Zero_ module
+- It uses the ever-so-cute _WaveShare_ _RP2040-Tiny_ module
 
 <img width="640" src="documentation/images/front.png">
 <img width="640" src="documentation/images/back.png">

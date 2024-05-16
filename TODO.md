@@ -1,6 +1,7 @@
 # TODO
 
 ## Rev.0
+   - [ ] Fix schematic for RP2040 Tiny (https://www.waveshare.com/rp2040-tiny.htm)
    - [x] mouser.ca
    - [x] Fix RP2040Z symbol + footprint
    - [x] Fix RX8900SA footprint
