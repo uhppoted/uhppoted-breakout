@@ -1,18 +1,13 @@
 # TODO
 
-## Breakout board
+## Rev.0
    - [x] mouser.ca
    - [x] Fix RP2040Z symbol + footprint
    - [x] Fix RX8900SA footprint
-   - [ ] README image
-         - https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/
-   - [ ] BOM
-   - [ ] Shopping list
-         - [ ] 1.6mm x 6.5mm dia. washers
-         - [ ] small jumpers
-         - [ ] tall socket headers for RP2040Z
-         - [ ] ordinary socket headers for RP2040Z
-         - [ ] 2-,3- and 5-pin connectors
+   - [x] README images
+   - [x] BOM
+   - [ ] Bring-up checklist
+   - [ ] Firmware
 
 ## R&D
 - [ ] Document pin voltage levels
@@ -51,7 +46,8 @@
 8. https://www.cnx-software.com/2021/12/09/raspberry-pi-zero-2-w-power-consumption
 9. https://raspi.tv/2017/how-much-power-does-pi-zero-w-use
 10. DC-DC converter modules:
-   - https://www.sparkfun.com/products/18375
-   - https://www.adafruit.com/product/1065
-   - https://www.adafruit.com/product/4739
-   - https://www.adafruit.com/product/1385
+    - https://www.sparkfun.com/products/18375
+    - https://www.adafruit.com/product/1065
+    - https://www.adafruit.com/product/4739
+    - https://www.adafruit.com/product/1385
+11. https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/

@@ -1,7 +1,9 @@
 .DS_Store
-kicad/Rev.0/breakout-backups
-kicad/Rev.0/breakout.csv
-kicad/Rev.0/breakout.xml
-kicad/Rev.0/~*
-kicad/library/custom/uhppoted.bak
+breakout-backups
+breakout.csv
+breakout.xml
+Rev.0/kicad/~*
+uhppoted.bak
 fp-info-cache
+fp-lib-table
+sym-lib-table
