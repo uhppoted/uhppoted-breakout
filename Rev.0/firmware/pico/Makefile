@@ -15,7 +15,12 @@ build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make
 
 install: build
+	# picotool load build/breakout.uf2
+	# picotool reboot
 	cp build/breakout.uf2 /Volumes/RPI-RP2
+
+run: build
+	openocd -f interface/picoprobe.cfg -f target/rp2040.cfg -c "program build/breakout.elf verify reset exit"
 
 tty:
 	 minicom -b 115200 -o -D $(PORT)

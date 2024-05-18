@@ -29,8 +29,8 @@
 ## J12
 
 - [x] short circuits
-- [x] +5V
 - [x] GND
+- [x] +5V
 - [x] J1
       - [x] pin 1 (DO1)
       - [x] pin 2 (PWR)
@@ -59,13 +59,19 @@
 
 ## J3/JP2 
 
-- [x] +5V
 - [x] GND
+- [x] +5V
 
 ## U1
 
 - [x] short circuits
-- [x] +5V
 - [x] GND
+- [x] +5V
 - [ ] 3.3V
 
+## U3
+
+- [x] short circuits
+- [x] GND
+- [x] +5V
+- [ ] +3.3V
