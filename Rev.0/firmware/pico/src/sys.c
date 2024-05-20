@@ -1,8 +1,12 @@
-#include <pico/stdlib.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <hardware/uart.h>
+#include <pico/stdlib.h>
 
+#include <breakout.h>
 #include <sys.h>
+#include <uart.h>
 
 #define UART0 uart0
 #define UART1 uart1
@@ -11,6 +15,16 @@
 #define DATA_BITS 8
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
+
+void on_uart0_rx();
+
+void dispatch(uint32_t v) {
+    if ((v & MSG) == MSG_RX) {
+        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
+        rx(b);
+        free(b);
+    }
+}
 
 void setup_uart() {
     uart_init(UART0, 2400);
@@ -23,10 +37,33 @@ void setup_uart() {
     uart_set_format(UART0, DATA_BITS, STOP_BITS, PARITY);
     uart_set_fifo_enabled(UART0, false);
 
-    // irq_set_exclusive_handler(UART0_IRQ, on_uart0_rx);
-    // irq_set_enabled(UART0_IRQ, true);
-    //
-    // uart_set_irq_enables(UART0, true, false);
+    irq_set_exclusive_handler(UART0_IRQ, on_uart0_rx);
+    irq_set_enabled(UART0_IRQ, true);
+
+    uart_set_irq_enables(UART0, true, false);
+}
+
+void on_uart0_rx() {
+    char buffer[32];
+    int ix = 0;
+
+    while (uart_is_readable(UART0) && ix < sizeof(buffer)) {
+        buffer[ix++] = uart_getc(UART0);
+    }
+
+    if (ix > 0) {
+        char *b;
+
+        if ((b = calloc(ix + 1, 1)) != NULL) {
+            memmove(b, buffer, ix);
+            uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
+            if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+                free(b);
+            }
+        }
+
+        ix = 0;
+    }
 }
 
 void blink() {

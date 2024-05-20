@@ -17,6 +17,8 @@ pico_sdk_init()
 add_executable(breakout
   src/main.c
   src/sys.c
+  src/uart.c
+  src/cli.c
   src/hwconfig.c
 )
 
