@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <PCAL6408APW.h>
+
 void exec(char *cmd) {
     char s[128];
 
-    snprintf(s, sizeof(s), "%s", cmd);
-    printf("\n---- %s\n", s);
+    if (strncasecmp(cmd, "x", 1) == 0) {
+        initU3();
+    }
 }

@@ -20,6 +20,7 @@ add_executable(breakout
   src/uart.c
   src/cli.c
   src/hwconfig.c
+  src/PCAL6408APW.c
 )
 
 target_include_directories(breakout 
@@ -37,4 +38,5 @@ pico_add_extra_outputs(breakout)
 target_link_libraries(
     breakout 
     pico_stdlib
+    hardware_i2c
 )

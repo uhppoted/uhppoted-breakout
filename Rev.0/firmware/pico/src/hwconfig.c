@@ -30,5 +30,6 @@ const uint GPIO_28 = 28; // Pico 34
 
 const uint UART0_TX = GPIO_0; // Pico 1
 const uint UART0_RX = GPIO_1; // Pico 2
-const uint UART1_TX = GPIO_4; // Pico 6
-const uint UART1_RX = GPIO_5; // Pico 7
+
+const uint I2C0_SDA = GPIO_4;
+const uint I2C0_SCL = GPIO_5;
