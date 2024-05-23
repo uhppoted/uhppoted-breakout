@@ -1,15 +1,23 @@
 # TODO
 
 ## Rev.0
-   - [ ] Fix schematic for RP2040 Tiny (https://www.waveshare.com/rp2040-tiny.htm)
+   - [x] Fix schematic for RP2040 Tiny (https://www.waveshare.com/rp2040-tiny.htm)
    - [x] mouser.ca
    - [x] Fix RP2040Z symbol + footprint
    - [x] Fix RX8900SA footprint
    - [x] README images
    - [x] BOM
    - [ ] Bring-up checklist
-   - [ ] Firmware
+
+### log
                
+### CLI
+    - [ ] debug
+    - [ ] get-time
+    - [ ] set-time
+
+### RX8900SA
+    - [ ] Defer setup with alarm timer
 
 ## R&D
 - [ ] Document pin voltage levels

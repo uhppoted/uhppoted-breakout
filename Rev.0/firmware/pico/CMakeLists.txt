@@ -19,7 +19,9 @@ add_executable(breakout
   src/sys.c
   src/uart.c
   src/cli.c
+  src/log.c
   src/hwconfig.c
+  src/I2C0.c
   src/PCAL6408APW.c
   src/RX8900SA.c
 )

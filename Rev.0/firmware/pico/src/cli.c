@@ -8,6 +8,6 @@ void exec(char *cmd) {
     char s[128];
 
     if (strncasecmp(cmd, "x", 1) == 0) {
-        initU5();
+        RX8900SA_init();
     }
 }

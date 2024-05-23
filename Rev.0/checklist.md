@@ -1,5 +1,17 @@
 # Checklist
 
+## J3
+- [ ] short circuit
+- [ ] resistance to GND
+
+## J4
+- [ ] short circuit
+- [ ] resistance to GND
+
+## J5
+- [ ] short circuit
+- [ ] resistance to GND
+
 ## J10
 
 - [x] short circuits
@@ -75,3 +87,12 @@
 - [x] GND
 - [x] +5V
 - [ ] +3.3V
+
+## U5
+
+- [x] short circuits
+- [x] GND
+- [x] +3.3V
+- [x] VBAT
+- [x] SCL
+- [x] SDA

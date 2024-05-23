@@ -4,6 +4,8 @@
 #include <pico/binary_info.h>
 #include <pico/stdlib.h>
 
+#include <I2C0.h>
+#include <RX8900SA.h>
 #include <breakout.h>
 #include <sys.h>
 
@@ -25,6 +27,11 @@ int main() {
     queue_init(&queue, sizeof(uint32_t), 64);
     setup_uart();
     alarm_pool_init_default();
+
+    // ... initialise RX8900SA
+
+    I2C0_init();
+    // RX8900SA_init();
 
     // ... run loop
 

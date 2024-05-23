@@ -3,114 +3,306 @@
 #include <hardware/i2c.h>
 #include <pico/stdlib.h>
 
+#include <I2C0.h>
 #include <PCAL6408APW.h>
-#include <breakout.h>
+#include <log.h>
 
+// RX8900SA I2C address
 const uint8_t U5 = 0x64;
-const uint8_t U5_READ = 0x01;
-const uint8_t U5_WRITE = 0x00;
 
-const uint8_t EXTENSION = 0x0d;
-const uint8_t FLAG = 0x0d;
-const uint8_t CONTROL = 0x0f;
+// RX8900SA registers
+const uint8_t SECOND = 0x10;
+const uint8_t MINUTE = 0x11;
+const uint8_t HOUR = 0x12;
+const uint8_t WEEKDAY = 0x13;
+const uint8_t DAY = 0x14;
+const uint8_t MONTH = 0x15;
+const uint8_t YEAR = 0x16;
+const uint8_t RAM = 0x07;
+const uint8_t ALARM_MINUTE = 0x08;
+const uint8_t ALARM_HOUR = 0x09;
+const uint8_t ALARM_DAY = 0x0a;
+const uint8_t TEMPERATURE = 0x17;
+const uint8_t BACKUP = 0x18;
+const uint8_t TIMER0 = 0x1b;
+const uint8_t TIMER1 = 0x1c;
+const uint8_t EXTENSION = 0x1d;
+const uint8_t FLAG = 0x1e;
+const uint8_t CONTROL = 0x1f;
+const uint32_t tSTA = 3 * 1000; // 3s
 
-void initU5() {
-    printf("--- INIT U5\n");
+// FLAG register bits
+const uint8_t VDET = 0x01;
+const uint8_t VLF = 0x02;
+const uint8_t AF = 0x08;
+const uint8_t TF = 0x10;
+const uint8_t UF = 0x20;
 
-    // // ... test SCL/SDA
-    // uint pin = I2C0_SDA;
-    //
-    // gpio_init(pin);
-    // gpio_set_dir(pin, GPIO_OUT);
-    //
-    // while (true) {
-    //     printf("OFF\n");
-    //     gpio_put(pin, 0);
-    //     sleep_ms(2500);
-    //     printf("ON\n");
-    //     gpio_put(pin, 1);
-    //     sleep_ms(2500);
-    // }
+// ALARM register bits
+const uint8_t ALARM_OFF = 0x00;
+const uint8_t ALARM_ON = 0x80;
 
-    // ... setup I2C0
-    i2c_init(i2c0, 100 * 1000); // 100kHz
+// EXTENSION register bits
+const uint8_t ALARM_DAILY = 0x40;
+const uint8_t ALARM_WEEKDAY = 0x00;
+const uint8_t UPDATE_SECOND = 0x00;
+const uint8_t UPDATE_MINUTE = 0x20;
+const uint8_t TIMER_ENABLED = 0x00;
+const uint8_t TIMER_DISABLE = 0x10;
+const uint8_t FREQ_DEFAULT = 0x00; // 32768
+const uint8_t FREQ_1024 = 0x0c;
+const uint8_t FREQ_1 = 0x08;
+const uint8_t FREQ_32768 = 0x0c;
+const uint8_t TICK_4096 = 0x00;
+const uint8_t TICK_64 = 0x01;
+const uint8_t TICK_SECOND = 0x02;
+const uint8_t TICK_MINUTE = 0x03;
 
-    gpio_set_function(I2C0_SDA, GPIO_FUNC_I2C);
-    gpio_set_function(I2C0_SCL, GPIO_FUNC_I2C);
-    gpio_pull_up(I2C0_SDA);
-    gpio_pull_up(I2C0_SCL);
+// FLAG register
 
-    // ... reset RX8900SA
-    printf("... reset RX8900SA\n");
+// CONTROL register
+const uint8_t COMPENSATE_05 = 0x00;
+const uint8_t COMPENSATE_2 = 0x40;
+const uint8_t COMPENSATE_10 = 0x80;
+const uint8_t COMPENSATE_30 = 0xc0;
+const uint8_t INTERRUPT_DISABLED = 0x00;
+const uint8_t INTERRUPT_ENABLED = 0x20;
+const uint8_t TIMER_INTERRUPT_DISABLED = 0x00;
+const uint8_t TIMER_INTERRUPT_ENABLED = 0x10;
+const uint8_t ALARM_INTERRUPT_DISABLED = 0x00;
+const uint8_t ALARM_INTERRUPT_ENABLED = 0x08;
+const uint8_t RESET = 0x01;
+const uint8_t NO_RESET = 0x00;
 
-    sleep_ms(1000);
+// weekdays
+const uint8_t SUNDAY = 0x01;
+const uint8_t MONDAY = 0x02;
+const uint8_t TUESDAY = 0x04;
+const uint8_t WEDNESDAY = 0x08;
+const uint8_t THURSDAY = 0x10;
+const uint8_t FRIDAY = 0x20;
+const uint8_t SATURDAY = 0x40;
 
-    int err = i2c_write_blocking(i2c0, (U5 >> 1) | U5_WRITE, &EXTENSION, 1, true);
-    uint8_t data = 0x08;
+// months
+const uint8_t JANUARY = 0x01;
+const uint8_t FEBRUARY = 0x02;
+const uint8_t MARCH = 0x03;
+const uint8_t APRIL = 0x04;
+const uint8_t MAY = 0x05;
+const uint8_t JUNE = 0x06;
+const uint8_t JULY = 0x07;
+const uint8_t AUGUST = 0x08;
+const uint8_t SEPTEMBER = 0x09;
+const uint8_t OCTOBER = 0x10;
+const uint8_t NOVEMBER = 0x011;
+const uint8_t DECEMBER = 0x012;
 
-    if (err == PICO_ERROR_GENERIC) {
-        printf("   ... command EXTENSION err:%d (PICO_ERROR_GENERIC)\n", err);
-    } else if (err == PICO_ERROR_TIMEOUT) {
-        printf("   ... command EXTENSION err:%d (PICO_ERROR_TIMEOUT)\n", err);
-    } else {
-        printf("   ... command EXTENSION ok:%d\n", err);
+// function prototypes
+void RX8900SA_setup();
+
+/*
+ * Retrieves the RX8900SA FLAG register and initialises all registers if the VLF
+ * bit is set.
+ */
+void RX8900SA_init() {
+    infof("RX8900SA", "init");
+
+    int err;
+    uint8_t flag;
+
+    sleep_us(1000);
+
+    for (int i = 0; i < 15; i++) {
+        uint8_t seconds;
+        if ((err = I2C0_read(U5, SECOND, &seconds)) < 1) {
+            warnf("RX8900SA", "SECOND read error:%d", err);
+        } else {
+            debugf("RX8900SA", "seconds: %x", seconds);
+        }
+
+        sleep_ms(500);
     }
 
-    err = i2c_write_blocking(i2c0, (U5 >> 1) | U5_WRITE, &data, 1, false);
-    if (err == PICO_ERROR_GENERIC) {
-        printf("   ... write   EXTENSION err:%d (PICO_ERROR_GENERIC)\n", err);
-    } else if (err == PICO_ERROR_TIMEOUT) {
-        printf("   ... write   EXTENSION err:%d (PICO_ERROR_TIMEOUT)\n", err);
+    if ((err = I2C0_read(U5, FLAG, &flag)) < 1) {
+        warnf("RX8900SA", "FLAG read error:%d", err);
     } else {
-        printf("   ... write   EXTENSION ok:%d %02x\n", err, data);
+        debugf("RX8900SA", "FLAG:%02x", flag);
+        debugf("RX8900SA", "     VDET:%d", (flag & VDET) == VDET, err);
+        debugf("RX8900SA", "     VLF: %d", (flag & VLF) == VLF, err);
+        debugf("RX8900SA", "     AF:  %d", (flag & AF) == AF, err);
+        debugf("RX8900SA", "     TF:  %d", (flag & TF) == TF, err);
+        debugf("RX8900SA", "     UF:  %d", (flag & UF) == UF, err);
+
+        if ((flag & VLF) == VLF) {
+            // // ... control
+            // uint8_t csel = COMPENSATE_2;
+            // uint8_t uie = INTERRUPT_DISABLED;
+            // uint8_t tie = TIMER_INTERRUPT_DISABLED;
+            // uint8_t aie = ALARM_INTERRUPT_DISABLED;
+            // uint8_t reset = RESET;
+
+            // if ((err = I2C0_write(U5, CONTROL, csel | uie | tie | aie | reset)) < 1) {
+            //     warnf("RX8900SA", "CONTROL write error:%d", err);
+            // }
+
+            sleep_ms(tSTA); // FIXME use alarm timer
+            RX8900SA_setup();
+        }
     }
 
-    err = i2c_write_blocking(i2c0, (U5 >> 1) | U5_WRITE, &FLAG, 1, true);
-    data = 0x00;
+    sleep_us(1000);
 
-    if (err == PICO_ERROR_GENERIC) {
-        printf("   ... command FLAG err:%d (PICO_ERROR_GENERIC)\n", err);
-    } else if (err == PICO_ERROR_TIMEOUT) {
-        printf("   ... command FLAG err:%d (PICO_ERROR_TIMEOUT)\n", err);
-    } else {
-        printf("   ... command FLAG ok:%d\n", err);
+    for (int i = 0; i < 15; i++) {
+        uint8_t seconds;
+        if ((err = I2C0_read(U5, SECOND, &seconds)) < 1) {
+            warnf("RX8900SA", "SECOND read error:%d", err);
+        } else {
+            debugf("RX8900SA", "seconds: %x", seconds);
+        }
+
+        sleep_ms(500);
+    }
+}
+
+/*
+ * Sets all RX8900SA registers to known values:
+ *
+ */
+void RX8900SA_setup() {
+    debugf("RX8900SA", "setup");
+
+    int err;
+
+    // ... date/time
+    uint8_t year = 0x24; // BCD
+    uint8_t month = MAY;
+    uint8_t day = 0x12;    // BCD
+    uint8_t hour = 0x12;   // BCD
+    uint8_t minute = 0x34; // BCD
+    uint8_t second = 0x56; // BCD
+    uint8_t weekday = THURSDAY;
+
+    if ((err = I2C0_write(U5, SECOND, second)) < 1) {
+        warnf("RX8900SA", "SECONDS write error:%d", err);
     }
 
-    err = i2c_write_blocking(i2c0, (U5 >> 1) | U5_WRITE, &data, 1, false);
-    if (err == PICO_ERROR_GENERIC) {
-        printf("   ... write   FLAG err:%d (PICO_ERROR_GENERIC)\n", err);
-    } else if (err == PICO_ERROR_TIMEOUT) {
-        printf("   ... write   FLAG err:%d (PICO_ERROR_TIMEOUT)\n", err);
-    } else {
-        printf("   ... write   FLAG ok:%d %02x\n", err, data);
+    sleep_us(10);
+
+    if ((err = I2C0_write(U5, MINUTE, minute)) < 1) {
+        warnf("RX8900SA", "MINUTES write error:%d", err);
     }
 
-    err = i2c_write_blocking(i2c0, (U5 >> 1) | U5_WRITE, &CONTROL, 1, true);
-    data = 0x00;
+    sleep_us(10);
 
-    if (err == PICO_ERROR_GENERIC) {
-        printf("   ... command CONTROL err:%d (PICO_ERROR_GENERIC)\n", err);
-    } else if (err == PICO_ERROR_TIMEOUT) {
-        printf("   ... command CONTROL err:%d (PICO_ERROR_TIMEOUT)\n", err);
-    } else {
-        printf("   ... command CONTROL ok:%d\n", err);
+    if ((err = I2C0_write(U5, HOUR, hour)) < 1) {
+        warnf("RX8900SA", "HOURS write error:%d", err);
     }
 
-    err = i2c_write_blocking(i2c0, (U5 >> 1) | U5_WRITE, &data, 1, false);
-    if (err == PICO_ERROR_GENERIC) {
-        printf("   ... write   CONTROL err:%d (PICO_ERROR_GENERIC)\n", err);
-    } else if (err == PICO_ERROR_TIMEOUT) {
-        printf("   ... write   CONTROL err:%d (PICO_ERROR_TIMEOUT)\n", err);
-    } else {
-        printf("   ... write   CONTROL ok:%d %02x\n", err, data);
+    sleep_us(10);
+
+    if ((err = I2C0_write(U5, DAY, day)) < 1) {
+        warnf("RX8900SA", "DAY write error:%d", err);
     }
 
-    // err = i2c_read_blocking(i2c0, U5 | U5_READ, &data, 1, false);
-    // if (err == PICO_ERROR_GENERIC) {
-    //     printf("   ... read    FLAG err:%d (PICO_ERROR_GENERIC)\n", err);
-    // } else if (err == PICO_ERROR_TIMEOUT) {
-    //     printf("   ... read    FLAG err:%d (PICO_ERROR_TIMEOUT)\n", err);
-    // } else {
-    //     printf("   ... read    FLAG ok:%d %02x\n", err, data);
-    // }
+    sleep_us(10);
+
+    if ((err = I2C0_write(U5, MONTH, month)) < 1) {
+        warnf("RX8900SA", "MONTH write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    if ((err = I2C0_write(U5, YEAR, year)) < 1) {
+        warnf("RX8900SA", "YEAR write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    if ((err = I2C0_write(U5, WEEKDAY, weekday)) < 1) {
+        warnf("RX8900SA", "WEEKDAY write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    if ((err = I2C0_write(U5, RAM, 0x00)) < 1) {
+        warnf("RX8900SA", "RAM write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    // ... alarm
+    uint8_t alarm_enable = ALARM_OFF;
+    uint8_t alarm_minute = 0x00;  // BCD
+    uint8_t alarm_hour = 0x00;    // BCD
+    uint8_t alarm_weekday = 0x00; // BCD
+
+    if ((err = I2C0_write(U5, ALARM_MINUTE, alarm_enable | alarm_minute)) < 1) {
+        warnf("RX8900SA", "ALARM MINUTE write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    if ((err = I2C0_write(U5, ALARM_HOUR, alarm_enable | alarm_hour)) < 1) {
+        warnf("RX8900SA", "ALARM HOUR write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    // ... timers
+    uint8_t timer0 = 0xff;
+    uint8_t timer1 = 0x0f;
+
+    if ((err = I2C0_write(U5, TIMER0, timer0)) < 1) {
+        warnf("RX8900SA", "TIMER 0 write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    if ((err = I2C0_write(U5, TIMER1, timer1)) < 1) {
+        warnf("RX8900SA", "TIMER 1 write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    // ... extension
+    uint8_t alarm = ALARM_DAILY;
+    uint8_t update = UPDATE_SECOND;
+    uint8_t timer = TIMER_DISABLE;
+    uint8_t freq = FREQ_1;
+    uint8_t tick = TICK_SECOND;
+
+    if ((err = I2C0_write(U5, EXTENSION, alarm | update | timer | freq | tick)) < 1) {
+        warnf("RX8900SA", "EXTENSION write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    // ... flag
+    uint8_t vdet = 0x00;
+    uint8_t vlf = 0x00;
+    uint8_t uf = 0x00;
+    uint8_t tf = 0x00;
+    uint8_t af = 0x00;
+
+    if ((err = I2C0_write(U5, FLAG, af | tf | uf | vlf | vdet)) < 1) {
+        warnf("RX8900SA", "FLAG write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    // ... control
+    uint8_t csel = COMPENSATE_2;
+    uint8_t uie = INTERRUPT_DISABLED;
+    uint8_t tie = TIMER_INTERRUPT_DISABLED;
+    uint8_t aie = ALARM_INTERRUPT_DISABLED;
+    uint8_t reset = NO_RESET;
+
+    if ((err = I2C0_write(U5, CONTROL, csel | uie | tie | aie | reset)) < 1) {
+        warnf("RX8900SA", "CONTROL write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    // ... all done
+    infof("RX8900SA", "setup/done");
 }

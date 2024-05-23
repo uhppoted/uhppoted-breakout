@@ -1,3 +1,3 @@
 #pragma once
 
-extern void initU5();
+extern void RX8900SA_init();
