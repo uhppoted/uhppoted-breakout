@@ -74,6 +74,16 @@ const uint8_t ALARM_INTERRUPT_ENABLED = 0x08;
 const uint8_t RESET = 0x01;
 const uint8_t NO_RESET = 0x00;
 
+// BACKUP register
+const uint8_t BACKUP_DISABLED = 0x08;
+const uint8_t BACKUP_ENABLED = 0x00;
+const uint8_t BACKUP_SWITCH = 0x00;
+const uint8_t BACKUP_DIODE = 0x04;
+const uint8_t VDET_2MS = 0x00;
+const uint8_t VDET_16MS = 0x01;
+const uint8_t VDET_128MS = 0x02;
+const uint8_t VDET_256MS = 0x03;
+
 // weekdays
 const uint8_t SUNDAY = 0x01;
 const uint8_t MONDAY = 0x02;
@@ -108,20 +118,22 @@ void RX8900SA_init() {
     infof("RX8900SA", "init");
 
     int err;
-    uint8_t flag;
 
     sleep_us(1000);
 
-    for (int i = 0; i < 15; i++) {
-        uint8_t seconds;
-        if ((err = I2C0_read(U5, SECOND, &seconds)) < 1) {
-            warnf("RX8900SA", "SECOND read error:%d", err);
-        } else {
-            debugf("RX8900SA", "seconds: %x", seconds);
-        }
+    // ... reset RX8900SA
+    uint8_t csel = COMPENSATE_2;
+    uint8_t uie = INTERRUPT_DISABLED;
+    uint8_t tie = TIMER_INTERRUPT_DISABLED;
+    uint8_t aie = ALARM_INTERRUPT_DISABLED;
+    uint8_t reset = RESET;
 
-        sleep_ms(500);
+    if ((err = I2C0_write(U5, CONTROL, csel | uie | tie | aie | reset)) < 1) {
+        warnf("RX8900SA", "CONTROL write error:%d", err);
     }
+
+    // ... check VLF
+    uint8_t flag;
 
     if ((err = I2C0_read(U5, FLAG, &flag)) < 1) {
         warnf("RX8900SA", "FLAG read error:%d", err);
@@ -134,16 +146,6 @@ void RX8900SA_init() {
         debugf("RX8900SA", "     UF:  %d", (flag & UF) == UF, err);
 
         if ((flag & VLF) == VLF) {
-            // // ... control
-            // uint8_t csel = COMPENSATE_2;
-            // uint8_t uie = INTERRUPT_DISABLED;
-            // uint8_t tie = TIMER_INTERRUPT_DISABLED;
-            // uint8_t aie = ALARM_INTERRUPT_DISABLED;
-            // uint8_t reset = RESET;
-
-            // if ((err = I2C0_write(U5, CONTROL, csel | uie | tie | aie | reset)) < 1) {
-            //     warnf("RX8900SA", "CONTROL write error:%d", err);
-            // }
 
             sleep_ms(tSTA); // FIXME use alarm timer
             RX8900SA_setup();
@@ -151,17 +153,6 @@ void RX8900SA_init() {
     }
 
     sleep_us(1000);
-
-    for (int i = 0; i < 15; i++) {
-        uint8_t seconds;
-        if ((err = I2C0_read(U5, SECOND, &seconds)) < 1) {
-            warnf("RX8900SA", "SECOND read error:%d", err);
-        } else {
-            debugf("RX8900SA", "seconds: %x", seconds);
-        }
-
-        sleep_ms(500);
-    }
 }
 
 /*
@@ -176,7 +167,7 @@ void RX8900SA_setup() {
     // ... date/time
     uint8_t year = 0x24; // BCD
     uint8_t month = MAY;
-    uint8_t day = 0x12;    // BCD
+    uint8_t day = 0x23;    // BCD
     uint8_t hour = 0x12;   // BCD
     uint8_t minute = 0x34; // BCD
     uint8_t second = 0x56; // BCD
@@ -248,6 +239,12 @@ void RX8900SA_setup() {
 
     sleep_us(10);
 
+    if ((err = I2C0_write(U5, ALARM_DAY, alarm_enable | alarm_weekday)) < 1) {
+        warnf("RX8900SA", "ALARM DAILY/WEEKDAY write error:%d", err);
+    }
+
+    sleep_us(10);
+
     // ... timers
     uint8_t timer0 = 0xff;
     uint8_t timer1 = 0x0f;
@@ -299,6 +296,17 @@ void RX8900SA_setup() {
 
     if ((err = I2C0_write(U5, CONTROL, csel | uie | tie | aie | reset)) < 1) {
         warnf("RX8900SA", "CONTROL write error:%d", err);
+    }
+
+    sleep_us(10);
+
+    // ... battery backup
+    uint8_t vbat = BACKUP_ENABLED;
+    uint8_t swoff = BACKUP_SWITCH;
+    uint8_t bksmp = VDET_2MS;
+
+    if ((err = I2C0_write(U5, BACKUP, vbat | swoff | bksmp)) < 1) {
+        warnf("RX8900SA", "BACKUP write error:%d", err);
     }
 
     sleep_us(10);

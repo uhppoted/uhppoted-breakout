@@ -7,9 +7,14 @@
 4. Use smaller (2.0mm?) board-to-board connectors (J2,J3,J4)
 5. Allow for external 3.3V
 6. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
-7. Tie RX8900SA FOE pin low through resistor
-8. Expose RX8900SA FOUT pin via test point/pad and resistor
-9. Expose RX8900SA INT  pin via test point/pad and resistor
+
+### RX8900SA
+1. Diode and resistor to VBAT
+2. Jumper VBAT to VDD for no battery option
+3. Decoupling capacitor on VBAT
+4. Tie FOE pin low through resistor
+5. Expose FOUT pin via test point/pad and resistor
+6. Expose INT  pin via test point/pad and resistor
 
 ## JLPCB
 1. Solder stencil does not require BAT1 and U1 pads (large enough to hand solder).
