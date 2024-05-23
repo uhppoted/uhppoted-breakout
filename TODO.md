@@ -9,6 +9,7 @@
    - [x] BOM
    - [ ] Bring-up checklist
    - [ ] Firmware
+               
 
 ## R&D
 - [ ] Document pin voltage levels

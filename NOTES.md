@@ -27,3 +27,6 @@
 18. https://nats.io
 19. https://store.particle.io/collections/all-products/products/photon-2
 20. https://youtu.be/RrUyS-gixWk?si=QhU_jPk8qZ5NfyuA
+
+## RX8900SA
+1. https://github.com/citriena/RX8900RTC/blob/master/src/RX8900RTC.cpp

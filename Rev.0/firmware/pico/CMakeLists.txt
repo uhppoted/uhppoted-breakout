@@ -21,6 +21,7 @@ add_executable(breakout
   src/cli.c
   src/hwconfig.c
   src/PCAL6408APW.c
+  src/RX8900SA.c
 )
 
 target_include_directories(breakout 

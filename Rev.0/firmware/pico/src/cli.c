@@ -2,11 +2,12 @@
 #include <string.h>
 
 #include <PCAL6408APW.h>
+#include <RX8900SA.h>
 
 void exec(char *cmd) {
     char s[128];
 
     if (strncasecmp(cmd, "x", 1) == 0) {
-        initU3();
+        initU5();
     }
 }
