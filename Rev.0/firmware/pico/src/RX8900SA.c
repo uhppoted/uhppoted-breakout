@@ -7,10 +7,10 @@
 #include <PCAL6408APW.h>
 #include <log.h>
 
-// RX8900SA I2C address
-const uint8_t U5 = 0x64;
-
 // RX8900SA registers
+const uint8_t TIME = 0x10;
+const uint8_t DATE = 0x14;
+
 const uint8_t SECOND = 0x10;
 const uint8_t MINUTE = 0x11;
 const uint8_t HOUR = 0x12;
@@ -108,18 +108,54 @@ const uint8_t NOVEMBER = 0x011;
 const uint8_t DECEMBER = 0x012;
 
 // function prototypes
-void RX8900SA_setup();
+int RX8900SA_reset(uint8_t addr);
+int RX8900SA_setup(uint8_t addr);
+uint8_t bcd(uint8_t N);
 
 /*
  * Retrieves the RX8900SA FLAG register and initialises all registers if the VLF
  * bit is set.
  */
-void RX8900SA_init() {
-    infof("RX8900SA", "init");
+void RX8900SA_init(uint8_t addr) {
+    infof("RX8900SA", "%02x  init", addr);
 
     int err;
 
     sleep_us(1000);
+    if ((err = RX8900SA_reset(addr)) != 0) {
+        warnf("RX8900SA", "%02x  reset errror (%d)", addr, err);
+    }
+
+    // ... check VLF
+    uint8_t flag;
+
+    if ((err = I2C0_read(addr, FLAG, &flag)) < 1) {
+        warnf("RX8900SA", "%02x  FLAG read error:%d", addr, err);
+    } else {
+        debugf("RX8900SA", "%02x  FLAG:%02x", addr, flag);
+        debugf("RX8900SA", "%02x       VDET:%d", addr, (flag & VDET) == VDET, err);
+        debugf("RX8900SA", "%02x       VLF: %d", addr, (flag & VLF) == VLF, err);
+        debugf("RX8900SA", "%02x       AF:  %d", addr, (flag & AF) == AF, err);
+        debugf("RX8900SA", "%02x       TF:  %d", addr, (flag & TF) == TF, err);
+        debugf("RX8900SA", "     UF:  %d", addr, (flag & UF) == UF, err);
+
+        if ((flag & VLF) == VLF) {
+
+            sleep_ms(tSTA); // FIXME use alarm timer
+            RX8900SA_setup(addr);
+        }
+    }
+
+    sleep_us(1000);
+}
+
+/*
+ * Resets the RX8900SA.
+ */
+int RX8900SA_reset(uint8_t addr) {
+    infof("RX8900SA", "%02x  reset", addr);
+
+    int err;
 
     // ... reset RX8900SA
     uint8_t csel = COMPENSATE_2;
@@ -128,38 +164,21 @@ void RX8900SA_init() {
     uint8_t aie = ALARM_INTERRUPT_DISABLED;
     uint8_t reset = RESET;
 
-    if ((err = I2C0_write(U5, CONTROL, csel | uie | tie | aie | reset)) < 1) {
-        warnf("RX8900SA", "CONTROL write error:%d", err);
-    }
-
-    // ... check VLF
-    uint8_t flag;
-
-    if ((err = I2C0_read(U5, FLAG, &flag)) < 1) {
-        warnf("RX8900SA", "FLAG read error:%d", err);
-    } else {
-        debugf("RX8900SA", "FLAG:%02x", flag);
-        debugf("RX8900SA", "     VDET:%d", (flag & VDET) == VDET, err);
-        debugf("RX8900SA", "     VLF: %d", (flag & VLF) == VLF, err);
-        debugf("RX8900SA", "     AF:  %d", (flag & AF) == AF, err);
-        debugf("RX8900SA", "     TF:  %d", (flag & TF) == TF, err);
-        debugf("RX8900SA", "     UF:  %d", (flag & UF) == UF, err);
-
-        if ((flag & VLF) == VLF) {
-
-            sleep_ms(tSTA); // FIXME use alarm timer
-            RX8900SA_setup();
-        }
+    if ((err = I2C0_write(addr, CONTROL, csel | uie | tie | aie | reset)) != 1) {
+        warnf("RX8900SA", "%02x  CONTROL write error:%d", addr, err);
+        return -1;
     }
 
     sleep_us(1000);
+
+    return 0;
 }
 
 /*
  * Sets all RX8900SA registers to known values:
  *
  */
-void RX8900SA_setup() {
+int RX8900SA_setup(uint8_t addr) {
     debugf("RX8900SA", "setup");
 
     int err;
@@ -173,50 +192,50 @@ void RX8900SA_setup() {
     uint8_t second = 0x56; // BCD
     uint8_t weekday = THURSDAY;
 
-    if ((err = I2C0_write(U5, SECOND, second)) < 1) {
-        warnf("RX8900SA", "SECONDS write error:%d", err);
+    if ((err = I2C0_write(addr, SECOND, second)) < 1) {
+        warnf("RX8900SA", "%02x  SECONDS write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, MINUTE, minute)) < 1) {
-        warnf("RX8900SA", "MINUTES write error:%d", err);
+    if ((err = I2C0_write(addr, MINUTE, minute)) < 1) {
+        warnf("RX8900SA", "%02x  MINUTES write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, HOUR, hour)) < 1) {
-        warnf("RX8900SA", "HOURS write error:%d", err);
+    if ((err = I2C0_write(addr, HOUR, hour)) < 1) {
+        warnf("RX8900SA", "%02x  HOURS write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, DAY, day)) < 1) {
-        warnf("RX8900SA", "DAY write error:%d", err);
+    if ((err = I2C0_write(addr, DAY, day)) < 1) {
+        warnf("RX8900SA", "%02x  DAY write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, MONTH, month)) < 1) {
-        warnf("RX8900SA", "MONTH write error:%d", err);
+    if ((err = I2C0_write(addr, MONTH, month)) < 1) {
+        warnf("RX8900SA", "%02x  MONTH write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, YEAR, year)) < 1) {
-        warnf("RX8900SA", "YEAR write error:%d", err);
+    if ((err = I2C0_write(addr, YEAR, year)) < 1) {
+        warnf("RX8900SA", "%02x  YEAR write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, WEEKDAY, weekday)) < 1) {
-        warnf("RX8900SA", "WEEKDAY write error:%d", err);
+    if ((err = I2C0_write(addr, WEEKDAY, weekday)) < 1) {
+        warnf("RX8900SA", "%02x  WEEKDAY write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, RAM, 0x00)) < 1) {
-        warnf("RX8900SA", "RAM write error:%d", err);
+    if ((err = I2C0_write(addr, RAM, 0x00)) < 1) {
+        warnf("RX8900SA", "%02x  RAM write error:%d", addr, err);
     }
 
     sleep_us(10);
@@ -227,20 +246,20 @@ void RX8900SA_setup() {
     uint8_t alarm_hour = 0x00;    // BCD
     uint8_t alarm_weekday = 0x00; // BCD
 
-    if ((err = I2C0_write(U5, ALARM_MINUTE, alarm_enable | alarm_minute)) < 1) {
-        warnf("RX8900SA", "ALARM MINUTE write error:%d", err);
+    if ((err = I2C0_write(addr, ALARM_MINUTE, alarm_enable | alarm_minute)) < 1) {
+        warnf("RX8900SA", "%02x  ALARM MINUTE write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, ALARM_HOUR, alarm_enable | alarm_hour)) < 1) {
-        warnf("RX8900SA", "ALARM HOUR write error:%d", err);
+    if ((err = I2C0_write(addr, ALARM_HOUR, alarm_enable | alarm_hour)) < 1) {
+        warnf("RX8900SA", "%02x  ALARM HOUR write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, ALARM_DAY, alarm_enable | alarm_weekday)) < 1) {
-        warnf("RX8900SA", "ALARM DAILY/WEEKDAY write error:%d", err);
+    if ((err = I2C0_write(addr, ALARM_DAY, alarm_enable | alarm_weekday)) < 1) {
+        warnf("RX8900SA", "%02x  ALARM DAILY/WEEKDAY write error:%d", addr, err);
     }
 
     sleep_us(10);
@@ -249,14 +268,14 @@ void RX8900SA_setup() {
     uint8_t timer0 = 0xff;
     uint8_t timer1 = 0x0f;
 
-    if ((err = I2C0_write(U5, TIMER0, timer0)) < 1) {
-        warnf("RX8900SA", "TIMER 0 write error:%d", err);
+    if ((err = I2C0_write(addr, TIMER0, timer0)) < 1) {
+        warnf("RX8900SA", "%02x  TIMER 0 write error:%d", addr, err);
     }
 
     sleep_us(10);
 
-    if ((err = I2C0_write(U5, TIMER1, timer1)) < 1) {
-        warnf("RX8900SA", "TIMER 1 write error:%d", err);
+    if ((err = I2C0_write(addr, TIMER1, timer1)) < 1) {
+        warnf("RX8900SA", "%02x  TIMER 1 write error:%d", addr, err);
     }
 
     sleep_us(10);
@@ -268,8 +287,8 @@ void RX8900SA_setup() {
     uint8_t freq = FREQ_1;
     uint8_t tick = TICK_SECOND;
 
-    if ((err = I2C0_write(U5, EXTENSION, alarm | update | timer | freq | tick)) < 1) {
-        warnf("RX8900SA", "EXTENSION write error:%d", err);
+    if ((err = I2C0_write(addr, EXTENSION, alarm | update | timer | freq | tick)) < 1) {
+        warnf("RX8900SA", "%02x  EXTENSION write error:%d", addr, err);
     }
 
     sleep_us(10);
@@ -281,8 +300,8 @@ void RX8900SA_setup() {
     uint8_t tf = 0x00;
     uint8_t af = 0x00;
 
-    if ((err = I2C0_write(U5, FLAG, af | tf | uf | vlf | vdet)) < 1) {
-        warnf("RX8900SA", "FLAG write error:%d", err);
+    if ((err = I2C0_write(addr, FLAG, af | tf | uf | vlf | vdet)) < 1) {
+        warnf("RX8900SA", "%02x  FLAG write error:%d", addr, err);
     }
 
     sleep_us(10);
@@ -294,8 +313,8 @@ void RX8900SA_setup() {
     uint8_t aie = ALARM_INTERRUPT_DISABLED;
     uint8_t reset = NO_RESET;
 
-    if ((err = I2C0_write(U5, CONTROL, csel | uie | tie | aie | reset)) < 1) {
-        warnf("RX8900SA", "CONTROL write error:%d", err);
+    if ((err = I2C0_write(addr, CONTROL, csel | uie | tie | aie | reset)) < 1) {
+        warnf("RX8900SA", "%02x  CONTROL write error:%d", addr, err);
     }
 
     sleep_us(10);
@@ -305,12 +324,104 @@ void RX8900SA_setup() {
     uint8_t swoff = BACKUP_SWITCH;
     uint8_t bksmp = VDET_2MS;
 
-    if ((err = I2C0_write(U5, BACKUP, vbat | swoff | bksmp)) < 1) {
-        warnf("RX8900SA", "BACKUP write error:%d", err);
+    if ((err = I2C0_write(addr, BACKUP, vbat | swoff | bksmp)) < 1) {
+        warnf("RX8900SA", "%02x  BACKUP write error:%d", addr, err);
     }
 
     sleep_us(10);
 
     // ... all done
-    infof("RX8900SA", "setup/done");
+    infof("RX8900SA", "%02x  setup/done", addr);
+
+    return 0;
+}
+
+void RX8900SA_get_date(uint8_t addr, char yymmmdd[11]) {
+    uint8_t date[3];
+    int err;
+
+    if ((err = I2C0_read_all(addr, DATE, date, 3)) != 3) {
+        warnf("RX8900SA", "%02x  DATE read error:%d", addr, err);
+
+        snprintf(yymmmdd, 11, "2000-01-01");
+    } else {
+        uint8_t year = date[2];
+        uint8_t month = date[1];
+        uint8_t day = date[0];
+
+        snprintf(yymmmdd, 11, "20%02x-%02x-%02x", year, month, day);
+    }
+}
+
+void RX8900SA_set_date(uint8_t addr, uint16_t year, uint8_t month, uint8_t day) {
+    int err;
+    uint8_t yy = bcd(year % 100);
+    uint8_t mm = bcd(month);
+    uint8_t dd = bcd(day);
+    uint8_t date[] = {dd, mm, yy};
+
+    if ((err = I2C0_write_all(addr, DATE, date, 3)) != 3) {
+        warnf("RX8900SA", "%02x  DATE write error:%d", addr, err);
+    }
+}
+
+void RX8900SA_get_time(uint8_t addr, char HHmmss[9]) {
+    uint8_t time[3];
+    int err;
+
+    if ((err = I2C0_read_all(addr, TIME, time, 3)) != 3) {
+        warnf("RX8900SA", "%02x  TIME read error:%d", addr, err);
+
+        snprintf(HHmmss, 9, "00:00:00");
+    } else {
+        uint8_t hour = time[2];
+        uint8_t minute = time[1];
+        uint8_t second = time[0];
+
+        snprintf(HHmmss, 9, "%02x:%02x:%02x", hour, minute, second);
+    }
+}
+
+void RX8900SA_set_time(uint8_t addr, uint8_t hour, uint8_t minute, uint8_t second) {
+    int err;
+    uint8_t hh = bcd(hour);
+    uint8_t mm = bcd(minute);
+    uint8_t ss = bcd(second);
+    uint8_t time[] = {ss, mm, hh};
+
+    if ((err = I2C0_write_all(addr, TIME, time, 3)) != 3) {
+        warnf("RX8900SA", "%02x  TIME write error:%d", addr, err);
+    }
+}
+
+void RX8900SA_debug(uint8_t addr) {
+    int err;
+    uint8_t flags;
+    uint8_t byte = 0x00;
+
+    if ((err = I2C0_read(addr, FLAG, &flags)) != 1) {
+        warnf("RX8900SA", "%02x FLAG read error:%d", addr, err);
+    }
+
+    sleep_us(10);
+    debugf("RX8900SA", "debug  FLAGS:%02x", flags);
+
+    if ((err = I2C0_write(addr, FLAG, byte)) != 0) {
+        warnf("RX8900SA", "%02x FLAG write error:%d", addr, err);
+    }
+
+    sleep_us(10);
+
+    if ((err = I2C0_read(addr, FLAG, &flags)) != 1) {
+        warnf("RX8900SA", "%02x FLAG read error:%d", addr, err);
+    }
+
+    sleep_us(10);
+    debugf("RX8900SA", "debug  FLAGS:%02x", flags);
+}
+
+uint8_t bcd(uint8_t N) {
+    uint8_t v = N % 100;
+
+    return ((v / 10) << 4) | (v % 10);
 }

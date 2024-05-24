@@ -35,3 +35,6 @@ const uint I2C0_SDA = GPIO_8;
 const uint I2C0_SCL = GPIO_9;
 
 const uint U3_RESET = GPIO_14;
+
+// RX8900SA
+const uint8_t U5 = 0x64; // I2C address

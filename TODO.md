@@ -12,12 +12,19 @@
 ### log
                
 ### CLI
-    - [ ] debug
-    - [ ] get-time
-    - [ ] set-time
+    - [x] debug
+    - [x] get/set-time
+    - [x] get/set-date
+    - [ ] get/set-datetime
 
 ### RX8900SA
     - [ ] Defer setup with alarm timer
+    - [ ] Rework setup to initialise registers as a block
+    - [ ] reset
+    - [x] get/set-time
+    - [x] get/set-date
+    - [ ] get/set-datetime
+    - [ ] get/set-weekday
 
 ## R&D
 - [ ] Document pin voltage levels

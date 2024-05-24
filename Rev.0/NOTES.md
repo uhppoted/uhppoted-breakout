@@ -9,12 +9,12 @@
 6. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
 
 ### RX8900SA
-1. Diode and resistor to VBAT
-2. Jumper VBAT to VDD for no battery option
-3. Decoupling capacitor on VBAT
-4. Tie FOE pin low through resistor
-5. Expose FOUT pin via test point/pad and resistor
-6. Expose INT  pin via test point/pad and resistor
+1. Jumper VBAT to VDD for no battery option
+2. Decoupling capacitor on VBAT
+3. (?) Diode and resistor to VBAT
+4. (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
+5. (?) Expose FOUT pin via test point/pad and resistor
+6. (?) Expose INT  pin via test point/pad and resistor
 
 ## JLPCB
 1. Solder stencil does not require BAT1 and U1 pads (large enough to hand solder).
