@@ -23,20 +23,18 @@ int main() {
     stdio_init_all();
     setup_uart();
 
+    printf(">> BREAKOUT %s\n", VERSION);
+
     // ... initialise FIFO, UART and timers
     queue_init(&queue, sizeof(uint32_t), 64);
     setup_uart();
     alarm_pool_init_default();
 
-    // ... initialise RX8900SA
-
+    // ... initialise RTC
     I2C0_init();
-    // RX8900SA_init(U5);
+    RX8900SA_init(U5);
 
     // ... run loop
-
-    printf(">> BREAKOUT %s\n", VERSION);
-
     while (true) {
         uint32_t v;
         queue_remove_blocking(&queue, &v);

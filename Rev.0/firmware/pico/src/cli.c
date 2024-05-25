@@ -33,7 +33,7 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    RX8900SA_debug(U5);
+    RX8900SA_init(U5);
 }
 
 void get_date() {

@@ -16,15 +16,20 @@
     - [x] get/set-time
     - [x] get/set-date
     - [ ] get/set-datetime
+    - [ ] get/set-weekday
+    - [ ] reset RTC
 
 ### RX8900SA
     - [ ] Defer setup with alarm timer
-    - [ ] Rework setup to initialise registers as a block
-    - [ ] reset
+    - [x] Rework setup to initialise registers as a block
     - [x] get/set-time
     - [x] get/set-date
     - [ ] get/set-datetime
     - [ ] get/set-weekday
+    - [ ] reset
+    - [ ] ready
+    - [ ] wrap in RTC.c
+    - [ ] compile in backup mode
 
 ## R&D
 - [ ] Document pin voltage levels

@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-#include <hardware/i2c.h>
 #include <pico/stdlib.h>
 
 #include <I2C0.h>
@@ -8,6 +7,7 @@
 #include <log.h>
 
 // RX8900SA registers
+const uint8_t BASE = 0x00;
 const uint8_t TIME = 0x10;
 const uint8_t DATE = 0x14;
 
@@ -29,7 +29,6 @@ const uint8_t TIMER1 = 0x1c;
 const uint8_t EXTENSION = 0x1d;
 const uint8_t FLAG = 0x1e;
 const uint8_t CONTROL = 0x1f;
-const uint32_t tSTA = 3 * 1000; // 3s
 
 // FLAG register bits
 const uint8_t VDET = 0x01;
@@ -49,12 +48,12 @@ const uint8_t UPDATE_SECOND = 0x00;
 const uint8_t UPDATE_MINUTE = 0x20;
 const uint8_t TIMER_ENABLED = 0x00;
 const uint8_t TIMER_DISABLE = 0x10;
-const uint8_t FREQ_DEFAULT = 0x00; // 32768
-const uint8_t FREQ_1024 = 0x0c;
-const uint8_t FREQ_1 = 0x08;
-const uint8_t FREQ_32768 = 0x0c;
-const uint8_t TICK_4096 = 0x00;
-const uint8_t TICK_64 = 0x01;
+const uint8_t FREQ_DEFAULT = 0x00; // 32768Hz
+const uint8_t FREQ_1024Hz = 0x0c;
+const uint8_t FREQ_1Hz = 0x08;
+const uint8_t FREQ_32768Hz = 0x0c;
+const uint8_t TICK_4096Hz = 0x00;
+const uint8_t TICK_64Hz = 0x01;
 const uint8_t TICK_SECOND = 0x02;
 const uint8_t TICK_MINUTE = 0x03;
 
@@ -107,6 +106,9 @@ const uint8_t OCTOBER = 0x10;
 const uint8_t NOVEMBER = 0x011;
 const uint8_t DECEMBER = 0x012;
 
+// other
+const uint32_t tSTA = 3 * 1000; // 3s (max. stabilisation time)
+
 // function prototypes
 int RX8900SA_reset(uint8_t addr);
 int RX8900SA_setup(uint8_t addr);
@@ -119,14 +121,8 @@ uint8_t bcd(uint8_t N);
 void RX8900SA_init(uint8_t addr) {
     infof("RX8900SA", "%02x  init", addr);
 
-    int err;
-
-    sleep_us(1000);
-    if ((err = RX8900SA_reset(addr)) != 0) {
-        warnf("RX8900SA", "%02x  reset errror (%d)", addr, err);
-    }
-
     // ... check VLF
+    int err;
     uint8_t flag;
 
     if ((err = I2C0_read(addr, FLAG, &flag)) < 1) {
@@ -137,16 +133,16 @@ void RX8900SA_init(uint8_t addr) {
         debugf("RX8900SA", "%02x       VLF: %d", addr, (flag & VLF) == VLF, err);
         debugf("RX8900SA", "%02x       AF:  %d", addr, (flag & AF) == AF, err);
         debugf("RX8900SA", "%02x       TF:  %d", addr, (flag & TF) == TF, err);
-        debugf("RX8900SA", "     UF:  %d", addr, (flag & UF) == UF, err);
+        debugf("RX8900SA", "%02x       UF:  %d", addr, (flag & UF) == UF, err);
 
-        if ((flag & VLF) == VLF) {
-
+        if ((flag & VLF) != VLF) {
+            infof("RX8900SA", "%02x  power on ok", addr);
+        } else {
+            warnf("RX8900SA", "%02x  power on VLF set", addr);
             sleep_ms(tSTA); // FIXME use alarm timer
             RX8900SA_setup(addr);
         }
     }
-
-    sleep_us(1000);
 }
 
 /*
@@ -169,7 +165,9 @@ int RX8900SA_reset(uint8_t addr) {
         return -1;
     }
 
-    sleep_us(1000);
+    // ... reinitialise
+    sleep_ms(tSTA); // FIXME use alarm timer
+    RX8900SA_setup(addr);
 
     return 0;
 }
@@ -182,153 +180,42 @@ int RX8900SA_setup(uint8_t addr) {
     debugf("RX8900SA", "setup");
 
     int err;
+    uint8_t extension = ALARM_WEEKDAY | UPDATE_MINUTE | TIMER_DISABLE | FREQ_1Hz | TICK_SECOND;
+    uint8_t flags = 0x00;
+    uint8_t control = COMPENSATE_2 | INTERRUPT_DISABLED | TIMER_INTERRUPT_DISABLED | ALARM_INTERRUPT_DISABLED | NO_RESET;
+    uint8_t data[] = {
+        0x00,             // second
+        0x00,             // minute
+        0x00,             // hour
+        MONDAY,           // weekday
+        0x01,             // day
+        JANUARY,          // month
+        24,               // year
+        0x00,             // RAM
+        ALARM_OFF | 0x00, // alarm: enable + minute
+        ALARM_OFF | 0x00, // alarm: enable + hour
+        ALARM_OFF | 0x00, // alarm: enable + weekday
+        0x00,             // timer 0
+        0x00,             // timer 1
+        extension,        // WADA | USEL | TE | FSEL | TSEL
+        flags,            // UF | TF | AF | VLF | VDET
+        control           // CSEL | UIE | TIE | AIE | RESET
+    };
 
-    // ... date/time
-    uint8_t year = 0x24; // BCD
-    uint8_t month = MAY;
-    uint8_t day = 0x23;    // BCD
-    uint8_t hour = 0x12;   // BCD
-    uint8_t minute = 0x34; // BCD
-    uint8_t second = 0x56; // BCD
-    uint8_t weekday = THURSDAY;
-
-    if ((err = I2C0_write(addr, SECOND, second)) < 1) {
-        warnf("RX8900SA", "%02x  SECONDS write error:%d", addr, err);
+    if ((err = I2C0_write_all(addr, BASE, data, 16)) != 16) {
+        warnf("RX8900SA", "%02x  setup write error:%d", addr, err);
+        return err;
     }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, MINUTE, minute)) < 1) {
-        warnf("RX8900SA", "%02x  MINUTES write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, HOUR, hour)) < 1) {
-        warnf("RX8900SA", "%02x  HOURS write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, DAY, day)) < 1) {
-        warnf("RX8900SA", "%02x  DAY write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, MONTH, month)) < 1) {
-        warnf("RX8900SA", "%02x  MONTH write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, YEAR, year)) < 1) {
-        warnf("RX8900SA", "%02x  YEAR write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, WEEKDAY, weekday)) < 1) {
-        warnf("RX8900SA", "%02x  WEEKDAY write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, RAM, 0x00)) < 1) {
-        warnf("RX8900SA", "%02x  RAM write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    // ... alarm
-    uint8_t alarm_enable = ALARM_OFF;
-    uint8_t alarm_minute = 0x00;  // BCD
-    uint8_t alarm_hour = 0x00;    // BCD
-    uint8_t alarm_weekday = 0x00; // BCD
-
-    if ((err = I2C0_write(addr, ALARM_MINUTE, alarm_enable | alarm_minute)) < 1) {
-        warnf("RX8900SA", "%02x  ALARM MINUTE write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, ALARM_HOUR, alarm_enable | alarm_hour)) < 1) {
-        warnf("RX8900SA", "%02x  ALARM HOUR write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, ALARM_DAY, alarm_enable | alarm_weekday)) < 1) {
-        warnf("RX8900SA", "%02x  ALARM DAILY/WEEKDAY write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    // ... timers
-    uint8_t timer0 = 0xff;
-    uint8_t timer1 = 0x0f;
-
-    if ((err = I2C0_write(addr, TIMER0, timer0)) < 1) {
-        warnf("RX8900SA", "%02x  TIMER 0 write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_write(addr, TIMER1, timer1)) < 1) {
-        warnf("RX8900SA", "%02x  TIMER 1 write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    // ... extension
-    uint8_t alarm = ALARM_DAILY;
-    uint8_t update = UPDATE_SECOND;
-    uint8_t timer = TIMER_DISABLE;
-    uint8_t freq = FREQ_1;
-    uint8_t tick = TICK_SECOND;
-
-    if ((err = I2C0_write(addr, EXTENSION, alarm | update | timer | freq | tick)) < 1) {
-        warnf("RX8900SA", "%02x  EXTENSION write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    // ... flag
-    uint8_t vdet = 0x00;
-    uint8_t vlf = 0x00;
-    uint8_t uf = 0x00;
-    uint8_t tf = 0x00;
-    uint8_t af = 0x00;
-
-    if ((err = I2C0_write(addr, FLAG, af | tf | uf | vlf | vdet)) < 1) {
-        warnf("RX8900SA", "%02x  FLAG write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    // ... control
-    uint8_t csel = COMPENSATE_2;
-    uint8_t uie = INTERRUPT_DISABLED;
-    uint8_t tie = TIMER_INTERRUPT_DISABLED;
-    uint8_t aie = ALARM_INTERRUPT_DISABLED;
-    uint8_t reset = NO_RESET;
-
-    if ((err = I2C0_write(addr, CONTROL, csel | uie | tie | aie | reset)) < 1) {
-        warnf("RX8900SA", "%02x  CONTROL write error:%d", addr, err);
-    }
-
-    sleep_us(10);
 
     // ... battery backup
-    uint8_t vbat = BACKUP_ENABLED;
+    uint8_t vbat = BACKUP_DISABLED;
     uint8_t swoff = BACKUP_SWITCH;
     uint8_t bksmp = VDET_2MS;
 
     if ((err = I2C0_write(addr, BACKUP, vbat | swoff | bksmp)) < 1) {
         warnf("RX8900SA", "%02x  BACKUP write error:%d", addr, err);
+        return err;
     }
-
-    sleep_us(10);
 
     // ... all done
     infof("RX8900SA", "%02x  setup/done", addr);
