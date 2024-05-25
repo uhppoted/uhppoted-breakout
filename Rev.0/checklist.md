@@ -79,7 +79,14 @@
 - [x] short circuits
 - [x] GND
 - [x] +5V
-- [ ] 3.3V
+- [x] 3.3V
+
+## U2
+
+- [x] short circuits
+- [x] GND
+- [x] +5V
+- [x] +3.3V
 
 ## U3
 
