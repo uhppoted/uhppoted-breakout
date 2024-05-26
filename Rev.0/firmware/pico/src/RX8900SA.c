@@ -165,9 +165,7 @@ int RX8900SA_reset(uint8_t addr) {
         return -1;
     }
 
-    // ... reinitialise
     sleep_ms(tSTA); // FIXME use alarm timer
-    RX8900SA_setup(addr);
 
     return 0;
 }
@@ -190,7 +188,7 @@ int RX8900SA_setup(uint8_t addr) {
         MONDAY,           // weekday
         0x01,             // day
         JANUARY,          // month
-        24,               // year
+        0x24,             // year
         0x00,             // RAM
         ALARM_OFF | 0x00, // alarm: enable + minute
         ALARM_OFF | 0x00, // alarm: enable + hour
@@ -279,32 +277,6 @@ void RX8900SA_set_time(uint8_t addr, uint8_t hour, uint8_t minute, uint8_t secon
     if ((err = I2C0_write_all(addr, TIME, time, 3)) != 3) {
         warnf("RX8900SA", "%02x  TIME write error:%d", addr, err);
     }
-}
-
-void RX8900SA_debug(uint8_t addr) {
-    int err;
-    uint8_t flags;
-    uint8_t byte = 0x00;
-
-    if ((err = I2C0_read(addr, FLAG, &flags)) != 1) {
-        warnf("RX8900SA", "%02x FLAG read error:%d", addr, err);
-    }
-
-    sleep_us(10);
-    debugf("RX8900SA", "debug  FLAGS:%02x", flags);
-
-    if ((err = I2C0_write(addr, FLAG, byte)) != 0) {
-        warnf("RX8900SA", "%02x FLAG write error:%d", addr, err);
-    }
-
-    sleep_us(10);
-
-    if ((err = I2C0_read(addr, FLAG, &flags)) != 1) {
-        warnf("RX8900SA", "%02x FLAG read error:%d", addr, err);
-    }
-
-    sleep_us(10);
-    debugf("RX8900SA", "debug  FLAGS:%02x", flags);
 }
 
 uint8_t bcd(uint8_t N) {

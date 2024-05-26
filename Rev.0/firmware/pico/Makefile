@@ -9,7 +9,9 @@ clean:
 	       cmake ..
 
 format: src/*.c
-	clang-format -i src/*.c
+	clang-format -i src/*.c         include/*.h
+	clang-format -i ../core/src/*.c ../core/include/*.h
+	clang-format -i ../lib/src/*.c  ../lib/include/*.h
 
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make

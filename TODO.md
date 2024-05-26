@@ -17,19 +17,23 @@
     - [x] get/set-date
     - [ ] get/set-datetime
     - [ ] get/set-weekday
-    - [ ] reset RTC
+    - [x] reset RTC
+
+### U2 PCAL6408APW
+    - [ ] init
 
 ### RX8900SA
     - [ ] Defer setup with alarm timer
     - [x] Rework setup to initialise registers as a block
     - [x] get/set-time
     - [x] get/set-date
+          - Zeller's congruence for weekday
     - [ ] get/set-datetime
-    - [ ] get/set-weekday
-    - [ ] reset
+    - [x] reset
+    - [x] initialise
     - [ ] ready
-    - [ ] wrap in RTC.c
-    - [ ] compile in backup mode
+    - [x] wrap in RTC.c
+    - [ ] backup mode compile flag
 
 ## R&D
 - [ ] Document pin voltage levels

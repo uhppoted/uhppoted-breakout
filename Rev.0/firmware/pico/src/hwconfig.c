@@ -33,8 +33,10 @@ const uint UART0_RX = GPIO_1; // Pico 2
 
 const uint I2C0_SDA = GPIO_8;
 const uint I2C0_SCL = GPIO_9;
+const uint I2C1_SDA = GPIO_2;
+const uint I2C1_SCL = GPIO_3;
 
-const uint U3_RESET = GPIO_14;
-
-// RX8900SA
-const uint8_t U5 = 0x64; // I2C address
+const uint IOX_RESET = GPIO_14;
+const uint8_t U2 = 0x40; // U2 PCAL6408A I2C address
+const uint8_t U3 = 0x42; // U3 PCAL6408A I2C address
+const uint8_t U5 = 0x64; // U5 RX8900SA  I2C address

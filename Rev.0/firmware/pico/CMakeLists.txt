@@ -9,8 +9,8 @@ set(CMAKE_C_STANDARD   11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
-# set(CORE "../../../core")
-# set(COMMON "../../common")
+set(CORE "../core")
+set(LIB  "../lib")
 
 pico_sdk_init()
 
@@ -19,16 +19,22 @@ add_executable(breakout
   src/sys.c
   src/uart.c
   src/cli.c
-  src/log.c
   src/hwconfig.c
   src/I2C0.c
   src/PCAL6408APW.c
   src/RX8900SA.c
+
+  ${CORE}/src/I2C1.c
+  ${CORE}/src/RTC.c
+  ${CORE}/src/log.c
+
+  ${LIB}/src/I2C.c
 )
 
 target_include_directories(breakout 
    PRIVATE include
    PRIVATE ${CORE}/include
+   PRIVATE ${LIB}/include
 )
 
 pico_set_program_name(breakout "uhppoted-breakout")

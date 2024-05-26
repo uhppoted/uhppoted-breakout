@@ -6,11 +6,6 @@
 #include <PCAL6408APW.h>
 #include <breakout.h>
 
-const uint8_t U2 = 0x40;
-const uint8_t U3 = 0x42;
-// const uint8_t READ = 0x01;
-// const uint8_t WRITE = 0x00;
-
 const uint8_t INPUT = 0x00;
 const uint8_t OUTPUT = 0x01;
 const uint8_t POLARITY = 0x02;
@@ -19,14 +14,14 @@ const uint8_t CONFIGURATION = 0x03;
 void initU3() {
     printf("--- INIT U3\n");
 
-    // ... reset
-    gpio_init(U3_RESET);
-    gpio_set_dir(U3_RESET, GPIO_OUT);
+    // // ... reset
+    // gpio_init(U3_RESET);
+    // gpio_set_dir(U3_RESET, GPIO_OUT);
 
-    gpio_put(U3_RESET, 0);
-    sleep_us(5);
-    gpio_put(U3_RESET, 1);
-    sleep_us(10);
+    // gpio_put(U3_RESET, 0);
+    // sleep_us(5);
+    // gpio_put(U3_RESET, 1);
+    // sleep_us(10);
 
     // // ... read INPUT port
 
