@@ -111,8 +111,6 @@ const uint8_t DECEMBER = 0x012;
 const uint32_t tSTA = 3 * 1000; // 3s (max. stabilisation time)
 
 // function prototypes
-int RX8900SA_reset(uint8_t addr);
-int RX8900SA_setup(uint8_t addr);
 uint8_t bcd(uint8_t N);
 
 /*

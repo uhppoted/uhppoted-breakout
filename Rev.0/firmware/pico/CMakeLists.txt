@@ -21,7 +21,6 @@ add_executable(breakout
   src/cli.c
   src/hwconfig.c
   src/I2C0.c
-  src/PCAL6408APW.c
 
   ${CORE}/src/I2C1.c
   ${CORE}/src/RTC.c
@@ -30,6 +29,7 @@ add_executable(breakout
 
   ${LIB}/src/I2C.c
   ${LIB}/src/RX8900SA.c
+  ${LIB}/src/PCAL6408APW.c
 )
 
 target_include_directories(breakout 

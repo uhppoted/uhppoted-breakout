@@ -4,12 +4,14 @@
 #include <I2C0.h>
 #include <I2C1.h>
 #include <RTC.h>
+#include <U2.h>
 
 void get_date();
 void set_date();
 void get_time();
 void set_time();
 void reset();
+void scan();
 void help();
 void debug();
 
@@ -26,8 +28,10 @@ void exec(char *cmd) {
         get_time();
     } else if (strncasecmp(cmd, "set time", 8) == 0) {
         set_time();
-    } else if (strncasecmp(cmd, "reset", 8) == 0) {
+    } else if (strncasecmp(cmd, "reset", 5) == 0) {
         reset();
+    } else if (strncasecmp(cmd, "scan", 4) == 0) {
+        scan();
     } else if (strncasecmp(cmd, "help", 4) == 0) {
         help();
     } else if (strncasecmp(cmd, "x", 1) == 0) {
@@ -36,8 +40,7 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    I2C0_scan();
-    I2C1_scan();
+    U2_debug();
 }
 
 void reset() {
@@ -74,6 +77,11 @@ void set_time() {
     uint8_t second = 56;
 
     RTC_set_time(hour, minute, second);
+}
+
+void scan() {
+    I2C0_scan();
+    I2C1_scan();
 }
 
 void help() {

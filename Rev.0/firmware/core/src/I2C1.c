@@ -16,6 +16,18 @@ void I2C1_init() {
     gpio_pull_up(I2C1_SCL);
 }
 
+int I2C1_write(uint8_t addr, uint8_t reg, uint8_t data) {
+    return I2C_write(i2c1, addr, reg, data);
+}
+
+int I2C1_write_all(uint8_t addr, uint8_t reg, uint8_t data[], int N) {
+    return I2C_write_all(i2c1, addr, reg, data, N);
+}
+
+int I2C1_read(uint8_t addr, uint8_t reg, uint8_t *data) {
+    return I2C_read(i2c1, addr, reg, data);
+}
+
 void I2C1_scan() {
     I2C_scan(i2c1, "I2C1 bus scan");
 }

@@ -33,7 +33,8 @@
     - [x] initialise
     - [ ] ready
     - [x] wrap in RTC.c
-    - [ ] backup mode compile flag
+    - [ ] handle initialisation sequence in RTC_init
+    - [ ] backup mode compile flags
 
 ## R&D
 - [ ] Document pin voltage levels

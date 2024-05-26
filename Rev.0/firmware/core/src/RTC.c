@@ -12,6 +12,8 @@
  */
 void RTC_init() {
     infof("RTC", "init");
+
+    RX8900SA_init(U5);
 }
 
 /*
