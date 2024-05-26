@@ -25,6 +25,7 @@ add_executable(breakout
   ${CORE}/src/I2C1.c
   ${CORE}/src/RTC.c
   ${CORE}/src/U2.c
+  ${CORE}/src/IOX.c
   ${CORE}/src/log.c
 
   ${LIB}/src/I2C.c

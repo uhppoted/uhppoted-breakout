@@ -11,6 +11,8 @@ extern const uint I2C1_SDA;
 extern const uint I2C1_SCL;
 
 extern const uint IOX_RESET;
+extern const uint IOX_INT0;
+
 extern const uint8_t U2;
 extern const uint8_t U3;
 extern const uint8_t U5;

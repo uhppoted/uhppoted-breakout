@@ -6,8 +6,8 @@
 
 #include <I2C0.h>
 #include <I2C1.h>
+#include <IOX.h>
 #include <RTC.h>
-#include <U2.h>
 #include <breakout.h>
 #include <sys.h>
 
@@ -26,6 +26,8 @@ int main() {
 
     stdio_init_all();
     setup_uart();
+    I2C0_init();
+    I2C1_init();
 
     printf(">> BREAKOUT %s\n", VERSION);
 
@@ -34,22 +36,9 @@ int main() {
     setup_uart();
     alarm_pool_init_default();
 
-    I2C0_init();
-    I2C1_init();
-
-    // ... initialise RTC
-    RTC_init(U5);
-
-    // ... initialise IO expanders
-    gpio_init(IOX_RESET);
-    gpio_set_dir(IOX_RESET, GPIO_OUT);
-
-    gpio_put(IOX_RESET, 0);
-    sleep_us(5);
-    gpio_put(IOX_RESET, 1);
-    sleep_us(10);
-
-    U2_init();
+    // ... initialise RTC and IO expanders
+    RTC_init();
+    IOX_init();
 
     // ... run loop
     while (true) {

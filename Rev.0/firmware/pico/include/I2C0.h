@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 extern void I2C0_init();
 extern void I2C0_scan();
 
