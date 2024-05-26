@@ -32,16 +32,19 @@ int I2C0_write(uint8_t addr, uint8_t reg, uint8_t data) {
     if ((err = i2c_write_blocking(i2c0, addr >> 1, bytes, 2, true)) != 2) {
         if (err == PICO_ERROR_GENERIC) {
             warnf("I2C0", "write addr:%02x  reg:%02x  err:%d (PICO_ERROR_GENERIC)", addr, reg, err);
-        } else if (err == PICO_ERROR_TIMEOUT) {
-            warnf("I2C0", "write addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
-        } else {
-            warnf("I2C0", "write addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+            return ERR_GENERIC;
         }
 
-        return err;
+        if (err == PICO_ERROR_TIMEOUT) {
+            warnf("I2C0", "write addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
+            return ERR_TIMEOUT;
+        }
+
+        warnf("I2C0", "write addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+        return ERR_UNKNOWN;
     }
 
-    return err - 1;
+    return 0;
 }
 
 int I2C0_write_all(uint8_t addr, uint8_t reg, uint8_t data[], int N) {
@@ -56,16 +59,19 @@ int I2C0_write_all(uint8_t addr, uint8_t reg, uint8_t data[], int N) {
     if ((err = i2c_write_blocking(i2c0, addr >> 1, bytes, N + 1, true)) != N + 1) {
         if (err == PICO_ERROR_GENERIC) {
             warnf("I2C0", "write-all addr:%02x  reg:%02x  err:%d (PICO_ERROR_GENERIC)", addr, reg, err);
-        } else if (err == PICO_ERROR_TIMEOUT) {
-            warnf("I2C0", "write-all addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
-        } else {
-            warnf("I2C0", "write-all addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+            return ERR_GENERIC;
         }
 
-        return err;
+        if (err == PICO_ERROR_TIMEOUT) {
+            warnf("I2C0", "write-all addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
+            return ERR_TIMEOUT;
+        }
+
+        warnf("I2C0", "write-all addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+        return ERR_UNKNOWN;
     }
 
-    return err - 1;
+    return 0;
 }
 
 int I2C0_read(uint8_t addr, uint8_t reg, uint8_t *data) {
@@ -76,28 +82,34 @@ int I2C0_read(uint8_t addr, uint8_t reg, uint8_t *data) {
     if ((err = i2c_write_blocking(i2c0, addr >> 1, &reg, 1, true)) != 1) {
         if (err == PICO_ERROR_GENERIC) {
             warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (PICO_ERROR_GENERIC)", addr, reg, err);
-        } else if (err == PICO_ERROR_TIMEOUT) {
-            warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
-        } else {
-            warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+            return ERR_GENERIC;
         }
 
-        return -1000;
+        if (err == PICO_ERROR_TIMEOUT) {
+            warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
+            return ERR_TIMEOUT;
+        }
+
+        warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+        return ERR_UNKNOWN;
     }
 
     if ((err = i2c_read_blocking(i2c0, addr >> 1, data, 1, false)) != 1) {
         if (err == PICO_ERROR_GENERIC) {
             warnf("I2C0", "read          reg:%02x  err:%d (PICO_ERROR_GENERIC)", reg, err);
-        } else if (err == PICO_ERROR_TIMEOUT) {
-            warnf("I2C0", "read          reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", reg, err);
-        } else {
-            warnf("I2C0", "read          reg:%02x  err:%d (UNKNOWN)", reg, err);
+            return ERR_GENERIC;
         }
 
-        return err;
+        if (err == PICO_ERROR_TIMEOUT) {
+            warnf("I2C0", "read          reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", reg, err);
+            return ERR_TIMEOUT;
+        }
+
+        warnf("I2C0", "read          reg:%02x  err:%d (UNKNOWN)", reg, err);
+        return ERR_UNKNOWN;
     }
 
-    return 1;
+    return 0;
 }
 
 int I2C0_read_all(uint8_t addr, uint8_t reg, uint8_t *data, int N) {
@@ -108,26 +120,32 @@ int I2C0_read_all(uint8_t addr, uint8_t reg, uint8_t *data, int N) {
     if ((err = i2c_write_blocking(i2c0, addr >> 1, &reg, 1, true)) != 1) {
         if (err == PICO_ERROR_GENERIC) {
             warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (PICO_ERROR_GENERIC)", addr, reg, err);
-        } else if (err == PICO_ERROR_TIMEOUT) {
-            warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
-        } else if (err < 1) {
-            warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+            return ERR_GENERIC;
         }
 
-        return -1000;
+        if (err == PICO_ERROR_TIMEOUT) {
+            warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
+            return ERR_TIMEOUT;
+        }
+
+        warnf("I2C0", "read addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+        return ERR_UNKNOWN;
     }
 
     if ((err = i2c_read_blocking(i2c0, addr >> 1, data, N, false)) != N) {
         if (err == PICO_ERROR_GENERIC) {
             warnf("I2C0", "read          reg:%02x  err:%d (PICO_ERROR_GENERIC)", reg, err);
-        } else if (err == PICO_ERROR_TIMEOUT) {
-            warnf("I2C0", "read          reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", reg, err);
-        } else {
-            warnf("I2C0", "read          reg:%02x  err:%d (UNKNOWN)", reg, err);
+            return ERR_GENERIC;
         }
 
-        return err;
+        if (err == PICO_ERROR_TIMEOUT) {
+            warnf("I2C0", "read          reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", reg, err);
+            return ERR_TIMEOUT;
+        }
+
+        warnf("I2C0", "read          reg:%02x  err:%d (UNKNOWN)", reg, err);
+        return ERR_UNKNOWN;
     }
 
-    return N;
+    return 0;
 }

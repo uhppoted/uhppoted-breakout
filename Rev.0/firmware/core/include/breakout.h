@@ -16,3 +16,8 @@ extern const uint8_t U3;
 extern const uint8_t U5;
 
 extern queue_t queue;
+
+extern const int ERR_OK;
+extern const int ERR_GENERIC;
+extern const int ERR_TIMEOUT;
+extern const int ERR_UNKNOWN;

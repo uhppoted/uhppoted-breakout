@@ -1,5 +1,11 @@
 #include "pico/types.h"
 
+// error codes
+const int ERR_OK = 0;       // OK
+const int ERR_GENERIC = -1; // PICO_ERROR_GENERIC
+const int ERR_TIMEOUT = -2; // PICO_ERROR_TIMEOUT
+const int ERR_UNKNOWN = -3;
+
 // GPIO
 const uint GPIO_0 = 0;   // Pico 1
 const uint GPIO_1 = 1;   // Pico 2
