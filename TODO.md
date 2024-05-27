@@ -10,17 +10,24 @@
    - [ ] Bring-up checklist
 
 ### log
+   - [ ] Queue log writes
                
 ### CLI
     - [x] debug
     - [x] get/set-time
     - [x] get/set-date
     - [ ] get/set-datetime
-    - [ ] get/set-weekday
     - [x] reset RTC
+    - [ ] command timeout
 
 ### U2 PCAL6408APW
-    - [ ] init
+    - [x] init
+          - [ ] set polarity, latch, etc in init
+    - [x] Queue WIO
+    - [ ] Decode Wiegand
+    - [ ] Decode keypad
+    - [ ] Continuous read 
+    - [ ] 100kHz/400kHz compile flag
 
 ### RX8900SA
     - [ ] Defer setup with alarm timer

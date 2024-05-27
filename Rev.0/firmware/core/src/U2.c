@@ -23,11 +23,11 @@ void U2_init() {
         warnf("U2", "error configuring PCAL6408APW (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_polarity(U2, 0x00)) != ERR_OK) {
+    if ((err = PCAL6408APW_set_polarity(U2, 0xff)) != ERR_OK) {
         warnf("U2", "error setting PCAL6408APW polarity (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_latched(U2, 0x00)) != ERR_OK) {
+    if ((err = PCAL6408APW_set_latched(U2, 0xff)) != ERR_OK) {
         warnf("U2", "error setting PCAL6408APW latches (%d)", err);
     }
 
@@ -48,7 +48,7 @@ void U2_init() {
     gpio_init(IOX_INT0);
     gpio_pull_up(IOX_INT0);
     gpio_add_raw_irq_handler(IOX_INT0, U2_on_interrupt);
-    gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_EDGE_FALL, true);
+    gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, true);
 
     irq_set_enabled(IO_IRQ_BANK0, true);
 }
@@ -65,7 +65,11 @@ void U2_on_interrupt(void) {
             warnf("U2", "error reading PCAL6408APW inputs (%d)", err);
         }
 
-        infof("U2", "... %02x %08b", inputs, inputs);
+        uint32_t msg = MSG_WIO | ((uint32_t)inputs & 0x0fffffff);
+
+        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+            warnf("U2", "discarded  %02x %08b", inputs, inputs);
+        }
     }
 }
 

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -5,6 +6,7 @@
 #include <pico/stdlib.h>
 
 #include <breakout.h>
+#include <readers.h>
 #include <sys.h>
 #include <uart.h>
 
@@ -23,6 +25,10 @@ void dispatch(uint32_t v) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
         rx(b);
         free(b);
+    }
+
+    if ((v & MSG) == MSG_WIO) {
+        wio((uint8_t)(v & 0x0fffffff));
     }
 }
 

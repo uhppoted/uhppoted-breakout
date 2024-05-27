@@ -22,3 +22,39 @@
 
 ## Misc.
 1. Don't use flux paste on through holes (hard to clean, especially under jumpers and headers)
+
+
+## Wiegand DI1/DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... f7 11110111  0 DO1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... fb 11111011  1 DI1
+DEBUG  reader     ... fb 11111011  1 DI1
+
+10058399
+0C9C83F
+0 0110 0100 1110 0100 0001 1111 1
+
+0 0110 0100 1110 0100 0001 1111 1
+
