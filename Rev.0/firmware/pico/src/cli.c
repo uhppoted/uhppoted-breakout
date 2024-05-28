@@ -10,6 +10,7 @@ void get_date();
 void set_date();
 void get_time();
 void set_time();
+void get_weekday();
 void reset();
 void scan();
 void help();
@@ -28,6 +29,8 @@ void exec(char *cmd) {
         get_time();
     } else if (strncasecmp(cmd, "set time", 8) == 0) {
         set_time();
+    } else if (strncasecmp(cmd, "get weekday", 11) == 0) {
+        get_weekday();
     } else if (strncasecmp(cmd, "reset", 5) == 0) {
         reset();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
@@ -50,7 +53,7 @@ void reset() {
 void get_date() {
     char date[11] = {0};
 
-    RTC_get_date(date);
+    RTC_get_date(date, 11);
 
     printf(">>> DATE:%s\n", date);
 }
@@ -66,9 +69,17 @@ void set_date() {
 void get_time() {
     char time[11] = {0};
 
-    RTC_get_time(time);
+    RTC_get_time(time, 11);
 
     printf(">>> TIME:%s\n", time);
+}
+
+void get_weekday() {
+    char weekday[9] = {0};
+
+    RTC_get_dow(weekday, 9);
+
+    printf(">>> DOW:%s\n", weekday);
 }
 
 void set_time() {

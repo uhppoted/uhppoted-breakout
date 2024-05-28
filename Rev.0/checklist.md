@@ -93,7 +93,7 @@
 - [x] short circuits
 - [x] GND
 - [x] +5V
-- [ ] +3.3V
+- [x] +3.3V
 
 ## U5
 

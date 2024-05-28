@@ -311,7 +311,7 @@
     (property "Footprint" "uhppoted:RP2040Z" (at -12.7 -20.32 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Datasheet" "" (at 1.27 5.08 0)
+    (property "Datasheet" "https://www.waveshare.com/rp2040-tiny.htm" (at 24.13 -20.32 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (symbol "RP2040-TINY_0_1"

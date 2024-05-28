@@ -2,22 +2,20 @@
 
 ## Rev.0
    - [x] Fix schematic for RP2040 Tiny (https://www.waveshare.com/rp2040-tiny.htm)
-   - [x] mouser.ca
-   - [x] Fix RP2040Z symbol + footprint
-   - [x] Fix RX8900SA footprint
-   - [x] README images
-   - [x] BOM
    - [ ] Bring-up checklist
+
+### OTA
 
 ### log
    - [ ] Queue log writes
                
 ### CLI
     - [x] debug
-    - [x] get/set-time
-    - [x] get/set-date
-    - [ ] get/set-datetime
     - [x] reset RTC
+    - [x] get-dow
+    - [ ] get/set-time
+    - [ ] get/set-date
+    - [ ] get/set-datetime
     - [ ] command timeout
 
 ### U2 PCAL6408APW
@@ -29,13 +27,18 @@
     - [ ] Continuous read 
     - [ ] 100kHz/400kHz compile flag
 
-### RX8900SA
+### U2 PCAL6408APW
+    - [ ] init
+
+### RTC/RX8900SA
     - [ ] Defer setup with alarm timer
     - [x] Rework setup to initialise registers as a block
     - [x] get/set-time
     - [x] get/set-date
-          - Zeller's congruence for weekday
+    - [x] Zeller's congruence for weekday
+          - [ ] verify for all dates over the next century
     - [ ] get/set-datetime
+    - [ ] get/set-dow
     - [x] reset
     - [x] initialise
     - [ ] ready

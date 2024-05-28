@@ -111,7 +111,8 @@ const uint8_t DECEMBER = 0x012;
 const uint32_t tSTA = 3 * 1000; // 3s (max. stabilisation time)
 
 // function prototypes
-uint8_t bcd(uint8_t N);
+uint8_t dec2bcd(uint8_t N);
+uint8_t bcd2dec(uint8_t N);
 
 /*
  * Retrieves the RX8900SA FLAG register and initialises all registers if the VLF
@@ -219,7 +220,7 @@ int RX8900SA_setup(uint8_t addr) {
     return 0;
 }
 
-int RX8900SA_get_date(uint8_t addr, char yymmmdd[11]) {
+int RX8900SA_get_date(uint8_t addr, uint16_t *year, uint8_t *month, uint8_t *day) {
     uint8_t date[3];
     int err;
 
@@ -227,25 +228,23 @@ int RX8900SA_get_date(uint8_t addr, char yymmmdd[11]) {
         return err;
     }
 
-    uint8_t year = date[2];
-    uint8_t month = date[1];
-    uint8_t day = date[0];
-
-    snprintf(yymmmdd, 11, "20%02x-%02x-%02x", year, month, day);
+    *year = 2000 + bcd2dec(date[2]);
+    *month = bcd2dec(date[1]);
+    *day = bcd2dec(date[0]);
 
     return ERR_OK;
 }
 
 int RX8900SA_set_date(uint8_t addr, uint16_t year, uint8_t month, uint8_t day) {
-    uint8_t yy = bcd(year % 100);
-    uint8_t mm = bcd(month);
-    uint8_t dd = bcd(day);
+    uint8_t yy = dec2bcd(year % 100);
+    uint8_t mm = dec2bcd(month);
+    uint8_t dd = dec2bcd(day);
     uint8_t date[] = {dd, mm, yy};
 
     return I2C0_write_all(addr, DATE, date, 3);
 }
 
-int RX8900SA_get_time(uint8_t addr, char HHmmss[9]) {
+int RX8900SA_get_time(uint8_t addr, uint8_t *hour, uint8_t *minute, uint8_t *second) {
     uint8_t time[3];
     int err;
 
@@ -253,26 +252,45 @@ int RX8900SA_get_time(uint8_t addr, char HHmmss[9]) {
         return err;
     }
 
-    uint8_t hour = time[2];
-    uint8_t minute = time[1];
-    uint8_t second = time[0];
-
-    snprintf(HHmmss, 9, "%02x:%02x:%02x", hour, minute, second);
+    *hour = bcd2dec(time[2]);
+    *minute = bcd2dec(time[1]);
+    *second = bcd2dec(time[0]);
 
     return ERR_OK;
 }
 
 int RX8900SA_set_time(uint8_t addr, uint8_t hour, uint8_t minute, uint8_t second) {
-    uint8_t hh = bcd(hour);
-    uint8_t mm = bcd(minute);
-    uint8_t ss = bcd(second);
+    uint8_t hh = dec2bcd(hour);
+    uint8_t mm = dec2bcd(minute);
+    uint8_t ss = dec2bcd(second);
     uint8_t time[] = {ss, mm, hh};
 
     return I2C0_write_all(addr, TIME, time, 3);
 }
 
-uint8_t bcd(uint8_t N) {
+int RX8900SA_get_dow(uint8_t addr, uint8_t *weekday) {
+    int err;
+
+    if ((err = I2C0_read(addr, WEEKDAY, weekday)) != 0) {
+        return err;
+    }
+
+    return ERR_OK;
+}
+
+int RX8900SA_set_dow(uint8_t addr, uint8_t weekday) {
+    return I2C0_write(addr, WEEKDAY, weekday);
+}
+
+uint8_t dec2bcd(uint8_t N) {
     uint8_t v = N % 100;
 
     return ((v / 10) << 4) | (v % 10);
+}
+
+uint8_t bcd2dec(uint8_t N) {
+    uint8_t tens = (N >> 4) & 0x0f;
+    uint8_t ones = (N >> 0) & 0x0f;
+
+    return 10 * tens + ones;
 }
