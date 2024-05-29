@@ -1,5 +1,6 @@
 #pragma once
 
+#include <I2C.h>
 #include <pico/util/queue.h>
 
 extern const uint32_t MSG;
@@ -16,9 +17,9 @@ extern const uint IOX_RESET;
 extern const uint IOX_INT0;
 extern const uint IOX_INT1;
 
-extern const uint8_t U2;
-extern const uint8_t U3;
-extern const uint8_t U5;
+extern const struct I2C U2;
+extern const struct I2C U3;
+extern const struct I2C U5;
 
 extern queue_t queue;
 

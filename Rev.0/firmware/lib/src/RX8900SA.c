@@ -118,39 +118,39 @@ uint8_t bcd2dec(uint8_t N);
  * Retrieves the RX8900SA FLAG register and initialises all registers if the VLF
  * bit is set.
  */
-int RX8900SA_init(uint8_t addr) {
-    infof("RX8900SA", "%02x  init", addr);
+int RX8900SA_init(I2C dev) {
+    infof("RX8900SA", "%02x  init", dev.addr);
 
     // ... check VLF
     uint8_t flag;
     int err;
 
-    if ((err = I2C0_read(addr, FLAG, &flag)) != 0) {
-        warnf("RX8900SA", "%02x  FLAG read error:%d", addr, err);
+    if ((err = I2C_read(dev, FLAG, &flag)) != 0) {
+        warnf("RX8900SA", "%02x  FLAG read error:%d", dev.addr, err);
         return err;
     }
 
-    debugf("RX8900SA", "%02x  FLAG:%02x", addr, flag);
-    debugf("RX8900SA", "%02x       VDET:%d", addr, (flag & VDET) == VDET, err);
-    debugf("RX8900SA", "%02x       VLF: %d", addr, (flag & VLF) == VLF, err);
-    debugf("RX8900SA", "%02x       AF:  %d", addr, (flag & AF) == AF, err);
-    debugf("RX8900SA", "%02x       TF:  %d", addr, (flag & TF) == TF, err);
-    debugf("RX8900SA", "%02x       UF:  %d", addr, (flag & UF) == UF, err);
+    debugf("RX8900SA", "%02x  FLAG:%02x", dev.addr, flag);
+    debugf("RX8900SA", "%02x       VDET:%d", dev.addr, (flag & VDET) == VDET, err);
+    debugf("RX8900SA", "%02x       VLF: %d", dev.addr, (flag & VLF) == VLF, err);
+    debugf("RX8900SA", "%02x       AF:  %d", dev.addr, (flag & AF) == AF, err);
+    debugf("RX8900SA", "%02x       TF:  %d", dev.addr, (flag & TF) == TF, err);
+    debugf("RX8900SA", "%02x       UF:  %d", dev.addr, (flag & UF) == UF, err);
 
     if ((flag & VLF) != VLF) {
-        infof("RX8900SA", "%02x  power on ok", addr);
+        infof("RX8900SA", "%02x  power on ok", dev.addr);
     } else {
-        warnf("RX8900SA", "%02x  power on VLF set", addr);
+        warnf("RX8900SA", "%02x  power on VLF set", dev.addr);
         sleep_ms(tSTA); // FIXME use alarm timer
-        RX8900SA_setup(addr);
+        RX8900SA_setup(dev);
     }
 }
 
 /*
  * Resets the RX8900SA.
  */
-int RX8900SA_reset(uint8_t addr) {
-    infof("RX8900SA", "%02x  reset", addr);
+int RX8900SA_reset(I2C dev) {
+    infof("RX8900SA", "%02x  reset", dev.addr);
 
     uint8_t csel = COMPENSATE_2;
     uint8_t uie = INTERRUPT_DISABLED;
@@ -159,8 +159,8 @@ int RX8900SA_reset(uint8_t addr) {
     uint8_t reset = RESET;
     int err;
 
-    if ((err = I2C0_write(addr, CONTROL, csel | uie | tie | aie | reset)) != 0) {
-        warnf("RX8900SA", "%02x  CONTROL write error:%d", addr, err);
+    if ((err = I2C_write(dev, CONTROL, csel | uie | tie | aie | reset)) != 0) {
+        warnf("RX8900SA", "%02x  CONTROL write error:%d", dev.addr, err);
         return err;
     }
 
@@ -173,7 +173,7 @@ int RX8900SA_reset(uint8_t addr) {
  * Sets all RX8900SA registers to known values:
  *
  */
-int RX8900SA_setup(uint8_t addr) {
+int RX8900SA_setup(I2C dev) {
     debugf("RX8900SA", "setup");
 
     int err;
@@ -199,8 +199,8 @@ int RX8900SA_setup(uint8_t addr) {
         control           // CSEL | UIE | TIE | AIE | RESET
     };
 
-    if ((err = I2C0_write_all(addr, BASE, data, 16)) != 0) {
-        warnf("RX8900SA", "%02x  setup write error:%d", addr, err);
+    if ((err = I2C_write_all(dev, BASE, data, 16)) != 0) {
+        warnf("RX8900SA", "%02x  setup write error:%d", dev.addr, err);
         return err;
     }
 
@@ -209,22 +209,22 @@ int RX8900SA_setup(uint8_t addr) {
     uint8_t swoff = BACKUP_SWITCH;
     uint8_t bksmp = VDET_2MS;
 
-    if ((err = I2C0_write(addr, BACKUP, vbat | swoff | bksmp)) != 0) {
-        warnf("RX8900SA", "%02x  BACKUP write error:%d", addr, err);
+    if ((err = I2C_write(dev, BACKUP, vbat | swoff | bksmp)) != 0) {
+        warnf("RX8900SA", "%02x  BACKUP write error:%d", dev.addr, err);
         return err;
     }
 
     // ... all done
-    infof("RX8900SA", "%02x  setup/done", addr);
+    infof("RX8900SA", "%02x  setup/done", dev.addr);
 
     return 0;
 }
 
-int RX8900SA_get_date(uint8_t addr, uint16_t *year, uint8_t *month, uint8_t *day) {
+int RX8900SA_get_date(I2C dev, uint16_t *year, uint8_t *month, uint8_t *day) {
     uint8_t date[3];
     int err;
 
-    if ((err = I2C0_read_all(addr, DATE, date, 3)) != ERR_OK) {
+    if ((err = I2C_read_all(dev, DATE, date, 3)) != ERR_OK) {
         return err;
     }
 
@@ -235,20 +235,20 @@ int RX8900SA_get_date(uint8_t addr, uint16_t *year, uint8_t *month, uint8_t *day
     return ERR_OK;
 }
 
-int RX8900SA_set_date(uint8_t addr, uint16_t year, uint8_t month, uint8_t day) {
+int RX8900SA_set_date(I2C dev, uint16_t year, uint8_t month, uint8_t day) {
     uint8_t yy = dec2bcd(year % 100);
     uint8_t mm = dec2bcd(month);
     uint8_t dd = dec2bcd(day);
     uint8_t date[] = {dd, mm, yy};
 
-    return I2C0_write_all(addr, DATE, date, 3);
+    return I2C_write_all(dev, DATE, date, 3);
 }
 
-int RX8900SA_get_time(uint8_t addr, uint8_t *hour, uint8_t *minute, uint8_t *second) {
+int RX8900SA_get_time(I2C dev, uint8_t *hour, uint8_t *minute, uint8_t *second) {
     uint8_t time[3];
     int err;
 
-    if ((err = I2C0_read_all(addr, TIME, time, 3)) != 0) {
+    if ((err = I2C_read_all(dev, TIME, time, 3)) != 0) {
         return err;
     }
 
@@ -259,27 +259,27 @@ int RX8900SA_get_time(uint8_t addr, uint8_t *hour, uint8_t *minute, uint8_t *sec
     return ERR_OK;
 }
 
-int RX8900SA_set_time(uint8_t addr, uint8_t hour, uint8_t minute, uint8_t second) {
+int RX8900SA_set_time(I2C dev, uint8_t hour, uint8_t minute, uint8_t second) {
     uint8_t hh = dec2bcd(hour);
     uint8_t mm = dec2bcd(minute);
     uint8_t ss = dec2bcd(second);
     uint8_t time[] = {ss, mm, hh};
 
-    return I2C0_write_all(addr, TIME, time, 3);
+    return I2C_write_all(dev, TIME, time, 3);
 }
 
-int RX8900SA_get_dow(uint8_t addr, uint8_t *weekday) {
+int RX8900SA_get_dow(I2C dev, uint8_t *weekday) {
     int err;
 
-    if ((err = I2C0_read(addr, WEEKDAY, weekday)) != 0) {
+    if ((err = I2C_read(dev, WEEKDAY, weekday)) != 0) {
         return err;
     }
 
     return ERR_OK;
 }
 
-int RX8900SA_set_dow(uint8_t addr, uint8_t weekday) {
-    return I2C0_write(addr, WEEKDAY, weekday);
+int RX8900SA_set_dow(I2C dev, uint8_t weekday) {
+    return I2C_write(dev, WEEKDAY, weekday);
 }
 
 uint8_t dec2bcd(uint8_t N) {

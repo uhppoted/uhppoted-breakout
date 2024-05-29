@@ -1,4 +1,5 @@
-#include "pico/types.h"
+#include <I2C.h>
+#include <pico/types.h>
 
 // error codes
 const int ERR_OK = 0;       // OK
@@ -46,6 +47,20 @@ const uint IOX_RESET = GPIO_14;
 const uint IOX_INT0 = GPIO_15;
 const uint IOX_INT1 = GPIO_16;
 
-const uint8_t U2 = 0x40; // U2 PCAL6408A I2C address
-const uint8_t U3 = 0x42; // U3 PCAL6408A I2C address
-const uint8_t U5 = 0x64; // U5 RX8900SA  I2C address
+// U2 PCAL6408A
+const struct I2C U2 = {
+    .bus = i2c1,
+    .addr = 0x40,
+};
+
+// U3 PCAL6408A
+const struct I2C U3 = {
+    .bus = i2c0,
+    .addr = 0x42,
+};
+
+// U5 RX8900SA
+const struct I2C U5 = {
+    .bus = i2c0,
+    .addr = 0x64,
+};
