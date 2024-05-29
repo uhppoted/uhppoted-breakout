@@ -4,6 +4,7 @@
 #include <I2C1.h>
 #include <IOX.h>
 #include <U2.h>
+#include <U3.h>
 #include <breakout.h>
 #include <log.h>
 
@@ -19,4 +20,7 @@ void IOX_init() {
     sleep_us(10);
 
     U2_init();
+    U3_init();
+
+    irq_set_enabled(IO_IRQ_BANK0, true);
 }

@@ -28,6 +28,10 @@ int I2C1_read(uint8_t addr, uint8_t reg, uint8_t *data) {
     return I2C_read(i2c1, addr, reg, data);
 }
 
+int I2C1_read_all(uint8_t addr, uint8_t reg, uint8_t *data, int N) {
+    return I2C_read_all(i2c1, addr, reg, data, N);
+}
+
 void I2C1_scan() {
     I2C_scan(i2c1, "I2C1 bus scan");
 }

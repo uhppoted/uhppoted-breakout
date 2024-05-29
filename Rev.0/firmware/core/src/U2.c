@@ -49,8 +49,6 @@ void U2_init() {
     gpio_pull_up(IOX_INT0);
     gpio_add_raw_irq_handler(IOX_INT0, U2_on_interrupt);
     gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, true);
-
-    irq_set_enabled(IO_IRQ_BANK0, true);
 }
 
 void U2_on_interrupt(void) {

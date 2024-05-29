@@ -99,6 +99,45 @@ int I2C_read(i2c_inst_t *bus, uint8_t addr, uint8_t reg, uint8_t *data) {
     return 0;
 }
 
+// Reads a contiguous block of N bytes into the data array.
+int I2C_read_all(i2c_inst_t *bus, uint8_t addr, uint8_t reg, uint8_t *data, int N) {
+    debugf("I2C", "read-all");
+
+    int err;
+
+    if ((err = i2c_write_blocking(bus, addr >> 1, &reg, 1, true)) != 1) {
+        if (err == PICO_ERROR_GENERIC) {
+            warnf("I2C", "read addr:%02x  reg:%02x  err:%d (PICO_ERROR_GENERIC)", addr, reg, err);
+            return ERR_GENERIC;
+        }
+
+        if (err == PICO_ERROR_TIMEOUT) {
+            warnf("I2C", "read addr:%02x  reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", addr, reg, err);
+            return ERR_TIMEOUT;
+        }
+
+        warnf("I2C", "read addr:%02x  reg:%02x  err:%d (UNKNOWN)", addr, reg, err);
+        return ERR_UNKNOWN;
+    }
+
+    if ((err = i2c_read_blocking(bus, addr >> 1, data, N, false)) != N) {
+        if (err == PICO_ERROR_GENERIC) {
+            warnf("I2C", "read          reg:%02x  err:%d (PICO_ERROR_GENERIC)", reg, err);
+            return ERR_GENERIC;
+        }
+
+        if (err == PICO_ERROR_TIMEOUT) {
+            warnf("I2C", "read          reg:%02x  err:%d (PICO_ERROR_TIMEOUT)", reg, err);
+            return ERR_TIMEOUT;
+        }
+
+        warnf("I2C", "read          reg:%02x  err:%d (UNKNOWN)", reg, err);
+        return ERR_UNKNOWN;
+    }
+
+    return 0;
+}
+
 // Performs a 1-byte dummy read of all unreserved I2C addresses.
 void I2C_scan(i2c_inst_t *bus, const char *title) {
     printf("\n%s\n", title);

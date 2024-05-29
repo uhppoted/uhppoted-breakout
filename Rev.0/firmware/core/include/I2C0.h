@@ -1,9 +1,8 @@
 #pragma once
 
-#include <stdint.h>
-
 extern void I2C0_init();
 extern void I2C0_scan();
+extern void I2C0_debug();
 
 extern int I2C0_write(uint8_t addr, uint8_t reg, uint8_t data);
 extern int I2C0_write_all(uint8_t addr, uint8_t reg, uint8_t data[], int N);

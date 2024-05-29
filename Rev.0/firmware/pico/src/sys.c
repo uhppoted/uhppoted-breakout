@@ -6,6 +6,7 @@
 #include <pico/stdlib.h>
 
 #include <breakout.h>
+#include <dio.h>
 #include <readers.h>
 #include <sys.h>
 #include <uart.h>
@@ -29,6 +30,10 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_WIO) {
         wio((uint8_t)(v & 0x0fffffff));
+    }
+
+    if ((v & MSG) == MSG_INPUTS) {
+        inputs((uint8_t)(v & 0x0fffffff));
     }
 }
 

@@ -5,6 +5,7 @@
    - [ ] Bring-up checklist
 
 ### OTA
+   - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
 
 ### log
    - [ ] Queue log writes
@@ -20,15 +21,17 @@
 
 ### U2 PCAL6408APW
     - [x] init
-          - [ ] set polarity, latch, etc in init
+          - [x] set polarity, latch, etc in init
     - [x] Queue WIO
     - [ ] Decode Wiegand
     - [ ] Decode keypad
     - [ ] Continuous read 
     - [ ] 100kHz/400kHz compile flag
 
-### U2 PCAL6408APW
-    - [ ] init
+### U3 PCAL6408APW
+    - [x] init
+    - [x] Queue INPUTS
+    - [ ] LPF
 
 ### RTC/RX8900SA
     - [ ] Defer setup with alarm timer

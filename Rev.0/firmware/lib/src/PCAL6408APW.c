@@ -1,5 +1,6 @@
 #include <PCAL6408APW.h>
 
+#include <I2C0.h>
 #include <I2C1.h>
 #include <breakout.h>
 #include <log.h>
@@ -18,15 +19,33 @@ int PCAL6408APW_init(uint8_t addr) {
 }
 
 int PCAL6408APW_set_configuration(uint8_t addr, uint8_t configuration) {
-    return I2C1_write(addr, CONFIGURATION, configuration);
+    if (addr == U2) {
+        return I2C1_write(addr, CONFIGURATION, configuration);
+    } else if (addr == U3) {
+        return I2C0_write(addr, CONFIGURATION, configuration);
+    } else {
+        return ERR_UNKNOWN;
+    }
 }
 
 int PCAL6408APW_set_polarity(uint8_t addr, uint8_t polarity) {
-    return I2C1_write(addr, POLARITY, polarity);
+    if (addr == U2) {
+        return I2C1_write(addr, POLARITY, polarity);
+    } else if (addr == U3) {
+        return I2C0_write(addr, POLARITY, polarity);
+    } else {
+        return ERR_UNKNOWN;
+    }
 }
 
 int PCAL6408APW_set_latched(uint8_t addr, uint8_t latched) {
-    return I2C1_write(addr, LATCH, latched);
+    if (addr == U2) {
+        return I2C1_write(addr, LATCH, latched);
+    } else if (addr == U3) {
+        return I2C0_write(addr, LATCH, latched);
+    } else {
+        return ERR_UNKNOWN;
+    }
 }
 
 int PCAL6408APW_set_pullups(uint8_t addr, uint8_t pullups) {
@@ -36,13 +55,31 @@ int PCAL6408APW_set_pullups(uint8_t addr, uint8_t pullups) {
         0x00 // pulldowns
     };
 
-    return I2C1_write_all(addr, PULLUPS, data, 2);
+    if (addr == U2) {
+        return I2C1_write_all(addr, PULLUPS, data, 2);
+    } else if (addr == U3) {
+        return I2C0_write_all(addr, PULLUPS, data, 2);
+    } else {
+        return ERR_UNKNOWN;
+    }
 }
 
 int PCAL6408APW_set_interrupts(uint8_t addr, uint8_t interrupts) {
-    return I2C1_write(addr, INTERRUPTS, interrupts);
+    if (addr == U2) {
+        return I2C1_write(addr, INTERRUPTS, interrupts);
+    } else if (addr == U3) {
+        return I2C0_write(addr, INTERRUPTS, interrupts);
+    } else {
+        return ERR_UNKNOWN;
+    }
 }
 
 int PCAL6408APW_read(uint8_t addr, uint8_t *data) {
-    return I2C1_read(addr, INPUTS, data);
+    if (addr == U2) {
+        return I2C1_read(addr, INPUTS, data);
+    } else if (addr == U3) {
+        return I2C0_read(addr, INPUTS, data);
+    } else {
+        return ERR_UNKNOWN;
+    }
 }

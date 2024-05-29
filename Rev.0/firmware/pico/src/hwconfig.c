@@ -44,6 +44,7 @@ const uint I2C1_SCL = GPIO_3;
 
 const uint IOX_RESET = GPIO_14;
 const uint IOX_INT0 = GPIO_15;
+const uint IOX_INT1 = GPIO_16;
 
 const uint8_t U2 = 0x40; // U2 PCAL6408A I2C address
 const uint8_t U3 = 0x42; // U3 PCAL6408A I2C address

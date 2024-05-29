@@ -5,6 +5,7 @@
 #include <I2C1.h>
 #include <RTC.h>
 #include <U2.h>
+#include <U3.h>
 
 void get_date();
 void set_date();
@@ -43,7 +44,7 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    U2_debug();
+    U3_debug();
 }
 
 void reset() {
