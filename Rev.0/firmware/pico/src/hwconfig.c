@@ -59,6 +59,12 @@ const struct I2C U3 = {
     .addr = 0x42,
 };
 
+// U4 PI4IOE5V6416
+const struct I2C U4 = {
+    .bus = i2c0,
+    .addr = 0x40,
+};
+
 // U5 RX8900SA
 const struct I2C U5 = {
     .bus = i2c0,

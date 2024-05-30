@@ -9,15 +9,17 @@
 6. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
 7. (?) RESET should (maybe) be tied low to hold U2 et al in reset until U5 is ready
 8. (?) Pullup/down resistors for reader LEDs
+9. J10/J12 soldering jig
+   - 2x10P header pins
 
 ### RX8900SA
-1. Jumper VBAT to VDD for no battery option
-2. Decoupling capacitor on VBAT
-3. (?) Diode and resistor to VBAT
-4. (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
-5. (?) Expose FOUT pin via test point/pad and resistor
-6. (?) Expose INT  pin via test point/pad and resistor
-7. (?) Rechargeable battery
+1. Decoupling capacitor on VBAT
+2. Tie NC pin to GND
+3. Diode and resistor to VBAT
+4. (?) Jumper VBAT to VDD for no battery option
+5. (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
+6. (?) Expose FOUT pin via test point/pad and resistor
+7. (?) Expose INT  pin via test point/pad and resistor
 
 - https://electronics.stackexchange.com/questions/348095/coin-cell-battery-recharging-circuit-for-rtc-backup-power
 - https://electronics.stackexchange.com/questions/410853/minimalistic-rtc-backup-battery-charging-or-a-super-capacitor

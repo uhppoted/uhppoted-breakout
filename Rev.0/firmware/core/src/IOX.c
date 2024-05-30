@@ -5,6 +5,7 @@
 #include <IOX.h>
 #include <U2.h>
 #include <U3.h>
+#include <U4.h>
 #include <breakout.h>
 #include <log.h>
 
@@ -21,6 +22,7 @@ void IOX_init() {
 
     U2_init();
     U3_init();
+    U4_init();
 
     irq_set_enabled(IO_IRQ_BANK0, true);
 }

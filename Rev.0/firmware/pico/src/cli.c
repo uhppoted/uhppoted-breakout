@@ -6,6 +6,7 @@
 #include <RTC.h>
 #include <U2.h>
 #include <U3.h>
+#include <U4.h>
 
 void get_date();
 void set_date();
@@ -44,7 +45,7 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    U3_debug();
+    U4_debug();
 }
 
 void reset() {

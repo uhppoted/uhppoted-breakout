@@ -19,6 +19,7 @@ extern const uint IOX_INT1;
 
 extern const struct I2C U2;
 extern const struct I2C U3;
+extern const struct I2C U4;
 extern const struct I2C U5;
 
 extern queue_t queue;
