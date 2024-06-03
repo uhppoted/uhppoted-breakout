@@ -33,6 +33,17 @@
     - [x] Queue INPUTS
     - [ ] LPF
 
+### U4 PI4IOE5V6416
+    - [x] init
+    - [x] set/clear relay
+          - [ ] relay timer
+    - [ ] set/clear reader LED
+          - [ ] blinks
+    - [ ] set/clear SYS LED
+    - [ ] set/clear ERR LED
+    - [ ] set/clear IN LED
+
+
 ### RTC/RX8900SA
     - [ ] Defer setup with alarm timer
     - [x] Rework setup to initialise registers as a block

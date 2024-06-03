@@ -13,7 +13,8 @@ void set_date();
 void get_time();
 void set_time();
 void get_weekday();
-void set_relay(int relay, bool state);
+void set_relay(const char *relay, bool state);
+void set_LED(const char *led, bool state);
 void reset();
 void scan();
 void help();
@@ -34,22 +35,14 @@ void exec(char *cmd) {
         set_time();
     } else if (strncasecmp(cmd, "get weekday", 11) == 0) {
         get_weekday();
-    } else if (strncasecmp(cmd, "set relay 1", 11) == 0) {
-        set_relay(1, true);
-    } else if (strncasecmp(cmd, "clear relay 1", 13) == 0) {
-        set_relay(1, false);
-    } else if (strncasecmp(cmd, "set relay 2", 11) == 0) {
-        set_relay(2, true);
-    } else if (strncasecmp(cmd, "clear relay 2", 13) == 0) {
-        set_relay(2, false);
-    } else if (strncasecmp(cmd, "set relay 3", 11) == 0) {
-        set_relay(3, true);
-    } else if (strncasecmp(cmd, "clear relay 3", 13) == 0) {
-        set_relay(3, false);
-    } else if (strncasecmp(cmd, "set relay 4", 11) == 0) {
-        set_relay(4, true);
-    } else if (strncasecmp(cmd, "clear relay 4", 13) == 0) {
-        set_relay(4, false);
+    } else if (strncasecmp(cmd, "set relay ", 10) == 0) {
+        set_relay(&cmd[10], true);
+    } else if (strncasecmp(cmd, "clear relay ", 12) == 0) {
+        set_relay(&cmd[11], false);
+    } else if (strncasecmp(cmd, "set LED ", 8) == 0) {
+        set_LED(&cmd[8], true);
+    } else if (strncasecmp(cmd, "clear LED ", 10) == 0) {
+        set_LED(&cmd[10], false);
     } else if (strncasecmp(cmd, "reset", 5) == 0) {
         reset();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
@@ -58,6 +51,8 @@ void exec(char *cmd) {
         help();
     } else if (strncasecmp(cmd, "x", 1) == 0) {
         debug();
+    } else {
+        printf(">>>> WTF???? %s\n", cmd);
     }
 }
 
@@ -109,8 +104,52 @@ void set_time() {
     RTC_set_time(hour, minute, second);
 }
 
-void set_relay(int relay, bool state) {
-    U4_set_relay(relay, state);
+void set_relay(const char *cmd, bool state) {
+    int N = strlen(cmd);
+
+    if (N > 0) {
+        uint8_t relay;
+        int rc;
+
+        if ((rc = sscanf(cmd, "%u", &relay)) < 1) {
+            return;
+        } else {
+            U4_set_relay(relay, state);
+        }
+    }
+}
+
+void set_LED(const char *cmd, bool state) {
+    int N = strlen(cmd);
+
+    if (N > 0) {
+        uint8_t LED;
+        int rc;
+
+        if ((rc = sscanf(cmd, "%u", &LED)) >= 1) {
+            U4_set_LED(LED, state);
+            printf("ok\n");
+            return;
+        }
+
+        if (strncasecmp(cmd, "ERR", 3) == 0) {
+            U4_set_ERR(state);
+            printf("ok\n");
+            return;
+        }
+
+        if (strncasecmp(cmd, "IN", 2) == 0) {
+            U4_set_IN(state);
+            printf("ok\n");
+            return;
+        }
+
+        if (strncasecmp(cmd, "SYS", 3) == 0) {
+            U4_set_SYS(state);
+            printf("ok\n");
+            return;
+        }
+    }
 }
 
 void scan() {
