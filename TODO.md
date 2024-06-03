@@ -48,6 +48,7 @@
     - [x] wrap in RTC.c
     - [ ] handle initialisation sequence in RTC_init
     - [ ] backup mode compile flags
+    - [ ] store/restore date/time to PSRAM
 
 ## R&D
 - [ ] Document pin voltage levels

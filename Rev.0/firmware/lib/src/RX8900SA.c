@@ -61,10 +61,10 @@ const uint8_t TICK_MINUTE = 0x03;
 // FLAG register
 
 // CONTROL register
-const uint8_t COMPENSATE_05 = 0x00;
-const uint8_t COMPENSATE_2 = 0x40;
-const uint8_t COMPENSATE_10 = 0x80;
-const uint8_t COMPENSATE_30 = 0xc0;
+const uint8_t COMPENSATE_05S = 0x00; // 0.5s temperature compensation interval
+const uint8_t COMPENSATE_2S = 0x40;  // 2s temperature compensation interval (default)
+const uint8_t COMPENSATE_10S = 0x80; // 10s temperature compensation interval
+const uint8_t COMPENSATE_30S = 0xc0; // 302 temperature compensation interval
 const uint8_t INTERRUPT_DISABLED = 0x00;
 const uint8_t INTERRUPT_ENABLED = 0x20;
 const uint8_t TIMER_INTERRUPT_DISABLED = 0x00;
@@ -152,7 +152,7 @@ int RX8900SA_init(I2C dev) {
 int RX8900SA_reset(I2C dev) {
     infof("RX8900SA", "%02x  reset", dev.addr);
 
-    uint8_t csel = COMPENSATE_2;
+    uint8_t csel = COMPENSATE_2S;
     uint8_t uie = INTERRUPT_DISABLED;
     uint8_t tie = TIMER_INTERRUPT_DISABLED;
     uint8_t aie = ALARM_INTERRUPT_DISABLED;
@@ -179,7 +179,7 @@ int RX8900SA_setup(I2C dev) {
     int err;
     uint8_t extension = ALARM_WEEKDAY | UPDATE_MINUTE | TIMER_DISABLE | FREQ_1Hz | TICK_SECOND;
     uint8_t flags = 0x00;
-    uint8_t control = COMPENSATE_2 | INTERRUPT_DISABLED | TIMER_INTERRUPT_DISABLED | ALARM_INTERRUPT_DISABLED | NO_RESET;
+    uint8_t control = COMPENSATE_2S | INTERRUPT_DISABLED | TIMER_INTERRUPT_DISABLED | ALARM_INTERRUPT_DISABLED | NO_RESET;
     uint8_t data[] = {
         0x00,             // second
         0x00,             // minute
@@ -205,11 +205,11 @@ int RX8900SA_setup(I2C dev) {
     }
 
     // ... battery backup
-    uint8_t vbat = BACKUP_DISABLED;
-    uint8_t swoff = BACKUP_SWITCH;
+    uint8_t vdet = BACKUP_DISABLED;
+    uint8_t swoff = BACKUP_DIODE;
     uint8_t bksmp = VDET_2MS;
 
-    if ((err = I2C_write(dev, BACKUP, vbat | swoff | bksmp)) != 0) {
+    if ((err = I2C_write(dev, BACKUP, vdet | swoff | bksmp)) != 0) {
         warnf("RX8900SA", "%02x  BACKUP write error:%d", dev.addr, err);
         return err;
     }

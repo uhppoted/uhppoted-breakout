@@ -13,6 +13,7 @@ void set_date();
 void get_time();
 void set_time();
 void get_weekday();
+void set_relay(int relay, bool state);
 void reset();
 void scan();
 void help();
@@ -33,6 +34,22 @@ void exec(char *cmd) {
         set_time();
     } else if (strncasecmp(cmd, "get weekday", 11) == 0) {
         get_weekday();
+    } else if (strncasecmp(cmd, "set relay 1", 11) == 0) {
+        set_relay(1, true);
+    } else if (strncasecmp(cmd, "clear relay 1", 13) == 0) {
+        set_relay(1, false);
+    } else if (strncasecmp(cmd, "set relay 2", 11) == 0) {
+        set_relay(2, true);
+    } else if (strncasecmp(cmd, "clear relay 2", 13) == 0) {
+        set_relay(2, false);
+    } else if (strncasecmp(cmd, "set relay 3", 11) == 0) {
+        set_relay(3, true);
+    } else if (strncasecmp(cmd, "clear relay 3", 13) == 0) {
+        set_relay(3, false);
+    } else if (strncasecmp(cmd, "set relay 4", 11) == 0) {
+        set_relay(4, true);
+    } else if (strncasecmp(cmd, "clear relay 4", 13) == 0) {
+        set_relay(4, false);
     } else if (strncasecmp(cmd, "reset", 5) == 0) {
         reset();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
@@ -90,6 +107,10 @@ void set_time() {
     uint8_t second = 56;
 
     RTC_set_time(hour, minute, second);
+}
+
+void set_relay(int relay, bool state) {
+    U4_set_relay(relay, state);
 }
 
 void scan() {

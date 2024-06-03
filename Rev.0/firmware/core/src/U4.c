@@ -7,6 +7,13 @@
 #include <breakout.h>
 #include <log.h>
 
+const uint16_t RELAY1 = 0x0001;
+const uint16_t RELAY2 = 0x0004;
+const uint16_t RELAY3 = 0x0010;
+const uint16_t RELAY4 = 0x0040;
+
+const uint16_t RELAYS[] = {RELAY1, RELAY2, RELAY3, RELAY4};
+
 void U4_init() {
     infof("U4", "init");
 
@@ -35,12 +42,42 @@ void U4_init() {
 
     uint16_t outputs = 0x0000;
     if ((err = PI4IOE5V6416_write(U4, outputs)) != ERR_OK) {
-        warnf("U4", "error setting PI4IOE5V6416 latches (%d)", err);
+        warnf("U4", "error setting PI4IOE5V6416 outputs (%d)", err);
+    }
+
+    if ((err = PI4IOE5V6416_read(U4, &outputs)) != ERR_OK) {
+        warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
     }
 
     debugf("U4", "initial state %04x %016b", outputs, outputs);
 }
 
+void U4_set_relay(int relay, bool state) {
+    uint16_t outputs = 0x0000;
+    int err;
+
+    if ((err = PI4IOE5V6416_read(U4, &outputs)) != ERR_OK) {
+        warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+    } else {
+        uint16_t mask = relay >= 1 && relay <= 4 ? RELAYS[relay - 1] : 0x0000;
+
+        debugf("U4", "before  %04x %016b  relay:%d  mask:%04x", outputs, outputs, relay, mask);
+
+        if (state) {
+            outputs |= mask;
+        } else {
+            outputs &= ~mask;
+        }
+
+        if ((err = PI4IOE5V6416_write(U4, outputs)) != ERR_OK) {
+            warnf("U4", "error setting PI4IOE5V6416 outputs (%d)", err);
+        } else if ((err = PI4IOE5V6416_read(U4, &outputs)) != ERR_OK) {
+            warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+        } else {
+            debugf("U4", "after   %04x %016b", outputs, outputs);
+        }
+    }
+}
 void U4_debug() {
     infof("U4", "debug");
 

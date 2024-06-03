@@ -65,6 +65,22 @@ int PI4IOE5V6416_set_pullups(I2C dev, uint16_t pullups) {
     return I2C_write_all(dev, PI4IOE5V6416.PULLUPS, data, 2);
 }
 
+int PI4IOE5V6416_read(I2C dev, uint16_t *data) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PI4IOE5V6416.INPUTS, buffer, 2)) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = ((uint16_t)buffer[1] & 0x00ff) << 8;
+        uint16_t lo = ((uint16_t)buffer[0] & 0x00ff) << 0;
+
+        *data = hi | lo;
+
+        return ERR_OK;
+    }
+}
+
 int PI4IOE5V6416_write(I2C dev, uint16_t outputs) {
     uint8_t data[] = {
         (uint8_t)((outputs >> 0) & 0x00ff),
