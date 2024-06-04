@@ -4,6 +4,9 @@
    - [x] Fix schematic for RP2040 Tiny (https://www.waveshare.com/rp2040-tiny.htm)
    - [ ] Bring-up checklist
 
+## PiZeroW
+   - [ ] 24/7 operation: ask Cam
+
 ### OTA
    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
 

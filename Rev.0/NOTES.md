@@ -13,6 +13,9 @@
    - 2x10P header pins
 10. https://www.chipquik.com/store/product_info.php?products_id=1900050
 11. R1 and R2 - maybe increase resistance (2.5K? 10K?)
+12. Slightly larger pads for soldering
+13. 0805 resistors and capacitors
+14. Fix logo
 
 ### RX8900SA
 1. Decoupling capacitor on VBAT
