@@ -204,18 +204,20 @@ int RX8900SA_setup(I2C dev) {
         return err;
     }
 
-    // ... battery backup
-    uint8_t vdet = BACKUP_DISABLED;
-    uint8_t swoff = BACKUP_DIODE;
-    uint8_t bksmp = VDET_2MS;
+    debugf("RX8900SA", "setup/1");
 
-    if ((err = I2C_write(dev, BACKUP, vdet | swoff | bksmp)) != 0) {
-        warnf("RX8900SA", "%02x  BACKUP write error:%d", dev.addr, err);
-        return err;
-    }
+    // // ... battery backup
+    // uint8_t vdet = BACKUP_DISABLED;
+    // uint8_t swoff = BACKUP_DIODE;
+    // uint8_t bksmp = VDET_2MS;
 
-    // ... all done
-    infof("RX8900SA", "%02x  setup/done", dev.addr);
+    // if ((err = I2C_write(dev, BACKUP, vdet | swoff | bksmp)) != 0) {
+    //     warnf("RX8900SA", "%02x  BACKUP write error:%d", dev.addr, err);
+    //     return err;
+    // }
+
+    // // ... all done
+    // infof("RX8900SA", "%02x  setup/done", dev.addr);
 
     return 0;
 }

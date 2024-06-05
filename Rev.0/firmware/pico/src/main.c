@@ -12,6 +12,10 @@
 #include <sys.h>
 
 #define VERSION "v0.0"
+#define I2C0SDA 8
+#define I2C0SDA 9
+#define I2C1SDA 2
+#define I2C1SDA 3
 
 const uint32_t MSG = 0xf0000000;
 const uint32_t MSG_WIO = 0x10000000;
@@ -23,8 +27,8 @@ queue_t queue;
 int main() {
     bi_decl(bi_program_description("uhppoted-breakout"));
     bi_decl(bi_program_version_string(VERSION));
-    // bi_decl(bi_2pins_with_func(I2C0_SDA, I2C0_SCL, GPIO_FUNC_I2C));
-    // bi_decl(bi_2pins_with_func(I2C1_SDA, I2C1_SCL, GPIO_FUNC_I2C));
+    bi_decl(bi_2pins_with_func(I2C0SDA, I2C0SCL, GPIO_FUNC_I2C));
+    bi_decl(bi_2pins_with_func(I2C1SDA, I2C1SCL, GPIO_FUNC_I2C));
 
     stdio_init_all();
     setup_uart();
@@ -35,7 +39,6 @@ int main() {
 
     // ... initialise FIFO, UART, timers and I2C
     queue_init(&queue, sizeof(uint32_t), 64);
-    setup_uart();
     alarm_pool_init_default();
 
     // ... initialise RTC and IO expanders

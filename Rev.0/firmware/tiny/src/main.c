@@ -1,44 +1,66 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "hardware/clocks.h"
-#include "hardware/pio.h"
-#include "pico/stdlib.h"
-#include "ws2812.pio.h"
+#include <pico/binary_info.h>
+#include <pico/stdlib.h>
+// #include <hardware/i2c.h>
 
-void put_pixel(uint32_t pixel_grb) {
-    pio_sm_put_blocking(pio0, 0, pixel_grb << 8u);
-}
-void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {
-    uint32_t mask = (green / 16 << 16) | (red / 16 << 8) | (blue / 16 << 0);
-    put_pixel(mask);
-}
+#include <I2C0.h>
+#include <I2C1.h>
+#include <IOX.h>
+#include <RTC.h>
+#include <breakout.h>
+#include <sys.h>
+
+#define VERSION "v0.0"
+#define I2C0SDA 12
+#define I2C0SCL 13
+#define I2C1SDA 26
+#define I2C1SCL 27
+
+// const uint32_t MSG = 0xf0000000;
+// const uint32_t MSG_WIO = 0x10000000;
+// const uint32_t MSG_INPUTS = 0x20000000;
+// const uint32_t MSG_RX = 0x30000000;
+
+queue_t queue;
 
 int main() {
-    // set_sys_clock_48();
+    bi_decl(bi_program_description("uhppoted-breakout"));
+    bi_decl(bi_program_version_string(VERSION));
+    bi_decl(bi_2pins_with_func(I2C0SDA, I2C0SCL, GPIO_FUNC_I2C));
+    bi_decl(bi_2pins_with_func(I2C1SDA, I2C1SCL, GPIO_FUNC_I2C));
+
     stdio_init_all();
+    sysinit();
+    I2C0_init();
+    I2C1_init();
 
-    PIO pio = pio0;
-    int sm = 0;
-    uint offset = pio_add_program(pio, &ws2812_program);
-    uint8_t cnt = 0;
+    sleep_ms(1000);
+    printf(">> BREAKOUT %s\n", VERSION);
 
-    puts("RP2040-Zero WS2812 Test");
+    // I2C0_scan();
+    I2C1_scan();
 
-    ws2812_program_init(pio, sm, offset, 16, 800000, true);
+    // ... initialise FIFO, timers and I2C
+    queue_init(&queue, sizeof(uint32_t), 64);
+    alarm_pool_init_default();
+
+    // ... initialise RTC and IO expanders
+    RTC_init();
+    printf(">>> wooot/1");
+    // IOX_init();
+    // printf(">>> wooot/2");
+
+    // ... run loop
+    //     while (true) {
+    //         uint32_t v;
+    //         queue_remove_blocking(&queue, &v);
+    //         dispatch(v);
+    //     }
 
     while (1) {
-        for (cnt = 0; cnt < 0xff; cnt++) {
-            put_rgb(cnt, 0xff - cnt, 0);
-            sleep_ms(3);
-        }
-        for (cnt = 0; cnt < 0xff; cnt++) {
-            put_rgb(0xff - cnt, 0, cnt);
-            sleep_ms(3);
-        }
-        for (cnt = 0; cnt < 0xff; cnt++) {
-            put_rgb(0, cnt, 0xff - cnt);
-            sleep_ms(3);
-        }
+        blink();
+        printf(">> wooot/X\n");
     }
 }

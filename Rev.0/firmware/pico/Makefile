@@ -1,14 +1,16 @@
 SDK ?=$(HOME)/Development/tools/pico/pico-sdk
 PORT=/dev/tty.usbmodem14201
 
-clean:
+.PHONY: format
+
+clean: CMakeList.txt
 	rm -rf build
 	mkdir -p build
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
 	       cmake ..
 
-format: src/*.c
+format: clean
 	clang-format -i src/*.c         include/*.h
 	clang-format -i ../core/src/*.c ../core/include/*.h
 	clang-format -i ../lib/src/*.c  ../lib/include/*.h

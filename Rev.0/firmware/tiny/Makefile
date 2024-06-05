@@ -1,23 +1,25 @@
 SDK ?=$(HOME)/Development/tools/pico/pico-sdk
 PORT=/dev/tty.usbmodem14201
 
-clean:
+.PHONY: format
+
+clean: CMakeLists.txt
 	rm -rf build
 	mkdir -p build
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
 	       cmake ..
 
-format: src/*.c
-	clang-format -i src/*.c
+format: clean
+	clang-format -i src/*.c         include/*.h
+	# clang-format -i ../core/src/*.c ../core/include/*.h
+	# clang-format -i ../lib/src/*.c  ../lib/include/*.h
 
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make
 
-install: build
-	# picotool load build/breakout.uf2
-	# picotool reboot
-	cp build/breakout.uf2 /Volumes/RPI-RP2
+run: build
+	picotool load -v build/breakout.uf2 -f
 
 tty:
 	 minicom -b 115200 -o -D $(PORT)
