@@ -3,7 +3,6 @@
 
 #include <pico/binary_info.h>
 #include <pico/stdlib.h>
-// #include <hardware/i2c.h>
 
 #include <I2C0.h>
 #include <I2C1.h>

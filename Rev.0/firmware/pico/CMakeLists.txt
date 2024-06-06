@@ -17,8 +17,6 @@ pico_sdk_init()
 add_executable(breakout
   src/main.c
   src/sys.c
-  src/uart.c
-  src/cli.c
   src/hwconfig.c
 
   ${CORE}/src/I2C0.c
@@ -28,8 +26,10 @@ add_executable(breakout
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
-  ${CORE}/src/readers.c
   ${CORE}/src/dio.c
+  ${CORE}/src/readers.c
+  ${CORE}/src/uart.c
+  ${CORE}/src/cli.c
   ${CORE}/src/log.c
 
   ${LIB}/src/I2C.c

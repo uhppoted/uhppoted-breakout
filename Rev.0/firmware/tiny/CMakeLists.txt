@@ -19,7 +19,6 @@ add_executable(breakout
   src/sys.c
   src/hwconfig.c
 
-  ${CORE}/src/IOX.c
   ${CORE}/src/I2C0.c
   ${CORE}/src/I2C1.c
   ${CORE}/src/RTC.c

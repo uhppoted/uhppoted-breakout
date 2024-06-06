@@ -1,6 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-#include <hardware/i2c.h>
 #include <pico/binary_info.h>
 #include <pico/stdlib.h>
 
@@ -13,9 +13,9 @@
 
 #define VERSION "v0.0"
 #define I2C0SDA 8
-#define I2C0SDA 9
+#define I2C0SCL 9
 #define I2C1SDA 2
-#define I2C1SDA 3
+#define I2C1SCL 3
 
 const uint32_t MSG = 0xf0000000;
 const uint32_t MSG_WIO = 0x10000000;
@@ -31,13 +31,13 @@ int main() {
     bi_decl(bi_2pins_with_func(I2C1SDA, I2C1SCL, GPIO_FUNC_I2C));
 
     stdio_init_all();
-    setup_uart();
+    sysinit();
     I2C0_init();
     I2C1_init();
 
     printf(">> BREAKOUT %s\n", VERSION);
 
-    // ... initialise FIFO, UART, timers and I2C
+    // ... initialise FIFO, timers and I2C
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
 
@@ -46,6 +46,8 @@ int main() {
     IOX_init();
 
     // ... run loop
+    blink();
+
     while (true) {
         uint32_t v;
         queue_remove_blocking(&queue, &v);
