@@ -133,9 +133,9 @@ int RX8900SA_init(I2C dev) {
     debugf("RX8900SA", "FLAG:%02x", flag);
     debugf("RX8900SA", "     VDET:%d", (flag & VDET) == VDET, err);
     debugf("RX8900SA", "     VLF: %d", (flag & VLF) == VLF, err);
-    debugf("RX8900SA", "     AF:  %d",  (flag & AF) == AF, err);
-    debugf("RX8900SA", "     TF:  %d",  (flag & TF) == TF, err);
-    debugf("RX8900SA", "     UF:  %d",  (flag & UF) == UF, err);
+    debugf("RX8900SA", "     AF:  %d", (flag & AF) == AF, err);
+    debugf("RX8900SA", "     TF:  %d", (flag & TF) == TF, err);
+    debugf("RX8900SA", "     UF:  %d", (flag & UF) == UF, err);
 
     if ((flag & VLF) != VLF) {
         infof("RX8900SA", "power on ok");

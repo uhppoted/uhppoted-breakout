@@ -38,9 +38,9 @@ void dispatch(uint32_t v) {
         wio((uint8_t)(v & 0x0fffffff));
     }
 
-    // if ((v & MSG) == MSG_INPUTS) {
-    //     inputs((uint8_t)(v & 0x0fffffff));
-    // }
+    if ((v & MSG) == MSG_INPUTS) {
+        inputs((uint8_t)(v & 0x0fffffff));
+    }
 }
 
 void blink() {

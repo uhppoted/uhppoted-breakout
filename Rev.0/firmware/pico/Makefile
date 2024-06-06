@@ -11,9 +11,9 @@ clean: CMakeList.txt
 	       cmake ..
 
 format: clean
-	clang-format -i src/*.c         include/*.h
-	clang-format -i ../core/src/*.c ../core/include/*.h
-	clang-format -i ../lib/src/*.c  ../lib/include/*.h
+	clang-format -i src/*.c         -i include/*.h
+	clang-format -i ../core/src/*.c -i ../core/include/*.h
+	clang-format -i ../lib/src/*.c  -i ../lib/include/*.h
 
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make

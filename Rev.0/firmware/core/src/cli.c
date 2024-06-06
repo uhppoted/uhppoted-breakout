@@ -1,6 +1,6 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 
 #include <I2C0.h>
 #include <I2C1.h>
@@ -199,11 +199,10 @@ void set_relay(const char *cmd, bool state) {
     int N = strlen(cmd);
 
     if (N > 0) {
-        uint8_t relay;
+        uint relay;
         int rc;
 
         if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
-            printf("... set relay %d %d\n", relay,state);
             U4_set_relay(relay, state);
             printf("ok\n");
         }
@@ -213,46 +212,34 @@ void set_relay(const char *cmd, bool state) {
 void set_LED(const char *cmd, bool state) {
     int N = strlen(cmd);
 
-    debugf("CLI","set_LED/1 %d\n",N);
     if (N > 0) {
-        uint8_t LED = 4;
+        uint LED;
         int rc;
 
-            debugf("CLI","set LED/4 %d %d\n", LED,state);
+        if ((rc = sscanf(cmd, "%u", &LED)) == 1) {
             U4_set_LED(LED, state);
             printf("ok\n");
             return;
+        }
 
-            // debugf("CLI","set LED/2 %d\n",sscanf(cmd, "%u", &LED));
-            // debugf("CLI","set LED/3 %d\n",LED);
+        if (strncasecmp(cmd, "ERR", 3) == 0) {
+            U4_set_ERR(state);
+            printf("ok\n");
+            return;
+        }
 
-        // if ((rc = sscanf(cmd, "%u", &LED)) == 1) {
-        //     debugf("CLI","set LED/4 %d %d\n", LED,state);
-        //     // U4_set_LED(LED, state);
-        //     printf("ok\n");
-        //     return;
-        // }
+        if (strncasecmp(cmd, "IN", 2) == 0) {
+            U4_set_IN(state);
+            printf("ok\n");
+            return;
+        }
 
-        // if (strncasecmp(cmd, "ERR", 3) == 0) {
-        //     U4_set_ERR(state);
-        //     printf("ok\n");
-        //     return;
-        // }
-
-        // if (strncasecmp(cmd, "IN", 2) == 0) {
-        //     U4_set_IN(state);
-        //     printf("ok\n");
-        //     return;
-        // }
-
-        // if (strncasecmp(cmd, "SYS", 3) == 0) {
-        //     U4_set_SYS(state);
-        //     printf("ok\n");
-        //     return;
-        // }
+        if (strncasecmp(cmd, "SYS", 3) == 0) {
+            U4_set_SYS(state);
+            printf("ok\n");
+            return;
+        }
     }
-
-            debugf("CLI","set LED/X\n");
 }
 
 void scan() {
@@ -275,7 +262,7 @@ void help() {
     printf("  set LED <1|2|3|4|SYS|IN|ERR>\n");
     printf("  clear LED <1|2|3|4|SYS|IN|ERR>\n");
     printf("\n");
-   printf("  reset\n");
-   printf("  scan\n");
+    printf("  reset\n");
+    printf("  scan\n");
     printf("\n");
- }
+}

@@ -24,7 +24,6 @@
 
 ### U2 PCAL6408APW
     - [x] init
-          - [x] set polarity, latch, etc in init
     - [x] Queue WIO
     - [ ] Decode Wiegand
     - [ ] Decode keypad
