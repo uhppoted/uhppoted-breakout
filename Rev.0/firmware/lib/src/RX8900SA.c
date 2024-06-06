@@ -130,17 +130,17 @@ int RX8900SA_init(I2C dev) {
         return err;
     }
 
-    debugf("RX8900SA", "%02x  FLAG:%02x", dev.addr, flag);
-    debugf("RX8900SA", "%02x       VDET:%d", dev.addr, (flag & VDET) == VDET, err);
-    debugf("RX8900SA", "%02x       VLF: %d", dev.addr, (flag & VLF) == VLF, err);
-    debugf("RX8900SA", "%02x       AF:  %d", dev.addr, (flag & AF) == AF, err);
-    debugf("RX8900SA", "%02x       TF:  %d", dev.addr, (flag & TF) == TF, err);
-    debugf("RX8900SA", "%02x       UF:  %d", dev.addr, (flag & UF) == UF, err);
+    debugf("RX8900SA", "FLAG:%02x", flag);
+    debugf("RX8900SA", "     VDET:%d", (flag & VDET) == VDET, err);
+    debugf("RX8900SA", "     VLF: %d", (flag & VLF) == VLF, err);
+    debugf("RX8900SA", "     AF:  %d",  (flag & AF) == AF, err);
+    debugf("RX8900SA", "     TF:  %d",  (flag & TF) == TF, err);
+    debugf("RX8900SA", "     UF:  %d",  (flag & UF) == UF, err);
 
     if ((flag & VLF) != VLF) {
-        infof("RX8900SA", "%02x  power on ok", dev.addr);
+        infof("RX8900SA", "power on ok");
     } else {
-        warnf("RX8900SA", "%02x  power on VLF set", dev.addr);
+        warnf("RX8900SA", "power on VLF set");
         sleep_ms(tSTA); // FIXME use alarm timer
         RX8900SA_setup(dev);
     }

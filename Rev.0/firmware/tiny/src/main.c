@@ -18,10 +18,10 @@
 #define I2C1SDA 26
 #define I2C1SCL 27
 
-// const uint32_t MSG = 0xf0000000;
-// const uint32_t MSG_WIO = 0x10000000;
-// const uint32_t MSG_INPUTS = 0x20000000;
-// const uint32_t MSG_RX = 0x30000000;
+const uint32_t MSG = 0xf0000000;
+const uint32_t MSG_WIO = 0x10000000;
+const uint32_t MSG_INPUTS = 0x20000000;
+const uint32_t MSG_RX = 0x30000000;
 
 queue_t queue;
 
@@ -39,28 +39,20 @@ int main() {
     sleep_ms(1000);
     printf(">> BREAKOUT %s\n", VERSION);
 
-    // I2C0_scan();
-    I2C1_scan();
-
     // ... initialise FIFO, timers and I2C
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
 
     // ... initialise RTC and IO expanders
     RTC_init();
-    printf(">>> wooot/1");
-    // IOX_init();
-    // printf(">>> wooot/2");
+    IOX_init();
 
     // ... run loop
-    //     while (true) {
-    //         uint32_t v;
-    //         queue_remove_blocking(&queue, &v);
-    //         dispatch(v);
-    //     }
+    blink();
 
-    while (1) {
-        blink();
-        printf(">> wooot/X\n");
+    while (true) {
+        uint32_t v;
+        queue_remove_blocking(&queue, &v);
+        dispatch(v);
     }
 }

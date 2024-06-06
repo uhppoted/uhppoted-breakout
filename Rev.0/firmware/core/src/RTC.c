@@ -14,8 +14,8 @@ uint8_t dow(uint16_t year, uint8_t month, uint8_t day);
  */
 void RTC_init() {
     infof("RTC", "init");
-
     RX8900SA_init(U5);
+    infof("RTC", "initialised");
 }
 
 /*

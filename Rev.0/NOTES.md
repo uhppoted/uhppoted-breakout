@@ -16,6 +16,7 @@
 12. Slightly larger pads for soldering
 13. 0805 resistors and capacitors
 14. Fix logo
+16. Use machine pin socket on dev. board.
 
 ### RX8900SA
 1. Decoupling capacitor on VBAT
