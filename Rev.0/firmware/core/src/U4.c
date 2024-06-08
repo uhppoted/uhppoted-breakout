@@ -60,7 +60,7 @@ void U4_init() {
         warnf("U4", "error setting PI4IOE5V6416 outputs (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_read(U4, &outputs)) != ERR_OK) {
+    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
         warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
     }
 
@@ -117,11 +117,11 @@ void U4_set(uint16_t mask) {
     uint16_t outputs = 0x0000;
     int err;
 
-    if ((err = PI4IOE5V6416_read(U4, &outputs)) != ERR_OK) {
+    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
         warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
     } else if ((err = PI4IOE5V6416_write(U4, (outputs | mask) & MASK)) != ERR_OK) {
         warnf("U4", "error setting PI4IOE5V6416 outputs (%d)", err);
-    } else if ((err = PI4IOE5V6416_read(U4, &outputs)) != ERR_OK) {
+    } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
         warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
     }
 }
@@ -130,11 +130,11 @@ void U4_clear(uint16_t mask) {
     uint16_t outputs = 0x0000;
     int err;
 
-    if ((err = PI4IOE5V6416_read(U4, &outputs)) != ERR_OK) {
+    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
         warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
     } else if ((err = PI4IOE5V6416_write(U4, (outputs & ~mask) & MASK)) != ERR_OK) {
         warnf("U4", "error setting PI4IOE5V6416 outputs (%d)", err);
-    } else if ((err = PI4IOE5V6416_read(U4, &outputs)) != ERR_OK) {
+    } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
         warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
     }
 }

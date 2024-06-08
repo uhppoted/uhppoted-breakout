@@ -34,6 +34,7 @@
     - [x] init
     - [x] Queue INPUTS
     - [ ] LPF
+    - [ ] Inputs chattering ?????
 
 ### U4 PI4IOE5V6416
     - [x] init

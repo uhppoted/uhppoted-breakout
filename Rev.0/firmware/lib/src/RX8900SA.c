@@ -119,7 +119,7 @@ uint8_t bcd2dec(uint8_t N);
  * bit is set.
  */
 int RX8900SA_init(I2C dev) {
-    infof("RX8900SA", "%02x  init", dev.addr);
+    infof("RX8900SA", "init");
 
     // ... check VLF
     uint8_t flag;
@@ -130,12 +130,23 @@ int RX8900SA_init(I2C dev) {
         return err;
     }
 
-    debugf("RX8900SA", "FLAG:%02x", flag);
-    debugf("RX8900SA", "     VDET:%d", (flag & VDET) == VDET, err);
-    debugf("RX8900SA", "     VLF: %d", (flag & VLF) == VLF, err);
-    debugf("RX8900SA", "     AF:  %d", (flag & AF) == AF, err);
-    debugf("RX8900SA", "     TF:  %d", (flag & TF) == TF, err);
-    debugf("RX8900SA", "     UF:  %d", (flag & UF) == UF, err);
+    bool vdet = (flag & VDET) == VDET;
+    bool vlf = (flag & VLF) == VLF;
+    bool af = (flag & AF) == AF;
+    bool tf = (flag & TF) == TF;
+    bool uf = (flag & UF) == UF;
+    bool any = vdet | vlf | af | tf | uf;
+
+    if (any) {
+        debugf("RX8900SA", "%s%s%s%s%s",
+               vdet ? "VDET " : "",
+               vlf ? "VLF " : "",
+               af ? "AF " : "",
+               tf ? "TF " : "",
+               uf ? "UF " : "");
+    } else {
+        debugf("RX8900SA", "----");
+    }
 
     if ((flag & VLF) != VLF) {
         infof("RX8900SA", "power on ok");

@@ -89,3 +89,19 @@ int PI4IOE5V6416_write(I2C dev, uint16_t outputs) {
 
     return I2C_write_all(dev, PI4IOE5V6416.OUTPUTS, data, 2);
 }
+
+int PI4IOE5V6416_readback(I2C dev, uint16_t *data) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PI4IOE5V6416.OUTPUTS, buffer, 2)) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = buffer[1];
+        uint16_t lo = buffer[0];
+
+        *data = ((hi << 8) & 0xff00) | ((lo << 0) & 0x00ff);
+
+        return ERR_OK;
+    }
+}

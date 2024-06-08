@@ -45,7 +45,6 @@ int PCAL6408APW_set_pullups(I2C dev, uint8_t pullups) {
     uint8_t data[] = {
         pullups,
         pullups,
-        0x00 // pulldowns
     };
 
     return I2C_write_all(dev, PCAL6408APW.PULLUPS, data, 2);
