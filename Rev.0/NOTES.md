@@ -1,34 +1,41 @@
 # NOTES
 
 ## Rev.1
-1. Connect NC pins on J10 to J2
-2. Connect NC    pins on J12 to J12
-3. Need 1.6mm x dia. 6.5mm washer for standoffs
-4. Use smaller (2.0mm?) board-to-board connectors (J2,J3,J4)
-5. Allow for external 3.3V
-6. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
-7. (?) RESET should (maybe) be tied low to hold U2 et al in reset until U5 is ready
-8. (?) Pullup/down resistors for reader LEDs
-9. J10/J12 soldering jig
-   - 2x10P header pins
-10. https://www.chipquik.com/store/product_info.php?products_id=1900050
-11. R1 and R2 - maybe increase resistance (2.5K? 10K?)
-12. Slightly larger pads for soldering
-13. 0805 resistors and capacitors
-14. Fix logo
-16. Use machine pin socket on dev. board.
-17. Need pulldowns on all inputs
+1. Schottkey diodes and resistor for RX8900SA VBAT
+   - https://www.diodes.com/assets/Datasheets/SDM03U40.pdf
+2. Decoupling capacitor on RX8900SA VBAT
+3. (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
+4. Pullups on INT0 and INT1
+5. RESET should (maybe) be tied low to hold U2 et al in reset until U5 is ready
+6 R1 and R2 - maybe increase resistance (2.5K? 10K?)
+7. Connect NC pins on J10 to J2
+8. Connect NC    pins on J12 to J12
+9. Tie RX8900SA NC pins to GND
+10. Fix PiZero2W mounting holes
+11. PiZero2W header (?)
+12. Neopixels
+13. BOM: 1.6mm x dia. 6.5mm washer for standoffs
+14. BOM: M3x5 screws
+15. BOM: Machine pin header and socket
+16. Use smaller (2.0mm?) board-to-board connectors (J2,J3,J4)
+17. Allow for external 3.3V
+18. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
+19. J10/J12 soldering jig
+20. Test baseboard
+21. 0805 resistors and capacitors
+22. Fix logo
+23. Use machine pin socket on dev. board.
+
+(?) Slightly larger pads for soldering
+(?)  https://www.chipquik.com/store/product_info.php?products_id=1900050
+(?) Pulldowns on all inputs
+(?) RC filters on inputs
+(?) Expose FOUT pin via test point/pad and resistor
+(?) Expose INT  pin via test point/pad and resistor
+(?) Jumper VBAT to VDD for no battery option
 
 ### RX8900SA
-1. Decoupling capacitor on VBAT
-2. Tie NC pin to GND
-3. Diode and resistor to VBAT
-   - https://www.diodes.com/assets/Datasheets/SDM03U40.pdf
-4. RX8025 ??
-5. (?) Jumper VBAT to VDD for no battery option
-6. (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
-7. (?) Expose FOUT pin via test point/pad and resistor
-8. (?) Expose INT  pin via test point/pad and resistor
+1. RX8025
 
 - https://electronics.stackexchange.com/questions/348095/coin-cell-battery-recharging-circuit-for-rtc-backup-power
 - https://electronics.stackexchange.com/questions/410853/minimalistic-rtc-backup-battery-charging-or-a-super-capacitor

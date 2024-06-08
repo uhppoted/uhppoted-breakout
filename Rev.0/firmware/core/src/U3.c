@@ -71,19 +71,19 @@ void U3_on_interrupt(void) {
     }
 }
 
-void U3_debug() {
-    infof("U3", "debug");
+// void U3_debug() {
+//     infof("U3", "debug");
+//
+//     for (int i = 0; i < 30; i++) {
+//         int int1 = gpio_get(IOX_INT1);
+//         uint8_t inputs;
+//         int err;
 
-    for (int i = 0; i < 30; i++) {
-        int int1 = gpio_get(IOX_INT1);
-        uint8_t inputs;
-        int err;
+//         if ((err = PCAL6408APW_read(U3, &inputs)) != ERR_OK) {
+//             warnf("U3", "error reading PCAL6408APW inputs (%d)", err);
+//         }
 
-        if ((err = PCAL6408APW_read(U3, &inputs)) != ERR_OK) {
-            warnf("U3", "error reading PCAL6408APW inputs (%d)", err);
-        }
-
-        infof("U3", "INPUTS %02x %08b  INT1:%d", inputs, inputs, int1);
-        sleep_ms(1000);
-    }
-}
+//         infof("U3", "INPUTS %02x %08b  INT1:%d", inputs, inputs, int1);
+//         sleep_ms(1000);
+//     }
+// }

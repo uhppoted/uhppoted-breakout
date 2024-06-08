@@ -148,7 +148,6 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    U4_debug();
 }
 
 void reset() {

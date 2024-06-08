@@ -8,7 +8,7 @@
 #include <breakout.h>
 
 void I2C0_init() {
-    uint f = i2c_init(i2c0, 50 * 1000); // 100kHz
+    uint f = i2c_init(i2c0, 100 * 1000); // 100kHz
 
     gpio_set_function(I2C0_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C0_SCL, GPIO_FUNC_I2C);

@@ -71,19 +71,19 @@ void U2_on_interrupt(void) {
     }
 }
 
-void U2_debug() {
-    infof("U2", "debug");
-
-    for (int i = 0; i < 30; i++) {
-        int int0 = gpio_get(IOX_INT0);
-        uint8_t inputs;
-        int err;
-
-        if ((err = PCAL6408APW_read(U2, &inputs)) != ERR_OK) {
-            warnf("U2", "error reading PCAL6408APW inputs (%d)", err);
-        }
-
-        infof("U2", "INPUTS %02x %08b  INT0:%d", inputs, inputs, int0);
-        sleep_ms(1000);
-    }
-}
+// void U2_debug() {
+//     infof("U2", "debug");
+//
+//     for (int i = 0; i < 30; i++) {
+//         int int0 = gpio_get(IOX_INT0);
+//         uint8_t inputs;
+//         int err;
+//
+//         if ((err = PCAL6408APW_read(U2, &inputs)) != ERR_OK) {
+//             warnf("U2", "error reading PCAL6408APW inputs (%d)", err);
+//         }
+//
+//         infof("U2", "INPUTS %02x %08b  INT0:%d", inputs, inputs, int0);
+//         sleep_ms(1000);
+//     }
+// }
