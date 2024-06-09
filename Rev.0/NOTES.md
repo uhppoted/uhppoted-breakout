@@ -25,6 +25,8 @@
 21. 0805 resistors and capacitors
 22. Fix logo
 23. Use machine pin socket on dev. board.
+24. Relay startup click
+25. SYS LED not driven
 
 (?) Slightly larger pads for soldering
 (?)  https://www.chipquik.com/store/product_info.php?products_id=1900050

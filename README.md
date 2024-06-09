@@ -24,6 +24,7 @@ Initial proof of concept, designed to be relatively easy to hand solder and debu
 
 <img width="640" src="documentation/images/front.png">
 <img width="640" src="documentation/images/back.png">
+<img width="640" src="documentation/images/Rev.0.jpg">
 
 ### Errata
 1. Requires Schottky barrier diode and resistor on RX8900SA backup battery.

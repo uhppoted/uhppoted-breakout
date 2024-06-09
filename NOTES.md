@@ -30,3 +30,14 @@
 
 ## RX8900SA
 1. https://github.com/citriena/RX8900RTC/blob/master/src/RX8900RTC.cpp
+
+## UT0311L04
+
+### Startup
+
+| RELAY | N/O     | N/C    | LED |
+|-------|---------|--------|-----|
+| 1     | OPEN    | CLOSED | +5V |
+| 2     | OPEN    | CLOSED | +5V |
+| 3     | OPEN    | CLOSED | +5V |
+| 4     | OPEN    | CLOSED | +5V |

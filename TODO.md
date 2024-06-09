@@ -42,9 +42,10 @@
           - [ ] relay timer
     - [ ] set/clear reader LED
           - [ ] blinks
-    - [ ] set/clear SYS LED
-    - [ ] set/clear ERR LED
-    - [ ] set/clear IN LED
+    - [x] set/clear SYS LED
+    - [x] set/clear ERR LED
+    - [x] set/clear IN LED
+    - [ ] invert SYS, IN and ERR LEDs
 
 
 ### RTC/RX8900SA
