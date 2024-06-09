@@ -13,7 +13,7 @@
 9. Tie RX8900SA NC pins to GND
 10. Fix PiZero2W mounting holes
 11. PiZero2W header (?)
-12. Neopixels
+12. debug/state LEDs
 13. BOM: 1.6mm x dia. 6.5mm washer for standoffs
 14. BOM: M3x5 screws
 15. BOM: Machine pin header and socket

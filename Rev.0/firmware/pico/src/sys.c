@@ -7,6 +7,7 @@
 #include <breakout.h>
 #include <cli.h>
 #include <dio.h>
+#include <log.h>
 #include <readers.h>
 #include <sys.h>
 #include <uart.h>
@@ -17,8 +18,26 @@
 #define PARITY UART_PARITY_NONE
 
 void on_uart0_rx();
+bool blink(repeating_timer_t *);
 
-void sysinit() {
+struct {
+    struct repeating_timer timer;
+} sysled;
+
+bool sysinit() {
+    // ... SYS LED
+#ifndef PICO_DEFAULT_LED_PIN
+#warning blink example requires a board with a regular LED
+#else
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+
+    if (!add_repeating_timer_ms(1000, blink, NULL, &sysled.timer)) {
+        return false;
+    }
+#endif
+
+    // ... UART
     uart_init(uart0, 2400);
 
     gpio_set_function(UART0_TX, GPIO_FUNC_UART);
@@ -33,6 +52,8 @@ void sysinit() {
     irq_set_enabled(UART0_IRQ, true);
 
     uart_set_irq_enables(uart0, true, false);
+
+    return true;
 }
 
 void dispatch(uint32_t v) {
@@ -43,28 +64,36 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_WIO) {
-        wio((uint8_t)(v & 0x0fffffff));
+        uint8_t io = v & 0x000000ff;
+        uint8_t mask = (v >> 8) & 0x000000ff;
+
+        wio(io, mask);
     }
 
     if ((v & MSG) == MSG_INPUTS) {
-        inputs((uint8_t)(v & 0x0fffffff));
+        uint8_t io = v & 0x000000ff;
+        uint8_t mask = (v >> 8) & 0x000000ff;
+
+        inputs(io, mask);
+    }
+
+    if ((v & MSG) == MSG_TICK) {
+        infof("SYS", "tick");
     }
 }
 
-void blink() {
-#ifndef PICO_DEFAULT_LED_PIN
-#warning blink example requires a board with a regular LED
-#else
-    const uint LED_PIN = PICO_DEFAULT_LED_PIN;
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-    gpio_put(LED_PIN, 1);
+/* SYSLED blink callback.
+ *
+ */
+bool blink(repeating_timer_t *t) {
+    bool on = gpio_get(PICO_DEFAULT_LED_PIN);
 
-    for (int i = 0; i < 4; i++) {
-        sleep_ms(250);
-        gpio_put(LED_PIN, 0);
-        sleep_ms(250);
-        gpio_put(LED_PIN, 1);
+    gpio_put(PICO_DEFAULT_LED_PIN, !on);
+
+    uint32_t msg = MSG_TICK | ((uint32_t)inputs & 0x00000000);
+    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+        warnf("SYS", "tick: queue full");
     }
-#endif
+
+    return true;
 }

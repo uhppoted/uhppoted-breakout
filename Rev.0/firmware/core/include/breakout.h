@@ -7,6 +7,7 @@ extern const uint32_t MSG;
 extern const uint32_t MSG_RX;
 extern const uint32_t MSG_WIO;
 extern const uint32_t MSG_INPUTS;
+extern const uint32_t MSG_TICK;
 
 extern const uint I2C0_SDA;
 extern const uint I2C0_SCL;

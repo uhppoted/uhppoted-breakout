@@ -10,8 +10,12 @@
 void I2C0_init() {
     uint f = i2c_init(i2c0, 100 * 1000); // 100kHz
 
+    gpio_init(I2C0_SCL);
+    gpio_init(I2C0_SDA);
+
     gpio_set_function(I2C0_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C0_SCL, GPIO_FUNC_I2C);
+
     gpio_pull_up(I2C0_SDA);
     gpio_pull_up(I2C0_SCL);
 }

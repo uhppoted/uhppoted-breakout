@@ -1,6 +1,6 @@
 #include <log.h>
 #include <readers.h>
 
-void wio(uint8_t inputs) {
-    debugf("reader", "... %02x %08b", inputs, inputs);
+void wio(uint8_t inputs, uint8_t mask) {
+    debugf("reader", "inputs:%02x (%08b)  mask:%02x (%08b)", inputs, inputs, mask, mask);
 }

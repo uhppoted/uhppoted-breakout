@@ -13,12 +13,13 @@ void IOX_init() {
     infof("IOX", "init");
 
     gpio_init(IOX_RESET);
+    gpio_pull_up(IOX_RESET);
     gpio_set_dir(IOX_RESET, GPIO_OUT);
 
     gpio_put(IOX_RESET, 0);
-    sleep_us(5);
-    gpio_put(IOX_RESET, 1);
     sleep_us(10);
+    gpio_put(IOX_RESET, 1);
+    sleep_us(25);
 
     U2_init();
     U3_init();

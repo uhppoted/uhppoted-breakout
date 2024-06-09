@@ -12,6 +12,7 @@ const struct {
     uint8_t LATCH;
     uint8_t PULLUPS;
     uint8_t INTERRUPTS;
+    uint8_t ISR;
     uint8_t OUTPUT_CONFIG;
 } PCAL6408APW = {
     .INPUTS = 0x00,
@@ -22,6 +23,7 @@ const struct {
     .LATCH = 0x42,
     .PULLUPS = 0x43,
     .INTERRUPTS = 0x45,
+    .ISR = 0x46,
     .OUTPUT_CONFIG = 0x4f,
 };
 
@@ -56,4 +58,8 @@ int PCAL6408APW_set_interrupts(I2C dev, uint8_t interrupts) {
 
 int PCAL6408APW_read(I2C dev, uint8_t *data) {
     return I2C_read(dev, PCAL6408APW.INPUTS, data);
+}
+
+int PCAL6408APW_isr(I2C dev, uint8_t *data) {
+    return I2C_read(dev, PCAL6408APW.ISR, data);
 }

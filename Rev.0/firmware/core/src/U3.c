@@ -49,25 +49,38 @@ void U3_init() {
     gpio_pull_up(IOX_INT1);
     gpio_add_raw_irq_handler(IOX_INT1, U3_on_interrupt);
     gpio_set_irq_enabled(IOX_INT1, GPIO_IRQ_LEVEL_LOW, true);
+
+    infof("U3", "initialised");
 }
 
+// Ref. https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip3ddad2997f19125681bb
 void U3_on_interrupt(void) {
-    uint32_t mask = GPIO_IRQ_LEVEL_LOW | GPIO_IRQ_LEVEL_HIGH | GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL;
+    uint8_t isr;
     uint8_t inputs;
     int err;
 
-    if (gpio_get_irq_event_mask(IOX_INT1) & mask) {
-        gpio_acknowledge_irq(IOX_INT1, mask);
+    if ((gpio_get_irq_event_mask(IOX_INT1) & GPIO_IRQ_LEVEL_LOW) != 0) {
+        gpio_set_irq_enabled(IOX_INT1, GPIO_IRQ_LEVEL_LOW, false);
+
+        if ((err = PCAL6408APW_isr(U3, &isr)) != ERR_OK) {
+            warnf("U3", "error reading PCAL6408APW ISR (%d)", err);
+        }
 
         if ((err = PCAL6408APW_read(U3, &inputs)) != ERR_OK) {
             warnf("U3", "error reading PCAL6408APW inputs (%d)", err);
+        } else {
+            uint32_t p = isr;
+            uint32_t q = inputs;
+            uint32_t v = (p << 8u) | q;
+
+            uint32_t msg = MSG_INPUTS | (v & 0x0fffffff);
+
+            if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+                warnf("U3", "discarded  INPUTS:%02x (%08b) ISR:%02x (%08b)", inputs, inputs, isr, isr);
+            }
         }
 
-        uint32_t msg = MSG_INPUTS | ((uint32_t)inputs & 0x0fffffff);
-
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            warnf("U3", "discarded  %02x %08b", inputs, inputs);
-        }
+        gpio_set_irq_enabled(IOX_INT1, GPIO_IRQ_LEVEL_LOW, true);
     }
 }
 

@@ -52,22 +52,32 @@ void U2_init() {
 }
 
 void U2_on_interrupt(void) {
-    uint32_t mask = GPIO_IRQ_LEVEL_LOW | GPIO_IRQ_LEVEL_HIGH | GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL;
+    uint8_t isr;
     uint8_t inputs;
     int err;
 
-    if (gpio_get_irq_event_mask(IOX_INT0) & mask) {
-        gpio_acknowledge_irq(IOX_INT0, mask);
+    if ((gpio_get_irq_event_mask(IOX_INT0) & GPIO_IRQ_LEVEL_LOW) != 0) {
+        gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, false);
+
+        if ((err = PCAL6408APW_isr(U2, &isr)) != ERR_OK) {
+            warnf("U2", "error reading PCAL6408APW ISR (%d)", err);
+        }
 
         if ((err = PCAL6408APW_read(U2, &inputs)) != ERR_OK) {
             warnf("U2", "error reading PCAL6408APW inputs (%d)", err);
+        } else {
+            uint32_t p = isr;
+            uint32_t q = inputs;
+            uint32_t v = (p << 8u) | q;
+
+            uint32_t msg = MSG_WIO | (v & 0x0fffffff);
+
+            if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+                warnf("U2", "discarded  INPUTS:%02x (%08b) ISR:%02x (%08b)", inputs, inputs, isr, isr);
+            }
         }
 
-        uint32_t msg = MSG_WIO | ((uint32_t)inputs & 0x0fffffff);
-
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            warnf("U2", "discarded  %02x %08b", inputs, inputs);
-        }
+        gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, true);
     }
 }
 

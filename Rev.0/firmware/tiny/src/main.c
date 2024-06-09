@@ -9,6 +9,7 @@
 #include <IOX.h>
 #include <RTC.h>
 #include <breakout.h>
+#include <log.h>
 #include <sys.h>
 
 #define VERSION "v0.0"
@@ -21,6 +22,7 @@ const uint32_t MSG = 0xf0000000;
 const uint32_t MSG_WIO = 0x10000000;
 const uint32_t MSG_INPUTS = 0x20000000;
 const uint32_t MSG_RX = 0x30000000;
+const uint32_t MSG_TICK = 0xf0000000;
 
 queue_t queue;
 
@@ -31,7 +33,12 @@ int main() {
     bi_decl(bi_2pins_with_func(I2C1SDA, I2C1SCL, GPIO_FUNC_I2C));
 
     stdio_init_all();
-    sysinit();
+
+    if (!sysinit()) {
+        warnf("SYS", "ERROR INITIALISING SYSTEM");
+        return -1;
+    }
+
     I2C0_init();
     I2C1_init();
 
@@ -47,8 +54,6 @@ int main() {
     IOX_init();
 
     // ... run loop
-    blink();
-
     while (true) {
         uint32_t v;
         queue_remove_blocking(&queue, &v);

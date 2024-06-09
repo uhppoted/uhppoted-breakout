@@ -1,5 +1,4 @@
 #pragma once
 
-extern void sysinit();
+extern bool sysinit();
 extern void dispatch(uint32_t);
-extern void blink();

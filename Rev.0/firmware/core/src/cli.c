@@ -168,6 +168,7 @@ void set_date() {
     uint8_t day = 24;
 
     RTC_set_date(year, month, day);
+    printf("ok\n");
 }
 
 void get_time() {
@@ -178,20 +179,21 @@ void get_time() {
     printf(">>> %s\n", time);
 }
 
-void get_weekday() {
-    char weekday[9] = {0};
-
-    RTC_get_dow(weekday, 9);
-
-    printf(">>> %s\n", weekday);
-}
-
 void set_time() {
     uint8_t hour = 12;
     uint8_t minute = 34;
     uint8_t second = 56;
 
     RTC_set_time(hour, minute, second);
+    printf("ok\n");
+}
+
+void get_weekday() {
+    char weekday[9] = {0};
+
+    RTC_get_dow(weekday, 9);
+
+    printf(">>> %s\n", weekday);
 }
 
 void set_relay(const char *cmd, bool state) {

@@ -3,6 +3,5 @@
 extern const uint UART0_TX;
 extern const uint UART0_RX;
 
-extern void sysinit();
+extern bool sysinit();
 extern void dispatch(uint32_t);
-extern void blink();
