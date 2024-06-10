@@ -1,5 +1,7 @@
 SDK ?=$(HOME)/Development/tools/pico/pico-sdk
 PORT=/dev/tty.usbmodem14201
+SRC=src/*.c ../core/src/*.c ../lib/src/*.c
+INCLUDE=include/*.h ../core/include/*.h ../lib/include/*.h
 
 .PHONY: format
 
@@ -10,7 +12,7 @@ clean: CMakeLists.txt
 	       cd build && \
 	       cmake ..
 
-format: clean
+format: clean $(SRC) $(INCLUDE)
 	clang-format -i src/*.c         -i include/*.h
 	clang-format -i ../core/src/*.c -i ../core/include/*.h
 	clang-format -i ../lib/src/*.c  -i ../lib/include/*.h

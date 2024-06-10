@@ -9,6 +9,8 @@
 
 void U2_on_interrupt(void);
 
+const uint8_t tRST = 1; // tRST (µs) for PCAL6408APW_interrupt line
+
 void U2_init() {
     infof("U2", "init");
 
@@ -77,6 +79,8 @@ void U2_on_interrupt(void) {
             }
         }
 
+        // Ref. https://github.com/raspberrypi/pico-sdk/issues/108
+        busy_wait_us_32(tRST);
         gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, true);
     }
 }

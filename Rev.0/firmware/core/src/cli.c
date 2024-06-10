@@ -21,13 +21,18 @@ const uint8_t height = 25;
 
 void echo(const char *line);
 void exec(char *cmd);
+
+void get_datetime();
+void set_datetime(const char *cmd);
 void get_date();
-void set_date();
+void set_date(const char *cmd);
 void get_time();
-void set_time();
+void set_time(const char *cmd);
 void get_weekday();
+
 void set_relay(const char *relay, bool state);
 void set_LED(const char *led, bool state);
+
 void reset();
 void scan();
 void help();
@@ -116,14 +121,18 @@ void exec(char *cmd) {
 
     printf("\n");
 
-    if (strncasecmp(cmd, "get date", 8) == 0) {
+    if (strncasecmp(cmd, "get datetime", 12) == 0) {
+        get_datetime();
+    } else if (strncasecmp(cmd, "set datetime ", 13) == 0) {
+        set_datetime(&cmd[13]);
+    } else if (strncasecmp(cmd, "get date", 8) == 0) {
         get_date();
-    } else if (strncasecmp(cmd, "set date", 8) == 0) {
-        set_date();
+    } else if (strncasecmp(cmd, "set date ", 9) == 0) {
+        set_date(&cmd[9]);
     } else if (strncasecmp(cmd, "get time", 8) == 0) {
         get_time();
-    } else if (strncasecmp(cmd, "set time", 8) == 0) {
-        set_time();
+    } else if (strncasecmp(cmd, "set time ", 9) == 0) {
+        set_time(&cmd[9]);
     } else if (strncasecmp(cmd, "get weekday", 11) == 0) {
         get_weekday();
     } else if (strncasecmp(cmd, "set relay ", 10) == 0) {
@@ -154,6 +163,42 @@ void reset() {
     RTC_reset();
 }
 
+void get_datetime() {
+    char date[11] = {0};
+    char time[11] = {0};
+
+    RTC_get_date(date, 11);
+    RTC_get_time(time, 11);
+
+    printf(">>> %s %s\n", date, time);
+}
+
+void set_datetime(const char *cmd) {
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+    int second;
+    int rc;
+
+    if ((rc = sscanf(cmd, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day, &hour, &minute, &second)) == 6) {
+        RTC_set_date(year, month, day);
+        RTC_set_time(hour, minute, second);
+        printf("ok\n");
+        return;
+    }
+
+    if ((rc = sscanf(cmd, "%04d-%02d-%02d %02d:%02d", &year, &month, &day, &hour, &minute)) == 5) {
+        RTC_set_date(year, month, day);
+        RTC_set_time(hour, minute, 0);
+        printf("ok\n");
+        return;
+    }
+
+    printf(">> invalid date (%s)\n", cmd);
+}
+
 void get_date() {
     char date[11] = {0};
 
@@ -162,13 +207,19 @@ void get_date() {
     printf(">>> %s\n", date);
 }
 
-void set_date() {
-    uint16_t year = 2024;
-    uint8_t month = 5;
-    uint8_t day = 24;
+void set_date(const char *cmd) {
+    int year;
+    int month;
+    int day;
+    int rc;
 
-    RTC_set_date(year, month, day);
-    printf("ok\n");
+    if ((rc = sscanf(cmd, "%04d-%02d-%02d", &year, &month, &day)) == 3) {
+        RTC_set_date(year, month, day);
+        printf("ok\n");
+        return;
+    }
+
+    printf(">> invalid date (%s)\n", cmd);
 }
 
 void get_time() {
@@ -179,13 +230,25 @@ void get_time() {
     printf(">>> %s\n", time);
 }
 
-void set_time() {
-    uint8_t hour = 12;
-    uint8_t minute = 34;
-    uint8_t second = 56;
+void set_time(const char *cmd) {
+    int hour;
+    int minute;
+    int second;
+    int rc;
 
-    RTC_set_time(hour, minute, second);
-    printf("ok\n");
+    if ((rc = sscanf(cmd, "%02d:%02d:%02d", &hour, &minute, &second)) == 3) {
+        RTC_set_time(hour, minute, second);
+        printf("ok\n");
+        return;
+    }
+
+    if ((rc = sscanf(cmd, "%02d:%02d", &hour, &minute)) == 2) {
+        RTC_set_time(hour, minute, 0);
+        printf("ok\n");
+        return;
+    }
+
+    printf(">> invalid time (%s)\n", cmd);
 }
 
 void get_weekday() {
@@ -253,10 +316,12 @@ void help() {
     printf("\n");
     printf("Commands:\n");
     printf("  get date\n");
+    printf("  set date <YYYY-MM-DD>\n");
     printf("  get time\n");
+    printf("  set time <HH:MM:SS>\n");
+    printf("  get datetime\n");
+    printf("  set datetime <YYYY-MM-DD HH:MM:SS>\n");
     printf("  get weekday\n");
-    printf("  set date\n");
-    printf("  set time\n");
     printf("\n");
     printf("  set relay <1|2|3|4>\n");
     printf("  clear relay <1|2|3|4>\n");

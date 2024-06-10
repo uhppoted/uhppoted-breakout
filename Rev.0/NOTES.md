@@ -2,34 +2,35 @@
 
 ## Rev.1
 
-1. Schottkey diodes and resistor for RX8900SA VBAT
-   - https://www.diodes.com/assets/Datasheets/SDM03U40.pdf
-2. Decoupling capacitor on RX8900SA VBAT
-3. (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
-4. Pullups on INT0 and INT1
-5. RESET should (maybe) be tied low to hold U2 et al in reset until U5 is ready
-6 R1 and R2 - maybe increase resistance (2.5K? 10K?)
-7. Connect NC pins on J10 to J2
-8. Connect NC    pins on J12 to J12
-9. Tie RX8900SA NC pins to GND
-10. Fix PiZero2W mounting holes
-11. PiZero2W header (?)
-12. debug/state LEDs
-13. BOM: 1.6mm x dia. 6.5mm washer for standoffs
-14. BOM: M3x5 screws
-15. BOM: Machine pin header and socket
-16. Use smaller (2.0mm?) board-to-board connectors (J2,J3,J4)
-17. Allow for external 3.3V
-18. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
-19. J10/J12 soldering jig
-20. Test baseboard
-21. 0805 resistors and capacitors
-22. Fix logo
-23. Use machine pin socket on dev. board.
-24. Relay startup click
-25. SYS LED not driven
-26. Reset/reboot button
-27. Slot for USB ribbon
+1.  Schottkey diodes and resistor for RX8900SA VBAT
+    - https://www.diodes.com/assets/Datasheets/SDM03U40.pdf
+2.  Decoupling capacitor on RX8900SA VBAT
+3.  (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
+4.  Pullups on INT0 and INT1
+5. 20Hz RC LPF for U3 inputs
+6.  RESET should (maybe) be tied low to hold U2 et al in reset until U5 is ready
+7.   R1 and R2 - maybe increase resistance (2.5K? 10K?)
+8.  Connect NC pins on J10 to J2
+9.  Connect NC    pins on J12 to J12
+11.  Tie RX8900SA NC pins to GND
+12. Fix PiZero2W mounting holes
+13. PiZero2W header (?)
+13. debug/state LEDs
+14. BOM: 1.6mm x dia. 6.5mm washer for standoffs
+15. BOM: M3x5 screws
+16. BOM: Machine pin header and socket
+17. Use smaller (2.0mm?) board-to-board connectors (J2,J3,J4)
+18. Allow for external 3.3V
+19. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
+20. J10/J12 soldering jig
+21. Test baseboard
+22. 0805 resistors and capacitors
+23. Fix logo
+24. Use machine pin socket on dev. board.
+25. Relay startup click
+26. SYS LED not driven
+27. Reset/reboot button
+28. Slot for USB ribbon
 
 (?) Slightly larger pads for soldering
 (?)  https://www.chipquik.com/store/product_info.php?products_id=1900050

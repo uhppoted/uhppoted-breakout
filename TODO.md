@@ -2,10 +2,19 @@
 
 ## Rev.0
    - [x] Fix schematic for RP2040 Tiny (https://www.waveshare.com/rp2040-tiny.htm)
-   - [ ] Bring-up checklist
+   - [x] Bring-up checklist
+
+### CLI
+    - [x] debug
+    - [x] reset RTC
+    - [x] get/set-date
+    - [x] get/set-time
+    - [x] get-dow
+    - [x] get/set-datetime
+    - [ ] command timeout
 
 ## PiZeroW
-   - [ ] 24/7 operation: ask Cam
+   - [ ] NB: 24/7 operation - Cam said to ask him
 
 ### OTA
    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
@@ -13,15 +22,6 @@
 ### log
    - [ ] Queue log writes
                
-### CLI
-    - [x] debug
-    - [x] reset RTC
-    - [x] get-dow
-    - [ ] get/set-time
-    - [ ] get/set-date
-    - [ ] get/set-datetime
-    - [ ] command timeout
-
 ### U2 PCAL6408APW
     - [x] init
     - [x] Queue WIO
