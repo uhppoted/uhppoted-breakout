@@ -215,8 +215,6 @@ int RX8900SA_setup(I2C dev) {
         return err;
     }
 
-    debugf("RX8900SA", "setup/1");
-
     // // ... battery backup
     // uint8_t vdet = BACKUP_DISABLED;
     // uint8_t swoff = BACKUP_DIODE;
@@ -227,8 +225,8 @@ int RX8900SA_setup(I2C dev) {
     //     return err;
     // }
 
-    // // ... all done
-    // infof("RX8900SA", "%02x  setup/done", dev.addr);
+    // ... all done
+    infof("RX8900SA", "%02x  setup/done", dev.addr);
 
     return 0;
 }

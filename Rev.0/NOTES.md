@@ -1,6 +1,7 @@
 # NOTES
 
 ## Rev.1
+
 1. Schottkey diodes and resistor for RX8900SA VBAT
    - https://www.diodes.com/assets/Datasheets/SDM03U40.pdf
 2. Decoupling capacitor on RX8900SA VBAT
@@ -27,6 +28,8 @@
 23. Use machine pin socket on dev. board.
 24. Relay startup click
 25. SYS LED not driven
+26. Reset/reboot button
+27. Slot for USB ribbon
 
 (?) Slightly larger pads for soldering
 (?)  https://www.chipquik.com/store/product_info.php?products_id=1900050
