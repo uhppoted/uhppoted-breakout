@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "pico/stdlib.h"
@@ -193,15 +194,23 @@ void exec(char *cmd) {
     }
 }
 
-void yadda() {
-    printf("YADDA YADDA YADDA\n");
+void yadda(void *data) {
+    printf("YADDA YADDA YADDA %p\n", data);
+    free(data);
 }
 
 void debug() {
-    if (!I2C0_push(yadda)) {
-        warnf("CLI", "failed to push task %p", yadda);
-    } else {
-        printf("ok\n");
+    struct closure *task = (struct closure *)malloc(sizeof(closure));
+
+    if (task != NULL) {
+        task->f = yadda;
+        task->data = (void *)task;
+
+        if (!I2C0_push(task)) {
+            warnf("CLI", "failed to push task %p", task);
+        } else {
+            printf("ok\n");
+        }
     }
 }
 

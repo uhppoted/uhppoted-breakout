@@ -19,7 +19,7 @@
 
 ## I2C0
    - [x] queue
-   - [ ] closure
+   - [x] closure
    - [ ] RTC
    - [ ] U3
    - [ ] U4

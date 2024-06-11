@@ -6,6 +6,7 @@
 #include <I2C.h>
 #include <I2C0.h>
 #include <breakout.h>
+#include <state.h>
 
 struct {
     queue_t queue;
@@ -23,21 +24,21 @@ void I2C0_init() {
     gpio_pull_up(I2C0_SDA);
     gpio_pull_up(I2C0_SCL);
 
-    queue_init(&I2C0.queue, sizeof(F), 32);
+    queue_init(&I2C0.queue, sizeof(closure), 32);
 }
 
 void I2C0_run() {
-    F f;
+    struct closure v;
 
     while (true) {
-        queue_remove_blocking(&I2C0.queue, &f);
-        f();
+        queue_remove_blocking(&I2C0.queue, &v);
+        v.f(v.data);
     }
 }
 
-bool I2C0_push(F f) {
-    if (queue_is_full(&I2C0.queue) || !queue_try_add(&I2C0.queue, &f)) {
-        printf("I2C0 .. discarded task %p\n", f);
+bool I2C0_push(const closure *v) {
+    if (queue_is_full(&I2C0.queue) || !queue_try_add(&I2C0.queue, v)) {
+        set_error(ERR_QUEUE_FULL);
         return false;
     }
 
