@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "pico/stdlib.h"
+
 #include <I2C0.h>
 #include <I2C1.h>
 #include <RTC.h>
@@ -12,14 +14,17 @@
 #include <log.h>
 
 typedef struct CLI {
-    // int32_t timer;
+    int32_t timer;
     int ix;
     char buffer[64];
 } CLI;
 
+const uint32_t CLI_TIMEOUT = 10000; // ms
 const uint8_t height = 25;
 
+int64_t cli_timeout(alarm_id_t id, void *data);
 void echo(const char *line);
+void clearline();
 void exec(char *cmd);
 
 void get_datetime();
@@ -38,15 +43,20 @@ void scan();
 void help();
 void debug();
 
-/** Processes received UART characters.
+/** Processes received characters.
  *
  */
 void rx(char *received) {
     static CLI cli = {
-        // .timer = -1,
+        .timer = -1,
         .ix = 0,
         .buffer = {0},
     };
+
+    if (cli.timer > 0) {
+        cancel_alarm(cli.timer);
+        cli.timer = 0;
+    }
 
     int N = strlen(received);
     for (int i = 0; i < N; i++) {
@@ -81,9 +91,9 @@ void rx(char *received) {
                 echo(cli.buffer);
             }
 
-            // if (cli.ix > 0) {
-            //     cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
-            // }
+            if (cli.ix > 0) {
+                cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
+            }
 
             continue;
         }
@@ -98,10 +108,24 @@ void rx(char *received) {
                 echo(cli.buffer);
             }
 
-            // cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
+            cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
             continue;
         }
     }
+}
+
+/* Timeout handler. Clears the current command and command line.
+ *
+ */
+int64_t cli_timeout(alarm_id_t id, void *data) {
+    CLI *cli = (CLI *)data;
+    memset(cli->buffer, 0, sizeof(cli->buffer));
+    cli->ix = 0;
+    cli->timer = 0;
+
+    clearline();
+
+    return 0;
 }
 
 /* Saves the cursor position, displays the current command buffer and then restores
@@ -114,6 +138,19 @@ void echo(const char *cmd) {
     snprintf(s, sizeof(s), "\r>> %s\033[0K", cmd);
     fputs(s, stdout);
     fflush(stdout);
+}
+
+/* Saves the cursor position, clears the command line, redisplays the prompt and then
+ * restores the cursor position.
+ *
+ */
+void clearline() {
+    //     char s[24];
+    //     snprintf(s, sizeof(s), "\0337\033[%d;0H>> \033[0K\0338", height);
+    //     fputs(s, stdout);
+    //     fflush(stdout);
+    //
+    echo("");
 }
 
 void exec(char *cmd) {

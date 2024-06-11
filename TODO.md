@@ -11,7 +11,11 @@
     - [x] get/set-time
     - [x] get-dow
     - [x] get/set-datetime
-    - [ ] command timeout
+    - [x] command timeout
+    - [ ] clear
+    - [ ] reboot
+    - [ ] command line
+
 
 ## I2C0
    - [x] queue
@@ -34,8 +38,8 @@
     - [x] Queue WIO
     - [ ] Decode Wiegand
     - [ ] Decode keypad
-    - [ ] Continuous read 
-    - [ ] 100kHz/400kHz compile flag
+    - (?) Continuous read 
+    - (?) 100kHz/400kHz compile flag
 
 ### U3 PCAL6408APW
     - [x] init
