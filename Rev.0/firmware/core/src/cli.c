@@ -149,14 +149,23 @@ void exec(char *cmd) {
         scan();
     } else if (strncasecmp(cmd, "help", 4) == 0) {
         help();
-    } else if (strncasecmp(cmd, "x", 1) == 0) {
+    } else if (strncasecmp(cmd, "debug", 5) == 0) {
         debug();
     } else {
         printf(">>>> ???? %s\n", cmd);
     }
 }
 
+void yadda() {
+    printf("YADDA YADDA YADDA\n");
+}
+
 void debug() {
+    if (!I2C0_push(yadda)) {
+        warnf("CLI", "failed to push task %p", yadda);
+    } else {
+        printf("ok\n");
+    }
 }
 
 void reset() {

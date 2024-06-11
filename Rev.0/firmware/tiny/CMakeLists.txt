@@ -59,6 +59,7 @@ pico_add_extra_outputs(breakout)
 target_link_libraries(
     breakout 
     pico_stdlib
+    pico_multicore
     hardware_i2c
     hardware_pio 
 )

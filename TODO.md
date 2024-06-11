@@ -13,6 +13,9 @@
     - [x] get/set-datetime
     - [ ] command timeout
 
+## I2C0
+   - [ ] queue
+
 ## PiZeroW
    - [ ] NB: 24/7 operation - Cam said to ask him
 

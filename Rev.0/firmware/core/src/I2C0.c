@@ -7,6 +7,10 @@
 #include <I2C0.h>
 #include <breakout.h>
 
+struct {
+    queue_t queue;
+} I2C0;
+
 void I2C0_init() {
     uint f = i2c_init(i2c0, 100 * 1000); // 100kHz
 
@@ -18,6 +22,26 @@ void I2C0_init() {
 
     gpio_pull_up(I2C0_SDA);
     gpio_pull_up(I2C0_SCL);
+
+    queue_init(&I2C0.queue, sizeof(F), 32);
+}
+
+void I2C0_run() {
+    F f;
+
+    while (true) {
+        queue_remove_blocking(&I2C0.queue, &f);
+        f();
+    }
+}
+
+bool I2C0_push(F f) {
+    if (queue_is_full(&I2C0.queue) || !queue_try_add(&I2C0.queue, &f)) {
+        printf("I2C0 .. discarded task %p\n", f);
+        return false;
+    }
+
+    return true;
 }
 
 int I2C0_write(uint8_t addr, uint8_t reg, uint8_t data) {
