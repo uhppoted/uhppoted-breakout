@@ -30,6 +30,7 @@ add_executable(breakout
   ${CORE}/src/readers.c
   ${CORE}/src/uart.c
   ${CORE}/src/cli.c
+  ${CORE}/src/state.c
   ${CORE}/src/log.c
 
   ${LIB}/src/I2C.c
@@ -54,5 +55,6 @@ pico_add_extra_outputs(breakout)
 target_link_libraries(
     breakout 
     pico_stdlib
+    pico_multicore
     hardware_i2c
 )

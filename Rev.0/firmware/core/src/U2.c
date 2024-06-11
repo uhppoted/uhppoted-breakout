@@ -6,6 +6,7 @@
 #include <U2.h>
 #include <breakout.h>
 #include <log.h>
+#include <state.h>
 
 void U2_on_interrupt(void);
 
@@ -75,7 +76,7 @@ void U2_on_interrupt(void) {
             uint32_t msg = MSG_WIO | (v & 0x0fffffff);
 
             if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-                warnf("U2", "discarded  INPUTS:%02x (%08b) ISR:%02x (%08b)", inputs, inputs, isr, isr);
+                set_error(ERR_QUEUE_FULL);
             }
         }
 
@@ -84,20 +85,3 @@ void U2_on_interrupt(void) {
         gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, true);
     }
 }
-
-// void U2_debug() {
-//     infof("U2", "debug");
-//
-//     for (int i = 0; i < 30; i++) {
-//         int int0 = gpio_get(IOX_INT0);
-//         uint8_t inputs;
-//         int err;
-//
-//         if ((err = PCAL6408APW_read(U2, &inputs)) != ERR_OK) {
-//             warnf("U2", "error reading PCAL6408APW inputs (%d)", err);
-//         }
-//
-//         infof("U2", "INPUTS %02x %08b  INT0:%d", inputs, inputs, int0);
-//         sleep_ms(1000);
-//     }
-// }

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include <pico/binary_info.h>
+#include <pico/multicore.h>
 #include <pico/stdlib.h>
 
 #include <I2C0.h>
@@ -41,6 +42,8 @@ int main() {
 
     I2C0_init();
     I2C1_init();
+
+    multicore_launch_core1(I2C0_run);
 
     printf(">> BREAKOUT %s\n", VERSION);
 

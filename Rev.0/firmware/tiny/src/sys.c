@@ -9,6 +9,7 @@
 #include <dio.h>
 #include <log.h>
 #include <readers.h>
+#include <state.h>
 #include <sys.h>
 #include <usb.h>
 
@@ -80,28 +81,11 @@ void dispatch(uint32_t v) {
 bool blink(repeating_timer_t *t) {
     uint32_t msg = MSG_TICK | ((uint32_t)inputs & 0x00000000);
     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-        warnf("SYS", "tick: queue full");
+        set_error(ERR_QUEUE_FULL);
     }
 
     return true;
 }
-
-// void blink() {
-//     uint8_t cnt = 0;
-//
-//     for (cnt = 0; cnt < 0xff; cnt++) {
-//         put_rgb(cnt, 0xff - cnt, 0);
-//         sleep_ms(3);
-//     }
-//     for (cnt = 0; cnt < 0xff; cnt++) {
-//         put_rgb(0xff - cnt, 0, cnt);
-//         sleep_ms(3);
-//     }
-//     for (cnt = 0; cnt < 0xff; cnt++) {
-//         put_rgb(0, cnt, 0xff - cnt);
-//         sleep_ms(3);
-//     }
-// }
 
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {
     uint32_t rgb = (red << 16u) | (green << 8u) | (blue / 16 << 0u);

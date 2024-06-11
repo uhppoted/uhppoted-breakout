@@ -25,7 +25,10 @@ extern const struct I2C U5;
 
 extern queue_t queue;
 
-extern const int ERR_OK;
-extern const int ERR_GENERIC;
-extern const int ERR_TIMEOUT;
-extern const int ERR_UNKNOWN;
+typedef enum {
+    ERR_OK,
+    ERR_I2C_GENERIC,
+    ERR_I2C_TIMEOUT,
+    ERR_QUEUE_FULL,
+    ERR_UNKNOWN,
+} err;

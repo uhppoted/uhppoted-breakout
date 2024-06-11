@@ -14,7 +14,11 @@
     - [ ] command timeout
 
 ## I2C0
-   - [ ] queue
+   - [x] queue
+   - [ ] closure
+   - [ ] RTC
+   - [ ] U3
+   - [ ] U4
 
 ## PiZeroW
    - [ ] NB: 24/7 operation - Cam said to ask him

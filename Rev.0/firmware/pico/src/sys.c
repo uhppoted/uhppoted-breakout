@@ -9,6 +9,7 @@
 #include <dio.h>
 #include <log.h>
 #include <readers.h>
+#include <state.h>
 #include <sys.h>
 #include <uart.h>
 
@@ -92,7 +93,7 @@ bool blink(repeating_timer_t *t) {
 
     uint32_t msg = MSG_TICK | ((uint32_t)inputs & 0x00000000);
     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-        warnf("SYS", "tick: queue full");
+        set_error(ERR_QUEUE_FULL);
     }
 
     return true;

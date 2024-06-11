@@ -6,6 +6,7 @@
 #include <U3.h>
 #include <breakout.h>
 #include <log.h>
+#include <state.h>
 
 void U3_on_interrupt(void);
 
@@ -76,27 +77,10 @@ void U3_on_interrupt(void) {
             uint32_t msg = MSG_INPUTS | (v & 0x0fffffff);
 
             if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-                warnf("U3", "discarded  INPUTS:%02x (%08b) ISR:%02x (%08b)", inputs, inputs, isr, isr);
+                set_error(ERR_QUEUE_FULL);
             }
         }
 
         gpio_set_irq_enabled(IOX_INT1, GPIO_IRQ_LEVEL_LOW, true);
     }
 }
-
-// void U3_debug() {
-//     infof("U3", "debug");
-//
-//     for (int i = 0; i < 30; i++) {
-//         int int1 = gpio_get(IOX_INT1);
-//         uint8_t inputs;
-//         int err;
-
-//         if ((err = PCAL6408APW_read(U3, &inputs)) != ERR_OK) {
-//             warnf("U3", "error reading PCAL6408APW inputs (%d)", err);
-//         }
-
-//         infof("U3", "INPUTS %02x %08b  INT1:%d", inputs, inputs, int1);
-//         sleep_ms(1000);
-//     }
-// }

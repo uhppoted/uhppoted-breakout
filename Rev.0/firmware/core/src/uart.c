@@ -4,6 +4,7 @@
 #include <hardware/uart.h>
 
 #include <breakout.h>
+#include <state.h>
 
 void on_uart0_rx() {
     char buffer[32];
@@ -20,6 +21,7 @@ void on_uart0_rx() {
             memmove(b, buffer, ix);
             uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
             if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+                set_error(ERR_QUEUE_FULL);
                 free(b);
             }
         }

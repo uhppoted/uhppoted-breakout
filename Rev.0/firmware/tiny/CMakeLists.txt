@@ -30,6 +30,7 @@ add_executable(breakout
   ${CORE}/src/readers.c
   ${CORE}/src/usb.c
   ${CORE}/src/cli.c
+  ${CORE}/src/state.c
   ${CORE}/src/log.c
 
   ${LIB}/src/I2C.c
