@@ -12,10 +12,12 @@
     - [x] get-dow
     - [x] get/set-datetime
     - [x] command timeout
-    - [ ] clear
+    - [x] clear
     - [ ] reboot
     - [ ] command line
 
+## SPI
+   - https://learn.sparkfun.com/tutorials/raspberry-pi-spi-and-i2c-tutorial/all#spi-on-pi
 
 ## I2C0
    - [x] queue

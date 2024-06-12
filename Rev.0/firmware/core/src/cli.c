@@ -41,6 +41,8 @@ void set_LED(const char *led, bool state);
 
 void reset();
 void scan();
+
+void clear();
 void help();
 void debug();
 
@@ -185,6 +187,8 @@ void exec(char *cmd) {
         reset();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
         scan();
+    } else if (strncasecmp(cmd, "clear", 5) == 0) {
+        clear();
     } else if (strncasecmp(cmd, "help", 4) == 0) {
         help();
     } else if (strncasecmp(cmd, "debug", 5) == 0) {
@@ -366,6 +370,16 @@ void scan() {
     I2C1_scan();
 }
 
+/* Clears the terminal.
+ *
+ */
+void clear() {
+    fputs("\033c\033[2J", stdout);
+    fflush(stdout);
+
+    // set_scroll_area();
+}
+
 void help() {
     printf("BREAKOUT Rev.0\n");
     printf("\n");
@@ -385,5 +399,8 @@ void help() {
     printf("\n");
     printf("  reset\n");
     printf("  scan\n");
+    printf("\n");
+    printf("  clear\n");
+    printf("  help\n");
     printf("\n");
 }
