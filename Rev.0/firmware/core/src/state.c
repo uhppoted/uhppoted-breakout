@@ -1,29 +1,39 @@
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+
 #include <breakout.h>
 #include <log.h>
 
-void set_error(err error) {
+void set_error(err error, const char *tag, const char *fmt, ...) {
     switch (error) {
     case ERR_OK:
         break;
 
     case ERR_I2C_GENERIC:
-        warnf("I2C", "read/write error");
         break;
 
-    ERR_I2C_TIMEOUT:
-        warnf("I2C", "read/write timeout");
+    case ERR_I2C_TIMEOUT:
         break;
 
-        ERR_QUEUE_FULL;
-        warnf("SYS", "queue full");
+    case ERR_QUEUE_FULL:
         break;
 
-    ERR_RX8900SA:
-        warnf("RTC", "RX8900SA error");
+    case ERR_RX8900SA:
         break;
 
-    ERR_UNKNOWN:
-        warnf("SYS", "unknown error");
+    case ERR_UNKNOWN:
         break;
     }
+
+    int N = strlen(fmt);
+    char format[N + 32];
+
+    snprintf(format, sizeof(format), "%-5s  %-10s %s\n", "ERROR", tag, fmt);
+
+    va_list args;
+
+    va_start(args, fmt);
+    vprintf(format, args);
+    va_end(args);
 }

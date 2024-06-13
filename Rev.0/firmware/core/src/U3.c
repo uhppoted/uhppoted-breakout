@@ -77,7 +77,7 @@ void U3_on_interrupt(void) {
             uint32_t msg = MSG_INPUTS | (v & 0x0fffffff);
 
             if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-                set_error(ERR_QUEUE_FULL);
+                set_error(ERR_QUEUE_FULL, "U3", "interrupt: queue full");
             }
         }
 

@@ -55,7 +55,7 @@ void RTC_init() {
 
 bool RTC_on_update(repeating_timer_t *rt) {
     if (!I2C0_push(&RTC.task)) {
-        set_error(ERR_QUEUE_FULL);
+        set_error(ERR_QUEUE_FULL, "RTC", "update: queue full");
     }
 
     return true;
@@ -73,8 +73,7 @@ void RTC_get(void *data) {
 
     if (mutex_try_enter(&RTC.guard, NULL)) {
         if ((err = RX8900SA_get_date(U5, &year, &month, &day)) != ERR_OK) {
-            //     warnf("RTC", "get-date error %d", err);
-            set_error(ERR_RX8900SA);
+            set_error(ERR_RX8900SA, "RTC", "get-date error %d", err);
         } else {
             RTC.year = year;
             RTC.month = month;
@@ -82,8 +81,7 @@ void RTC_get(void *data) {
         }
 
         if ((err = RX8900SA_get_time(U5, &hour, &minute, &second)) != ERR_OK) {
-            // warnf("RTC", "get-time error %d", err);
-            set_error(ERR_RX8900SA);
+            set_error(ERR_RX8900SA, "RTC", "get-time error %d", err);
         } else {
             RTC.hour = hour;
             RTC.minute = minute;
@@ -91,8 +89,7 @@ void RTC_get(void *data) {
         }
 
         if ((err = RX8900SA_get_dow(U5, &dow)) != ERR_OK) {
-            // warnf("RTC", "get-dow error %d", err);
-            set_error(ERR_RX8900SA);
+            set_error(ERR_RX8900SA, "RTC", "get-dow error %d", err);
         } else {
             RTC.dow = dow;
         }

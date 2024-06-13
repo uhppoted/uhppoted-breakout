@@ -76,7 +76,7 @@ void U2_on_interrupt(void) {
             uint32_t msg = MSG_WIO | (v & 0x0fffffff);
 
             if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-                set_error(ERR_QUEUE_FULL);
+                set_error(ERR_QUEUE_FULL, "U2", "interrupt: queue full");
             }
         }
 

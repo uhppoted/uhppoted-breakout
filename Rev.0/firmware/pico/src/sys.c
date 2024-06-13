@@ -93,7 +93,7 @@ bool blink(repeating_timer_t *t) {
 
     uint32_t msg = MSG_TICK | ((uint32_t)inputs & 0x00000000);
     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-        set_error(ERR_QUEUE_FULL);
+        set_error(ERR_QUEUE_FULL, "SYS", "blink: queue full");
     }
 
     return true;
