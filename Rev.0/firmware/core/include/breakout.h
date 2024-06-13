@@ -30,5 +30,6 @@ typedef enum {
     ERR_I2C_GENERIC,
     ERR_I2C_TIMEOUT,
     ERR_QUEUE_FULL,
+    ERR_RX8900SA,
     ERR_UNKNOWN,
 } err;

@@ -311,9 +311,9 @@ void set_time(const char *cmd) {
 }
 
 void get_weekday() {
-    char weekday[9] = {0};
+    char weekday[10] = {0};
 
-    RTC_get_dow(weekday, 9);
+    RTC_get_dow(weekday, 10);
 
     printf(">>> %s\n", weekday);
 }

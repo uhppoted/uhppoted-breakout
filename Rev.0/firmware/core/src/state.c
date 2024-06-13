@@ -10,7 +10,7 @@ void set_error(err error) {
         warnf("I2C", "read/write error");
         break;
 
-        ERR_I2C_TIMEOUT;
+    ERR_I2C_TIMEOUT:
         warnf("I2C", "read/write timeout");
         break;
 
@@ -18,7 +18,11 @@ void set_error(err error) {
         warnf("SYS", "queue full");
         break;
 
-        ERR_UNKNOWN;
+    ERR_RX8900SA:
+        warnf("RTC", "RX8900SA error");
+        break;
+
+    ERR_UNKNOWN:
         warnf("SYS", "unknown error");
         break;
     }
