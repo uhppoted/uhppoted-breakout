@@ -1,7 +1,11 @@
 #pragma once
 
+struct closure;
+
+typedef void (*F)(void *);
+
 typedef struct closure {
-    const void (*f)(void *);
+    F f;
     void *data;
 } closure;
 

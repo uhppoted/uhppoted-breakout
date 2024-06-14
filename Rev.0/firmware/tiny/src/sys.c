@@ -44,6 +44,10 @@ bool sysinit() {
 }
 
 void dispatch(uint32_t v) {
+    if ((v & MSG) == MSG_DEBUG) {
+        debugf("SYS", "... debug??");
+    }
+
     if ((v & MSG) == MSG_RX) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
         rx(b);

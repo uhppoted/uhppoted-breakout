@@ -4,6 +4,7 @@
 #include <pico/util/queue.h>
 
 extern const uint32_t MSG;
+extern const uint32_t MSG_DEBUG;
 extern const uint32_t MSG_RX;
 extern const uint32_t MSG_SPI;
 extern const uint32_t MSG_WIO;

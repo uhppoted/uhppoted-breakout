@@ -26,11 +26,15 @@
    - https://www.circuitstate.com/tutorials/making-two-raspberry-pi-pico-boards-communicate-through-spi-using-c-cpp-sdk/#SPI_Receive_Interrupt
    - https://www.digikey.ca/en/maker/projects/raspberry-pi-pico-rp2040-spi-example-with-micropython-and-cc/9706ea0cf3784ee98e35ff49188ee045
    - https://raspberrypi.stackexchange.com/questions/132758/what-is-the-pico-max-spi-frequency
+   - https://github.com/espressif/esp-idf/issues/4810
+   - https://forums.raspberrypi.com/viewtopic.php?t=30052
 
 ## I2C0
    - [x] queue
    - [x] closure
    - [x] RTC
+         [x] get date/time/dow
+         [x] set date/time/dow
    - [ ] U3
    - [ ] U4
 
@@ -71,26 +75,16 @@
 
 ### RTC/RX8900SA
     - [ ] Defer setup with alarm timer
-    - [x] Rework setup to initialise registers as a block
-    - [x] get/set-time
-    - [x] get/set-date
-    - [x] Zeller's congruence for weekday
-          - [ ] verify for all dates over the next century
-    - [ ] get/set-datetime
-    - [ ] get/set-dow
-    - [x] reset
-    - [x] initialise
     - [ ] ready
-    - [x] wrap in RTC.c
     - [ ] handle initialisation sequence in RTC_init
     - [ ] backup mode compile flags
-    - [ ] store/restore date/time to PSRAM
+    - (?) store/restore date/time to flash
 
 ## R&D
-- [ ] Document pin voltage levels
-      - [x] Relays
+- [x] Relay pin voltages
+- [ ] CPU board power consumption
+- [ ] Breakout board power consumption
 
-- [ ] Annotated photos
 - [ ] Pinout diagram
       - (?) [WireViz] https://github.com/formatc1702/WireViz
       - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator

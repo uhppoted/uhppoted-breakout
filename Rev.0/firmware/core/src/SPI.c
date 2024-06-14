@@ -22,8 +22,9 @@ void SPI_init() {
     // spi0_hw->imsc = SSPRXINTR;
     // spi0_hw->imsc = SPI_SSPIMSC_RTIM_BITS | SPI_SSPIMSC_RORIM_BITS | SPI_SSPIMSC_RXIM_BITS;
 
-    irq_set_exclusive_handler(SPI0_IRQ, SPI_on_interrupt);
-    irq_set_enabled(SPI0_IRQ, true);
+    // spi0_hw->imsc = SPI_SSPIMSC_RXIM_BITS;
+    // irq_set_exclusive_handler(SPI0_IRQ, SPI_on_interrupt);
+    // irq_set_enabled(SPI0_IRQ, true);
 
     debugf("SPI", "initialised %u", baudrate);
 }
