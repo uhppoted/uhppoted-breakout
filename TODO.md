@@ -18,6 +18,14 @@
 
 ## SPI
    - https://learn.sparkfun.com/tutorials/raspberry-pi-spi-and-i2c-tutorial/all#spi-on-pi
+   - https://embetronicx.com/tutorials/linux/device-drivers/linux-kernel-spi-device-driver-tutorial
+   - https://github.com/cpb-/spi-tools
+   - https://github.com/joan2937/picod/blob/master/DAEMON/picod.c
+   - https://raspberrypi.stackexchange.com/questions/138460/software-spi-interrupt
+   - https://raspberrypi.stackexchange.com/questions/140153/pi-pico-spi-interrupt-only-fires-once
+   - https://www.circuitstate.com/tutorials/making-two-raspberry-pi-pico-boards-communicate-through-spi-using-c-cpp-sdk/#SPI_Receive_Interrupt
+   - https://www.digikey.ca/en/maker/projects/raspberry-pi-pico-rp2040-spi-example-with-micropython-and-cc/9706ea0cf3784ee98e35ff49188ee045
+   - https://raspberrypi.stackexchange.com/questions/132758/what-is-the-pico-max-spi-frequency
 
 ## I2C0
    - [x] queue

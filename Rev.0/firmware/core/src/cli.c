@@ -8,6 +8,7 @@
 #include <I2C0.h>
 #include <I2C1.h>
 #include <RTC.h>
+#include <SPI.h>
 #include <U2.h>
 #include <U3.h>
 #include <U4.h>
@@ -198,24 +199,8 @@ void exec(char *cmd) {
     }
 }
 
-void yadda(void *data) {
-    printf("YADDA YADDA YADDA %p\n", data);
-    free(data);
-}
-
 void debug() {
-    struct closure *task = (struct closure *)malloc(sizeof(closure));
-
-    if (task != NULL) {
-        task->f = yadda;
-        task->data = (void *)task;
-
-        if (!I2C0_push(task)) {
-            warnf("CLI", "failed to push task %p", task);
-        } else {
-            printf("ok\n");
-        }
-    }
+    SPI_debug();
 }
 
 void reset() {

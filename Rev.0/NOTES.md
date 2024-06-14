@@ -24,13 +24,14 @@
 19. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
 20. J10/J12 soldering jig
 21. Test baseboard
-22. 0805 resistors and capacitors
+22. 1206 or 0603 resistors and capacitors ?
 23. Fix logo
 24. Use machine pin socket on dev. board.
 25. Relay startup click
 26. SYS LED not driven
 27. Reset/reboot button
 28. Slot for USB ribbon
+29. PiZero2W mounting holes are M2.5
 
 (?) Slightly larger pads for soldering
 (?)  https://www.chipquik.com/store/product_info.php?products_id=1900050

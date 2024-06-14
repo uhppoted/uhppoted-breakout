@@ -5,14 +5,14 @@ INCLUDE=include/*.h ../core/include/*.h ../lib/include/*.h
 
 .PHONY: format
 
-clean: CMakeLists.txt
+clean: 
 	rm -rf build
 	mkdir -p build
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
 	       cmake ..
 
-format: clean $(SRC) $(INCLUDE)
+format: 
 	clang-format -i src/*.c         -i include/*.h
 	clang-format -i ../core/src/*.c -i ../core/include/*.h
 	clang-format -i ../lib/src/*.c  -i ../lib/include/*.h

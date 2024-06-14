@@ -9,6 +9,7 @@
 #include <I2C1.h>
 #include <IOX.h>
 #include <RTC.h>
+#include <SPI.h>
 #include <breakout.h>
 #include <log.h>
 #include <sys.h>
@@ -23,6 +24,7 @@ const uint32_t MSG = 0xf0000000;
 const uint32_t MSG_WIO = 0x10000000;
 const uint32_t MSG_INPUTS = 0x20000000;
 const uint32_t MSG_RX = 0x30000000;
+const uint32_t MSG_SPI = 0x40000000;
 const uint32_t MSG_TICK = 0xf0000000;
 
 queue_t queue;
@@ -52,9 +54,10 @@ int main() {
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
 
-    // ... initialise RTC and IO expanders
+    // ... initialise RTC, IO expanders and SPI
     RTC_init();
     IOX_init();
+    SPI_init();
 
     // ... run loop
     while (true) {

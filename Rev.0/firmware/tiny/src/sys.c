@@ -50,6 +50,10 @@ void dispatch(uint32_t v) {
         free(b);
     }
 
+    if ((v & MSG) == MSG_SPI) {
+        debugf("SPI", "woof");
+    }
+
     if ((v & MSG) == MSG_WIO) {
         uint8_t io = v & 0x000000ff;
         uint8_t mask = (v >> 8) & 0x000000ff;

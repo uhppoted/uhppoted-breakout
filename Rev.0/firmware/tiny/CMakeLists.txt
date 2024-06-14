@@ -23,6 +23,7 @@ add_executable(breakout
   ${CORE}/src/I2C1.c
   ${CORE}/src/RTC.c
   ${CORE}/src/IOX.c
+  ${CORE}/src/SPI.c
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
@@ -63,5 +64,6 @@ target_link_libraries(
     pico_multicore
     pico_sync
     hardware_i2c
+    hardware_spi
     hardware_pio 
 )

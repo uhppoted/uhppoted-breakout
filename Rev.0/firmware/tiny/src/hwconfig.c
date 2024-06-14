@@ -38,6 +38,11 @@ const uint IOX_RESET = GPIO_14;
 const uint IOX_INT0 = GPIO_15;
 const uint IOX_INT1 = GPIO_9;
 
+const uint SPI_RX = GPIO_4;
+const uint SPI_TX = GPIO_7;
+const uint SPI_CSn = GPIO_5;
+const uint SPI_CLK = GPIO_6;
+
 // U2 PCAL6408A
 const struct I2C U2 = {
     .bus = i2c1,
