@@ -40,3 +40,8 @@ typedef enum {
     ERR_RX8900SA,
     ERR_UNKNOWN,
 } err;
+
+typedef struct buffer {
+    int N;
+    uint8_t *data;
+} buffer;

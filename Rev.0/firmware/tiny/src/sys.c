@@ -4,6 +4,7 @@
 #include <hardware/pio.h>
 #include <pico/stdlib.h>
 
+#include <SPI.h>
 #include <breakout.h>
 #include <cli.h>
 #include <dio.h>
@@ -55,7 +56,12 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_SPI) {
-        debugf("SPI", "woof");
+        buffer *b = (buffer *)(SRAM_BASE | (v & 0x0fffffff));
+
+        SPI_rx(b->N, b->data);
+
+        free(b->data);
+        free(b);
     }
 
     if ((v & MSG) == MSG_WIO) {

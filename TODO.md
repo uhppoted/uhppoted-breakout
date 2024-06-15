@@ -29,6 +29,13 @@
    - https://github.com/espressif/esp-idf/issues/4810
    - https://forums.raspberrypi.com/viewtopic.php?t=30052
 
+   - https://forums.raspberrypi.com/viewtopic.php?t=324252
+   - https://github.com/raspberrypi/pico-examples/tree/master/spi/spi_dma
+   - https://forums.raspberrypi.com/viewtopic.php?t=338108
+   - https://people.ece.cornell.edu/land/courses/ece4760/RP2040/C_SDK_DMA_machine/DMA_machine_rp2040.html
+   - https://blog.adafruit.com/2023/01/24/using-direct-memory-access-dma-on-the-rp2040-chip-raspberrypi-rp2040-dma
+   - https://stackoverflow.com/questions/66388451/how-to-use-raspberry-pi-pico-with-dac-with-spi-to-generate-sine-wave-of-1-khz-wi
+
 ## I2C0
    - [x] queue
    - [x] closure
