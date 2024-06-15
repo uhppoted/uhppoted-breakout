@@ -11,6 +11,7 @@
     - [x] clear
     - [ ] reboot
     - [ ] command line
+    - [ ] Dangling '['
 
 ## I2C0
    - [x] queue
@@ -22,6 +23,11 @@
    - [ ] U4
 
 ## UART
+   - [ ] Enable FIFO
+   - [ ] // FIXME use struct with length (or match on SOM/EOM or something)
+   - https://forums.raspberrypi.com/viewtopic.php?t=327189
+   - https://stackoverflow.com/questions/76367736/uart-tx-produce-endless-interrupts-how-to-acknowlage-the-interrupt
+   - https://www.baeldung.com/cs/bisync
 
 ## PiZeroW
    - [ ] Reduce power consumption

@@ -27,7 +27,7 @@ bool on_usb_rx(repeating_timer_t *rt) {
 
             if ((b = calloc(ix + 1, 1)) != NULL) {
                 memmove(b, buffer, ix);
-                uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
+                uint32_t msg = MSG_TTY | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
                 if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
                     set_error(ERR_QUEUE_FULL, "USB", "rx: queue full");
                     free(b);

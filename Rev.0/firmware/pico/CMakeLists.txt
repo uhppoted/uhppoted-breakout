@@ -29,7 +29,7 @@ add_executable(breakout
   ${CORE}/src/dio.c
   ${CORE}/src/wiegand.c
   ${CORE}/src/txrx.c
-  ${CORE}/src/uart.c
+  ${CORE}/src/tty.c
   ${CORE}/src/cli.c
   ${CORE}/src/state.c
   ${CORE}/src/log.c

@@ -65,4 +65,5 @@ target_link_libraries(
     pico_sync
     hardware_i2c
     hardware_pio 
+    hardware_uart
 )

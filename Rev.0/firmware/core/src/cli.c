@@ -13,6 +13,7 @@
 #include <U4.h>
 #include <cli.h>
 #include <log.h>
+#include <txrx.h>
 
 typedef struct CLI {
     int32_t timer;
@@ -199,6 +200,7 @@ void exec(char *cmd) {
 }
 
 void debug() {
+    TXRX_debug();
 }
 
 void reset() {

@@ -10,6 +10,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
+#include <txrx.h>
 #include <usb.h>
 #include <wiegand.h>
 
@@ -48,12 +49,6 @@ void dispatch(uint32_t v) {
         debugf("SYS", "... debug??");
     }
 
-    if ((v & MSG) == MSG_RX) {
-        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        rx(b);
-        free(b);
-    }
-
     if ((v & MSG) == MSG_WIO) {
         uint8_t io = v & 0x000000ff;
         uint8_t mask = (v >> 8) & 0x000000ff;
@@ -66,6 +61,18 @@ void dispatch(uint32_t v) {
         uint8_t mask = (v >> 8) & 0x000000ff;
 
         inputs(io, mask);
+    }
+
+    if ((v & MSG) == MSG_RX) {
+        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
+        TXRX_rx(b);
+        free(b);
+    }
+
+    if ((v & MSG) == MSG_TTY) {
+        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
+        rx(b);
+        free(b);
     }
 
     if ((v & MSG) == MSG_TICK) {

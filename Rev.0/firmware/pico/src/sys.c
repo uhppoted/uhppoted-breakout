@@ -10,7 +10,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
-#include <uart.h>
+#include <tty.h>
 #include <wiegand.h>
 
 #define BAUD_RATE 115200
@@ -18,7 +18,6 @@
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
-void on_uart0_rx();
 bool blink(repeating_timer_t *);
 
 struct {
@@ -49,7 +48,7 @@ bool sysinit() {
     uart_set_format(uart0, DATA_BITS, STOP_BITS, PARITY);
     uart_set_fifo_enabled(uart0, false);
 
-    irq_set_exclusive_handler(UART0_IRQ, on_uart0_rx);
+    irq_set_exclusive_handler(UART0_IRQ, on_tty_rx);
     irq_set_enabled(UART0_IRQ, true);
 
     uart_set_irq_enables(uart0, true, false);
@@ -58,7 +57,7 @@ bool sysinit() {
 }
 
 void dispatch(uint32_t v) {
-    if ((v & MSG) == MSG_RX) {
+    if ((v & MSG) == MSG_TTY) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
         rx(b);
         free(b);
