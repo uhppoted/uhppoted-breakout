@@ -18,7 +18,7 @@ void SPI_init() {
     gpio_set_function(SPI_CLK, GPIO_FUNC_SPI);
     gpio_set_function(SPI_CSn, GPIO_FUNC_SPI);
 
-    uint baudrate = spi_init(spi0, 2000000s);
+    uint baudrate = spi_init(spi0, 2000000);
     spi_set_format(spi0, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
     spi_set_slave(spi0, true);
 

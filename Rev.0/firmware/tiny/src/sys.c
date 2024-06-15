@@ -4,15 +4,14 @@
 #include <hardware/pio.h>
 #include <pico/stdlib.h>
 
-#include <SPI.h>
 #include <breakout.h>
 #include <cli.h>
 #include <dio.h>
 #include <log.h>
-#include <readers.h>
 #include <state.h>
 #include <sys.h>
 #include <usb.h>
+#include <wiegand.h>
 
 #include "ws2812.pio.h"
 
@@ -38,7 +37,7 @@ bool sysinit() {
         return false;
     }
 
-    // ... USB
+    // ... CLI
     setup_usb();
 
     return true;
@@ -52,15 +51,6 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_RX) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
         rx(b);
-        free(b);
-    }
-
-    if ((v & MSG) == MSG_SPI) {
-        buffer *b = (buffer *)(SRAM_BASE | (v & 0x0fffffff));
-
-        SPI_rx(b->N, b->data);
-
-        free(b->data);
         free(b);
     }
 

@@ -43,6 +43,9 @@ const uint SPI_TX = GPIO_7;
 const uint SPI_CSn = GPIO_5;
 const uint SPI_CLK = GPIO_6;
 
+const uint UART0_TX = GPIO_0;
+const uint UART0_RX = GPIO_1;
+
 // U2 PCAL6408A
 const struct I2C U2 = {
     .bus = i2c1,

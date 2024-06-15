@@ -12,6 +12,7 @@
 #include <breakout.h>
 #include <log.h>
 #include <sys.h>
+#include <txrx.h>
 
 #define VERSION "v0.0"
 #define I2C0SDA 8
@@ -52,8 +53,9 @@ int main() {
     alarm_pool_init_default();
 
     // ... initialise RTC and IO expanders
-    // RTC_init();
+    RTC_init();
     IOX_init();
+    TXRX_init();
 
     // ... run loop
     while (true) {

@@ -6,7 +6,6 @@
 extern const uint32_t MSG;
 extern const uint32_t MSG_DEBUG;
 extern const uint32_t MSG_RX;
-extern const uint32_t MSG_SPI;
 extern const uint32_t MSG_WIO;
 extern const uint32_t MSG_INPUTS;
 extern const uint32_t MSG_TICK;
@@ -24,6 +23,9 @@ extern const uint SPI_RX;
 extern const uint SPI_TX;
 extern const uint SPI_CSn;
 extern const uint SPI_CLK;
+
+extern const uint UART0_TX;
+extern const uint UART0_RX;
 
 extern const struct I2C U2;
 extern const struct I2C U3;

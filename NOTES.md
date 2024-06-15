@@ -31,6 +31,26 @@
 ## RX8900SA
 1. https://github.com/citriena/RX8900RTC/blob/master/src/RX8900RTC.cpp
 
+## SPI
+   - https://learn.sparkfun.com/tutorials/raspberry-pi-spi-and-i2c-tutorial/all#spi-on-pi
+   - https://embetronicx.com/tutorials/linux/device-drivers/linux-kernel-spi-device-driver-tutorial
+   - https://github.com/cpb-/spi-tools
+   - https://github.com/joan2937/picod/blob/master/DAEMON/picod.c
+   - https://raspberrypi.stackexchange.com/questions/138460/software-spi-interrupt
+   - https://raspberrypi.stackexchange.com/questions/140153/pi-pico-spi-interrupt-only-fires-once
+   - https://www.circuitstate.com/tutorials/making-two-raspberry-pi-pico-boards-communicate-through-spi-using-c-cpp-sdk/#SPI_Receive_Interrupt
+   - https://www.digikey.ca/en/maker/projects/raspberry-pi-pico-rp2040-spi-example-with-micropython-and-cc/9706ea0cf3784ee98e35ff49188ee045
+   - https://raspberrypi.stackexchange.com/questions/132758/what-is-the-pico-max-spi-frequency
+   - https://github.com/espressif/esp-idf/issues/4810
+   - https://forums.raspberrypi.com/viewtopic.php?t=30052
+
+   - https://forums.raspberrypi.com/viewtopic.php?t=324252
+   - https://github.com/raspberrypi/pico-examples/tree/master/spi/spi_dma
+   - https://forums.raspberrypi.com/viewtopic.php?t=338108
+   - https://people.ece.cornell.edu/land/courses/ece4760/RP2040/C_SDK_DMA_machine/DMA_machine_rp2040.html
+   - https://blog.adafruit.com/2023/01/24/using-direct-memory-access-dma-on-the-rp2040-chip-raspberrypi-rp2040-dma
+   - https://stackoverflow.com/questions/66388451/how-to-use-raspberry-pi-pico-with-dac-with-spi-to-generate-sine-wave-of-1-khz-wi
+
 ## UT0311L04
 
 ### Startup
@@ -41,3 +61,4 @@
 | 2     | OPEN    | CLOSED | +5V |
 | 3     | OPEN    | CLOSED | +5V |
 | 4     | OPEN    | CLOSED | +5V |
+

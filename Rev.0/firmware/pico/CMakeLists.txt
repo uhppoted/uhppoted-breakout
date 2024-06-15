@@ -27,7 +27,8 @@ add_executable(breakout
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
   ${CORE}/src/dio.c
-  ${CORE}/src/readers.c
+  ${CORE}/src/wiegand.c
+  ${CORE}/src/txrx.c
   ${CORE}/src/uart.c
   ${CORE}/src/cli.c
   ${CORE}/src/state.c

@@ -8,7 +8,6 @@
 #include <I2C0.h>
 #include <I2C1.h>
 #include <RTC.h>
-#include <SPI.h>
 #include <U2.h>
 #include <U3.h>
 #include <U4.h>
@@ -200,7 +199,6 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    SPI_debug();
 }
 
 void reset() {

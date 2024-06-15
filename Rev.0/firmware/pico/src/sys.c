@@ -8,10 +8,10 @@
 #include <cli.h>
 #include <dio.h>
 #include <log.h>
-#include <readers.h>
 #include <state.h>
 #include <sys.h>
 #include <uart.h>
+#include <wiegand.h>
 
 #define BAUD_RATE 115200
 #define DATA_BITS 8

@@ -7,9 +7,9 @@
 2.  Decoupling capacitor on RX8900SA VBAT
 3.  (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
 4.  Pullups on INT0 and INT1
-5. 20Hz RC LPF for U3 inputs
+5.  20Hz RC LPF for U3 inputs
 6.  RESET should (maybe) be tied low to hold U2 et al in reset until U5 is ready
-7.   R1 and R2 - maybe increase resistance (2.5K? 10K?)
+7.  R1 and R2 - maybe increase resistance (2.5K? 10K?)
 8.  Connect NC pins on J10 to J2
 9.  Connect NC    pins on J12 to J12
 11.  Tie RX8900SA NC pins to GND
@@ -32,11 +32,13 @@
 27. Reset/reboot button
 28. Slot for USB ribbon
 29. PiZero2W mounting holes are M2.5
+30. Route GND and +5V to PiZero2W header (jumper on +5V)
+31. Route SPI and UART to PiZero2W header (with solder bridges/zero ohm resistors)
+(?) Maybe put GND on pin 1 of UART/SPI header
 
+(?) Mounting holes for external 12V power supply
 (?) Slightly larger pads for soldering
-(?)  https://www.chipquik.com/store/product_info.php?products_id=1900050
-(?) Pulldowns on all inputs
-(?) RC filters on inputs
+(?) https://www.chipquik.com/store/product_info.php?products_id=1900050
 (?) Expose FOUT pin via test point/pad and resistor
 (?) Expose INT  pin via test point/pad and resistor
 (?) Jumper VBAT to VDD for no battery option
