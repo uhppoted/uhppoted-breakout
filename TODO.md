@@ -28,6 +28,9 @@
    - https://forums.raspberrypi.com/viewtopic.php?t=327189
    - https://stackoverflow.com/questions/76367736/uart-tx-produce-endless-interrupts-how-to-acknowlage-the-interrupt
    - https://www.baeldung.com/cs/bisync
+   - https://stackoverflow.com/questions/51609813/serial-communication-in-c-for-raspberry-pi
+   - https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
+   - https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
 
 ## PiZeroW
    - [ ] Reduce power consumption
@@ -52,6 +55,7 @@
     - [x] Queue INPUTS
     - [ ] LPF
     - [ ] Inputs chattering ?????
+          - https://pyspice.fabrice-salvaire.fr/releases/v1.4/examples/filter/low-pass-rc-filter.html
 
 ### U4 PI4IOE5V6416
     - [x] init
