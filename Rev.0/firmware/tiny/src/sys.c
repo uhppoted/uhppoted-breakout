@@ -57,10 +57,7 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_INPUTS) {
-        uint8_t io = v & 0x000000ff;
-        uint8_t mask = (v >> 8) & 0x000000ff;
-
-        inputs(io, mask);
+        inputs(v & 0x000000ff);
     }
 
     if ((v & MSG) == MSG_RX) {

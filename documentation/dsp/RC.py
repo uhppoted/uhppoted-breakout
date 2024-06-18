@@ -8,6 +8,7 @@ fs:     1kHz
 from scipy import signal
 from scipy import pi
 from matplotlib.ticker import ScalarFormatter
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -15,11 +16,17 @@ import numpy as np
 # 2𝜋𝑅𝐶 = 1/𝑓𝑐
 # 𝑅 = 1/𝐶.2𝜋𝑓𝑐
 
+# PCAL6408APW
+# Vᴅᴅ   = 5V
+# Vʟᴏᴡ  = 0.3Vᴅᴅ (1.5V)
+# Vʜɪɢʜ = 0.7Vᴅᴅ (3.5V)
+# Vʜ    = 3.5V - 1.5V = 2V
+
 TAU = 2*pi
-N = 1       # order of filter
-f0 = 50     # cutoff frequency (Hz)
-fs = 1000   # sampling frequency (Hz)
-aliasing = 3/5 # max. allowable aliasing noise with Schmitt trigger with Vʟᴏᴡ=1.0V Vʜɪɢʜ=4.0V
+N = 1          # order of filter
+f0 = 50        # cutoff frequency (Hz)
+fs = 1000      # sampling frequency (Hz)
+aliasing = 2/5 # max. allowable aliasing noise
 
 C = 3.3/10000000 # 0.33uF
 R = 1/(C*TAU*f0)

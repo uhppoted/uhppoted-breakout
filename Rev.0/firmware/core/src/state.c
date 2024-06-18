@@ -22,6 +22,9 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
     case ERR_RX8900SA:
         break;
 
+    case ERR_U3:
+        break;
+
     case ERR_UNKNOWN:
         break;
     }

@@ -107,7 +107,7 @@ void rx(char *received) {
             cli.buffer[cli.ix++] = ch;
             cli.buffer[cli.ix] = 0;
 
-            // ... echo if normal commnad and not a VT100 code
+            // ... echo if normal command and not a VT100 code
             if (cli.buffer[0] != 27) {
                 echo(cli.buffer);
             }
@@ -139,7 +139,7 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
 void echo(const char *cmd) {
     char s[64];
     // snprintf(s, sizeof(s), "\0337\033[%d;0H>> %s\033[0K\0338", height, cmd);
-    snprintf(s, sizeof(s), "\r>> %s\033[0K", cmd);
+    snprintf(s, sizeof(s), "\r>> %s", cmd);
     fputs(s, stdout);
     fflush(stdout);
 }

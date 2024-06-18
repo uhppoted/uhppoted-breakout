@@ -10,16 +10,16 @@
     - [x] command timeout
     - [x] clear
     - [ ] reboot
-    - [ ] command line
+    - (?) command line
     - [ ] Dangling '['
 
 ## I2C0
    - [x] queue
    - [x] closure
    - [x] RTC
-         [x] get date/time/dow
-         [x] set date/time/dow
    - [ ] U3
+         - [x] sample @1kHz
+         - [ ] LPF
    - [ ] U4
 
 ## UART
@@ -56,6 +56,8 @@
     - [ ] LPF
     - [ ] Inputs chattering ?????
           - https://pyspice.fabrice-salvaire.fr/releases/v1.4/examples/filter/low-pass-rc-filter.html
+          - https://www.digikey.ca/en/articles/how-to-implement-hardware-debounce-for-switches-and-relays
+          - https://www.eejournal.com/article/ultimate-guide-to-switch-debounce-part-3/
 
 ### U4 PI4IOE5V6416
     - [x] init

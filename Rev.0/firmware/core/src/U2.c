@@ -30,12 +30,12 @@ void U2_init() {
         warnf("U2", "error setting PCAL6408APW polarity (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_latched(U2, 0xff)) != ERR_OK) {
-        warnf("U2", "error setting PCAL6408APW latches (%d)", err);
-    }
-
     if ((err = PCAL6408APW_set_pullups(U2, 0xff)) != ERR_OK) {
         warnf("U2", "error setting PCAL6408APW pullups (%d)", err);
+    }
+
+    if ((err = PCAL6408APW_set_latched(U2, 0xff)) != ERR_OK) {
+        warnf("U2", "error setting PCAL6408APW latches (%d)", err);
     }
 
     if ((err = PCAL6408APW_set_interrupts(U2, 0x00)) != ERR_OK) {
