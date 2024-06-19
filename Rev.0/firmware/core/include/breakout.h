@@ -8,7 +8,7 @@ extern const uint32_t MSG_DEBUG;
 extern const uint32_t MSG_RX;
 extern const uint32_t MSG_TTY;
 extern const uint32_t MSG_WIO;
-extern const uint32_t MSG_INPUTS;
+extern const uint32_t MSG_U3;
 extern const uint32_t MSG_TICK;
 
 extern const uint I2C0_SDA;

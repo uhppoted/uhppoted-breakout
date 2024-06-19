@@ -4,9 +4,9 @@
 #include <hardware/pio.h>
 #include <pico/stdlib.h>
 
+#include <U3.h>
 #include <breakout.h>
 #include <cli.h>
-#include <dio.h>
 #include <log.h>
 #include <state.h>
 #include <sys.h>
@@ -56,8 +56,8 @@ void dispatch(uint32_t v) {
         wio(io, mask);
     }
 
-    if ((v & MSG) == MSG_INPUTS) {
-        inputs(v & 0x000000ff);
+    if ((v & MSG) == MSG_U3) {
+        U3_process(v & 0x000000ff);
     }
 
     if ((v & MSG) == MSG_RX) {
@@ -87,7 +87,7 @@ void dispatch(uint32_t v) {
  *
  */
 bool blink(repeating_timer_t *t) {
-    uint32_t msg = MSG_TICK | ((uint32_t)inputs & 0x00000000);
+    uint32_t msg = MSG_TICK;
     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
         set_error(ERR_QUEUE_FULL, "SYS", "blink: queue full");
     }

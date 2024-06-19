@@ -4,13 +4,14 @@
 #include <hardware/uart.h>
 #include <pico/stdlib.h>
 
+#include <U3.h>
 #include <breakout.h>
 #include <cli.h>
-#include <dio.h>
 #include <log.h>
 #include <state.h>
 #include <sys.h>
 #include <tty.h>
+#include <txrx.h>
 #include <wiegand.h>
 
 #define BAUD_RATE 115200
@@ -57,10 +58,8 @@ bool sysinit() {
 }
 
 void dispatch(uint32_t v) {
-    if ((v & MSG) == MSG_TTY) {
-        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        rx(b);
-        free(b);
+    if ((v & MSG) == MSG_DEBUG) {
+        debugf("SYS", "... debug??");
     }
 
     if ((v & MSG) == MSG_WIO) {
@@ -70,11 +69,20 @@ void dispatch(uint32_t v) {
         wio(io, mask);
     }
 
-    if ((v & MSG) == MSG_INPUTS) {
-        uint8_t io = v & 0x000000ff;
-        uint8_t mask = (v >> 8) & 0x000000ff;
+    if ((v & MSG) == MSG_U3) {
+        U3_process(v & 0x000000ff);
+    }
 
-        inputs(io, mask);
+    if ((v & MSG) == MSG_RX) {
+        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
+        TXRX_rx(b);
+        free(b);
+    }
+
+    if ((v & MSG) == MSG_TTY) {
+        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
+        rx(b);
+        free(b);
     }
 
     if ((v & MSG) == MSG_TICK) {
@@ -90,7 +98,7 @@ bool blink(repeating_timer_t *t) {
 
     gpio_put(PICO_DEFAULT_LED_PIN, !on);
 
-    uint32_t msg = MSG_TICK | ((uint32_t)inputs & 0x00000000);
+    uint32_t msg = MSG_TICK;
     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
         set_error(ERR_QUEUE_FULL, "SYS", "blink: queue full");
     }

@@ -12,10 +12,9 @@ from matplotlib.ticker import ScalarFormatter
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 TAU = 2*pi
 N = 1      # order of filter
-fc = 50    # cutoff frequency (Hz)
+fc = 1     # cutoff frequency (Hz)
 fs = 1000  # sampling frequency (Hz)
 hysteresis = 0.3
 

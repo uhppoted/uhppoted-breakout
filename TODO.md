@@ -10,6 +10,7 @@
     - [x] command timeout
     - [x] clear
     - [ ] reboot
+    - [ ] show switches/buttons
     - (?) command line
     - [ ] Dangling '['
 
@@ -19,7 +20,11 @@
    - [x] RTC
    - [ ] U3
          - [x] sample @1kHz
+         - [ ] set polarity
          - [ ] LPF
+               - https://vcvrack.com/docs-v2/filter_8hpp_source
+               - check coefficients
+               - simulation
    - [ ] U4
 
 ## UART

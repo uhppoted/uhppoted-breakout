@@ -26,7 +26,6 @@ add_executable(breakout
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
-  ${CORE}/src/dio.c
   ${CORE}/src/wiegand.c
   ${CORE}/src/txrx.c
   ${CORE}/src/usb.c
@@ -38,6 +37,7 @@ add_executable(breakout
   ${LIB}/src/RX8900SA.c
   ${LIB}/src/PCAL6408APW.c
   ${LIB}/src/PI4IOE5V6416.c
+  ${LIB}/src/IIR.c
 )
 
 target_include_directories(breakout 
