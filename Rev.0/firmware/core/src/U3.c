@@ -3,15 +3,16 @@
 #include <pico/stdlib.h>
 
 #include <I2C0.h>
-#include <IIR.h>
 #include <PCAL6408APW.h>
 #include <U3.h>
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
 
-bool U3_on_update(repeating_timer_t *rt);
-void U3_get(void *data);
+typedef struct IIR {
+    float x₁;
+    float y₁;
+} IIR;
 
 struct {
     uint8_t inputs;
@@ -20,14 +21,14 @@ struct {
 } U3x = {
     .inputs = 0x00,
     .lpf = {
-        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
-        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
-        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
-        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
-        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
-        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
-        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
-        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+        {.x₁ = 0.0, .y₁ = 0.0},
+        {.x₁ = 0.0, .y₁ = 0.0},
+        {.x₁ = 0.0, .y₁ = 0.0},
+        {.x₁ = 0.0, .y₁ = 0.0},
+        {.x₁ = 0.0, .y₁ = 0.0},
+        {.x₁ = 0.0, .y₁ = 0.0},
+        {.x₁ = 0.0, .y₁ = 0.0},
+        {.x₁ = 0.0, .y₁ = 0.0},
     }};
 
 const uint8_t S1 = 0x10;
@@ -43,6 +44,16 @@ const uint8_t PB4 = 0x01;
 const uint8_t U3_MASKS[] = {S1, S2, S3, S4, PB1, PB2, PB3, PB4};
 const uint8_t U3_DOORS[] = {0x00, 0x01, 0x02, 0x04, 0x08};
 const uint8_t U3_BUTTONS[] = {0x00, 0x10, 0x20, 0x40, 0x80};
+
+// 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+const float a₀ = 1.0;
+const float a₁ = -0.85408069;
+const float b₀ = 0.07295966;
+const float b₁ = 0.07295966;
+
+bool U3_on_update(repeating_timer_t *rt);
+void U3_get(void *data);
+float lpf(IIR *iir, float in);
 
 void U3_init() {
     infof("U3", "init");
@@ -127,7 +138,7 @@ void U3_process(uint8_t inputs) {
 
     for (int i = 0; i < 8; i++) {
         float u = (inputs & U3_MASKS[i]) != 0x00 ? 1.0 : 0.0;
-        float v = IIR_process(&U3x.lpf[i], u);
+        float v = lpf(&U3x.lpf[i], u);
 
         if (v > 0.9) {
             bits |= mask;
@@ -171,4 +182,18 @@ bool U3_get_button(uint8_t door) {
     }
 
     return (U3x.inputs & U3_BUTTONS[door]) != 0x00;
+}
+
+// y₀ = (b₀x₀ + b₁x₁ - a₁y₁)/a₀
+float lpf(IIR *iir, float x₀) {
+    // clang-format off
+    float y₀ = b₀ * x₀;
+          y₀ += b₁ * iir->x₁;
+          y₀ -= a₁ * iir->y₁;
+    // clang-format on
+
+    iir->x₁ = x₀;
+    iir->y₁ = y₀;
+
+    return y₀;
 }

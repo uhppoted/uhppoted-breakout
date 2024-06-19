@@ -401,6 +401,8 @@ void help() {
     printf("  clear relay <1|2|3|4>\n");
     printf("  set LED <1|2|3|4|SYS|IN|ERR>\n");
     printf("  clear LED <1|2|3|4|SYS|IN|ERR>\n");
+    printf("  get doors\n");
+    printf("  get buttons\n");
     printf("\n");
     printf("  reset\n");
     printf("  scan\n");

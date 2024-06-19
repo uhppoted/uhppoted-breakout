@@ -8,4 +8,5 @@
 - Vʜɪɢʜ = 0.7Vᴅᴅ (3.5V)
 - Vʜ    = 3.5V - 1.5V = 2V
 
-
+# Debouncing
+- https://www.eejournal.com/article/ultimate-guide-to-switch-debounce-part-1
