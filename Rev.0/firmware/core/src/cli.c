@@ -39,6 +39,8 @@ void get_weekday();
 
 void set_relay(const char *relay, bool state);
 void set_LED(const char *led, bool state);
+void get_doors();
+void get_buttons();
 
 void reset();
 void scan();
@@ -184,6 +186,10 @@ void exec(char *cmd) {
         set_LED(&cmd[8], true);
     } else if (strncasecmp(cmd, "clear LED ", 10) == 0) {
         set_LED(&cmd[10], false);
+    } else if (strncasecmp(cmd, "get doors", 9) == 0) {
+        get_doors();
+    } else if (strncasecmp(cmd, "get buttons", 11) == 0) {
+        get_buttons();
     } else if (strncasecmp(cmd, "reset", 5) == 0) {
         reset();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
@@ -348,6 +354,20 @@ void set_LED(const char *cmd, bool state) {
             return;
         }
     }
+}
+
+void get_doors() {
+    for (uint8_t door = 1; door <= 4; door++) {
+        bool open = U3_get_door(door);
+        printf(">>> door %u %s\n", door, open ? "open" : "closed");
+    };
+}
+
+void get_buttons() {
+    for (uint8_t door = 1; door <= 4; door++) {
+        bool pressed = U3_get_button(door);
+        printf(">>> button %u %s\n", door, pressed ? "pressed" : "released");
+    };
 }
 
 void scan() {

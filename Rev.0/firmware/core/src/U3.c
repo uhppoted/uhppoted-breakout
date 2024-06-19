@@ -20,14 +20,14 @@ struct {
 } U3x = {
     .inputs = 0x00,
     .lpf = {
-        {.x = 0.0, .y = 0.0, .a = {1.0, -0.96128084}, .b = {0.01935958, 0.01935958}}, // 1Hz 1 pole Butterworth LPF
-        {.x = 0.0, .y = 0.0, .a = {1.0, -0.96128084}, .b = {0.01935958, 0.01935958}}, // 1Hz 1 pole Butterworth LPF
-        {.x = 0.0, .y = 0.0, .a = {1.0, -0.96128084}, .b = {0.01935958, 0.01935958}}, // 1Hz 1 pole Butterworth LPF
-        {.x = 0.0, .y = 0.0, .a = {1.0, -0.96128084}, .b = {0.01935958, 0.01935958}}, // 1Hz 1 pole Butterworth LPF
-        {.x = 0.0, .y = 0.0, .a = {1.0, -0.96128084}, .b = {0.01935958, 0.01935958}}, // 1Hz 1 pole Butterworth LPF
-        {.x = 0.0, .y = 0.0, .a = {1.0, -0.96128084}, .b = {0.01935958, 0.01935958}}, // 1Hz 1 pole Butterworth LPF
-        {.x = 0.0, .y = 0.0, .a = {1.0, -0.96128084}, .b = {0.01935958, 0.01935958}}, // 1Hz 1 pole Butterworth LPF
-        {.x = 0.0, .y = 0.0, .a = {1.0, -0.96128084}, .b = {0.01935958, 0.01935958}}, // 1Hz 1 pole Butterworth LPF
+        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
+        {.x₁ = 0.0, .y₁ = 0.0, .a₀ = 1.0, .a₁ = -0.85408069, .b₀ = 0.07295966, .b₁ = 0.07295966}, // 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
     }};
 
 const uint8_t S1 = 0x10;
@@ -41,6 +41,8 @@ const uint8_t PB3 = 0x02;
 const uint8_t PB4 = 0x01;
 
 const uint8_t U3_MASKS[] = {S1, S2, S3, S4, PB1, PB2, PB3, PB4};
+const uint8_t U3_DOORS[] = {0x00, 0x01, 0x02, 0x04, 0x08};
+const uint8_t U3_BUTTONS[] = {0x00, 0x10, 0x20, 0x40, 0x80};
 
 void U3_init() {
     infof("U3", "init");
@@ -56,7 +58,7 @@ void U3_init() {
         warnf("U3", "error configuring PCAL6408APW (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_polarity(U3, 0x00)) != ERR_OK) {
+    if ((err = PCAL6408APW_set_polarity(U3, PB1 | PB2 | PB3 | PB4)) != ERR_OK) {
         warnf("U3", "error setting PCAL6408APW polarity (%d)", err);
     }
 
@@ -123,8 +125,6 @@ void U3_process(uint8_t inputs) {
     uint8_t bits = U3x.inputs;
     uint8_t mask = 0x01;
 
-    // debugf("U3", "---");
-
     for (int i = 0; i < 8; i++) {
         float u = (inputs & U3_MASKS[i]) != 0x00 ? 1.0 : 0.0;
         float v = IIR_process(&U3x.lpf[i], u);
@@ -145,4 +145,30 @@ void U3_process(uint8_t inputs) {
 
         U3x.inputs = bits;
     }
+}
+
+/*
+ * Returns true if the door is open.
+ *
+ * Door is in the range [1..4].
+ */
+bool U3_get_door(uint8_t door) {
+    if ((door < 1) || (door > 4)) {
+        return false;
+    }
+
+    return (U3x.inputs & U3_DOORS[door]) != 0x00;
+}
+
+/*
+ * Returns true if the button is pressed.
+ *
+ * Door is in the range [1..4].
+ */
+bool U3_get_button(uint8_t door) {
+    if ((door < 1) || (door > 4)) {
+        return false;
+    }
+
+    return (U3x.inputs & U3_BUTTONS[door]) != 0x00;
 }

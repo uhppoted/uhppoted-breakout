@@ -12,41 +12,40 @@ from matplotlib.ticker import ScalarFormatter
 import matplotlib.pyplot as plt
 import numpy as np
 
-TAU = 2*pi
+Vᴅᴅ   = 1
+Vʟᴏᴡ  = 0.1
+Vʜɪɢʜ = 0.9
+Vʜ    = Vʜɪɢʜ - Vʟᴏᴡ
+
 N = 1      # order of filter
-fc = 1     # cutoff frequency (Hz)
+fc = 25    # cutoff frequency (Hz)
 fs = 1000  # sampling frequency (Hz)
-hysteresis = 0.3
+hysteresis = Vʜ # internal software Schmitt trigger points
 
 # IIR Butterworth filter
-b, a = signal.butter(N, TAU*fc, 'lowpass', analog=False, fs=fs)
+b, a = signal.butter(N, fc, 'lowpass', analog=False, fs=fs)
 w, h = signal.freqz(b, a, fs=fs)
-f = w/TAU
 
 print('a:', a)
 print('b:', b)
 
-# a: [1.         0.20433702]
-# b: [0.60216851 0.60216851]
-
 # Frequency response (dB)
-plt.semilogx(f, 20 * np.log10(abs(h)))
-plt.title('Butterworth digital filter frequency response')
+plt.semilogx(w, 20 * np.log10(abs(h)))
+plt.title('Butterworth IIR filter')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [dB]')
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
-plt.axvline(100, color='green')  # cutoff frequency
+plt.axvline(fc, color='green')  # cutoff frequency
 plt.axhline(-3, color='red')  # -3dB
 plt.gca().xaxis.set_major_formatter(ScalarFormatter())
 plt.show()
 
 # Frequency response (voltage)
 w, h = signal.freqz(b, a, fs=fs)
-f = w/TAU
 
-plt.semilogx(f, abs(h))
-plt.title('Butterworth analog filter frequency response')
+plt.semilogx(w, abs(h))
+plt.title('Butterworth IIR filter')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [V]')
 plt.margins(0, 0.1)

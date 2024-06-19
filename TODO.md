@@ -9,8 +9,10 @@
     - [x] get/set-datetime
     - [x] command timeout
     - [x] clear
+    - [x] get doors
+    - [x] get buttons
     - [ ] reboot
-    - [ ] show switches/buttons
+    - [ ] depict state
     - (?) command line
     - [ ] Dangling '['
 
@@ -18,13 +20,11 @@
    - [x] queue
    - [x] closure
    - [x] RTC
-   - [ ] U3
+   - [x] U3
          - [x] sample @1kHz
-         - [ ] set polarity
-         - [ ] LPF
-               - https://vcvrack.com/docs-v2/filter_8hpp_source
-               - check coefficients
-               - simulation
+         - [x] set polarity
+         - [x] LPF
+         - [ ] simulation
    - [ ] U4
 
 ## UART
