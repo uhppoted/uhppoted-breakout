@@ -15,18 +15,24 @@
     - [ ] depict state
     - (?) command line
     - [ ] Dangling '['
+    - [ ] clreol on backspace
 
 ## I2C0
    - [x] queue
    - [x] closure
    - [x] RTC
    - [x] U3
-   - [ ] U4
+   - [x] U4
 
 ## Inputs   
    - [ ] debounce simulation
    - [ ] Error if input is indeterminate (i.e. chattering)
 
+## Outputs   
+    - [ ] Configure as open drain
+    - [ ] check polarity
+    - [ ] relay delay
+    - [ ] LED blinks
 
 ## UART
    - [ ] Enable FIFO
@@ -59,14 +65,11 @@
 ### U4 PI4IOE5V6416
     - [x] init
     - [x] set/clear relay
-          - [ ] relay timer
-    - [ ] set/clear reader LED
-          - [ ] blinks
+    - [x] set/clear reader LED
     - [x] set/clear SYS LED
     - [x] set/clear ERR LED
     - [x] set/clear IN LED
     - [ ] invert SYS, IN and ERR LEDs
-
 
 ### RTC/RX8900SA
     - [ ] Defer setup with alarm timer

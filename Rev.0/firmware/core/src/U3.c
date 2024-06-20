@@ -14,6 +14,13 @@ typedef struct IIR {
     float y₁;
 } IIR;
 
+typedef struct LPF {
+    float a₀;
+    float a₁;
+    float b₀;
+    float b₁;
+} LPF;
+
 struct {
     uint8_t inputs;
     IIR lpf[8];
@@ -45,14 +52,16 @@ const uint8_t U3_MASKS[] = {S1, S2, S3, S4, PB1, PB2, PB3, PB4};
 const uint8_t U3_DOORS[] = {0x00, 0x01, 0x02, 0x04, 0x08};
 const uint8_t U3_BUTTONS[] = {0x00, 0x10, 0x20, 0x40, 0x80};
 
-// 25Hz 1 pole Butterworth LPF (approx. 15ms delay)
-const float a₀ = 1.0;
-const float a₁ = -0.85408069;
-const float b₀ = 0.07295966;
-const float b₁ = 0.07295966;
+// 25Hz 1 pole Butterworth LPF (approx. 15ms debounce delay)
+const struct LPF LPF₁ = {
+    .a₀ = 1.0,
+    .a₁ = -0.85408069,
+    .b₀ = 0.07295966,
+    .b₁ = 0.07295966,
+};
 
 bool U3_on_update(repeating_timer_t *rt);
-void U3_get(void *data);
+void U3_read(void *data);
 float lpf(IIR *iir, float in);
 
 void U3_init() {
@@ -98,7 +107,7 @@ void U3_init() {
 
 bool U3_on_update(repeating_timer_t *rt) {
     closure task = {
-        .f = U3_get,
+        .f = U3_read,
         .data = &U3x,
     };
 
@@ -110,9 +119,9 @@ bool U3_on_update(repeating_timer_t *rt) {
 }
 
 /*
- * I2C0 task to update RTC struct from RX8900SA.
+ * I2C0 task to update U3 state from PCAL6408APW.
  */
-void U3_get(void *data) {
+void U3_read(void *data) {
     uint8_t inputs;
     int err;
 
@@ -187,9 +196,9 @@ bool U3_get_button(uint8_t door) {
 // y₀ = (b₀x₀ + b₁x₁ - a₁y₁)/a₀
 float lpf(IIR *iir, float x₀) {
     // clang-format off
-    float y₀ = b₀ * x₀;
-          y₀ += b₁ * iir->x₁;
-          y₀ -= a₁ * iir->y₁;
+    float y₀ = LPF₁.b₀ * x₀;
+          y₀ += LPF₁.b₁ * iir->x₁;
+          y₀ -= LPF₁.a₁ * iir->y₁;
     // clang-format on
 
     iir->x₁ = x₀;

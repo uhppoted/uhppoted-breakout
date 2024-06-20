@@ -1,11 +1,14 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <pico/stdlib.h>
 
+#include <I2C0.h>
 #include <PI4IOE5V6416.h>
 #include <U4.h>
 #include <breakout.h>
 #include <log.h>
+#include <state.h>
 
 const uint16_t MASK = 0x07ff;
 
@@ -26,8 +29,28 @@ const uint16_t SYS = 0x0400;
 const uint16_t RELAYS[] = {RELAY1, RELAY2, RELAY3, RELAY4};
 const uint16_t LEDS[] = {LED1, LED2, LED3, LED4};
 
+void U4_write(void *data);
 void U4_set(uint16_t mask);
 void U4_clear(uint16_t mask);
+
+typedef enum {
+    U4_UNKNOWN,
+    U4_SET,
+    U4_CLEAR,
+} U4_TASK;
+
+typedef struct operation {
+    U4_TASK tag;
+    union {
+        struct {
+            uint16_t mask;
+        } set;
+
+        struct {
+            uint16_t mask;
+        } clear;
+    };
+} operation;
 
 void U4_init() {
     infof("U4", "init");
@@ -37,6 +60,10 @@ void U4_init() {
 
     if ((err = PI4IOE5V6416_init(U4)) != ERR_OK) {
         warnf("U4", "error initialising PI4IOE5V6416 (%d)", err);
+    }
+
+    if ((err = PI4IOE5V6416_set_open_drain(U4, false, false)) != ERR_OK) {
+        warnf("U4", "error configuring PI4IOE5V6416 open drain outputs (%d)", err);
     }
 
     if ((err = PI4IOE5V6416_set_configuration(U4, 0xf800)) != ERR_OK) {
@@ -65,6 +92,43 @@ void U4_init() {
     }
 
     debugf("U4", "initial state %04x %016b", outputs, outputs);
+}
+
+/*
+ * I2C0 task to set/clear PI4IOE5V6416 outputs.
+ */
+void U4_write(void *data) {
+    operation *op = (operation *)data;
+
+    if (op->tag == U4_SET) {
+        uint16_t mask = op->set.mask;
+        uint16_t outputs = 0x0000;
+        int err;
+
+        if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+            set_error(ERR_U4, "U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+        } else if ((err = PI4IOE5V6416_write(U4, (outputs | mask) & MASK)) != ERR_OK) {
+            set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 outputs (%d)", err);
+        } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+            set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
+        }
+    }
+
+    if (op->tag == U4_CLEAR) {
+        uint16_t mask = op->clear.mask;
+        uint16_t outputs = 0x0000;
+        int err;
+
+        if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+            set_error(ERR_U4, "U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+        } else if ((err = PI4IOE5V6416_write(U4, (outputs & ~mask) & MASK)) != ERR_OK) {
+            set_error(ERR_U4, "U4", "error clearing PI4IOE5V6416 outputs (%d)", err);
+        } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+            set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
+        }
+    }
+
+    free(data);
 }
 
 void U4_set_relay(int relay, bool state) {
@@ -114,61 +178,33 @@ void U4_set_SYS(bool state) {
 }
 
 void U4_set(uint16_t mask) {
-    uint16_t outputs = 0x0000;
-    int err;
+    operation *op = (operation *)calloc(1, sizeof(operation));
 
-    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
-    } else if ((err = PI4IOE5V6416_write(U4, (outputs | mask) & MASK)) != ERR_OK) {
-        warnf("U4", "error setting PI4IOE5V6416 outputs (%d)", err);
-    } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+    op->tag = U4_SET;
+    op->set.mask = mask;
+
+    closure task = {
+        .f = U4_write,
+        .data = op,
+    };
+
+    if (!I2C0_push(&task)) {
+        set_error(ERR_QUEUE_FULL, "U4", "set: queue full");
     }
 }
 
 void U4_clear(uint16_t mask) {
-    uint16_t outputs = 0x0000;
-    int err;
+    operation *op = (operation *)calloc(1, sizeof(operation));
 
-    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
-    } else if ((err = PI4IOE5V6416_write(U4, (outputs & ~mask) & MASK)) != ERR_OK) {
-        warnf("U4", "error setting PI4IOE5V6416 outputs (%d)", err);
-    } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+    op->tag = U4_CLEAR;
+    op->set.mask = mask;
+
+    closure task = {
+        .f = U4_write,
+        .data = op,
+    };
+
+    if (!I2C0_push(&task)) {
+        set_error(ERR_QUEUE_FULL, "U4", "set: queue full");
     }
 }
-
-// void U4_debug() {
-//     infof("U4", "debug");
-//
-//     static uint16_t OUTPUTS[] = {
-//         0x0000,
-//         0x0001,
-//         0x0002,
-//         0x0004,
-//         0x0008,
-//         0x0010,
-//         0x0020,
-//         0x0040,
-//         0x0080,
-//         0x0100,
-//         0x0200,
-//         0x0400,
-//         0x0000,
-//     };
-//
-//     static int N = sizeof(OUTPUTS) / sizeof(uint16_t);
-//     static int ix = 0;
-//
-//     uint16_t outputs = OUTPUTS[ix % N];
-//     int err;
-//
-//     if ((err = PI4IOE5V6416_write(U4, outputs)) != ERR_OK) {
-//         warnf("U4", "error writing PI4IOE5V6416 outputs (%d)", err);
-//     }
-//
-//     infof("U4", "OUTPUTS %04x %016b", outputs, outputs);
-//
-//     ix++;
-// }

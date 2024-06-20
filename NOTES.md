@@ -51,14 +51,5 @@
    - https://blog.adafruit.com/2023/01/24/using-direct-memory-access-dma-on-the-rp2040-chip-raspberrypi-rp2040-dma
    - https://stackoverflow.com/questions/66388451/how-to-use-raspberry-pi-pico-with-dac-with-spi-to-generate-sine-wave-of-1-khz-wi
 
-## UT0311L04
-
-### Startup
-
-| RELAY | N/O     | N/C    | LED |
-|-------|---------|--------|-----|
-| 1     | OPEN    | CLOSED | +5V |
-| 2     | OPEN    | CLOSED | +5V |
-| 3     | OPEN    | CLOSED | +5V |
-| 4     | OPEN    | CLOSED | +5V |
-
+# Debouncing
+- https://www.eejournal.com/article/ultimate-guide-to-switch-debounce-part-1

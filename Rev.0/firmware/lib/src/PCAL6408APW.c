@@ -52,6 +52,12 @@ int PCAL6408APW_set_pullups(I2C dev, uint8_t pullups) {
     return I2C_write_all(dev, PCAL6408APW.PULLUPS, data, 2);
 }
 
+int PCAL6408APW_set_open_drain(I2C dev, bool enabled) {
+    uint8_t data = enabled ? 0x01 : 0x00;
+
+    return I2C_write(dev, PCAL6408APW.OUTPUT_CONFIG, data);
+}
+
 int PCAL6408APW_set_interrupts(I2C dev, uint8_t interrupts) {
     return I2C_write(dev, PCAL6408APW.INTERRUPTS, interrupts);
 }

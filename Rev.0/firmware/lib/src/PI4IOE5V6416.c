@@ -65,6 +65,15 @@ int PI4IOE5V6416_set_pullups(I2C dev, uint16_t pullups) {
     return I2C_write_all(dev, PI4IOE5V6416.PULLUPS, data, 2);
 }
 
+int PI4IOE5V6416_set_open_drain(I2C dev, bool port0, bool port1) {
+    uint8_t data = 0x00;
+
+    data |= port0 ? 0x01 : 0x00;
+    data |= port1 ? 0x02 : 0x00;
+
+    return I2C_write(dev, PI4IOE5V6416.OUTPUT_CONFIG, data);
+}
+
 int PI4IOE5V6416_read(I2C dev, uint16_t *data) {
     uint8_t buffer[] = {0, 0};
     int err;

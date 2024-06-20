@@ -11,8 +11,8 @@
 #include <log.h>
 #include <state.h>
 
-void RTC_get(void *data);
-void RTC_set(void *data);
+void RTC_read(void *data);
+void RTC_write(void *data);
 bool RTC_on_update(repeating_timer_t *rt);
 uint8_t dow(uint16_t year, uint8_t month, uint8_t day);
 
@@ -77,7 +77,7 @@ void RTC_init() {
 
 bool RTC_on_update(repeating_timer_t *rt) {
     closure task = {
-        .f = RTC_get,
+        .f = RTC_read,
         .data = &RTC,
     };
 
@@ -91,7 +91,7 @@ bool RTC_on_update(repeating_timer_t *rt) {
 /*
  * I2C0 task to update RTC struct from RX8900SA.
  */
-void RTC_get(void *data) {
+void RTC_read(void *data) {
     uint16_t year = 0;
     uint8_t month = 0;
     uint8_t day = 0;
@@ -132,7 +132,7 @@ void RTC_get(void *data) {
 /*
  * I2C0 task to set RX8900SA.
  */
-void RTC_set(void *data) {
+void RTC_write(void *data) {
     datetime *d = (datetime *)data;
 
     if (d->tag == RTC_SET_DATE) {
@@ -205,7 +205,7 @@ void RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
     dt->yyyymmdd.dow = weekday;
 
     closure task = {
-        .f = RTC_set,
+        .f = RTC_write,
         .data = dt,
     };
 
@@ -233,7 +233,7 @@ void RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
     dt->HHmmss.second = second;
 
     closure task = {
-        .f = RTC_set,
+        .f = RTC_write,
         .data = dt,
     };
 

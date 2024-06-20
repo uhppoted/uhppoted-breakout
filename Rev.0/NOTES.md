@@ -12,7 +12,9 @@
 7.  R1 and R2 - maybe increase resistance (2.5K? 10K?)
 8.  Connect NC pins on J10 to J2
 9.  Connect NC    pins on J12 to J12
-11.  Tie RX8900SA NC pins to GND
+11. Tie RX8900SA NC pins to GND
+12. (maybe) convert relay/reader LED push-pull outputs to open drain
+    - or seperate LEDs from relays
 12. Fix PiZero2W mounting holes
 13. PiZero2W header (?)
 13. debug/state LEDs

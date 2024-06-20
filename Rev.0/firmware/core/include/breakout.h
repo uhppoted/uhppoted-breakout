@@ -42,6 +42,7 @@ typedef enum {
     ERR_QUEUE_FULL,
     ERR_RX8900SA,
     ERR_U3,
+    ERR_U4,
     ERR_UNKNOWN,
 } err;
 
