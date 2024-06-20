@@ -134,14 +134,12 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
     return 0;
 }
 
-/* Saves the cursor position, displays the current command buffer and then restores
- *  the cursor position
+/* Redisplays the current command buffer and clears trailing characters.
  *
  */
 void echo(const char *cmd) {
     char s[64];
-    // snprintf(s, sizeof(s), "\0337\033[%d;0H>> %s\033[0K\0338", height, cmd);
-    snprintf(s, sizeof(s), "\r>> %s", cmd);
+    snprintf(s, sizeof(s), "\r>> %s\033[0K", cmd);
     fputs(s, stdout);
     fflush(stdout);
 }

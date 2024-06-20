@@ -15,7 +15,7 @@
     - [ ] depict state
     - (?) command line
     - [ ] Dangling '['
-    - [ ] clreol on backspace
+    - [x] clreol on backspace
 
 ## I2C0
    - [x] queue
@@ -24,16 +24,42 @@
    - [x] U3
    - [x] U4
 
-## Inputs   
+### U2 PCAL6408APW
+    - [x] init
+    - [x] Queue WIO
+    - [ ] Decode Wiegand
+    - [ ] Decode keypad
+    - (?) Continuous read 
+    - (?) 100kHz/400kHz compile flag
+
+### U3 PCAL6408APW
    - [ ] debounce simulation
    - [ ] Error if input is indeterminate (i.e. chattering)
 
-## Outputs   
-    - [ ] Configure as open drain
+### U4 PI4IOE5V6416
+    - [x] init
+    - [x] set/clear relay
+    - [x] set/clear reader LED
+    - [x] set/clear SYS LED
+    - [x] set/clear ERR LED
+    - [x] set/clear IN LED
+    - [ ] invert SYS, IN and ERR LEDs
     - [ ] check polarity
     - [ ] relay delay
     - [ ] LED blinks
+    - [ ] Set output drive
+    - (?) Configure as open drain
 
+### RTC/RX8900SA
+    - [ ] Defer setup with alarm timer
+    - [ ] ready
+    - [ ] handle initialisation sequence in RTC_init
+    - [ ] backup mode compile flags
+    - (?) store/restore date/time to flash
+
+### log
+   - [ ] Queue log writes
+               
 ## UART
    - [ ] Enable FIFO
    - [ ] // FIXME use struct with length (or match on SOM/EOM or something)
@@ -51,32 +77,6 @@
 ### OTA
    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
 
-### log
-   - [ ] Queue log writes
-               
-### U2 PCAL6408APW
-    - [x] init
-    - [x] Queue WIO
-    - [ ] Decode Wiegand
-    - [ ] Decode keypad
-    - (?) Continuous read 
-    - (?) 100kHz/400kHz compile flag
-
-### U4 PI4IOE5V6416
-    - [x] init
-    - [x] set/clear relay
-    - [x] set/clear reader LED
-    - [x] set/clear SYS LED
-    - [x] set/clear ERR LED
-    - [x] set/clear IN LED
-    - [ ] invert SYS, IN and ERR LEDs
-
-### RTC/RX8900SA
-    - [ ] Defer setup with alarm timer
-    - [ ] ready
-    - [ ] handle initialisation sequence in RTC_init
-    - [ ] backup mode compile flags
-    - (?) store/restore date/time to flash
 
 ## R&D
 - [x] Relay pin voltages
