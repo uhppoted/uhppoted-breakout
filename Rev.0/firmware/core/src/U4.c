@@ -32,13 +32,16 @@ const uint16_t LEDS[] = {LED1, LED2, LED3, LED4};
 void U4_write(void *data);
 void U4_set(uint16_t mask);
 void U4_clear(uint16_t mask);
+void U4_toggle(uint16_t mask);
 int64_t U4_callback(alarm_id_t id, void *data);
 
 typedef enum {
     U4_UNKNOWN,
     U4_SET,
     U4_CLEAR,
+    U4_TOGGLE,
     U4_RESET,
+    U4_BLINK,
 } U4_TASK;
 
 typedef struct operation {
@@ -53,8 +56,18 @@ typedef struct operation {
         } clear;
 
         struct {
+            uint16_t mask;
+        } toggle;
+
+        struct {
             int relay;
         } reset;
+
+        struct {
+            int led;
+            int count;
+            uint16_t interval;
+        } blink;
     };
 } operation;
 
@@ -134,6 +147,28 @@ void U4_write(void *data) {
         }
     }
 
+    if (op->tag == U4_TOGGLE) {
+        uint16_t mask = op->toggle.mask;
+        uint16_t outputs = 0x0000;
+        int err;
+
+        if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+            set_error(ERR_U4, "U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+        } else {
+            // clang-format off
+            uint16_t v = (outputs ^ mask);
+                     v &= mask;
+                     v |= outputs & ~mask;
+            // clang-format on
+
+            if ((err = PI4IOE5V6416_write(U4, v & MASK)) != ERR_OK) {
+                set_error(ERR_U4, "U4", "error toggling PI4IOE5V6416 outputs (%d)", err);
+            } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+                set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
+            }
+        }
+    }
+
     free(data);
 }
 
@@ -157,15 +192,43 @@ void U4_clear_relay(int relay) {
     }
 }
 
-void U4_set_LED(int LED, bool state) {
+void U4_set_LED(int LED) {
     if (LED >= 1 && LED <= 4) {
         uint16_t led = LEDS[LED - 1];
 
-        if (state) {
-            U4_set(led);
-        } else {
-            U4_clear(led);
-        }
+        U4_set(led);
+    }
+}
+
+void U4_clear_LED(int LED) {
+    if (LED >= 1 && LED <= 4) {
+        uint16_t led = LEDS[LED - 1];
+
+        U4_clear(led);
+    }
+}
+
+void U4_toggle_LED(int LED) {
+    if (LED >= 1 && LED <= 4) {
+        uint16_t led = LEDS[LED - 1];
+
+        U4_toggle(led);
+    }
+}
+
+void U4_blink_LED(int LED, int count, uint16_t interval) {
+    if (LED >= 1 && LED <= 4) {
+        uint16_t led = LEDS[LED - 1];
+
+        U4_set(led);
+
+        operation *op = (operation *)calloc(1, sizeof(operation));
+        op->tag = U4_BLINK;
+        op->blink.led = LED;
+        op->blink.count = 2 * count - 1;
+        op->blink.interval = interval;
+
+        add_alarm_in_ms(interval, U4_callback, op, false);
     }
 }
 
@@ -213,7 +276,7 @@ void U4_clear(uint16_t mask) {
     operation *op = (operation *)calloc(1, sizeof(operation));
 
     op->tag = U4_CLEAR;
-    op->set.mask = mask;
+    op->clear.mask = mask;
 
     closure task = {
         .f = U4_write,
@@ -221,7 +284,23 @@ void U4_clear(uint16_t mask) {
     };
 
     if (!I2C0_push(&task)) {
-        set_error(ERR_QUEUE_FULL, "U4", "set: queue full");
+        set_error(ERR_QUEUE_FULL, "U4", "clear: queue full");
+    }
+}
+
+void U4_toggle(uint16_t mask) {
+    operation *op = (operation *)calloc(1, sizeof(operation));
+
+    op->tag = U4_TOGGLE;
+    op->toggle.mask = mask;
+
+    closure task = {
+        .f = U4_write,
+        .data = op,
+    };
+
+    if (!I2C0_push(&task)) {
+        set_error(ERR_QUEUE_FULL, "U4", "toggle: queue full");
     }
 }
 
@@ -231,6 +310,15 @@ int64_t U4_callback(alarm_id_t id, void *data) {
     if (op->tag == U4_RESET) {
         int relay = op->reset.relay;
         U4_clear_relay(relay);
+    }
+
+    if (op->tag == U4_BLINK) {
+        int led = op->blink.led;
+        U4_toggle_LED(led);
+
+        if (--op->blink.count > 0) {
+            return -1000 * (int64_t)op->blink.interval;
+        }
     }
 
     free(data);

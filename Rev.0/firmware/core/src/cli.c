@@ -39,6 +39,7 @@ void get_weekday();
 
 void set_relay(const char *relay, bool state);
 void set_LED(const char *led, bool state);
+void blink_LED(const char *led);
 void get_doors();
 void get_buttons();
 
@@ -184,6 +185,8 @@ void exec(char *cmd) {
         set_LED(&cmd[8], true);
     } else if (strncasecmp(cmd, "clear LED ", 10) == 0) {
         set_LED(&cmd[10], false);
+    } else if (strncasecmp(cmd, "blink LED ", 10) == 0) {
+        blink_LED(&cmd[10]);
     } else if (strncasecmp(cmd, "get doors", 9) == 0) {
         get_doors();
     } else if (strncasecmp(cmd, "get buttons", 11) == 0) {
@@ -333,7 +336,12 @@ void set_LED(const char *cmd, bool state) {
         int rc;
 
         if ((rc = sscanf(cmd, "%u", &LED)) == 1) {
-            U4_set_LED(LED, state);
+            if (state) {
+                U4_set_LED(LED);
+
+            } else {
+                U4_clear_LED(LED);
+            }
             printf("ok\n");
             return;
         }
@@ -352,6 +360,21 @@ void set_LED(const char *cmd, bool state) {
 
         if (strncasecmp(cmd, "SYS", 3) == 0) {
             U4_set_SYS(state);
+            printf("ok\n");
+            return;
+        }
+    }
+}
+
+void blink_LED(const char *cmd) {
+    int N = strlen(cmd);
+
+    if (N > 0) {
+        uint LED;
+        int rc;
+
+        if ((rc = sscanf(cmd, "%u", &LED)) == 1) {
+            U4_blink_LED(LED, 5, 500);
             printf("ok\n");
             return;
         }

@@ -36,10 +36,12 @@
     - [x] set/clear SYS LED
     - [x] set/clear ERR LED
     - [x] set/clear IN LED
+    - [x] relay delay
+    - [x] blink LED
+          - resolve blink/set/clear LED conflicts
+          - check polarity
     - [ ] invert SYS, IN and ERR LEDs
     - [ ] check polarity
-    - [x] relay delay
-    - [ ] LED blinks
     - [ ] Set output drive
     - (?) Configure as open drain
 
