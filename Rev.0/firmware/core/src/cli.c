@@ -315,7 +315,11 @@ void set_relay(const char *cmd, bool state) {
         int rc;
 
         if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
-            U4_set_relay(relay, state);
+            if (state) {
+                U4_set_relay(relay, 5000);
+            } else {
+                U4_clear_relay(relay);
+            }
             printf("ok\n");
         }
     }

@@ -1,21 +1,14 @@
 # TODO
 
 ### CLI
-    - [x] debug
-    - [x] reset RTC
-    - [x] get/set-date
-    - [x] get/set-time
-    - [x] get-dow
-    - [x] get/set-datetime
-    - [x] command timeout
-    - [x] clear
-    - [x] get doors
-    - [x] get buttons
+    - [x] clreol on backspace
+    - [ ] get relays
+    - [ ] unlock door
+    - [ ] blink door LED
     - [ ] reboot
     - [ ] depict state
     - (?) command line
     - [ ] Dangling '['
-    - [x] clreol on backspace
 
 ## I2C0
    - [x] queue
@@ -45,7 +38,7 @@
     - [x] set/clear IN LED
     - [ ] invert SYS, IN and ERR LEDs
     - [ ] check polarity
-    - [ ] relay delay
+    - [x] relay delay
     - [ ] LED blinks
     - [ ] Set output drive
     - (?) Configure as open drain

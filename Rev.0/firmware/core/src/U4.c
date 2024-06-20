@@ -32,11 +32,13 @@ const uint16_t LEDS[] = {LED1, LED2, LED3, LED4};
 void U4_write(void *data);
 void U4_set(uint16_t mask);
 void U4_clear(uint16_t mask);
+int64_t U4_callback(alarm_id_t id, void *data);
 
 typedef enum {
     U4_UNKNOWN,
     U4_SET,
     U4_CLEAR,
+    U4_RESET,
 } U4_TASK;
 
 typedef struct operation {
@@ -49,6 +51,10 @@ typedef struct operation {
         struct {
             uint16_t mask;
         } clear;
+
+        struct {
+            int relay;
+        } reset;
     };
 } operation;
 
@@ -131,13 +137,23 @@ void U4_write(void *data) {
     free(data);
 }
 
-void U4_set_relay(int relay, bool state) {
+void U4_set_relay(int relay, uint16_t delay) {
     if (relay >= 1 && relay <= 4) {
-        if (state) {
-            U4_set(RELAYS[relay - 1]);
-        } else {
-            U4_clear(RELAYS[relay - 1]);
+        U4_set(RELAYS[relay - 1]);
+
+        if ((delay > 0) && (delay <= 60000)) {
+            operation *op = (operation *)calloc(1, sizeof(operation));
+            op->tag = U4_RESET;
+            op->reset.relay = relay;
+
+            add_alarm_in_ms(delay, U4_callback, op, false);
         }
+    }
+}
+
+void U4_clear_relay(int relay) {
+    if (relay >= 1 && relay <= 4) {
+        U4_clear(RELAYS[relay - 1]);
     }
 }
 
@@ -207,4 +223,17 @@ void U4_clear(uint16_t mask) {
     if (!I2C0_push(&task)) {
         set_error(ERR_QUEUE_FULL, "U4", "set: queue full");
     }
+}
+
+int64_t U4_callback(alarm_id_t id, void *data) {
+    operation *op = data;
+
+    if (op->tag == U4_RESET) {
+        int relay = op->reset.relay;
+        U4_clear_relay(relay);
+    }
+
+    free(data);
+
+    return 0;
 }
