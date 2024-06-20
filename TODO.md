@@ -25,6 +25,8 @@
 
 ## Inputs   
    - [ ] debounce simulation
+   - [ ] Error if input is indeterminate (i.e. chattering)
+
 
 ## UART
    - [ ] Enable FIFO
@@ -53,12 +55,6 @@
     - [ ] Decode keypad
     - (?) Continuous read 
     - (?) 100kHz/400kHz compile flag
-
-### U3 PCAL6408APW
-    - [x] init
-    - [x] Queue INPUTS
-    - [x] LPF
-    - [x] Inputs chattering
 
 ### U4 PI4IOE5V6416
     - [x] init
