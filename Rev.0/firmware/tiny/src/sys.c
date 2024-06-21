@@ -4,6 +4,7 @@
 #include <hardware/pio.h>
 #include <pico/stdlib.h>
 
+#include <U2.h>
 #include <U3.h>
 #include <breakout.h>
 #include <cli.h>
@@ -12,7 +13,6 @@
 #include <sys.h>
 #include <txrx.h>
 #include <usb.h>
-#include <wiegand.h>
 
 #include "ws2812.pio.h"
 
@@ -39,7 +39,7 @@ bool sysinit() {
     }
 
     // ... CLI
-    setup_usb();
+    usb_init();
 
     return true;
 }
@@ -50,10 +50,7 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_WIO) {
-        uint8_t io = v & 0x000000ff;
-        uint8_t mask = (v >> 8) & 0x000000ff;
-
-        wio(io, mask);
+        U2_wio(v & 0x0000ffff);
     }
 
     if ((v & MSG) == MSG_U3) {
@@ -70,6 +67,11 @@ void dispatch(uint32_t v) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
         rx(b);
         free(b);
+    }
+
+    if ((v & MSG) == MSG_USB) {
+        bool connected = (v & 0x0fffffff) == 1;
+        infof("SYS", "USB connected: %s", connected ? "yes" : "no");
     }
 
     if ((v & MSG) == MSG_TICK) {

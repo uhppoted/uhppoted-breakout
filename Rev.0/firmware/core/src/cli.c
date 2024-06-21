@@ -37,7 +37,8 @@ void get_time();
 void set_time(const char *cmd);
 void get_weekday();
 
-void set_relay(const char *relay, bool state);
+void unlock_door(const char *door);
+void lock_door(const char *door);
 void set_LED(const char *led, bool state);
 void blink_LED(const char *led);
 void get_doors();
@@ -177,10 +178,10 @@ void exec(char *cmd) {
         set_time(&cmd[9]);
     } else if (strncasecmp(cmd, "get weekday", 11) == 0) {
         get_weekday();
-    } else if (strncasecmp(cmd, "set relay ", 10) == 0) {
-        set_relay(&cmd[10], true);
-    } else if (strncasecmp(cmd, "clear relay ", 12) == 0) {
-        set_relay(&cmd[11], false);
+    } else if (strncasecmp(cmd, "unlock door ", 12) == 0) {
+        unlock_door(&cmd[12]);
+    } else if (strncasecmp(cmd, "lock door ", 10) == 0) {
+        lock_door(&cmd[10]);
     } else if (strncasecmp(cmd, "set LED ", 8) == 0) {
         set_LED(&cmd[8], true);
     } else if (strncasecmp(cmd, "clear LED ", 10) == 0) {
@@ -310,7 +311,7 @@ void get_weekday() {
     printf(">>> %s\n", weekday);
 }
 
-void set_relay(const char *cmd, bool state) {
+void unlock_door(const char *cmd) {
     int N = strlen(cmd);
 
     if (N > 0) {
@@ -318,11 +319,21 @@ void set_relay(const char *cmd, bool state) {
         int rc;
 
         if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
-            if (state) {
-                U4_set_relay(relay, 5000);
-            } else {
-                U4_clear_relay(relay);
-            }
+            U4_set_relay(relay, 5000);
+            printf("ok\n");
+        }
+    }
+}
+
+void lock_door(const char *cmd) {
+    int N = strlen(cmd);
+
+    if (N > 0) {
+        uint relay;
+        int rc;
+
+        if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
+            U4_clear_relay(relay);
             printf("ok\n");
         }
     }
@@ -422,10 +433,11 @@ void help() {
     printf("  set datetime <YYYY-MM-DD HH:MM:SS>\n");
     printf("  get weekday\n");
     printf("\n");
-    printf("  set relay <1|2|3|4>\n");
-    printf("  clear relay <1|2|3|4>\n");
+    printf("  unlock door <1|2|3|4>\n");
+    printf("  lock door <1|2|3|4>\n");
     printf("  set LED <1|2|3|4|SYS|IN|ERR>\n");
     printf("  clear LED <1|2|3|4|SYS|IN|ERR>\n");
+    printf("\n");
     printf("  get doors\n");
     printf("  get buttons\n");
     printf("\n");

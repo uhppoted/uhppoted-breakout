@@ -7,6 +7,7 @@ extern const uint32_t MSG;
 extern const uint32_t MSG_DEBUG;
 extern const uint32_t MSG_RX;
 extern const uint32_t MSG_TTY;
+extern const uint32_t MSG_USB;
 extern const uint32_t MSG_WIO;
 extern const uint32_t MSG_U3;
 extern const uint32_t MSG_TICK;

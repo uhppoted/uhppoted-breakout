@@ -25,7 +25,8 @@ const uint32_t MSG_DEBUG = 0x00000000;
 const uint32_t MSG_WIO = 0x10000000;
 const uint32_t MSG_U3 = 0x20000000;
 const uint32_t MSG_RX = 0x30000000;
-const uint32_t MSG_TTY = 0xe0000000;
+const uint32_t MSG_TTY = 0xd0000000;
+const uint32_t MSG_USB = 0xe0000000;
 const uint32_t MSG_TICK = 0xf0000000;
 
 queue_t queue;

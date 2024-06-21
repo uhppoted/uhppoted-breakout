@@ -1,27 +1,19 @@
 # TODO
 
+- [ ] Power on/reset and reprogram initial states are unexpectedly different
+
 ### CLI
-    - [x] clreol on backspace
-    - [ ] get relays
-    - [ ] unlock door
-    - [ ] blink door LED
+    - [x] unlock door
+    - [x] blink LED
     - [ ] reboot
-    - [ ] depict state
+    - [ ] render state
     - (?) command line
     - [ ] Dangling '['
 
-## I2C0
-   - [x] queue
-   - [x] closure
-   - [x] RTC
-   - [x] U3
-   - [x] U4
-
 ### U2 PCAL6408APW
-    - [x] init
-    - [x] Queue WIO
-    - [ ] Decode Wiegand
+    - [x] Decode Wiegand-26
     - [ ] Decode keypad
+    - [ ] Read timeout
     - (?) Continuous read 
     - (?) 100kHz/400kHz compile flag
 
@@ -30,32 +22,25 @@
    - [ ] Error if input is indeterminate (i.e. chattering)
 
 ### U4 PI4IOE5V6416
-    - [x] init
-    - [x] set/clear relay
-    - [x] set/clear reader LED
-    - [x] set/clear SYS LED
-    - [x] set/clear ERR LED
-    - [x] set/clear IN LED
-    - [x] relay delay
-    - [x] blink LED
-          - resolve blink/set/clear LED conflicts
-          - check polarity
+    - [ ] rework as clocked update
+    - [ ] resolve lock/unlock relay conflicts
+    - [ ] resolve blink/set/clear LED conflicts
     - [ ] invert SYS, IN and ERR LEDs
     - [ ] check polarity
     - [ ] Set output drive
-    - (?) Configure as open drain
+    - (?) Configure LEDs as open drain
 
 ### RTC/RX8900SA
     - [ ] Defer setup with alarm timer
     - [ ] ready
     - [ ] handle initialisation sequence in RTC_init
     - [ ] backup mode compile flags
-    - (?) store/restore date/time to flash
 
 ### log
    - [ ] Queue log writes
                
 ## UART
+   - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] // FIXME use struct with length (or match on SOM/EOM or something)
    - https://forums.raspberrypi.com/viewtopic.php?t=327189

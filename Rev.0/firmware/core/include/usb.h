@@ -1,3 +1,3 @@
 #pragma once
 
-extern void setup_usb();
+extern void usb_init();

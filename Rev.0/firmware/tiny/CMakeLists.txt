@@ -26,7 +26,6 @@ add_executable(breakout
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
-  ${CORE}/src/wiegand.c
   ${CORE}/src/txrx.c
   ${CORE}/src/usb.c
   ${CORE}/src/cli.c
