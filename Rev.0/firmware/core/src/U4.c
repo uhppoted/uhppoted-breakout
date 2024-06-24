@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include <pico/stdlib.h>
+#include <pico/sync.h>
 
 #include <I2C0.h>
 #include <PI4IOE5V6416.h>
@@ -29,18 +30,21 @@ const uint16_t SYS = 0x0400;
 const uint16_t RELAYS[] = {RELAY1, RELAY2, RELAY3, RELAY4};
 const uint16_t LEDS[] = {LED1, LED2, LED3, LED4};
 
+const int32_t TICK = 10;
+
 void U4_write(void *data);
 void U4_set(uint16_t mask);
 void U4_clear(uint16_t mask);
 void U4_toggle(uint16_t mask);
 int64_t U4_callback(alarm_id_t id, void *data);
+bool U4_tick(repeating_timer_t *rt);
+int32_t clamp(int32_t v, int32_t min, int32_t max);
 
 typedef enum {
     U4_UNKNOWN,
     U4_SET,
     U4_CLEAR,
     U4_TOGGLE,
-    U4_RESET,
     U4_BLINK,
 } U4_TASK;
 
@@ -70,6 +74,25 @@ typedef struct operation {
         } blink;
     };
 } operation;
+
+typedef struct relay {
+    int id;
+    uint16_t mask;
+    int32_t timer;
+} relay;
+
+struct {
+    relay relays[4];
+    repeating_timer_t timer;
+    mutex_t guard;
+} U4x = {
+    .relays = {
+        {.id = 1, .mask = RELAY1, .timer = 0},
+        {.id = 2, .mask = RELAY2, .timer = 0},
+        {.id = 3, .mask = RELAY3, .timer = 0},
+        {.id = 4, .mask = RELAY4, .timer = 0},
+    },
+};
 
 void U4_init() {
     infof("U4", "init");
@@ -110,7 +133,32 @@ void U4_init() {
         warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
     }
 
-    debugf("U4", "initial state %04x %016b", outputs, outputs);
+    mutex_init(&U4x.guard);
+    add_repeating_timer_ms(TICK, U4_tick, NULL, &U4x.timer);
+
+    debugf("U4", "initialised state %04x %016b", outputs, outputs);
+}
+
+/*
+ * Decrements relay timers.
+ */
+bool U4_tick(repeating_timer_t *rt) {
+    if (mutex_try_enter(&U4x.guard, NULL)) {
+        for (int ix = 0; ix < 4; ix++) {
+            relay *r = &U4x.relays[ix];
+
+            if (r->timer > 0) {
+                r->timer = clamp(r->timer - TICK, 0, 60000);
+                if (r->timer == 0) {
+                    U4_clear(r->mask);
+                }
+            }
+        }
+
+        mutex_exit(&U4x.guard);
+    }
+
+    return true;
 }
 
 /*
@@ -174,21 +222,19 @@ void U4_write(void *data) {
 
 void U4_set_relay(int relay, uint16_t delay) {
     if (relay >= 1 && relay <= 4) {
+        mutex_enter_blocking(&U4x.guard);
         U4_set(RELAYS[relay - 1]);
-
-        if ((delay > 0) && (delay <= 60000)) {
-            operation *op = (operation *)calloc(1, sizeof(operation));
-            op->tag = U4_RESET;
-            op->reset.relay = relay;
-
-            add_alarm_in_ms(delay, U4_callback, op, false);
-        }
+        U4x.relays[relay - 1].timer = clamp(delay, 0, 60000);
+        mutex_exit(&U4x.guard);
     }
 }
 
 void U4_clear_relay(int relay) {
     if (relay >= 1 && relay <= 4) {
+        mutex_enter_blocking(&U4x.guard);
         U4_clear(RELAYS[relay - 1]);
+        U4x.relays[relay - 1].timer = 0;
+        mutex_exit(&U4x.guard);
     }
 }
 
@@ -307,11 +353,6 @@ void U4_toggle(uint16_t mask) {
 int64_t U4_callback(alarm_id_t id, void *data) {
     operation *op = data;
 
-    if (op->tag == U4_RESET) {
-        int relay = op->reset.relay;
-        U4_clear_relay(relay);
-    }
-
     if (op->tag == U4_BLINK) {
         int led = op->blink.led;
         U4_toggle_LED(led);
@@ -324,4 +365,8 @@ int64_t U4_callback(alarm_id_t id, void *data) {
     free(data);
 
     return 0;
+}
+
+int32_t clamp(int32_t v, int32_t min, int32_t max) {
+    return v < min ? min : (v > max ? max : v);
 }

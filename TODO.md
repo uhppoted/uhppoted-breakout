@@ -23,7 +23,7 @@
 
 ### U4 PI4IOE5V6416
     - [ ] rework as clocked update
-    - [ ] resolve lock/unlock relay conflicts
+    - [x] resolve lock/unlock relay conflicts
     - [ ] resolve blink/set/clear LED conflicts
     - [ ] invert SYS, IN and ERR LEDs
     - [ ] check polarity
@@ -56,7 +56,7 @@
 
 ### OTA
    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
-
+   - https://www.youtube.com/watch?v=4-dle5L9REs
 
 ## R&D
 - [x] Relay pin voltages
