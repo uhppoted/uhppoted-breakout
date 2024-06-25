@@ -38,23 +38,21 @@ int main() {
     bi_decl(bi_2pins_with_func(I2C1SDA, I2C1SCL, GPIO_FUNC_I2C));
 
     stdio_init_all();
+    queue_init(&queue, sizeof(uint32_t), 64);
+    alarm_pool_init_default();
 
     if (!sysinit()) {
         warnf("SYS", "ERROR INITIALISING SYSTEM");
         return -1;
     }
 
+    // ... initialise FIFO, timers and I2C
     I2C0_init();
     I2C1_init();
 
     multicore_launch_core1(I2C0_run);
-
     sleep_ms(1000);
     printf(">> BREAKOUT %s\n", VERSION);
-
-    // ... initialise FIFO, timers and I2C
-    queue_init(&queue, sizeof(uint32_t), 64);
-    alarm_pool_init_default();
 
     // ... initialise RTC, IO expanders and serial port
     RTC_init();

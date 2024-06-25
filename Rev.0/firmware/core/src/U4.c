@@ -96,36 +96,36 @@ void U4_init() {
     int err;
 
     if ((err = PI4IOE5V6416_init(U4)) != ERR_OK) {
-        warnf("U4", "error initialising PI4IOE5V6416 (%d)", err);
+        set_error(ERR_U4, "U4", "error initialising (%d)", err);
     }
 
     if ((err = PI4IOE5V6416_set_open_drain(U4, false, false)) != ERR_OK) {
-        warnf("U4", "error configuring PI4IOE5V6416 open drain outputs (%d)", err);
-    }
-
-    if ((err = PI4IOE5V6416_set_configuration(U4, 0xf800)) != ERR_OK) {
-        warnf("U4", "error configuring PI4IOE5V6416 (%d)", err);
+        set_error(ERR_U4, "U4", "error configuring PI4IOE5V6416 open drain outputs (%d)", err);
     }
 
     if ((err = PI4IOE5V6416_set_polarity(U4, 0x0000)) != ERR_OK) {
-        warnf("U4", "error setting PI4IOE5V6416 polarity (%d)", err);
+        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 polarity (%d)", err);
     }
 
     if ((err = PI4IOE5V6416_set_latched(U4, 0x0000)) != ERR_OK) {
-        warnf("U4", "error setting PI4IOE5V6416 latches (%d)", err);
+        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 latches (%d)", err);
     }
 
     if ((err = PI4IOE5V6416_set_pullups(U4, 0x00)) != ERR_OK) {
-        warnf("U4", "error setting PI4IOE5V6416 pullups (%d)", err);
+        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 pullups (%d)", err);
     }
 
     uint16_t outputs = 0x0000;
     if ((err = PI4IOE5V6416_write(U4, outputs & MASK)) != ERR_OK) {
-        warnf("U4", "error setting PI4IOE5V6416 outputs (%d)", err);
+        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 outputs (%d)", err);
     }
 
     if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        warnf("U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+        set_error(ERR_U4, "U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+    }
+
+    if ((err = PI4IOE5V6416_set_configuration(U4, 0xf800)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error configuring PI4IOE5V6416 (%d)", err);
     }
 
     mutex_init(&U4x.guard);

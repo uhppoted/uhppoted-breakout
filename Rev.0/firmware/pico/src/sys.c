@@ -4,6 +4,7 @@
 #include <hardware/uart.h>
 #include <pico/stdlib.h>
 
+#include <U2.h>
 #include <U3.h>
 #include <breakout.h>
 #include <cli.h>
@@ -12,7 +13,6 @@
 #include <sys.h>
 #include <tty.h>
 #include <txrx.h>
-#include <wiegand.h>
 
 #define BAUD_RATE 115200
 #define DATA_BITS 8
@@ -63,10 +63,7 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_WIO) {
-        uint8_t io = v & 0x000000ff;
-        uint8_t mask = (v >> 8) & 0x000000ff;
-
-        wio(io, mask);
+        U2_wio(v & 0x0000ffff);
     }
 
     if ((v & MSG) == MSG_U3) {

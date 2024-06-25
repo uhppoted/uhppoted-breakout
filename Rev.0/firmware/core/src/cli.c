@@ -13,6 +13,7 @@
 #include <U4.h>
 #include <cli.h>
 #include <log.h>
+#include <state.h>
 #include <txrx.h>
 
 typedef struct CLI {
@@ -44,6 +45,7 @@ void blink_LED(const char *led);
 void get_doors();
 void get_buttons();
 
+void state();
 void reset();
 void scan();
 
@@ -192,6 +194,8 @@ void exec(char *cmd) {
         get_doors();
     } else if (strncasecmp(cmd, "get buttons", 11) == 0) {
         get_buttons();
+    } else if (strncasecmp(cmd, "state", 5) == 0) {
+        state();
     } else if (strncasecmp(cmd, "reset", 5) == 0) {
         reset();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
@@ -209,6 +213,15 @@ void exec(char *cmd) {
 
 void debug() {
     TXRX_debug();
+}
+
+void state() {
+    printf(">>> I2C   %s\n", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
+    printf(">>> queue %s\n", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
+    printf(">>> RTC   %s\n", get_error(ERR_RX8900SA) ? "error" : "ok");
+    printf(">>> U3    %s\n", get_error(ERR_U3) ? "error" : "ok");
+    printf(">>> U4    %s\n", get_error(ERR_U4) ? "error" : "ok");
+    printf(">>> other %s\n", get_error(ERR_UNKNOWN) ? "error" : "ok");
 }
 
 void reset() {
@@ -441,6 +454,7 @@ void help() {
     printf("  get doors\n");
     printf("  get buttons\n");
     printf("\n");
+    printf("  state\n");
     printf("  reset\n");
     printf("  scan\n");
     printf("\n");
