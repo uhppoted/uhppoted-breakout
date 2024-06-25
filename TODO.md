@@ -11,7 +11,6 @@
     - [ ] Dangling '['
 
 ### U2 PCAL6408APW
-    - [x] Decode Wiegand-26
     - [ ] Decode keypad
     - [ ] Read timeout
     - (?) Continuous read 
@@ -22,7 +21,7 @@
    - [ ] Error if input is indeterminate (i.e. chattering)
 
 ### U4 PI4IOE5V6416
-    - [ ] rework as clocked update
+    - (?) rework as clocked update
     - [x] resolve lock/unlock relay conflicts
     - [ ] resolve blink/set/clear LED conflicts
     - [ ] invert SYS, IN and ERR LEDs

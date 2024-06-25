@@ -27,7 +27,6 @@ const uint16_t ERR = 0x0100;
 const uint16_t IN = 0x0200;
 const uint16_t SYS = 0x0400;
 
-const uint16_t RELAYS[] = {RELAY1, RELAY2, RELAY3, RELAY4};
 const uint16_t LEDS[] = {LED1, LED2, LED3, LED4};
 
 const int32_t TICK = 10;
@@ -62,10 +61,6 @@ typedef struct operation {
         struct {
             uint16_t mask;
         } toggle;
-
-        struct {
-            int relay;
-        } reset;
 
         struct {
             int led;
@@ -221,21 +216,33 @@ void U4_write(void *data) {
 }
 
 void U4_set_relay(int relay, uint16_t delay) {
-    if (relay >= 1 && relay <= 4) {
-        mutex_enter_blocking(&U4x.guard);
-        U4_set(RELAYS[relay - 1]);
-        U4x.relays[relay - 1].timer = clamp(delay, 0, 60000);
-        mutex_exit(&U4x.guard);
+    mutex_enter_blocking(&U4x.guard);
+
+    for (int ix = 0; ix < 4; ix++) {
+        if (U4x.relays[ix].id == relay) {
+            struct relay *r = &U4x.relays[ix];
+
+            U4_set(r->mask);
+            r->timer = clamp(delay, 0, 60000);
+        }
     }
+
+    mutex_exit(&U4x.guard);
 }
 
 void U4_clear_relay(int relay) {
-    if (relay >= 1 && relay <= 4) {
-        mutex_enter_blocking(&U4x.guard);
-        U4_clear(RELAYS[relay - 1]);
-        U4x.relays[relay - 1].timer = 0;
-        mutex_exit(&U4x.guard);
+    mutex_enter_blocking(&U4x.guard);
+
+    for (int ix = 0; ix < 4; ix++) {
+        if (U4x.relays[ix].id == relay) {
+            struct relay *r = &U4x.relays[ix];
+
+            U4_clear(r->mask);
+            r->timer = 0;
+        }
     }
+
+    mutex_exit(&U4x.guard);
 }
 
 void U4_set_LED(int LED) {
