@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Power on/reset and reprogram initial states are unexpectedly different
+- [x] Power on/reset and reprogram initial states are unexpectedly different
 
 ### CLI
     - [x] unlock door
@@ -21,13 +21,13 @@
    - [ ] Error if input is indeterminate (i.e. chattering)
 
 ### U4 PI4IOE5V6416
-    - (?) rework as clocked update
-    - [x] resolve lock/unlock relay conflicts
-    - [ ] resolve blink/set/clear LED conflicts
+    - [ ] rework as clocked update
+    - [x] rework relay set/clear as ticked operations
+    - [x] rework LED set/clear as ticked operations
+    - [ ] rework SYS,IN, ERR as ticked operations
     - [ ] invert SYS, IN and ERR LEDs
     - [ ] check polarity
     - [ ] Set output drive
-    - (?) Configure LEDs as open drain
 
 ### RTC/RX8900SA
     - [ ] Defer setup with alarm timer
