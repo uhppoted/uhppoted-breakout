@@ -9,11 +9,14 @@
     - [ ] render state
     - (?) command line
     - [ ] Dangling '['
+    - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
 ### U2 PCAL6408APW
     - [ ] Decode keypad
     - [ ] Read timeout
     - (?) Continuous read 
+          - Use I2C1 to check last register (a la I2C0)
+          - Request with address after time delay, continuous otherwise
     - (?) 100kHz/400kHz compile flag
 
 ### U3 PCAL6408APW
@@ -24,7 +27,7 @@
     - [ ] rework as clocked update
     - [x] rework relay set/clear as ticked operations
     - [x] rework LED set/clear as ticked operations
-    - [ ] rework SYS,IN, ERR as ticked operations
+    - [x] rework SYS,IN, ERR as ticked operations
     - [ ] invert SYS, IN and ERR LEDs
     - [ ] check polarity
     - [ ] Set output drive

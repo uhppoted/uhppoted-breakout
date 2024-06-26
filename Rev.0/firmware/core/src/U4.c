@@ -28,6 +28,9 @@ const uint16_t IN = 0x0200;
 const uint16_t SYS = 0x0400;
 
 const int32_t TICK = 10;
+const int ID_ERR = -1;
+const int ID_IN = -2;
+const int ID_SYS = -3;
 
 void U4_write(void *data);
 void U4_set(uint16_t mask);
@@ -76,22 +79,39 @@ typedef struct LED {
 } LED;
 
 struct {
-    relay relays[4];
-    LED LEDs[4];
+    struct {
+        int N;
+        relay relays[4];
+    } relays;
+
+    struct {
+        int N;
+        LED LEDs[7];
+    } LEDs;
+
     repeating_timer_t timer;
     mutex_t guard;
 } U4x = {
     .relays = {
-        {.id = 1, .mask = RELAY1, .timer = 0},
-        {.id = 2, .mask = RELAY2, .timer = 0},
-        {.id = 3, .mask = RELAY3, .timer = 0},
-        {.id = 4, .mask = RELAY4, .timer = 0},
+        .N = sizeof(U4x.relays) / sizeof(struct relay),
+        .relays = {
+            {.id = 1, .mask = RELAY1, .timer = 0},
+            {.id = 2, .mask = RELAY2, .timer = 0},
+            {.id = 3, .mask = RELAY3, .timer = 0},
+            {.id = 4, .mask = RELAY4, .timer = 0},
+        },
     },
     .LEDs = {
-        {.id = 1, .mask = LED1, .timer = 0, .blinks = 0, .interval = 0},
-        {.id = 2, .mask = LED2, .timer = 0, .blinks = 0, .interval = 0},
-        {.id = 3, .mask = LED3, .timer = 0, .blinks = 0, .interval = 0},
-        {.id = 4, .mask = LED4, .timer = 0, .blinks = 0, .interval = 0},
+        .N = sizeof(U4x.LEDs) / sizeof(struct LED),
+        .LEDs = {
+            {.id = 1, .mask = LED1, .timer = 0, .blinks = 0, .interval = 0},
+            {.id = 2, .mask = LED2, .timer = 0, .blinks = 0, .interval = 0},
+            {.id = 3, .mask = LED3, .timer = 0, .blinks = 0, .interval = 0},
+            {.id = 4, .mask = LED4, .timer = 0, .blinks = 0, .interval = 0},
+            {.id = ID_ERR, .mask = ERR, .timer = 0, .blinks = 0, .interval = 0},
+            {.id = ID_IN, .mask = IN, .timer = 0, .blinks = 0, .interval = 0},
+            {.id = ID_SYS, .mask = SYS, .timer = 0, .blinks = 0, .interval = 0},
+        },
     },
 };
 
@@ -141,11 +161,11 @@ void U4_init() {
 }
 
 /*
- * Decrements relay timers.
+ * Decrements relay and LED timers.
  */
 bool U4_tick(repeating_timer_t *rt) {
     if (mutex_try_enter(&U4x.guard, NULL)) {
-        for (struct relay *r = U4x.relays; r < U4x.relays + 4; r++) {
+        for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
             if (r->timer > 0) {
                 r->timer = clamp(r->timer - TICK, 0, 60000);
                 if (r->timer == 0) {
@@ -154,7 +174,7 @@ bool U4_tick(repeating_timer_t *rt) {
             }
         }
 
-        for (struct LED *l = U4x.LEDs; l < U4x.LEDs + 4; l++) {
+        for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
             if (l->timer > 0) {
                 l->timer = clamp(l->timer - TICK, 0, 60000);
                 if (l->timer == 0) {
@@ -237,7 +257,7 @@ void U4_write(void *data) {
 void U4_set_relay(int relay, uint16_t delay) {
     mutex_enter_blocking(&U4x.guard);
 
-    for (struct relay *r = U4x.relays; r < U4x.relays + 4; r++) {
+    for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
         if (r->id == relay) {
             U4_set(r->mask);
             r->timer = clamp(delay, 0, 60000);
@@ -250,7 +270,7 @@ void U4_set_relay(int relay, uint16_t delay) {
 void U4_clear_relay(int relay) {
     mutex_enter_blocking(&U4x.guard);
 
-    for (struct relay *r = U4x.relays; r < U4x.relays + 4; r++) {
+    for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
         if (r->id == relay) {
             U4_clear(r->mask);
             r->timer = 0;
@@ -263,7 +283,7 @@ void U4_clear_relay(int relay) {
 void U4_set_LED(int LED) {
     mutex_enter_blocking(&U4x.guard);
 
-    for (struct LED *l = U4x.LEDs; l < U4x.LEDs + 4; l++) {
+    for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
         if (l->id == LED) {
             U4_set(l->mask);
             l->timer = 0;
@@ -276,7 +296,7 @@ void U4_set_LED(int LED) {
 void U4_clear_LED(int LED) {
     mutex_enter_blocking(&U4x.guard);
 
-    for (struct LED *l = U4x.LEDs; l < U4x.LEDs + 4; l++) {
+    for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
         if (l->id == LED) {
             U4_clear(l->mask);
             l->timer = 0;
@@ -289,7 +309,7 @@ void U4_clear_LED(int LED) {
 void U4_toggle_LED(int LED) {
     mutex_enter_blocking(&U4x.guard);
 
-    for (struct LED *l = U4x.LEDs; l < U4x.LEDs + 4; l++) {
+    for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
         if (l->id == LED) {
             U4_toggle(l->mask);
             l->timer = 0;
@@ -303,39 +323,39 @@ void U4_toggle_LED(int LED) {
 void U4_blink_LED(int LED, int count, uint16_t interval) {
     mutex_enter_blocking(&U4x.guard);
 
-    for (struct LED *l = U4x.LEDs; l < U4x.LEDs + 4; l++) {
+    for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
         if (l->id == LED) {
             l->timer = interval;
             l->interval = 1000;
-            l->blinks += 2 * count;
+            l->blinks = clamp(l->blinks + 2 * count, 0, 64);
         }
     }
 
     mutex_exit(&U4x.guard);
 }
 
-void U4_set_ERR(bool state) {
-    if (state) {
-        U4_set(ERR);
-    } else {
-        U4_clear(ERR);
-    }
+void U4_set_ERR() {
+    U4_set_LED(ID_ERR);
 }
 
-void U4_set_IN(bool state) {
-    if (state) {
-        U4_set(IN);
-    } else {
-        U4_clear(IN);
-    }
+void U4_clear_ERR() {
+    U4_clear_LED(ID_ERR);
 }
 
-void U4_set_SYS(bool state) {
-    if (state) {
-        U4_set(SYS);
-    } else {
-        U4_clear(SYS);
-    }
+void U4_set_IN() {
+    U4_set_LED(ID_IN);
+}
+
+void U4_clear_IN() {
+    U4_clear_LED(ID_IN);
+}
+
+void U4_set_SYS() {
+    U4_set_LED(ID_SYS);
+}
+
+void U4_clear_SYS() {
+    U4_clear_LED(ID_SYS);
 }
 
 void U4_set(uint16_t mask) {

@@ -7,25 +7,24 @@
 2.  Decoupling capacitor on RX8900SA VBAT
 3.  (?) Tie FOE pin low through zero ohm resistor (with pullup to VDD)
 4.  Pullups on INT0 and INT1
-5.  Group LED outputs on same port (open collector?)
-6.  RESET should (maybe) be tied low to hold U2 et al in reset until U5 is ready
+5.  Relays and reader LEDs should be open collector and tied to +5V (fail open and red LED_s
+6.  (?) RESET should be tied low to hold U2 et al in reset until U5 is ready
 7.  R1 and R2 - maybe increase resistance (2.5K? 10K?)
-8.  Connect NC pins on J10 to J2
-9.  Connect NC    pins on J12 to J12
-10. Tie RX8900SA NC pins to GND
-11. (maybe) convert relay/reader LED push-pull outputs to open drain
+8.  1206 or 0804 or 0603 resistors and capacitors ?
+9.  Connect NC pins on J10 to J2
+10. Connect NC    pins on J12 to J12
+11. Tie RX8900SA NC pins to GND
 12. Fix PiZero2W mounting holes
-13. PiZero2W header (?)
-13. debug/state LEDs
-14. BOM: 1.6mm x dia. 6.5mm washer for standoffs
-15. BOM: M3x5 screws
-16. BOM: Machine pin header and socket
-17. Use smaller (2.0mm?) board-to-board connectors (J2,J3,J4)
-18. Allow for external 3.3V
-19. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
-20. J10/J12 soldering jig
-21. Test baseboard
-22. 1206 or 0603 resistors and capacitors ?
+13. PiZero2W header (surface mount)
+14. Debug/state LEDs
+15. BOM: 1.6mm x dia. 6.5mm washer for standoffs
+16. BOM: M3x5 screws
+17. BOM: Machine pin header and socket
+18. Use smaller (2.0mm?) board-to-board connectors (J2,J3,J4)
+19. Allow for external 3.3V
+20. Replace Diodes Inc PI4IOE5V6416 with NXP equivalent
+21. J10/J12 soldering jig
+22. Test baseboard
 23. Fix logo
 24. Use machine pin socket on dev. board.
 25. Relay startup click
@@ -40,8 +39,6 @@
 (?) Mounting holes for external 12V power supply
 (?) Slightly larger pads for soldering
 (?) https://www.chipquik.com/store/product_info.php?products_id=1900050
-(?) Expose FOUT pin via test point/pad and resistor
-(?) Expose INT  pin via test point/pad and resistor
 (?) Jumper VBAT to VDD for no battery option
 
 ### RX8900SA

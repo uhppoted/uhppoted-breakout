@@ -371,19 +371,31 @@ void set_LED(const char *cmd, bool state) {
         }
 
         if (strncasecmp(cmd, "ERR", 3) == 0) {
-            U4_set_ERR(state);
+            if (state) {
+                U4_set_ERR();
+            } else {
+                U4_clear_ERR();
+            }
             printf("ok\n");
             return;
         }
 
         if (strncasecmp(cmd, "IN", 2) == 0) {
-            U4_set_IN(state);
+            if (state) {
+                U4_set_IN();
+            } else {
+                U4_clear_IN();
+            }
             printf("ok\n");
             return;
         }
 
         if (strncasecmp(cmd, "SYS", 3) == 0) {
-            U4_set_SYS(state);
+            if (state) {
+                U4_set_SYS();
+            } else {
+                U4_clear_SYS();
+            }
             printf("ok\n");
             return;
         }
