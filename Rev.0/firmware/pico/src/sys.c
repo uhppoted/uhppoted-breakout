@@ -38,6 +38,9 @@ bool sysinit() {
     }
 #endif
 
+    // ... logging
+    log_init();
+
     // ... UART
     uart_init(uart0, 2400);
 

@@ -38,6 +38,9 @@ bool sysinit() {
         return false;
     }
 
+    // ... logging
+    log_init();
+
     // ... CLI
     usb_init();
 

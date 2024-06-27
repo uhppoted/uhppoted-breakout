@@ -212,7 +212,7 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    TXRX_debug();
+    debugf("CLI", "debuggety bug bug");
 }
 
 void state() {

@@ -39,7 +39,10 @@
     - [ ] backup mode compile flags
 
 ### log
-   - [ ] Queue log writes
+   - [x] Queue log writes
+   - [ ] Pop first log entry on full
+   - [ ] Partially printing in tight loop (check return value of printf ?)
+   - [ ] Wait for USB connected
                
 ## UART
    - [ ] usb_init
