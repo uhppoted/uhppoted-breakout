@@ -1,6 +1,9 @@
 # TODO
 
 - [x] Power on/reset and reprogram initial states are unexpectedly different
+- [ ] Rev 0.1
+      - [ ] RTC Schottky diodes and resistor
+      - [ ] 1206 resistor/capacitors
 
 ### CLI
     - [x] unlock door
@@ -8,6 +11,7 @@
     - [ ] reboot
     - [ ] render state
     - (?) command line
+    - (?) UI thread
     - [ ] Dangling '['
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
@@ -24,11 +28,12 @@
    - [ ] Error if input is indeterminate (i.e. chattering)
 
 ### U4 PI4IOE5V6416
-    - [ ] rework as clocked update
+    - [x] rework as clocked update
     - [x] rework relay set/clear as ticked operations
     - [x] rework LED set/clear as ticked operations
     - [x] rework SYS,IN, ERR as ticked operations
-    - [ ] invert SYS, IN and ERR LEDs
+    - [ ] sanity check PI4IOE5V6416 against U4x.outputs
+    - (?) invert SYS, IN and ERR LEDs
     - [ ] check polarity
     - [ ] Set output drive
 
@@ -42,6 +47,7 @@
    - [x] Queue log writes
    - [ ] Pop first log entry on full
    - [ ] Partially printing in tight loop (check return value of printf ?)
+   - [ ] MSG_LOG
    - [ ] Wait for USB connected
                
 ## UART

@@ -414,6 +414,24 @@ void blink_LED(const char *cmd) {
             printf("ok\n");
             return;
         }
+
+        if (strncasecmp(cmd, "ERR", 3) == 0) {
+            U4_blink_ERR(5, 500);
+            printf("ok\n");
+            return;
+        }
+
+        if (strncasecmp(cmd, "IN", 2) == 0) {
+            U4_blink_IN(5, 500);
+            printf("ok\n");
+            return;
+        }
+
+        if (strncasecmp(cmd, "SYS", 3) == 0) {
+            U4_blink_SYS(5, 500);
+            printf("ok\n");
+            return;
+        }
     }
 }
 
