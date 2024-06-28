@@ -6,8 +6,6 @@
       - [ ] 1206 resistor/capacitors
 
 ### CLI
-    - [x] unlock door
-    - [x] blink LED
     - [ ] reboot
     - [ ] render state
     - (?) command line
@@ -45,9 +43,10 @@
 
 ### log
    - [x] Queue log writes
-   - [ ] Pop first log entry on full
-   - [ ] Partially printing in tight loop (check return value of printf ?)
    - [ ] MSG_LOG
+   - [ ] Pop first log entry on full
+   - [ ] Print '...' after queue full
+   - [ ] Partially printing in tight loop (check return value of printf ?)
    - [ ] Wait for USB connected
                
 ## UART
