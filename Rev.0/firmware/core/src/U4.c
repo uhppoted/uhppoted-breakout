@@ -33,12 +33,12 @@ const int ID_IN = -2;
 const int ID_SYS = -3;
 
 void U4_write(void *data);
-void U4_set(uint16_t mask);
-void U4_clear(uint16_t mask);
-void U4_toggle(uint16_t mask);
 bool U4_tick(repeating_timer_t *rt);
 
-int32_t clamp(int32_t v, int32_t min, int32_t max);
+inline void U4_set(uint16_t mask);
+inline void U4_clear(uint16_t mask);
+inline void U4_toggle(uint16_t mask);
+inline int32_t clamp(int32_t v, int32_t min, int32_t max);
 
 typedef enum {
     U4_UNKNOWN,
@@ -351,15 +351,15 @@ void U4_blink_SYS(int count, uint16_t interval) {
     U4_blink_LED(ID_SYS, count, interval);
 }
 
-void U4_set(uint16_t mask) {
+inline void U4_set(uint16_t mask) {
     U4x.outputs |= mask;
 }
 
-void U4_clear(uint16_t mask) {
+inline void U4_clear(uint16_t mask) {
     U4x.outputs &= ~mask;
 }
 
-void U4_toggle(uint16_t mask) {
+inline void U4_toggle(uint16_t mask) {
     uint16_t outputs = U4x.outputs;
 
     // clang-format off
@@ -371,6 +371,6 @@ void U4_toggle(uint16_t mask) {
     U4x.outputs = v;
 }
 
-int32_t clamp(int32_t v, int32_t min, int32_t max) {
+inline int32_t clamp(int32_t v, int32_t min, int32_t max) {
     return v < min ? min : (v > max ? max : v);
 }

@@ -1,6 +1,7 @@
 # TODO
 
 - [x] Power on/reset and reprogram initial states are unexpectedly different
+- [ ] `I2C0 queue full` on power on
 - [ ] Rev 0.1
       - [ ] RTC Schottky diodes and resistor
       - [ ] 1206 resistor/capacitors
@@ -30,6 +31,7 @@
     - [x] rework relay set/clear as ticked operations
     - [x] rework LED set/clear as ticked operations
     - [x] rework SYS,IN, ERR as ticked operations
+    - [x] inline (https://stackoverflow.com/questions/31108159/what-is-the-use-of-the-inline-keyword-in-c)
     - [ ] sanity check PI4IOE5V6416 against U4x.outputs
     - (?) invert SYS, IN and ERR LEDs
     - [ ] check polarity
