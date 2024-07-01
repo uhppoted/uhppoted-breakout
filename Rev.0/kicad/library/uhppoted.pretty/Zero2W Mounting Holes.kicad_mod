@@ -1,0 +1,66 @@
+(footprint "Zero2W Mounting Holes" (version 20221018) (generator pcbnew)
+  (layer "F.Cu")
+  (descr "Mounting Hole 2.5mm, no annular")
+  (tags "mounting hole 2.5mm no annular")
+  (attr exclude_from_pos_files exclude_from_bom)
+  (fp_text reference "REF**" (at 0 0) (layer "F.SilkS")
+      (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp 60dc95ca-c481-4e14-96df-e61721388cb1)
+  )
+  (fp_text value "Zero2W Mounting Holes" (at 0 5.08) (layer "F.Fab")
+      (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp 1ba7045f-83dc-4d94-9d12-21cd50de4757)
+  )
+  (fp_text user "${REFERENCE}" (at 0 2.54) (layer "F.Fab")
+      (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp c9906d16-ada8-4e03-b374-e39a25c28aa9)
+  )
+  (fp_circle (center -11.5 -29) (end -9 -29)
+    (stroke (width 0.15) (type solid)) (fill none) (layer "Cmts.User") (tstamp e4b0ae4d-512f-4b36-a58c-bc4ce3eee2ea))
+  (fp_circle (center -11.5 29) (end -9 29)
+    (stroke (width 0.15) (type solid)) (fill none) (layer "Cmts.User") (tstamp 81d5061a-28b4-483a-aa7f-56066576c9e7))
+  (fp_circle (center 11.5 -29) (end 14 -29)
+    (stroke (width 0.15) (type solid)) (fill none) (layer "Cmts.User") (tstamp fe2ae579-c312-48a3-b9ef-51baf0bb1720))
+  (fp_circle (center 11.5 29) (end 14 29)
+    (stroke (width 0.15) (type solid)) (fill none) (layer "Cmts.User") (tstamp 5fdbd741-6e38-4b98-8a49-30f23be6571b))
+  (fp_circle (center -11.5 -29) (end -8.75 -29)
+    (stroke (width 0.05) (type solid)) (fill none) (layer "F.CrtYd") (tstamp 98ba82c9-4fe6-4d9d-a6da-d088fb43d61f))
+  (fp_circle (center -11.5 29) (end -8.75 29)
+    (stroke (width 0.05) (type solid)) (fill none) (layer "F.CrtYd") (tstamp 3effd85b-0412-46c6-b26f-3642c8f4dc92))
+  (fp_circle (center 11.5 -29) (end 14.25 -29)
+    (stroke (width 0.05) (type solid)) (fill none) (layer "F.CrtYd") (tstamp 1d712325-877d-4872-867f-6166602cd445))
+  (fp_circle (center 11.5 29) (end 14.25 29)
+    (stroke (width 0.05) (type solid)) (fill none) (layer "F.CrtYd") (tstamp 748c436b-f213-4557-b897-e59188db7793))
+  (pad "" np_thru_hole circle (at -11.5 -29) (size 2.5 2.5) (drill 2.5) (layers "F&B.Cu" "*.Mask") (tstamp af89feae-a629-4d08-95db-aa4e16c27faf))
+  (pad "" np_thru_hole circle (at -11.5 29) (size 2.5 2.5) (drill 2.5) (layers "F&B.Cu" "*.Mask") (tstamp 92b79553-1110-4033-8176-454f14ef2310))
+  (pad "" np_thru_hole circle (at 11.5 -29) (size 2.5 2.5) (drill 2.5) (layers "F&B.Cu" "*.Mask") (tstamp 088b7563-bf97-4f22-a25e-d01d67256390))
+  (pad "" np_thru_hole circle (at 11.5 29) (size 2.5 2.5) (drill 2.5) (layers "F&B.Cu" "*.Mask") (tstamp 4dd505d9-190b-42c6-b1e9-91a4caac972c))
+  (group "" (id 0faf9493-23dc-43b7-a0e1-eb2f93c2b860)
+    (members
+      98ba82c9-4fe6-4d9d-a6da-d088fb43d61f
+      af89feae-a629-4d08-95db-aa4e16c27faf
+      e4b0ae4d-512f-4b36-a58c-bc4ce3eee2ea
+    )
+  )
+  (group "" (id 4d79155b-b4c0-456c-b696-41c839dab1ef)
+    (members
+      4dd505d9-190b-42c6-b1e9-91a4caac972c
+      5fdbd741-6e38-4b98-8a49-30f23be6571b
+      748c436b-f213-4557-b897-e59188db7793
+    )
+  )
+  (group "" (id 921640ef-49e5-4c0a-aad6-1b38a57c8927)
+    (members
+      088b7563-bf97-4f22-a25e-d01d67256390
+      1d712325-877d-4872-867f-6166602cd445
+      fe2ae579-c312-48a3-b9ef-51baf0bb1720
+    )
+  )
+  (group "" (id f3b9b46f-7559-4b8f-b875-5aefb0ba0bee)
+    (members
+      3effd85b-0412-46c6-b26f-3642c8f4dc92
+      81d5061a-28b4-483a-aa7f-56066576c9e7
+      92b79553-1110-4033-8176-454f14ef2310
+    )
+  )
+)
