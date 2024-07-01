@@ -19,6 +19,7 @@ add_executable(breakout
   src/sys.c
   src/hwconfig.c
 
+  ${CORE}/src/sys.c
   ${CORE}/src/I2C0.c
   ${CORE}/src/I2C1.c
   ${CORE}/src/RTC.c
@@ -27,10 +28,11 @@ add_executable(breakout
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
   ${CORE}/src/txrx.c
-  ${CORE}/src/tty.c
-  ${CORE}/src/cli.c
   ${CORE}/src/state.c
   ${CORE}/src/log.c
+  ${CORE}/src/cli.c
+
+  ${CORE}/src/tty.c
 
   ${LIB}/src/I2C.c
   ${LIB}/src/RX8900SA.c
@@ -39,7 +41,6 @@ add_executable(breakout
 )
 
 target_include_directories(breakout 
-   PRIVATE include
    PRIVATE ${CORE}/include
    PRIVATE ${LIB}/include
 )

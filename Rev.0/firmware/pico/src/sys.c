@@ -19,11 +19,11 @@
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
-bool blink(repeating_timer_t *);
+bool on_tick(repeating_timer_t *);
 
 struct {
     struct repeating_timer timer;
-} sysled;
+} sys;
 
 bool sysinit() {
     // ... SYS LED
@@ -33,13 +33,10 @@ bool sysinit() {
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
-    if (!add_repeating_timer_ms(1000, blink, NULL, &sysled.timer)) {
+    if (!add_repeating_timer_ms(1000, on_tick, NULL, &sys.timer)) {
         return false;
     }
 #endif
-
-    // ... logging
-    log_init();
 
     // ... UART
     uart_init(uart0, 2400);
@@ -57,51 +54,26 @@ bool sysinit() {
 
     uart_set_irq_enables(uart0, true, false);
 
+    // ... logging
+    log_init();
+
     return true;
 }
 
-void dispatch(uint32_t v) {
-    if ((v & MSG) == MSG_DEBUG) {
-        debugf("SYS", "... debug??");
+bool on_tick(repeating_timer_t *t) {
+    uint32_t msg = MSG_TICK;
+    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+        set_error(ERR_QUEUE_FULL, "SYS", "tick: queue full");
     }
 
-    if ((v & MSG) == MSG_WIO) {
-        U2_wio(v & 0x0000ffff);
-    }
-
-    if ((v & MSG) == MSG_U3) {
-        U3_process(v & 0x000000ff);
-    }
-
-    if ((v & MSG) == MSG_RX) {
-        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        TXRX_rx(b);
-        free(b);
-    }
-
-    if ((v & MSG) == MSG_TTY) {
-        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        rx(b);
-        free(b);
-    }
-
-    if ((v & MSG) == MSG_TICK) {
-        infof("SYS", "tick");
-    }
+    return true;
 }
 
 /* SYSLED blink callback.
  *
  */
-bool blink(repeating_timer_t *t) {
+void tick() {
     bool on = gpio_get(PICO_DEFAULT_LED_PIN);
 
     gpio_put(PICO_DEFAULT_LED_PIN, !on);
-
-    uint32_t msg = MSG_TICK;
-    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-        set_error(ERR_QUEUE_FULL, "SYS", "blink: queue full");
-    }
-
-    return true;
 }

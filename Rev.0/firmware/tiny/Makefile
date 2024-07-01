@@ -13,7 +13,7 @@ clean:
 	       cmake ..
 
 format: 
-	clang-format -i src/*.c         include/*.h
+	clang-format -i src/*.c
 	clang-format -i ../core/src/*.c ../core/include/*.h
 	clang-format -i ../lib/src/*.c  ../lib/include/*.h
 

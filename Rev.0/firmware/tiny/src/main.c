@@ -64,5 +64,10 @@ int main() {
         uint32_t v;
         queue_remove_blocking(&queue, &v);
         dispatch(v);
+
+        if ((v & MSG) == MSG_USB) {
+            bool connected = (v & 0x0fffffff) == 1;
+            infof("SYS", "USB connected: %s", connected ? "yes" : "no");
+        }
     }
 }
