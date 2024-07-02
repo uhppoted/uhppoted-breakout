@@ -93,8 +93,8 @@ ERROR  U3         update: queue full
 
 ## R&D
 - [x] Relay pin voltages
-- [ ] CPU board power consumption
-- [ ] Breakout board power consumption
+- [x] CPU board power consumption
+- [x] Breakout board power consumption
 
 - [ ] Pinout diagram
       - (?) [WireViz] https://github.com/formatc1702/WireViz

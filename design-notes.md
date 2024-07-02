@@ -4,10 +4,11 @@
 
 ## Power Consumption
 
-| Configuration | Measured        | Power |
-|---------------|-----------------|-------|
-| Base + CPU    | 155mA  @ 12.21V | 1.9W  |
-| Base          | 16.5mA @ 12.23V | 0.2W  |
+| Configuration    | Measured        | Power  |
+|------------------|-----------------|--------|
+| Base + CPU       | 155mA  @ 12.21V | 1.9W   |
+| Base             | 16.5mA @ 12.23V | 0.2W   |
+| Breakout Rev 0.0 | 25.4mA @ 5.10V  | 0.13W  |
 
 
 ### Startup
