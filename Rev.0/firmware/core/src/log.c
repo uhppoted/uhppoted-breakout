@@ -13,6 +13,7 @@ struct {
 };
 
 const int32_t LOG_TICK = 100;
+const int LOG_MSGLENGTH = 128;
 
 bool log_tick(repeating_timer_t *rt);
 
@@ -40,14 +41,14 @@ bool log_tick(repeating_timer_t *rt) {
 void debugf(const char *tag, const char *fmt, ...) {
     int N = strlen(fmt);
     char format[N + 32];
-    char *msg = (char *)calloc(64, sizeof(char));
+    char *msg = (char *)calloc(LOG_MSGLENGTH, sizeof(char));
 
     snprintf(format, sizeof(format), "%-5s  %-10s %s", "DEBUG", tag, fmt);
 
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(msg, 64, format, args);
+    vsnprintf(msg, LOG_MSGLENGTH, format, args);
     va_end(args);
 
     if (queue_is_full(&LOG.queue) || !queue_try_add(&LOG.queue, &msg)) {
@@ -58,14 +59,14 @@ void debugf(const char *tag, const char *fmt, ...) {
 void infof(const char *tag, const char *fmt, ...) {
     int N = strlen(fmt);
     char format[N + 32];
-    char *msg = (char *)calloc(64, sizeof(char));
+    char *msg = (char *)calloc(LOG_MSGLENGTH, sizeof(char));
 
     snprintf(format, sizeof(format), "%-5s  %-10s %s", "INFO", tag, fmt);
 
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(msg, 64, format, args);
+    vsnprintf(msg, LOG_MSGLENGTH, format, args);
     va_end(args);
 
     if (queue_is_full(&LOG.queue) || !queue_try_add(&LOG.queue, &msg)) {
@@ -76,14 +77,14 @@ void infof(const char *tag, const char *fmt, ...) {
 void warnf(const char *tag, const char *fmt, ...) {
     int N = strlen(fmt);
     char format[N + 32];
-    char *msg = (char *)calloc(64, sizeof(char));
+    char *msg = (char *)calloc(LOG_MSGLENGTH, sizeof(char));
 
     snprintf(format, sizeof(format), "%-5s  %-10s %s", "WARN", tag, fmt);
 
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(msg, 64, format, args);
+    vsnprintf(msg, LOG_MSGLENGTH, format, args);
     va_end(args);
 
     if (queue_is_full(&LOG.queue) || !queue_try_add(&LOG.queue, &msg)) {
@@ -94,14 +95,14 @@ void warnf(const char *tag, const char *fmt, ...) {
 void errorf(const char *tag, const char *fmt, ...) {
     int N = strlen(fmt);
     char format[N + 32];
-    char *msg = (char *)calloc(64, sizeof(char));
+    char *msg = (char *)calloc(LOG_MSGLENGTH, sizeof(char));
 
     snprintf(format, sizeof(format), "%-5s  %-10s %s", "ERROR", tag, fmt);
 
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(msg, 64, format, args);
+    vsnprintf(msg, LOG_MSGLENGTH, format, args);
     va_end(args);
 
     if (queue_is_full(&LOG.queue) || !queue_try_add(&LOG.queue, &msg)) {

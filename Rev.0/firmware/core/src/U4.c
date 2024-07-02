@@ -27,12 +27,14 @@ const uint16_t ERR = 0x0100;
 const uint16_t IN = 0x0200;
 const uint16_t SYS = 0x0400;
 
-const int32_t TICK = 10;
+const int32_t TICK = 10;   // ms
+const int32_t TOCK = 1000; // ms
 const int ID_ERR = -1;
 const int ID_IN = -2;
 const int ID_SYS = -3;
 
 void U4_write(void *data);
+void U4_healthcheck(void *data);
 bool U4_tick(repeating_timer_t *rt);
 
 inline void U4_set(uint16_t mask);
@@ -43,6 +45,7 @@ inline int32_t clamp(int32_t v, int32_t min, int32_t max);
 typedef enum {
     U4_UNKNOWN,
     U4_WRITE,
+    U4_HEALTHCHECK,
 } U4_TASK;
 
 typedef struct operation {
@@ -51,6 +54,10 @@ typedef struct operation {
         struct {
             uint16_t outputs;
         } write;
+
+        struct {
+            uint16_t outputs;
+        } healthcheck;
     };
 } operation;
 
@@ -70,6 +77,8 @@ typedef struct LED {
 
 struct {
     uint16_t outputs;
+    int32_t tock;
+    bool write;
 
     struct {
         int N;
@@ -85,6 +94,8 @@ struct {
     mutex_t guard;
 } U4x = {
     .outputs = 0x0000,
+    .tock = TOCK,
+    .write = false,
     .relays = {
         .N = sizeof(U4x.relays) / sizeof(struct relay),
         .relays = {
@@ -110,9 +121,6 @@ struct {
 
 void U4_init() {
     infof("U4", "init");
-
-    // ... initialise state
-    U4x.outputs = 0x0000;
 
     // ... configure PI4IOE5V6416
     uint16_t outputs;
@@ -162,9 +170,30 @@ void U4_init() {
  * Decrements relay and LED timers.
  */
 bool U4_tick(repeating_timer_t *rt) {
-    static uint16_t outputs = 0x0000;
+    uint16_t outputs = U4x.outputs;
 
     if (mutex_try_enter(&U4x.guard, NULL)) {
+        // ... health check
+        U4x.tock -= TICK;
+        if (U4x.tock < 0) {
+            U4x.tock = TOCK;
+
+            operation *op = (operation *)calloc(1, sizeof(operation));
+
+            op->tag = U4_HEALTHCHECK;
+            op->healthcheck.outputs = U4x.outputs & MASK;
+
+            closure task = {
+                .f = U4_healthcheck,
+                .data = op,
+            };
+
+            if (!I2C0_push(&task)) {
+                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+            }
+        }
+
+        // ... update relays
         for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
             if (r->timer > 0) {
                 r->timer = clamp(r->timer - TICK, 0, 60000);
@@ -174,6 +203,7 @@ bool U4_tick(repeating_timer_t *rt) {
             }
         }
 
+        // ... update LEDs
         for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
             if (l->timer > 0) {
                 l->timer = clamp(l->timer - TICK, 0, 60000);
@@ -189,7 +219,8 @@ bool U4_tick(repeating_timer_t *rt) {
             }
         }
 
-        if ((outputs & MASK) != (U4x.outputs & MASK)) {
+        // ... update outputs
+        if (outputs != U4x.outputs || U4x.write) {
             outputs = U4x.outputs;
 
             operation *op = (operation *)calloc(1, sizeof(operation));
@@ -203,8 +234,10 @@ bool U4_tick(repeating_timer_t *rt) {
             };
 
             if (!I2C0_push(&task)) {
-                set_error(ERR_QUEUE_FULL, "U4", "write: queue full");
+                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
             }
+
+            U4x.write = false;
         }
 
         mutex_exit(&U4x.guard);
@@ -219,17 +252,37 @@ bool U4_tick(repeating_timer_t *rt) {
 void U4_write(void *data) {
     operation *op = (operation *)data;
 
-    if (op->tag == U4_WRITE) {
-        uint16_t outputs = op->write.outputs;
-        int err;
+    uint16_t outputs = op->write.outputs;
+    int err;
 
-        if ((err = PI4IOE5V6416_write(U4, outputs & MASK)) != ERR_OK) {
-            set_error(ERR_U4, "U4", "error writing PI4IOE5V6416 outputs (%d)", err);
-        } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-            set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
-        } else if (outputs != op->write.outputs) {
-            set_error(ERR_U4, "U4", "invalid PI4IOE5V6416 output state - expected:04x, got:%04x", op->write.outputs, outputs);
-        }
+    if ((err = PI4IOE5V6416_write(U4, outputs & MASK)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error writing PI4IOE5V6416 outputs (%d)", err);
+    } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
+    } else if ((outputs & MASK) != (op->write.outputs & MASK)) {
+        set_error(ERR_U4, "U4", "invalid PI4IOE5V6416 output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
+    }
+
+    if (mutex_try_enter(&U4x.guard, NULL)) {
+        U4x.write = true;
+        mutex_exit(&U4x.guard);
+    }
+
+    free(data);
+}
+
+/*
+ * I2C0 task to readback and validate PI4IOE5V6416 outputs.
+ */
+void U4_healthcheck(void *data) {
+    operation *op = (operation *)data;
+    uint16_t outputs;
+    int err;
+
+    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
+    } else if ((outputs & MASK) != (op->healthcheck.outputs & MASK)) {
+        set_error(ERR_U4, "U4", "PI4IOE5V6416 healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
     }
 
     free(data);
@@ -353,10 +406,12 @@ void U4_blink_SYS(int count, uint16_t interval) {
 
 inline void U4_set(uint16_t mask) {
     U4x.outputs |= mask;
+    U4x.write = true;
 }
 
 inline void U4_clear(uint16_t mask) {
     U4x.outputs &= ~mask;
+    U4x.write = true;
 }
 
 inline void U4_toggle(uint16_t mask) {
@@ -369,6 +424,7 @@ inline void U4_toggle(uint16_t mask) {
     // clang-format on
 
     U4x.outputs = v;
+    U4x.write = true;
 }
 
 inline int32_t clamp(int32_t v, int32_t min, int32_t max) {
