@@ -5,7 +5,16 @@
       - [x] RTC Schottky diodes and resistor
 
 - [ ] `I2C0 queue full` on power on
+       - maybe USB char?
+       - **BECAUSE** repeating timers kick in before system initialisation is complete and I2C0 conflicts
+```
+ERROR  I2C0       push: queue full
+ERROR  U3         update: queue full
+...
+```
+
 - [ ] pico: txrx/uart conflict
+- [ ] debounce simulation
 
 ### CLI
     - [ ] reboot
@@ -24,7 +33,6 @@
     - (?) 100kHz/400kHz compile flag
 
 ### U3 PCAL6408APW
-   - [ ] debounce simulation
    - [ ] Error if input is indeterminate (i.e. chattering)
 
 ### U4 PI4IOE5V6416
@@ -34,8 +42,20 @@
     - [x] rework SYS,IN, ERR as ticked operations
     - [x] inline (https://stackoverflow.com/questions/31108159/what-is-the-use-of-the-inline-keyword-in-c)
     - [x] sanity check PI4IOE5V6416 state against U4x.outputs
-    - (?) invert SYS, IN and ERR LEDs
-    - [ ] check polarity
+    - [x] invert SYS, IN and ERR LEDs
+    - [x] Initial readback always reads back 0x0000
+    - [x] check polarity
+          - [x] RELAY 1
+          - [x] RELAY 2
+          - [x] RELAY 3
+          - [x] RELAY 4
+          - [x] LED 1
+          - [x] LED 2
+          - [x] LED 3
+          - [x] LED 4
+          - [x] SYS
+          - [x] ERR
+          - [x] IN
     - [ ] Set output drive
 
 ### RTC/RX8900SA

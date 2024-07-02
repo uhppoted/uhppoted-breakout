@@ -2,6 +2,14 @@
 
 ## UT0311L04
 
+## Power Consumption
+
+| Configuration | Measured        | Power |
+|---------------|-----------------|-------|
+| Base + CPU    | 155mA  @ 12.21V | 1.9W  |
+| Base          | 16.5mA @ 12.23V | 0.2W  |
+
+
 ### Startup
 
 | RELAY | N/O     | N/C    | LED |

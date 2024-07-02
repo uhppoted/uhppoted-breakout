@@ -21,9 +21,10 @@ void IOX_init() {
     gpio_put(IOX_RESET, 1);
     sleep_us(25);
 
+    // FIXME enabled repeating timers when system initialised
+    U4_init();
     U2_init();
     U3_init();
-    U4_init();
 
     irq_set_enabled(IO_IRQ_BANK0, true);
 

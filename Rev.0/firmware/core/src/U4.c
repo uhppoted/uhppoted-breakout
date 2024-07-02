@@ -77,6 +77,7 @@ typedef struct LED {
 
 struct {
     uint16_t outputs;
+    uint16_t polarity;
     int32_t tock;
     bool write;
 
@@ -94,6 +95,7 @@ struct {
     mutex_t guard;
 } U4x = {
     .outputs = 0x0000,
+    .polarity = 0x0700, // SYS, IN and ERR LEDs are inverted
     .tock = TOCK,
     .write = false,
     .relays = {
@@ -123,7 +125,6 @@ void U4_init() {
     infof("U4", "init");
 
     // ... configure PI4IOE5V6416
-    uint16_t outputs;
     int err;
 
     if ((err = PI4IOE5V6416_init(U4)) != ERR_OK) {
@@ -146,24 +147,25 @@ void U4_init() {
         set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 pullups (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_write(U4, U4x.outputs & MASK)) != ERR_OK) {
+    if ((err = PI4IOE5V6416_write(U4, (U4x.outputs ^ U4x.polarity) & MASK)) != ERR_OK) {
         set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 outputs (%d)", err);
-    }
-
-    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error reading PI4IOE5V6416 outputs (%d)", err);
-    } else if ((outputs & MASK) != (U4x.outputs & MASK)) {
-        set_error(ERR_U4, "U4", "invalid PI4IOE5V6416 output state - expected:04x, got:%04x", U4x.outputs, outputs);
     }
 
     if ((err = PI4IOE5V6416_set_configuration(U4, 0xf800)) != ERR_OK) {
         set_error(ERR_U4, "U4", "error configuring PI4IOE5V6416 (%d)", err);
     }
 
+    uint16_t outputs;
+    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+    } else if ((outputs & MASK) != ((U4x.outputs ^ U4x.polarity) & MASK)) {
+        set_error(ERR_U4, "U4", "invalid PI4IOE5V6416 output state - expected:%04x, got:%04x", U4x.outputs, outputs);
+    }
+
     mutex_init(&U4x.guard);
     add_repeating_timer_ms(TICK, U4_tick, NULL, &U4x.timer);
 
-    debugf("U4", "initialised state %04x %016b", outputs, outputs);
+    debugf("U4", "initialised state %04x %011b", outputs ^ U4x.polarity, outputs ^ U4x.polarity);
 }
 
 /*
@@ -181,7 +183,7 @@ bool U4_tick(repeating_timer_t *rt) {
             operation *op = (operation *)calloc(1, sizeof(operation));
 
             op->tag = U4_HEALTHCHECK;
-            op->healthcheck.outputs = U4x.outputs & MASK;
+            op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
 
             closure task = {
                 .f = U4_healthcheck,
@@ -226,7 +228,7 @@ bool U4_tick(repeating_timer_t *rt) {
             operation *op = (operation *)calloc(1, sizeof(operation));
 
             op->tag = U4_WRITE;
-            op->write.outputs = outputs & MASK;
+            op->write.outputs = (outputs ^ U4x.polarity) & MASK;
 
             closure task = {
                 .f = U4_write,
@@ -263,11 +265,6 @@ void U4_write(void *data) {
         set_error(ERR_U4, "U4", "invalid PI4IOE5V6416 output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
     }
 
-    if (mutex_try_enter(&U4x.guard, NULL)) {
-        U4x.write = true;
-        mutex_exit(&U4x.guard);
-    }
-
     free(data);
 }
 
@@ -283,6 +280,11 @@ void U4_healthcheck(void *data) {
         set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
     } else if ((outputs & MASK) != (op->healthcheck.outputs & MASK)) {
         set_error(ERR_U4, "U4", "PI4IOE5V6416 healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
+
+        if (mutex_try_enter(&U4x.guard, NULL)) {
+            U4x.write = true;
+            mutex_exit(&U4x.guard);
+        }
     }
 
     free(data);
@@ -359,6 +361,7 @@ void U4_blink_LED(int LED, int count, uint16_t interval) {
 
     for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
         if (l->id == LED) {
+            // FIXME handle inverted polarity for SYS, IN and ERR
             l->timer = interval;
             l->interval = 1000;
             l->blinks = clamp(l->blinks + 2 * count, 0, 64);
