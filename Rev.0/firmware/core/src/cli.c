@@ -16,6 +16,8 @@
 #include <state.h>
 #include <txrx.h>
 
+#include <PI4IOE5V6416.h>
+
 typedef struct CLI {
     int32_t timer;
     int ix;
@@ -211,8 +213,28 @@ void exec(char *cmd) {
     }
 }
 
+void debugx(void *data) {
+    debugf("CLI", "debug - U4 set output drive");
+
+    float drive[16] = {0.25f, 0.5f, 0.75f, 1.f, 0.2f, 0.4f, 0.6f, 0.8f, 1.f, 0.75f, 0.5f, 0.25f, 1.f, 0.75f, 0.5f, 0.25f};
+    int err;
+
+    if ((err = PI4IOE5V6416_set_output_drive(U4, drive)) != ERR_OK) {
+        debugf("CLI", ">>>> DEBUG - OOOPS (%d)", err);
+    } else {
+        debugf("CLI", ">>>> DEBUG - OK");
+    }
+}
+
 void debug() {
-    debugf("CLI", "debuggety bug bug");
+    struct closure op = {
+        .f = debugx,
+        .data = NULL,
+    };
+
+    if (!I2C0_push(&op)) {
+        set_error(ERR_QUEUE_FULL, "CLI", "debug: queue full");
+    }
 }
 
 void state() {

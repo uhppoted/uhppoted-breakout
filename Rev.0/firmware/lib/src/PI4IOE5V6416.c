@@ -25,6 +25,11 @@ const struct {
     .OUTPUT_CONFIG = 0x4f,
 };
 
+const uint32_t PI4IOE5V6416_DRIVE_1 = 0xffffffff;
+const uint32_t PI4IOE5V6416_DRIVE_0_75 = 0xaaaaaaaa;
+const uint32_t PI4IOE5V6416_DRIVE_0_5 = 0x55555555;
+const uint32_t PI4IOE5V6416_DRIVE_0_25 = 0x00000000;
+
 int PI4IOE5V6416_init(I2C dev) {
     return ERR_OK;
 }
@@ -72,6 +77,34 @@ int PI4IOE5V6416_set_open_drain(I2C dev, bool port0, bool port1) {
     data |= port1 ? 0x02 : 0x00;
 
     return I2C_write(dev, PI4IOE5V6416.OUTPUT_CONFIG, data);
+}
+
+int PI4IOE5V6416_set_output_drive(I2C dev, const float drive[16]) {
+    uint32_t mask = 0x00000003;
+    uint32_t out = 0x00000000;
+
+    for (int i = 0; i < 16; i++) {
+        if (drive[i] <= 0.25f) {
+            out |= PI4IOE5V6416_DRIVE_0_25 & mask;
+        } else if (drive[i] <= 0.5f) {
+            out |= PI4IOE5V6416_DRIVE_0_5 & mask;
+        } else if (drive[i] <= 0.75f) {
+            out |= PI4IOE5V6416_DRIVE_0_75 & mask;
+        } else {
+            out |= PI4IOE5V6416_DRIVE_1 & mask;
+        }
+
+        mask <<= 2;
+    }
+
+    uint8_t data[] = {
+        (uint8_t)((out >> 0) & 0x000000ff),
+        (uint8_t)((out >> 8) & 0x000000ff),
+        (uint8_t)((out >> 16) & 0x000000ff),
+        (uint8_t)((out >> 24) & 0x000000ff),
+    };
+
+    return I2C_write_all(dev, PI4IOE5V6416.DRIVE, data, 4);
 }
 
 int PI4IOE5V6416_read(I2C dev, uint16_t *data) {

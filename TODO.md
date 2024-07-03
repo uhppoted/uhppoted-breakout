@@ -43,20 +43,11 @@ ERROR  U3         update: queue full
     - [x] inline (https://stackoverflow.com/questions/31108159/what-is-the-use-of-the-inline-keyword-in-c)
     - [x] sanity check PI4IOE5V6416 state against U4x.outputs
     - [x] invert SYS, IN and ERR LEDs
-    - [x] Initial readback always reads back 0x0000
+    - [x] initial readback always reads back 0x0000
     - [x] check polarity
-          - [x] RELAY 1
-          - [x] RELAY 2
-          - [x] RELAY 3
-          - [x] RELAY 4
-          - [x] LED 1
-          - [x] LED 2
-          - [x] LED 3
-          - [x] LED 4
-          - [x] SYS
-          - [x] ERR
-          - [x] IN
-    - [ ] Set output drive
+    - [x] set output drive
+    - [ ] fix pullups function
+    - [ ] fix open drain function
 
 ### RTC/RX8900SA
     - [ ] Defer setup with alarm timer

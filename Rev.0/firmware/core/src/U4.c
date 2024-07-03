@@ -33,6 +33,28 @@ const int ID_ERR = -1;
 const int ID_IN = -2;
 const int ID_SYS = -3;
 
+const float U4_OUTPUT_DRIVE[16] = {
+    0.25f, // relay 1
+    0.25f, // LED 1
+    0.25f, // relay 2
+    0.25f, // LED 2
+
+    0.25f, // relay 3
+    0.25f, // LED 3
+    0.25f, // relay 4
+    0.25f, // LED 4
+
+    0.25f, // LED ERR
+    0.5f,  // LED IN
+    0.75f, // LED SYS
+    0.f,   // -- unused --
+
+    0.f, // -- unused --
+    0.f, // -- unused --
+    0.f, // -- unused --
+    0.f, // -- unused --
+};
+
 void U4_write(void *data);
 void U4_healthcheck(void *data);
 bool U4_tick(repeating_timer_t *rt);
@@ -151,6 +173,10 @@ void U4_init() {
         set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 outputs (%d)", err);
     }
 
+    if ((err = PI4IOE5V6416_set_output_drive(U4, U4_OUTPUT_DRIVE)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 outputs (%d)", err);
+    }
+
     if ((err = PI4IOE5V6416_set_configuration(U4, 0xf800)) != ERR_OK) {
         set_error(ERR_U4, "U4", "error configuring PI4IOE5V6416 (%d)", err);
     }
@@ -185,7 +211,7 @@ bool U4_tick(repeating_timer_t *rt) {
             op->tag = U4_HEALTHCHECK;
             op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
 
-            closure task = {
+            struct closure task = {
                 .f = U4_healthcheck,
                 .data = op,
             };
@@ -230,7 +256,7 @@ bool U4_tick(repeating_timer_t *rt) {
             op->tag = U4_WRITE;
             op->write.outputs = (outputs ^ U4x.polarity) & MASK;
 
-            closure task = {
+            struct closure task = {
                 .f = U4_write,
                 .data = op,
             };
