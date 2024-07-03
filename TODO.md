@@ -26,7 +26,10 @@
     - (?) 100kHz/400kHz compile flag
 
 ### U3 PCAL6408APW
-   - [ ] Error if input is indeterminate (i.e. chattering)
+    - [ ] fix pullups function
+    - [ ] fix open drain function
+    - [ ] PCAL6408APW output drive
+    - [ ] Error if input is indeterminate (i.e. chattering)
 
 ### U4 PI4IOE5V6416
     - [x] rework as clocked update
@@ -39,8 +42,9 @@
     - [x] initial readback always reads back 0x0000
     - [x] check polarity
     - [x] set output drive
-    - [ ] fix pullups function
+    - [x] fix pullups function
     - [ ] fix open drain function
+    - [ ] PI4IOE5V6416 read
 
 ### RTC/RX8900SA
     - [ ] Defer setup with alarm timer

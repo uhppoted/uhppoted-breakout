@@ -33,6 +33,28 @@ const int ID_ERR = -1;
 const int ID_IN = -2;
 const int ID_SYS = -3;
 
+const PULLUP U4_PULLUPS[16] = {
+    PULLUP_NONE, // relay 1
+    PULLUP_NONE, // LED 1
+    PULLUP_NONE, // relay 2
+    PULLUP_NONE, // LED 2
+
+    PULLUP_NONE, // relay 3
+    PULLUP_NONE, // LED 3
+    PULLUP_NONE, // relay 4
+    PULLUP_NONE, // LED 4
+
+    PULLUP_NONE, // LED ERR
+    PULLUP_NONE, // LED IN
+    PULLUP_NONE, // LED SYS
+    PULLUP_NONE, // -- unused --
+
+    PULLUP_NONE, // -- unused --
+    PULLUP_NONE, // -- unused --
+    PULLUP_NONE, // -- unused --
+    PULLUP_NONE, // -- unused --
+};
+
 const float U4_OUTPUT_DRIVE[16] = {
     0.25f, // relay 1
     0.25f, // LED 1
@@ -165,7 +187,7 @@ void U4_setup() {
         set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 latches (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_set_pullups(U4, 0x00)) != ERR_OK) {
+    if ((err = PI4IOE5V6416_set_pullups(U4, U4_PULLUPS)) != ERR_OK) {
         set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 pullups (%d)", err);
     }
 

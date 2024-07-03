@@ -61,13 +61,32 @@ int PI4IOE5V6416_set_latched(I2C dev, uint16_t latched) {
     return I2C_write_all(dev, PI4IOE5V6416.LATCH, data, 2);
 }
 
-int PI4IOE5V6416_set_pullups(I2C dev, uint16_t pullups) {
+int PI4IOE5V6416_set_pullups(I2C dev, const PULLUP pullups[16]) {
+    uint16_t enabled = 0x00;
+    uint16_t up = 0x00;
+    uint16_t mask = 0x0001;
+    int err;
+
+    for (int i = 0; i < 16; i++) {
+        if (pullups[i] == PULLUP_UP) {
+            enabled |= mask;
+            up |= mask;
+        } else if (pullups[i] == PULLUP_DOWN) {
+            enabled |= mask;
+        }
+
+        mask <<= 1;
+    }
+
+    // ... enable/disable internal pullups
     uint8_t data[] = {
-        (uint8_t)((pullups >> 0) & 0x00ff),
-        (uint8_t)((pullups >> 8) & 0x00ff),
+        (uint8_t)((enabled >> 0) & 0x00ff),
+        (uint8_t)((enabled >> 8) & 0x00ff),
+        (uint8_t)((up >> 0) & 0x00ff),
+        (uint8_t)((up >> 8) & 0x00ff),
     };
 
-    return I2C_write_all(dev, PI4IOE5V6416.PULLUPS, data, 2);
+    return I2C_write_all(dev, PI4IOE5V6416.PULLUPS, data, 4);
 }
 
 int PI4IOE5V6416_set_open_drain(I2C dev, bool port0, bool port1) {

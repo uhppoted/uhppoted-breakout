@@ -214,16 +214,33 @@ void exec(char *cmd) {
 }
 
 void debugx(void *data) {
-    debugf("CLI", "debug - U4 set output drive");
+    debugf("CLI", "debug - U4 set pullups");
 
-    float drive[16] = {0.25f, 0.5f, 0.75f, 1.f, 0.2f, 0.4f, 0.6f, 0.8f, 1.f, 0.75f, 0.5f, 0.25f, 1.f, 0.75f, 0.5f, 0.25f};
-    int err;
+    // PULLUP pullups[16] = {
+    //     PULLUP_UP,
+    //     PULLUP_DOWN,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_NONE,
+    //     PULLUP_UP,
+    //     PULLUP_DOWN,
+    // };
+    // int err;
 
-    if ((err = PI4IOE5V6416_set_output_drive(U4, drive)) != ERR_OK) {
-        debugf("CLI", ">>>> DEBUG - OOOPS (%d)", err);
-    } else {
-        debugf("CLI", ">>>> DEBUG - OK");
-    }
+    // if ((err = PI4IOE5V6416_set_pullups(U4, pullups)) != ERR_OK) {
+    //     debugf("CLI", ">>>> DEBUG - OOOPS (%d)", err);
+    // } else {
+    //     debugf("CLI", ">>>> DEBUG - OK");
+    // }
 }
 
 void debug() {
