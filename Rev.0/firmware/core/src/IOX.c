@@ -9,8 +9,8 @@
 #include <breakout.h>
 #include <log.h>
 
-void IOX_init() {
-    infof("IOX", "init");
+void IOX_setup() {
+    infof("IOX", "setup");
 
     gpio_init(IOX_RESET);
     gpio_pull_up(IOX_RESET);
@@ -21,12 +21,19 @@ void IOX_init() {
     gpio_put(IOX_RESET, 1);
     sleep_us(25);
 
-    // FIXME enabled repeating timers when system initialised
-    U4_init();
-    U2_init();
-    U3_init();
-
-    irq_set_enabled(IO_IRQ_BANK0, true);
+    U2_setup();
+    U3_setup();
+    U4_setup();
 
     infof("IOX", "initialised");
+}
+
+void IOX_start() {
+    infof("IOX", "start");
+
+    U2_start();
+    U3_start();
+    U4_start();
+
+    irq_set_enabled(IO_IRQ_BANK0, true);
 }

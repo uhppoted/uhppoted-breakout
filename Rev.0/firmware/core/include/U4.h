@@ -2,7 +2,8 @@
 
 #include <stdbool.h>
 
-extern void U4_init();
+extern void U4_setup();
+extern void U4_start();
 extern void U4_set_relay(int relay, uint16_t delay);
 extern void U4_clear_relay(int relay);
 extern void U4_set_LED(int LED);

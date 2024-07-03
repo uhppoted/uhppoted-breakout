@@ -28,6 +28,7 @@ Initial proof of concept, designed to be relatively easy to hand solder and debu
 
 ### Errata
 1. Requires Schottky barrier diode and resistor on RX8900SA backup battery.
+2. Mounting holes do not match Pi Zero2W.
 
 
 ## Notes

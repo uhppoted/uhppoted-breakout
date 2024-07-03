@@ -1,3 +1,4 @@
 #pragma once
 
-extern void IOX_init();
+extern void IOX_setup();
+extern void IOX_start();

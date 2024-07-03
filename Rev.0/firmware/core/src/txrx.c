@@ -16,8 +16,8 @@ void on_txrx();
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
-void TXRX_init() {
-    debugf("TXRX", "initialise");
+void TXRX_setup() {
+    debugf("TXRX", "setup");
 
     // ... UART
     gpio_set_function(UART0_TX, GPIO_FUNC_UART);
@@ -29,11 +29,16 @@ void TXRX_init() {
     uart_set_hw_flow(uart0, false, false);
     uart_set_fifo_enabled(uart0, false);
 
+    infof("TXRX", "initialised");
+}
+
+// Enables interrupt handler.
+void TXRX_start() {
+    debugf("TXRX", "start");
+
     irq_set_exclusive_handler(UART0_IRQ, on_txrx);
     irq_set_enabled(UART0_IRQ, true);
     uart_set_irq_enables(uart0, true, false);
-
-    infof("TXRX", "initialised");
 }
 
 void on_txrx() {

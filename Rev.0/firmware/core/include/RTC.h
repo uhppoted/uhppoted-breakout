@@ -1,6 +1,7 @@
 #pragma once
 
-extern void RTC_init();
+extern void RTC_setup();
+extern void RTC_start();
 extern void RTC_reset();
 extern void RTC_get_date(char *date, int N);
 extern void RTC_set_date(uint16_t year, uint8_t month, uint8_t day);

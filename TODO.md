@@ -3,16 +3,9 @@
 - [x] Power on/reset and reprogram initial states are unexpectedly different
 - [x] Rev 0.1
       - [x] RTC Schottky diodes and resistor
+      - [ ] Tidy up PCB layout
 
-- [ ] `I2C0 queue full` on power on
-       - maybe USB char?
-       - **BECAUSE** repeating timers kick in before system initialisation is complete and I2C0 conflicts
-```
-ERROR  I2C0       push: queue full
-ERROR  U3         update: queue full
-...
-```
-
+- [x] `I2C0 queue full` on power on
 - [ ] pico: txrx/uart conflict
 - [ ] debounce simulation
 

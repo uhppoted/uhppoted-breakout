@@ -143,8 +143,8 @@ struct {
     },
 };
 
-void U4_init() {
-    infof("U4", "init");
+void U4_setup() {
+    infof("U4", "setup");
 
     // ... configure PI4IOE5V6416
     int err;
@@ -189,9 +189,14 @@ void U4_init() {
     }
 
     mutex_init(&U4x.guard);
-    add_repeating_timer_ms(TICK, U4_tick, NULL, &U4x.timer);
 
     debugf("U4", "initialised state %04x %011b", outputs ^ U4x.polarity, outputs ^ U4x.polarity);
+}
+
+void U4_start() {
+    infof("U4", "start");
+
+    add_repeating_timer_ms(TICK, U4_tick, NULL, &U4x.timer);
 }
 
 /*

@@ -24,8 +24,8 @@ struct {
     .count = 0,
 };
 
-void U2_init() {
-    infof("U2", "init");
+void U2_setup() {
+    infof("U2", "setup");
 
     // ... configure PCAL6408APW
     int err;
@@ -58,8 +58,12 @@ void U2_init() {
     PCAL6408APW_read(U2, &inputs); // clear any existing interrupts
 
     debugf("U2", "initial state %02x %08b", inputs, inputs);
+}
 
-    // ... attach interrupt handler
+// Enables interrupt handler
+void U2_start() {
+    infof("U2", "start");
+
     gpio_init(IOX_INT0);
     gpio_pull_up(IOX_INT0);
     gpio_add_raw_irq_handler(IOX_INT0, U2_on_interrupt);

@@ -64,8 +64,8 @@ bool U3_on_update(repeating_timer_t *rt);
 void U3_read(void *data);
 float lpf(IIR *iir, float in);
 
-void U3_init() {
-    infof("U3", "init");
+void U3_setup() {
+    infof("U3", "setup");
 
     // ... configure PCAL6408APW
     int err;
@@ -98,11 +98,14 @@ void U3_init() {
     PCAL6408APW_read(U3, &inputs); // clear any existing interrupts
 
     debugf("U3", "initial state %02x %08b", inputs, inputs);
-
-    // ... sample @1kHz
-    add_repeating_timer_us(1000, U3_on_update, NULL, &U3x.timer);
-
     infof("U3", "initialised");
+}
+
+// Starts the 1kHz input sampling
+void U3_start() {
+    infof("U3", "start");
+
+    add_repeating_timer_us(1000, U3_on_update, NULL, &U3x.timer);
 }
 
 bool U3_on_update(repeating_timer_t *rt) {

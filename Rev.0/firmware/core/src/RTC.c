@@ -64,15 +64,22 @@ typedef struct datetime {
 /*
  * Initialises the RX8900SA.
  */
-void RTC_init() {
-    infof("RTC", "init");
+void RTC_setup() {
+    infof("RTC", "setup");
     RX8900SA_init(U5);
 
     mutex_init(&RTC.guard);
 
-    add_repeating_timer_ms(1000, RTC_on_update, NULL, &RTC.timer);
-
     infof("RTC", "initialised %p", &RTC);
+}
+
+/*
+ * Starts scheduled update.
+ */
+void RTC_start() {
+    infof("RTC", "start");
+
+    add_repeating_timer_ms(1000, RTC_on_update, NULL, &RTC.timer);
 }
 
 bool RTC_on_update(repeating_timer_t *rt) {
