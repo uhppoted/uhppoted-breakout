@@ -19,7 +19,7 @@
 
 ### U2 PCAL6408A
     - [x] Decode all readers
-    - [ ] Read timeout
+    - [x] Read timeout
     - [ ] Decode keypad
     - (?) Continuous read 
           - Use I2C1 to check last register (a la I2C0)
@@ -87,7 +87,6 @@
 - [x] Relay pin voltages
 - [x] CPU board power consumption
 - [x] Breakout board power consumption
-
 - [ ] Pinout diagram
       - (?) [WireViz] https://github.com/formatc1702/WireViz
       - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator

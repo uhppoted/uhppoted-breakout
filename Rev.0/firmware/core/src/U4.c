@@ -27,8 +27,8 @@ const uint16_t ERR = 0x0100;
 const uint16_t IN = 0x0200;
 const uint16_t SYS = 0x0400;
 
-const int32_t TICK = 10;   // ms
-const int32_t TOCK = 1000; // ms
+const int32_t U4_TICK = 10;   // ms
+const int32_t U4_TOCK = 1000; // ms
 const int ID_ERR = -1;
 const int ID_IN = -2;
 const int ID_SYS = -3;
@@ -140,7 +140,7 @@ struct {
 } U4x = {
     .outputs = 0x0000,
     .polarity = 0x0700, // SYS, IN and ERR LEDs are inverted
-    .tock = TOCK,
+    .tock = U4_TOCK,
     .write = false,
     .relays = {
         .N = sizeof(U4x.relays) / sizeof(struct relay),
@@ -218,7 +218,7 @@ void U4_setup() {
 void U4_start() {
     infof("U4", "start");
 
-    add_repeating_timer_ms(TICK, U4_tick, NULL, &U4x.timer);
+    add_repeating_timer_ms(U4_TICK, U4_tick, NULL, &U4x.timer);
 }
 
 /*
@@ -229,9 +229,9 @@ bool U4_tick(repeating_timer_t *rt) {
 
     if (mutex_try_enter(&U4x.guard, NULL)) {
         // ... health check
-        U4x.tock -= TICK;
+        U4x.tock -= U4_TICK;
         if (U4x.tock < 0) {
-            U4x.tock = TOCK;
+            U4x.tock = U4_TOCK;
 
             operation *op = (operation *)calloc(1, sizeof(operation));
 
@@ -251,7 +251,7 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... update relays
         for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
             if (r->timer > 0) {
-                r->timer = clamp(r->timer - TICK, 0, 60000);
+                r->timer = clamp(r->timer - U4_TICK, 0, 60000);
                 if (r->timer == 0) {
                     U4_clear(r->mask);
                 }
@@ -261,7 +261,7 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... update LEDs
         for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
             if (l->timer > 0) {
-                l->timer = clamp(l->timer - TICK, 0, 60000);
+                l->timer = clamp(l->timer - U4_TICK, 0, 60000);
                 if (l->timer == 0) {
                     if ((l->blinks > 0) && (l->interval > 0)) {
                         l->blinks--;

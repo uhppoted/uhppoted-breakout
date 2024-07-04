@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <pico/stdlib.h>
+#include <pico/sync.h>
 
 #include <PCAL6408A.h>
 #include <U2.h>
@@ -10,34 +11,40 @@
 
 void U2_on_interrupt(void);
 void U2_on_card_read(uint8_t reader, uint32_t v);
+bool U2_tick(repeating_timer_t *rt);
 int bits(uint32_t v);
 
-const uint8_t tRST = 1; // tRST (µs) for PCAL6408A interrupt line
-const uint8_t DO1 = 0x08;
-const uint8_t DI1 = 0x04;
-const uint8_t DI2 = 0x01;
-const uint8_t DO2 = 0x02;
-const uint8_t DI3 = 0x20;
-const uint8_t DO3 = 0x10;
-const uint8_t DI4 = 0x80;
-const uint8_t DO4 = 0x40;
+const uint8_t tRST = 1;    // tRST (µs) for PCAL6408A interrupt line
+const uint8_t R1D0 = 0x08; // reader 1 D0
+const uint8_t R1D1 = 0x04; // reader 1 D1
+const uint8_t R2D0 = 0x02; // reader 2 D0
+const uint8_t R2D1 = 0x01; // reader 2 D1
+const uint8_t R3D0 = 0x10; // reader 3 D0
+const uint8_t R3D1 = 0x20; // reader 3 D1
+const uint8_t R4D0 = 0x40; // reader 4 D0
+const uint8_t R4D1 = 0x80; // reader 4 D1
 
-const uint8_t D0[4] = {DO1, DO2, DO3, DO4};
-const uint8_t D1[4] = {DI1, DI2, DI3, DI4};
+const uint8_t D0[4] = {R1D0, R2D0, R3D0, R4D0};
+const uint8_t D1[4] = {R1D1, R2D1, R3D1, R4D1};
+const int32_t U2_TICK = 10;          // ms
+const int32_t U2_READ_TIMEOUT = 100; // ms
 
 typedef struct reader {
     uint64_t data;
     uint8_t count;
+    uint8_t timer;
 } reader;
 
 struct {
     struct reader readers[4];
+    repeating_timer_t timer;
+    mutex_t guard;
 } U2x = {
     .readers = {
-        {.data = 0x00000000, .count = 0},
-        {.data = 0x00000000, .count = 0},
-        {.data = 0x00000000, .count = 0},
-        {.data = 0x00000000, .count = 0},
+        {.data = 0x00000000, .count = 0, .timer = 0},
+        {.data = 0x00000000, .count = 0, .timer = 0},
+        {.data = 0x00000000, .count = 0, .timer = 0},
+        {.data = 0x00000000, .count = 0, .timer = 0},
     }};
 
 const PULLUP U2_PULLUPS[8] = {
@@ -86,6 +93,8 @@ void U2_setup() {
     uint8_t inputs;
     PCAL6408A_read(U2, &inputs);
 
+    mutex_init(&U2x.guard);
+
     debugf("U2", "initial state %02x %08b", inputs, inputs);
 }
 
@@ -97,6 +106,39 @@ void U2_start() {
     gpio_pull_up(IOX_INT0);
     gpio_add_raw_irq_handler(IOX_INT0, U2_on_interrupt);
     gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, true);
+
+    add_repeating_timer_ms(U2_TICK, U2_tick, NULL, &U2x.timer);
+}
+
+/*
+ * Increments active reader timers.
+ */
+bool U2_tick(repeating_timer_t *rt) {
+    if (mutex_try_enter(&U2x.guard, NULL)) {
+        uint8_t door = 1;
+        struct reader *reader = U2x.readers;
+
+        for (int i = 0; i < 4; i++) {
+            if (reader->count > 0) {
+                reader->timer += U2_TICK;
+            }
+
+            if (reader->timer > U2_READ_TIMEOUT) {
+                reader->data = 0x00000000;
+                reader->count = 0;
+                reader->timer = 0;
+
+                debugf("U2", "reader %d timeout", door);
+            }
+
+            reader++;
+            door++;
+        }
+
+        mutex_exit(&U2x.guard);
+    }
+
+    return true;
 }
 
 void U2_on_interrupt(void) {
@@ -129,6 +171,8 @@ void U2_on_interrupt(void) {
 }
 
 void U2_wio(uint8_t inputs) {
+    mutex_enter_blocking(&U2x.guard);
+
     uint8_t door = 1;
     struct reader *reader = U2x.readers;
 
@@ -148,12 +192,15 @@ void U2_wio(uint8_t inputs) {
         if (U2x.readers[i].count == 26) {
             U2_on_card_read(door, reader->data);
             reader->data = 0x00000000;
-            reader->count = 0x00000000;
+            reader->count = 0;
+            reader->timer = 0;
         }
 
         reader++;
         door++;
     }
+
+    mutex_exit(&U2x.guard);
 }
 
 void U2_on_card_read(uint8_t reader, uint32_t v) {
