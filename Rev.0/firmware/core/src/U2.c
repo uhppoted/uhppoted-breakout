@@ -24,6 +24,18 @@ struct {
     .count = 0,
 };
 
+const PULLUP U2_PULLUPS[8] = {
+    PULLUP_UP, // DI2
+    PULLUP_UP, // DO2
+    PULLUP_UP, // DI1
+    PULLUP_UP, // DO1
+
+    PULLUP_UP, // DO3
+    PULLUP_UP, // DI3
+    PULLUP_UP, // DO4
+    PULLUP_UP, // DI4
+};
+
 void U2_setup() {
     infof("U2", "setup");
 
@@ -42,7 +54,7 @@ void U2_setup() {
         warnf("U2", "error setting PCAL6408A polarity (%d)", err);
     }
 
-    if ((err = PCAL6408A_set_pullups(U2, 0xff)) != ERR_OK) {
+    if ((err = PCAL6408A_set_pullups(U2, U2_PULLUPS)) != ERR_OK) {
         warnf("U2", "error setting PCAL6408A pullups (%d)", err);
     }
 

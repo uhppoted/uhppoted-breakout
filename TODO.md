@@ -17,7 +17,7 @@
     - [ ] Dangling '['
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
-### U2 PCAL6408APW
+### U2 PCAL6408A
     - [ ] Decode keypad
     - [ ] Read timeout
     - (?) Continuous read 
@@ -26,9 +26,11 @@
     - (?) 100kHz/400kHz compile flag
 
 ### U3 PCAL6408A
-    - [ ] fix pullups function
-    - [ ] fix open drain function
-    - [ ] PCAL6408APW output drive
+    - [x] fix pullups function
+    - [x] fix open drain function
+    - [x] PCAL6408A write
+    - [x] PCAL6408A output drive
+    - [x] PCAL6408A readback
     - [ ] Error if input is indeterminate (i.e. chattering)
 
 ### U4 PCAL6416A
@@ -44,6 +46,8 @@
     - [x] set output drive
     - [x] fix pullups function
     - [x] PCAL6416A read
+    - [x] PCAL6416A set interrupts
+    - [x] PCAL6416A isr
 
 ### U5 RX8900SA
     - [ ] Defer setup with alarm timer

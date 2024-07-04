@@ -12,6 +12,8 @@ extern int PCAL6416A_set_latched(I2C dev, uint16_t latched);
 extern int PCAL6416A_set_pullups(I2C dev, const PULLUP pullups[16]);
 extern int PCAL6416A_set_open_drain(I2C dev, bool port0, bool port1);
 extern int PCAL6416A_set_output_drive(I2C dev, const float drive[16]);
+extern int PCAL6416A_set_interrupts(I2C dev, uint16_t interrupts);
+extern int PCAL6416A_isr(I2C dev, uint16_t *data);
 extern int PCAL6416A_read(I2C dev, uint16_t *data);
 extern int PCAL6416A_write(I2C dev, uint16_t data);
 extern int PCAL6416A_readback(I2C dev, uint16_t *data);

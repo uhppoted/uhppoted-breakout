@@ -12,6 +12,7 @@ const struct {
     uint8_t LATCH;
     uint8_t PULLUPS;
     uint8_t INTERRUPTS;
+    uint8_t ISR;
     uint8_t OUTPUT_CONFIG;
 } PCAL6416A = {
     .INPUTS = 0x00,
@@ -22,6 +23,7 @@ const struct {
     .LATCH = 0x44,
     .PULLUPS = 0x46,
     .INTERRUPTS = 0x4a,
+    .ISR = 0x4c,
     .OUTPUT_CONFIG = 0x4f,
 };
 
@@ -124,6 +126,31 @@ int PCAL6416A_set_output_drive(I2C dev, const float drive[16]) {
     };
 
     return I2C_write_all(dev, PCAL6416A.DRIVE, data, 4);
+}
+
+int PCAL6416A_set_interrupts(I2C dev, uint16_t interrupts) {
+    uint8_t data[] = {
+        (uint8_t)((interrupts >> 0) & 0x00ff),
+        (uint8_t)((interrupts >> 8) & 0x00ff),
+    };
+
+    return I2C_write_all(dev, PCAL6416A.INTERRUPTS, data, 2);
+}
+
+int PCAL6416A_isr(I2C dev, uint16_t *data) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PCAL6416A.ISR, buffer, 2)) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = ((uint16_t)buffer[1] << 8) & 0x00ff;
+        uint16_t lo = ((uint16_t)buffer[0] << 0) & 0x00ff;
+
+        *data = hi | lo;
+
+        return ERR_OK;
+    }
 }
 
 int PCAL6416A_read(I2C dev, uint16_t *data) {

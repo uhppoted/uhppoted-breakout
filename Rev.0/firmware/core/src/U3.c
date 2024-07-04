@@ -52,6 +52,18 @@ const uint8_t U3_MASKS[] = {S1, S2, S3, S4, PB1, PB2, PB3, PB4};
 const uint8_t U3_DOORS[] = {0x00, 0x01, 0x02, 0x04, 0x08};
 const uint8_t U3_BUTTONS[] = {0x00, 0x10, 0x20, 0x40, 0x80};
 
+const PULLUP U3_PULLUPS[8] = {
+    PULLUP_UP, // PB4
+    PULLUP_UP, // PB3
+    PULLUP_UP, // PB2
+    PULLUP_UP, // PB1
+
+    PULLUP_UP, // S1
+    PULLUP_UP, // S2
+    PULLUP_UP, // S3
+    PULLUP_UP, // S4
+};
+
 // 25Hz 1 pole Butterworth LPF (approx. 15ms debounce delay)
 const struct LPF LPF₁ = {
     .a₀ = 1.0,
@@ -82,7 +94,7 @@ void U3_setup() {
         warnf("U3", "error setting PCAL6408A polarity (%d)", err);
     }
 
-    if ((err = PCAL6408A_set_pullups(U3, 0xff)) != ERR_OK) {
+    if ((err = PCAL6408A_set_pullups(U3, U3_PULLUPS)) != ERR_OK) {
         warnf("U3", "error setting PCAL6408A pullups (%d)", err);
     }
 
