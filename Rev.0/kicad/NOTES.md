@@ -34,6 +34,7 @@
 29. PiZero2W mounting holes are M2.5
 30. Route GND and +5V to PiZero2W header (jumper on +5V)
 31. Route SPI and UART to PiZero2W header (with solder bridges/zero ohm resistors)
+32. DO and DI are actual D0 and D1, etc
 (?) Maybe put GND on pin 1 of UART/SPI header
 (?) https://www.olimex.com/Products/Components/IC/SY6280
     - https://hackaday.com/2024/07/03/usb-and-the-myth-of-500-milliamps/

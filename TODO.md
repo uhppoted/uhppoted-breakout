@@ -18,8 +18,9 @@
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
 ### U2 PCAL6408A
-    - [ ] Decode keypad
+    - [x] Decode all readers
     - [ ] Read timeout
+    - [ ] Decode keypad
     - (?) Continuous read 
           - Use I2C1 to check last register (a la I2C0)
           - Request with address after time delay, continuous otherwise

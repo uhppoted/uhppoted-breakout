@@ -9,20 +9,36 @@
 #include <state.h>
 
 void U2_on_interrupt(void);
+void U2_on_card_read(uint8_t reader, uint32_t v);
 int bits(uint32_t v);
 
 const uint8_t tRST = 1; // tRST (µs) for PCAL6408A interrupt line
-const uint16_t DO1 = 0x08;
-const uint16_t DI1 = 0x04;
+const uint8_t DO1 = 0x08;
+const uint8_t DI1 = 0x04;
+const uint8_t DI2 = 0x01;
+const uint8_t DO2 = 0x02;
+const uint8_t DI3 = 0x20;
+const uint8_t DO3 = 0x10;
+const uint8_t DI4 = 0x80;
+const uint8_t DO4 = 0x40;
+
+const uint8_t D0[4] = {DO1, DO2, DO3, DO4};
+const uint8_t D1[4] = {DI1, DI2, DI3, DI4};
+
+typedef struct reader {
+    uint64_t data;
+    uint8_t count;
+} reader;
 
 struct {
-    uint32_t reader;
-    uint8_t count;
-
+    struct reader readers[4];
 } U2x = {
-    .reader = 0x00000000,
-    .count = 0,
-};
+    .readers = {
+        {.data = 0x00000000, .count = 0},
+        {.data = 0x00000000, .count = 0},
+        {.data = 0x00000000, .count = 0},
+        {.data = 0x00000000, .count = 0},
+    }};
 
 const PULLUP U2_PULLUPS[8] = {
     PULLUP_UP, // DI2
@@ -66,8 +82,9 @@ void U2_setup() {
         warnf("U2", "error enabling PCAL6408A interrupts (%d)", err);
     }
 
+    // ... clear any existing interrupts
     uint8_t inputs;
-    PCAL6408A_read(U2, &inputs); // clear any existing interrupts
+    PCAL6408A_read(U2, &inputs);
 
     debugf("U2", "initial state %02x %08b", inputs, inputs);
 }
@@ -112,30 +129,34 @@ void U2_on_interrupt(void) {
 }
 
 void U2_wio(uint8_t inputs) {
-    // debugf("U2", "inputs:%02x (%08b)", inputs, inputs);
+    uint8_t door = 1;
+    struct reader *reader = U2x.readers;
 
-    if ((inputs & DO1) != 0x00) {
-        U2x.reader <<= 1;
-        U2x.reader |= 0x00000001;
-        U2x.count++;
-    }
+    for (int i = 0; i < 4; i++) {
+        if ((inputs & D0[i]) != 0x00) {
+            reader->data <<= 1;
+            reader->data |= 0x00000000;
+            reader->count++;
+        }
 
-    if ((inputs & DI1) != 0x00) {
-        U2x.reader <<= 1;
-        U2x.reader |= 0x00000000;
-        U2x.count++;
-    }
+        if ((inputs & D1[i]) != 0x00) {
+            reader->data <<= 1;
+            reader->data |= 0x00000001;
+            reader->count++;
+        }
 
-    // debugf("U2", "R1 %-2d %032b", U2x.count, U2x.reader);
+        if (U2x.readers[i].count == 26) {
+            U2_on_card_read(door, reader->data);
+            reader->data = 0x00000000;
+            reader->count = 0x00000000;
+        }
 
-    if (U2x.count == 26) {
-        U2_on_card_read(U2x.reader);
-        U2x.reader = 0x00000000;
-        U2x.count = 0x00000000;
+        reader++;
+        door++;
     }
 }
 
-void U2_on_card_read(uint32_t v) {
+void U2_on_card_read(uint8_t reader, uint32_t v) {
     int even = bits(v & 0x03ffe000);
     int odd = bits(v & 0x00001fff);
     uint32_t code = (v >> 1) & 0x00ffffff;
@@ -144,7 +165,7 @@ void U2_on_card_read(uint32_t v) {
     uint32_t facility_code = (code >> 16) & 0x000000ff;
     uint32_t card = code & 0x0000ffff;
 
-    infof("U2", "CARD %-3u%-5u %s", facility_code, card, ok ? "ok" : "error");
+    infof("U2", "READER %d  CARD %-3u%-5u %s", reader, facility_code, card, ok ? "ok" : "error");
 }
 
 // Ref. https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
