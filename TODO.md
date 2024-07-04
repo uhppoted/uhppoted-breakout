@@ -25,13 +25,13 @@
           - Request with address after time delay, continuous otherwise
     - (?) 100kHz/400kHz compile flag
 
-### U3 PCAL6408APW
+### U3 PCAL6408A
     - [ ] fix pullups function
     - [ ] fix open drain function
     - [ ] PCAL6408APW output drive
     - [ ] Error if input is indeterminate (i.e. chattering)
 
-### U4 PI4IOE5V6416
+### U4 PCAL6416A
     - [x] rework as clocked update
     - [x] rework relay set/clear as ticked operations
     - [x] rework LED set/clear as ticked operations
@@ -43,10 +43,9 @@
     - [x] check polarity
     - [x] set output drive
     - [x] fix pullups function
-    - [ ] fix open drain function
-    - [ ] PI4IOE5V6416 read
+    - [x] PCAL6416A read
 
-### RTC/RX8900SA
+### U5 RX8900SA
     - [ ] Defer setup with alarm timer
     - [ ] ready
     - [ ] handle initialisation sequence in RTC_init

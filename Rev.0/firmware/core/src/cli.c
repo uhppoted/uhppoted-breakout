@@ -16,8 +16,6 @@
 #include <state.h>
 #include <txrx.h>
 
-#include <PI4IOE5V6416.h>
-
 typedef struct CLI {
     int32_t timer;
     int ix;
@@ -236,7 +234,7 @@ void debugx(void *data) {
     // };
     // int err;
 
-    // if ((err = PI4IOE5V6416_set_pullups(U4, pullups)) != ERR_OK) {
+    // if ((err = PCAL6416A_set_pullups(U4, pullups)) != ERR_OK) {
     //     debugf("CLI", ">>>> DEBUG - OOOPS (%d)", err);
     // } else {
     //     debugf("CLI", ">>>> DEBUG - OK");

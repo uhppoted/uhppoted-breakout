@@ -22,13 +22,13 @@ Initial proof of concept, designed to be relatively easy to hand solder and debu
 - All the components are on the front (top) of the PCB
 - It uses the ever-so-cute _WaveShare_ _RP2040-Tiny_ module
 
-<img width="640" src="documentation/images/front.png">
-<img width="640" src="documentation/images/back.png">
 <img width="640" src="documentation/images/Rev.0.jpg">
+<img width="480" src="documentation/images/front.png">
+<img width="480" src="documentation/images/back.png">
 
 ### Errata
 1. Requires Schottky barrier diode and resistor on RX8900SA backup battery.
-2. Mounting holes do not match Pi Zero2W.
+2. Add-on mounting holes are for RaspberryPi Pico.
 
 
 ## Notes

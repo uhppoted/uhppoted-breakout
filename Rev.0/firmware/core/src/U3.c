@@ -3,7 +3,7 @@
 #include <pico/stdlib.h>
 
 #include <I2C0.h>
-#include <PCAL6408APW.h>
+#include <PCAL6408A.h>
 #include <U3.h>
 #include <breakout.h>
 #include <log.h>
@@ -67,35 +67,35 @@ float lpf(IIR *iir, float in);
 void U3_setup() {
     infof("U3", "setup");
 
-    // ... configure PCAL6408APW
+    // ... configure PCAL6408A
     int err;
 
-    if ((err = PCAL6408APW_init(U3)) != ERR_OK) {
-        warnf("U3", "error initialising PCAL6408APW (%d)", err);
+    if ((err = PCAL6408A_init(U3)) != ERR_OK) {
+        warnf("U3", "error initialising PCAL6408A (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_configuration(U3, 0xff)) != ERR_OK) {
-        warnf("U3", "error configuring PCAL6408APW (%d)", err);
+    if ((err = PCAL6408A_set_configuration(U3, 0xff)) != ERR_OK) {
+        warnf("U3", "error configuring PCAL6408A (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_polarity(U3, PB1 | PB2 | PB3 | PB4)) != ERR_OK) {
-        warnf("U3", "error setting PCAL6408APW polarity (%d)", err);
+    if ((err = PCAL6408A_set_polarity(U3, PB1 | PB2 | PB3 | PB4)) != ERR_OK) {
+        warnf("U3", "error setting PCAL6408A polarity (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_pullups(U3, 0xff)) != ERR_OK) {
-        warnf("U3", "error setting PCAL6408APW pullups (%d)", err);
+    if ((err = PCAL6408A_set_pullups(U3, 0xff)) != ERR_OK) {
+        warnf("U3", "error setting PCAL6408A pullups (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_latched(U3, 0x00)) != ERR_OK) {
-        warnf("U3", "error setting PCAL6408APW latches (%d)", err);
+    if ((err = PCAL6408A_set_latched(U3, 0x00)) != ERR_OK) {
+        warnf("U3", "error setting PCAL6408A latches (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_interrupts(U3, 0xff)) != ERR_OK) {
-        warnf("U3", "error disabling PCAL6408APW interrupts (%d)", err);
+    if ((err = PCAL6408A_set_interrupts(U3, 0xff)) != ERR_OK) {
+        warnf("U3", "error disabling PCAL6408A interrupts (%d)", err);
     }
 
     uint8_t inputs;
-    PCAL6408APW_read(U3, &inputs); // clear any existing interrupts
+    PCAL6408A_read(U3, &inputs); // clear any existing interrupts
 
     debugf("U3", "initial state %02x %08b", inputs, inputs);
     infof("U3", "initialised");
@@ -122,14 +122,14 @@ bool U3_on_update(repeating_timer_t *rt) {
 }
 
 /*
- * I2C0 task to update U3 state from PCAL6408APW.
+ * I2C0 task to update U3 state from PCAL6408A.
  */
 void U3_read(void *data) {
     uint8_t inputs;
     int err;
 
-    if ((err = PCAL6408APW_read(U3, &inputs)) != ERR_OK) {
-        warnf("U3", "error reading PCAL6408APW inputs (%d)", err);
+    if ((err = PCAL6408A_read(U3, &inputs)) != ERR_OK) {
+        warnf("U3", "error reading PCAL6408A inputs (%d)", err);
         set_error(ERR_U3, "U3", "get-inputs error %d", err);
     } else {
         uint32_t v = inputs;

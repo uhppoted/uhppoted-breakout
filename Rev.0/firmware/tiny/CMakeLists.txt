@@ -36,8 +36,8 @@ add_executable(breakout
 
   ${LIB}/src/I2C.c
   ${LIB}/src/RX8900SA.c
-  ${LIB}/src/PCAL6408APW.c
-  ${LIB}/src/PI4IOE5V6416.c
+  ${LIB}/src/PCAL6408A.c
+  ${LIB}/src/PCAL6416A.c
 )
 
 target_include_directories(breakout 

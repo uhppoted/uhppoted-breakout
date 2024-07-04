@@ -2,7 +2,7 @@
 
 #include <pico/stdlib.h>
 
-#include <PCAL6408APW.h>
+#include <PCAL6408A.h>
 #include <U2.h>
 #include <breakout.h>
 #include <log.h>
@@ -11,7 +11,7 @@
 void U2_on_interrupt(void);
 int bits(uint32_t v);
 
-const uint8_t tRST = 1; // tRST (µs) for PCAL6408APW_interrupt line
+const uint8_t tRST = 1; // tRST (µs) for PCAL6408A interrupt line
 const uint16_t DO1 = 0x08;
 const uint16_t DI1 = 0x04;
 
@@ -27,35 +27,35 @@ struct {
 void U2_setup() {
     infof("U2", "setup");
 
-    // ... configure PCAL6408APW
+    // ... configure PCAL6408A
     int err;
 
-    if ((err = PCAL6408APW_init(U2)) != ERR_OK) {
-        warnf("U2", "error initialising PCAL6408APW (%d)", err);
+    if ((err = PCAL6408A_init(U2)) != ERR_OK) {
+        warnf("U2", "error initialising PCAL6408A (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_configuration(U2, 0xff)) != ERR_OK) {
-        warnf("U2", "error configuring PCAL6408APW (%d)", err);
+    if ((err = PCAL6408A_set_configuration(U2, 0xff)) != ERR_OK) {
+        warnf("U2", "error configuring PCAL6408A (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_polarity(U2, 0xff)) != ERR_OK) {
-        warnf("U2", "error setting PCAL6408APW polarity (%d)", err);
+    if ((err = PCAL6408A_set_polarity(U2, 0xff)) != ERR_OK) {
+        warnf("U2", "error setting PCAL6408A polarity (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_pullups(U2, 0xff)) != ERR_OK) {
-        warnf("U2", "error setting PCAL6408APW pullups (%d)", err);
+    if ((err = PCAL6408A_set_pullups(U2, 0xff)) != ERR_OK) {
+        warnf("U2", "error setting PCAL6408A pullups (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_latched(U2, 0xff)) != ERR_OK) {
-        warnf("U2", "error setting PCAL6408APW latches (%d)", err);
+    if ((err = PCAL6408A_set_latched(U2, 0xff)) != ERR_OK) {
+        warnf("U2", "error setting PCAL6408A latches (%d)", err);
     }
 
-    if ((err = PCAL6408APW_set_interrupts(U2, 0x00)) != ERR_OK) {
-        warnf("U2", "error enabling PCAL6408APW interrupts (%d)", err);
+    if ((err = PCAL6408A_set_interrupts(U2, 0x00)) != ERR_OK) {
+        warnf("U2", "error enabling PCAL6408A interrupts (%d)", err);
     }
 
     uint8_t inputs;
-    PCAL6408APW_read(U2, &inputs); // clear any existing interrupts
+    PCAL6408A_read(U2, &inputs); // clear any existing interrupts
 
     debugf("U2", "initial state %02x %08b", inputs, inputs);
 }
@@ -78,12 +78,12 @@ void U2_on_interrupt(void) {
     if ((gpio_get_irq_event_mask(IOX_INT0) & GPIO_IRQ_LEVEL_LOW) != 0) {
         gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, false);
 
-        if ((err = PCAL6408APW_isr(U2, &isr)) != ERR_OK) {
-            warnf("U2", "error reading PCAL6408APW ISR (%d)", err);
+        if ((err = PCAL6408A_isr(U2, &isr)) != ERR_OK) {
+            warnf("U2", "error reading PCAL6408A ISR (%d)", err);
         }
 
-        if ((err = PCAL6408APW_read(U2, &inputs)) != ERR_OK) {
-            warnf("U2", "error reading PCAL6408APW inputs (%d)", err);
+        if ((err = PCAL6408A_read(U2, &inputs)) != ERR_OK) {
+            warnf("U2", "error reading PCAL6408A inputs (%d)", err);
         } else {
             uint32_t v = inputs & isr;
             uint32_t msg = MSG_WIO | (v & 0x0fffffff);

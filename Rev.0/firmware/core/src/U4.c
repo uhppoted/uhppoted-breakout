@@ -5,7 +5,7 @@
 #include <pico/sync.h>
 
 #include <I2C0.h>
-#include <PI4IOE5V6416.h>
+#include <PCAL6416A.h>
 #include <U4.h>
 #include <breakout.h>
 #include <log.h>
@@ -168,46 +168,46 @@ struct {
 void U4_setup() {
     infof("U4", "setup");
 
-    // ... configure PI4IOE5V6416
+    // ... configure PCAL6416A
     int err;
 
-    if ((err = PI4IOE5V6416_init(U4)) != ERR_OK) {
+    if ((err = PCAL6416A_init(U4)) != ERR_OK) {
         set_error(ERR_U4, "U4", "error initialising (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_set_open_drain(U4, false, false)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error configuring PI4IOE5V6416 open drain outputs (%d)", err);
+    if ((err = PCAL6416A_set_open_drain(U4, false, false)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error configuring PCAL6416A open drain outputs (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_set_polarity(U4, 0x0000)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 polarity (%d)", err);
+    if ((err = PCAL6416A_set_polarity(U4, 0x0000)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error setting PCAL6416A polarity (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_set_latched(U4, 0x0000)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 latches (%d)", err);
+    if ((err = PCAL6416A_set_latched(U4, 0x0000)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error setting PCAL6416A latches (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_set_pullups(U4, U4_PULLUPS)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 pullups (%d)", err);
+    if ((err = PCAL6416A_set_pullups(U4, U4_PULLUPS)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error setting PCAL6416A pullups (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_write(U4, (U4x.outputs ^ U4x.polarity) & MASK)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 outputs (%d)", err);
+    if ((err = PCAL6416A_write(U4, (U4x.outputs ^ U4x.polarity) & MASK)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error setting PCAL6416A outputs (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_set_output_drive(U4, U4_OUTPUT_DRIVE)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PI4IOE5V6416 outputs (%d)", err);
+    if ((err = PCAL6416A_set_output_drive(U4, U4_OUTPUT_DRIVE)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error setting PCAL6416A outputs (%d)", err);
     }
 
-    if ((err = PI4IOE5V6416_set_configuration(U4, 0xf800)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error configuring PI4IOE5V6416 (%d)", err);
+    if ((err = PCAL6416A_set_configuration(U4, 0xf800)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error configuring PCAL6416A (%d)", err);
     }
 
     uint16_t outputs;
-    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error reading PI4IOE5V6416 outputs (%d)", err);
+    if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error reading PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != ((U4x.outputs ^ U4x.polarity) & MASK)) {
-        set_error(ERR_U4, "U4", "invalid PI4IOE5V6416 output state - expected:%04x, got:%04x", U4x.outputs, outputs);
+        set_error(ERR_U4, "U4", "invalid PCAL6416A output state - expected:%04x, got:%04x", U4x.outputs, outputs);
     }
 
     mutex_init(&U4x.guard);
@@ -302,7 +302,7 @@ bool U4_tick(repeating_timer_t *rt) {
 }
 
 /*
- * I2C0 task to set/clear PI4IOE5V6416 outputs.
+ * I2C0 task to set/clear PCAL6416A outputs.
  */
 void U4_write(void *data) {
     operation *op = (operation *)data;
@@ -310,29 +310,29 @@ void U4_write(void *data) {
     uint16_t outputs = op->write.outputs;
     int err;
 
-    if ((err = PI4IOE5V6416_write(U4, outputs & MASK)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error writing PI4IOE5V6416 outputs (%d)", err);
-    } else if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
+    if ((err = PCAL6416A_write(U4, outputs & MASK)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error writing PCAL6416A outputs (%d)", err);
+    } else if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error reading back PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != (op->write.outputs & MASK)) {
-        set_error(ERR_U4, "U4", "invalid PI4IOE5V6416 output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
+        set_error(ERR_U4, "U4", "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
     }
 
     free(data);
 }
 
 /*
- * I2C0 task to readback and validate PI4IOE5V6416 outputs.
+ * I2C0 task to readback and validate PCAL6416A outputs.
  */
 void U4_healthcheck(void *data) {
     operation *op = (operation *)data;
     uint16_t outputs;
     int err;
 
-    if ((err = PI4IOE5V6416_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error reading back PI4IOE5V6416 outputs (%d)", err);
+    if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
+        set_error(ERR_U4, "U4", "error reading back PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != (op->healthcheck.outputs & MASK)) {
-        set_error(ERR_U4, "U4", "PI4IOE5V6416 healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
+        set_error(ERR_U4, "U4", "PCAL6416A healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
 
         if (mutex_try_enter(&U4x.guard, NULL)) {
             U4x.write = true;

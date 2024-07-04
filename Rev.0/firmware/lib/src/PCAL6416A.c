@@ -1,4 +1,4 @@
-#include <PI4IOE5V6416.h>
+#include <PCAL6416A.h>
 
 #include <breakout.h>
 #include <log.h>
@@ -13,7 +13,7 @@ const struct {
     uint8_t PULLUPS;
     uint8_t INTERRUPTS;
     uint8_t OUTPUT_CONFIG;
-} PI4IOE5V6416 = {
+} PCAL6416A = {
     .INPUTS = 0x00,
     .OUTPUTS = 0x02,
     .POLARITY = 0x04,
@@ -25,43 +25,43 @@ const struct {
     .OUTPUT_CONFIG = 0x4f,
 };
 
-const uint32_t PI4IOE5V6416_DRIVE_1 = 0xffffffff;
-const uint32_t PI4IOE5V6416_DRIVE_0_75 = 0xaaaaaaaa;
-const uint32_t PI4IOE5V6416_DRIVE_0_5 = 0x55555555;
-const uint32_t PI4IOE5V6416_DRIVE_0_25 = 0x00000000;
+const uint32_t PCAL6416A_DRIVE_1 = 0xffffffff;
+const uint32_t PCAL6416A_DRIVE_0_75 = 0xaaaaaaaa;
+const uint32_t PCAL6416A_DRIVE_0_5 = 0x55555555;
+const uint32_t PCAL6416A_DRIVE_0_25 = 0x00000000;
 
-int PI4IOE5V6416_init(I2C dev) {
+int PCAL6416A_init(I2C dev) {
     return ERR_OK;
 }
 
-int PI4IOE5V6416_set_configuration(I2C dev, uint16_t configuration) {
+int PCAL6416A_set_configuration(I2C dev, uint16_t configuration) {
     uint8_t data[] = {
         (uint8_t)((configuration >> 0) & 0x00ff),
         (uint8_t)((configuration >> 8) & 0x00ff),
     };
 
-    return I2C_write_all(dev, PI4IOE5V6416.CONFIGURATION, data, 2);
+    return I2C_write_all(dev, PCAL6416A.CONFIGURATION, data, 2);
 }
 
-int PI4IOE5V6416_set_polarity(I2C dev, uint16_t polarity) {
+int PCAL6416A_set_polarity(I2C dev, uint16_t polarity) {
     uint8_t data[] = {
         (uint8_t)((polarity >> 0) & 0x00ff),
         (uint8_t)((polarity >> 8) & 0x00ff),
     };
 
-    return I2C_write_all(dev, PI4IOE5V6416.POLARITY, data, 2);
+    return I2C_write_all(dev, PCAL6416A.POLARITY, data, 2);
 }
 
-int PI4IOE5V6416_set_latched(I2C dev, uint16_t latched) {
+int PCAL6416A_set_latched(I2C dev, uint16_t latched) {
     uint8_t data[] = {
         (uint8_t)((latched >> 0) & 0x00ff),
         (uint8_t)((latched >> 8) & 0x00ff),
     };
 
-    return I2C_write_all(dev, PI4IOE5V6416.LATCH, data, 2);
+    return I2C_write_all(dev, PCAL6416A.LATCH, data, 2);
 }
 
-int PI4IOE5V6416_set_pullups(I2C dev, const PULLUP pullups[16]) {
+int PCAL6416A_set_pullups(I2C dev, const PULLUP pullups[16]) {
     uint16_t enabled = 0x00;
     uint16_t up = 0x00;
     uint16_t mask = 0x0001;
@@ -86,31 +86,31 @@ int PI4IOE5V6416_set_pullups(I2C dev, const PULLUP pullups[16]) {
         (uint8_t)((up >> 8) & 0x00ff),
     };
 
-    return I2C_write_all(dev, PI4IOE5V6416.PULLUPS, data, 4);
+    return I2C_write_all(dev, PCAL6416A.PULLUPS, data, 4);
 }
 
-int PI4IOE5V6416_set_open_drain(I2C dev, bool port0, bool port1) {
+int PCAL6416A_set_open_drain(I2C dev, bool port0, bool port1) {
     uint8_t data = 0x00;
 
     data |= port0 ? 0x01 : 0x00;
     data |= port1 ? 0x02 : 0x00;
 
-    return I2C_write(dev, PI4IOE5V6416.OUTPUT_CONFIG, data);
+    return I2C_write(dev, PCAL6416A.OUTPUT_CONFIG, data);
 }
 
-int PI4IOE5V6416_set_output_drive(I2C dev, const float drive[16]) {
+int PCAL6416A_set_output_drive(I2C dev, const float drive[16]) {
     uint32_t mask = 0x00000003;
     uint32_t out = 0x00000000;
 
     for (int i = 0; i < 16; i++) {
         if (drive[i] <= 0.25f) {
-            out |= PI4IOE5V6416_DRIVE_0_25 & mask;
+            out |= PCAL6416A_DRIVE_0_25 & mask;
         } else if (drive[i] <= 0.5f) {
-            out |= PI4IOE5V6416_DRIVE_0_5 & mask;
+            out |= PCAL6416A_DRIVE_0_5 & mask;
         } else if (drive[i] <= 0.75f) {
-            out |= PI4IOE5V6416_DRIVE_0_75 & mask;
+            out |= PCAL6416A_DRIVE_0_75 & mask;
         } else {
-            out |= PI4IOE5V6416_DRIVE_1 & mask;
+            out |= PCAL6416A_DRIVE_1 & mask;
         }
 
         mask <<= 2;
@@ -123,18 +123,18 @@ int PI4IOE5V6416_set_output_drive(I2C dev, const float drive[16]) {
         (uint8_t)((out >> 24) & 0x000000ff),
     };
 
-    return I2C_write_all(dev, PI4IOE5V6416.DRIVE, data, 4);
+    return I2C_write_all(dev, PCAL6416A.DRIVE, data, 4);
 }
 
-int PI4IOE5V6416_read(I2C dev, uint16_t *data) {
+int PCAL6416A_read(I2C dev, uint16_t *data) {
     uint8_t buffer[] = {0, 0};
     int err;
 
-    if ((err = I2C_read_all(dev, PI4IOE5V6416.INPUTS, buffer, 2)) != ERR_OK) {
+    if ((err = I2C_read_all(dev, PCAL6416A.INPUTS, buffer, 2)) != ERR_OK) {
         return err;
     } else {
-        uint16_t hi = ((uint16_t)buffer[1] & 0x00ff) << 8;
-        uint16_t lo = ((uint16_t)buffer[0] & 0x00ff) << 0;
+        uint16_t hi = ((uint16_t)buffer[1] << 8) & 0x00ff;
+        uint16_t lo = ((uint16_t)buffer[0] << 0) & 0x00ff;
 
         *data = hi | lo;
 
@@ -142,20 +142,20 @@ int PI4IOE5V6416_read(I2C dev, uint16_t *data) {
     }
 }
 
-int PI4IOE5V6416_write(I2C dev, uint16_t outputs) {
+int PCAL6416A_write(I2C dev, uint16_t outputs) {
     uint8_t data[] = {
         (uint8_t)((outputs >> 0) & 0x00ff),
         (uint8_t)((outputs >> 8) & 0x00ff),
     };
 
-    return I2C_write_all(dev, PI4IOE5V6416.OUTPUTS, data, 2);
+    return I2C_write_all(dev, PCAL6416A.OUTPUTS, data, 2);
 }
 
-int PI4IOE5V6416_readback(I2C dev, uint16_t *data) {
+int PCAL6416A_readback(I2C dev, uint16_t *data) {
     uint8_t buffer[] = {0, 0};
     int err;
 
-    if ((err = I2C_read_all(dev, PI4IOE5V6416.OUTPUTS, buffer, 2)) != ERR_OK) {
+    if ((err = I2C_read_all(dev, PCAL6416A.OUTPUTS, buffer, 2)) != ERR_OK) {
         return err;
     } else {
         uint16_t hi = buffer[1];

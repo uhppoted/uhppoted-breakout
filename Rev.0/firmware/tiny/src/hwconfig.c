@@ -58,7 +58,7 @@ const struct I2C U3 = {
     .addr = 0x42,
 };
 
-// U4 PI4IOE5V6416
+// U4 PCAL6416A
 const struct I2C U4 = {
     .bus = i2c0,
     .addr = 0x40,
