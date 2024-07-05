@@ -3,7 +3,7 @@
 """
 Frequency response scipy 1storder IIR Butterworth filter
 
-cutoff: 50Hz
+cutoff: 25Hz
 fs:     1kHz 
 """
 

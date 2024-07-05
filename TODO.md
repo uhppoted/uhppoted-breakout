@@ -1,11 +1,9 @@
 # TODO
 
-- [x] Power on/reset and reprogram initial states are unexpectedly different
 - [x] Rev 0.1
       - [x] RTC Schottky diodes and resistor
       - [ ] Tidy up PCB layout
 
-- [x] `I2C0 queue full` on power on
 - [ ] pico: txrx/uart conflict
 - [ ] debounce simulation
 
