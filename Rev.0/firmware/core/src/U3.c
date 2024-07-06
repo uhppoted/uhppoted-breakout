@@ -30,7 +30,7 @@ struct {
     struct {
         uint8_t state;
         IIR lpf[8];
-    } unstable;
+    } stable;
 
     repeating_timer_t timer;
 } U3x = {
@@ -48,7 +48,7 @@ struct {
         },
     },
 
-    .unstable = {
+    .stable = {
         .state = 0x00,
         .lpf = {
             {.x₁ = 0.0, .y₁ = 0.0},
@@ -76,6 +76,7 @@ const uint8_t PB4 = 0x01;
 const uint8_t U3_MASKS[] = {S1, S2, S3, S4, PB1, PB2, PB3, PB4};
 const uint8_t U3_DOORS[] = {0x00, 0x01, 0x02, 0x04, 0x08};
 const uint8_t U3_BUTTONS[] = {0x00, 0x10, 0x20, 0x40, 0x80};
+const int32_t U3_TICK = 1; // ms
 
 const PULLUP U3_PULLUPS[8] = {
     PULLUP_UP, // PB4
@@ -97,13 +98,20 @@ const struct LPF LPF₁ = {
     .b₁ = 0.07295966,
 };
 
-// 1Hz 1 pole Butterworth LPF for input stability monitor
+// 0.1Hz 1 pole Butterworth LPF for input stability monitor
 const struct LPF LPF₂ = {
     .a₀ = 1.0,
     .a₁ = -0.99937188,
-    -0.99937188,
     .b₀ = 0.00031406,
     .b₁ = 0.00031406,
+};
+
+// 5Hz 1 pole Butterworth LPF for input stability monitor
+const struct LPF LPF₃ = {
+    .a₀ = 1.0,
+    .a₁ = -0.96906742,
+    .b₀ = 0.01546629,
+    .b₁ = 0.01546629,
 };
 
 bool U3_on_update(repeating_timer_t *rt);
@@ -152,7 +160,7 @@ void U3_setup() {
 void U3_start() {
     infof("U3", "start");
 
-    add_repeating_timer_us(1000, U3_on_update, NULL, &U3x.timer);
+    add_repeating_timer_us(1000 * U3_TICK, U3_on_update, NULL, &U3x.timer);
 }
 
 bool U3_on_update(repeating_timer_t *rt) {
@@ -193,7 +201,7 @@ void U3_read(void *data) {
  */
 void U3_process(uint8_t data) {
     uint8_t inputs = U3x.inputs.state;
-    uint8_t unstable = U3x.unstable.state;
+    uint8_t stable = U3x.stable.state;
     uint8_t mask = 0x01;
 
     for (int i = 0; i < 8; i++) {
@@ -209,12 +217,12 @@ void U3_process(uint8_t data) {
 
         // ... unstable input filter
         float p = ((v > 0.9) || (v < 0.1)) ? 1.0 : 0.0;
-        float q = lpf₂(&U3x.unstable.lpf[i], p);
+        float q = lpf₂(&U3x.stable.lpf[i], p);
 
         if (q > 0.9) {
-            unstable |= mask;
-        } else {
-            unstable &= ~mask;
+            stable |= mask;
+        } else if (q < 0.1) {
+            stable &= ~mask;
         }
 
         mask <<= 1;
@@ -223,13 +231,13 @@ void U3_process(uint8_t data) {
     if (inputs != U3x.inputs.state) {
         U3x.inputs.state = inputs;
 
-        debugf("U3", "inputs   %08b (%08b)", U3x.inputs.state, U3x.unstable.state);
+        debugf("U3", "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
     }
 
-    if (unstable != U3x.unstable.state) {
-        U3x.unstable.state = unstable;
+    if (stable != U3x.stable.state) {
+        U3x.stable.state = stable;
 
-        debugf("U3", "unstable %08b (%08b)", U3x.inputs.state, U3x.unstable.state);
+        debugf("U3", "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
     }
 }
 
@@ -274,12 +282,16 @@ float lpf₁(IIR *iir, float x₀) {
     return y₀;
 }
 
-// asymmetric LPF for input instability
+// asymmetric LPF for input stability (fast down, slow up)
 float lpf₂(IIR *iir, float x₀) {
     float y₀;
 
     if (x₀ < 1.0) {
-        y₀ = 0.0;
+        // clang-format off
+        y₀ = LPF₃.b₀ * x₀;
+        y₀ += LPF₃.b₁ * iir->x₁;
+        y₀ -= LPF₃.a₁ * iir->y₁;
+        // clang-format on
     } else {
         // clang-format off
         y₀ = LPF₂.b₀ * x₀;

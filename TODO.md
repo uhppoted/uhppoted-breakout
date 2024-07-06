@@ -30,7 +30,7 @@
     - [x] PCAL6408A write
     - [x] PCAL6408A output drive
     - [x] PCAL6408A readback
-    - [ ] Error if input is indeterminate (i.e. chattering)
+    - [x] Chattering input detection
 
 ### U4 PCAL6416A
     - [x] rework as clocked update
