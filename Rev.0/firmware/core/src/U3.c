@@ -30,7 +30,7 @@ struct {
     struct {
         uint8_t state;
         IIR lpf[8];
-    } stable;
+    } unstable;
 
     repeating_timer_t timer;
 } U3x = {
@@ -48,7 +48,7 @@ struct {
         },
     },
 
-    .stable = {
+    .unstable = {
         .state = 0x00,
         .lpf = {
             {.x₁ = 0.0, .y₁ = 0.0},
@@ -193,7 +193,7 @@ void U3_read(void *data) {
  */
 void U3_process(uint8_t data) {
     uint8_t inputs = U3x.inputs.state;
-    uint8_t stable = U3x.stable.state;
+    uint8_t unstable = U3x.unstable.state;
     uint8_t mask = 0x01;
 
     for (int i = 0; i < 8; i++) {
@@ -207,31 +207,29 @@ void U3_process(uint8_t data) {
             inputs &= ~mask;
         }
 
-        // ... input 'stable' filter
+        // ... unstable input filter
         float p = ((v > 0.9) || (v < 0.1)) ? 1.0 : 0.0;
-        float q = lpf₂(&U3x.stable.lpf[i], p);
+        float q = lpf₂(&U3x.unstable.lpf[i], p);
 
         if (q > 0.9) {
-            stable |= mask;
+            unstable |= mask;
         } else {
-            stable &= ~mask;
+            unstable &= ~mask;
         }
 
         mask <<= 1;
-
-        // debugf("U3", "IIR(%d) bits:%02x u:%.3f v:%0.3f", i + 1, inputs, u, v);
     }
 
     if (inputs != U3x.inputs.state) {
         U3x.inputs.state = inputs;
 
-        debugf("U3", "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
+        debugf("U3", "inputs   %08b (%08b)", U3x.inputs.state, U3x.unstable.state);
     }
 
-    if (stable != U3x.stable.state) {
-        U3x.stable.state = stable;
+    if (unstable != U3x.unstable.state) {
+        U3x.unstable.state = unstable;
 
-        debugf("U3", "stable   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
+        debugf("U3", "unstable %08b (%08b)", U3x.inputs.state, U3x.unstable.state);
     }
 }
 
@@ -276,7 +274,7 @@ float lpf₁(IIR *iir, float x₀) {
     return y₀;
 }
 
-// asymmetric LPF for input stability
+// asymmetric LPF for input instability
 float lpf₂(IIR *iir, float x₀) {
     float y₀;
 
@@ -284,9 +282,9 @@ float lpf₂(IIR *iir, float x₀) {
         y₀ = 0.0;
     } else {
         // clang-format off
-    y₀ = LPF₂.b₀ * x₀;
-    y₀ += LPF₂.b₁ * iir->x₁;
-    y₀ -= LPF₂.a₁ * iir->y₁;
+        y₀ = LPF₂.b₀ * x₀;
+        y₀ += LPF₂.b₁ * iir->x₁;
+        y₀ -= LPF₂.a₁ * iir->y₁;
         // clang-format on
     }
 
