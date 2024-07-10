@@ -9,8 +9,8 @@
 #include <breakout.h>
 #include <log.h>
 
-void IOX_setup() {
-    infof("IOX", "setup");
+void IOX_init() {
+    infof("IOX", "init");
 
     gpio_init(IOX_RESET);
     gpio_pull_up(IOX_RESET);

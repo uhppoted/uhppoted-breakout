@@ -16,8 +16,8 @@ void on_txrx();
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
-void TXRX_setup() {
-    debugf("TXRX", "setup");
+void TXRX_init() {
+    debugf("TXRX", "init");
 
     // ... UART
     gpio_set_function(UART0_TX, GPIO_FUNC_UART);

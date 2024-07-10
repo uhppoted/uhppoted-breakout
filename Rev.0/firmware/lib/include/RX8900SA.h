@@ -20,3 +20,5 @@ extern const uint8_t WEDNESDAY;
 extern const uint8_t THURSDAY;
 extern const uint8_t FRIDAY;
 extern const uint8_t SATURDAY;
+
+extern const uint32_t RX8900SA_tSTA;

@@ -21,7 +21,7 @@
     - [ ] Decode keypad
     - (?) Continuous read 
           - Use I2C1 to check last register (a la I2C0)
-          - Request with address after time delay, continuous otherwise
+          - Request with address at start of card/keypad read, continuous otherwise
     - (?) 100kHz/400kHz compile flag
 
 ### U3 PCAL6408A
@@ -49,9 +49,9 @@
     - [x] PCAL6416A isr
 
 ### U5 RX8900SA
-    - [ ] Defer setup with alarm timer
-    - [ ] ready
-    - [ ] handle initialisation sequence in RTC_init
+    - [x] Defer init::setup with alarm timer
+    - [x] Defer reset::setup with alarm timer
+    - [x] ready
     - [ ] backup mode compile flags
 
 ### log

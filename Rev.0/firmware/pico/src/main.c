@@ -54,9 +54,9 @@ int main() {
     printf(">> BREAKOUT %s\n", VERSION);
 
     // ... initialise RTC, IO expanders and serial port
-    RTC_setup();
-    IOX_setup();
-    TXRX_setup();
+    RTC_init();
+    IOX_init();
+    TXRX_init();
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();

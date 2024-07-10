@@ -108,7 +108,7 @@ const uint8_t NOVEMBER = 0x011;
 const uint8_t DECEMBER = 0x012;
 
 // other
-const uint32_t tSTA = 3 * 1000; // 3s (max. stabilisation time)
+const uint32_t RX8900SA_tSTA = 3 * 1000; // 3s (max. stabilisation time)
 
 // function prototypes
 uint8_t dec2bcd(uint8_t N);
@@ -148,36 +148,13 @@ int RX8900SA_init(I2C dev) {
         debugf("RX8900SA", "----");
     }
 
-    if ((flag & VLF) != VLF) {
-        infof("RX8900SA", "power on ok");
-    } else {
+    if ((flag & VLF) == VLF) {
         warnf("RX8900SA", "power on VLF set");
-        sleep_ms(tSTA); // FIXME use alarm timer
-        RX8900SA_setup(dev);
-    }
-}
-
-/*
- * Resets the RX8900SA.
- */
-int RX8900SA_reset(I2C dev) {
-    infof("RX8900SA", "%02x  reset", dev.addr);
-
-    uint8_t csel = COMPENSATE_2S;
-    uint8_t uie = INTERRUPT_DISABLED;
-    uint8_t tie = TIMER_INTERRUPT_DISABLED;
-    uint8_t aie = ALARM_INTERRUPT_DISABLED;
-    uint8_t reset = RESET;
-    int err;
-
-    if ((err = I2C_write(dev, CONTROL, csel | uie | tie | aie | reset)) != 0) {
-        warnf("RX8900SA", "%02x  CONTROL write error:%d", dev.addr, err);
-        return err;
+        return ERR_VLF;
     }
 
-    sleep_ms(tSTA); // FIXME use alarm timer
-
-    return 0;
+    infof("RX8900SA", "power on ok");
+    return ERR_OK;
 }
 
 /*
@@ -219,14 +196,38 @@ int RX8900SA_setup(I2C dev) {
     // uint8_t vdet = BACKUP_DISABLED;
     // uint8_t swoff = BACKUP_DIODE;
     // uint8_t bksmp = VDET_2MS;
-
+    //
     // if ((err = I2C_write(dev, BACKUP, vdet | swoff | bksmp)) != 0) {
     //     warnf("RX8900SA", "%02x  BACKUP write error:%d", dev.addr, err);
     //     return err;
     // }
 
     // ... all done
-    infof("RX8900SA", "%02x  setup/done", dev.addr);
+
+    infof("RX8900SA", "setup ok");
+
+    return 0;
+}
+
+/*
+ * Resets the RX8900SA.
+ */
+int RX8900SA_reset(I2C dev) {
+    infof("RX8900SA", "%02x  reset", dev.addr);
+
+    uint8_t csel = COMPENSATE_2S;
+    uint8_t uie = INTERRUPT_DISABLED;
+    uint8_t tie = TIMER_INTERRUPT_DISABLED;
+    uint8_t aie = ALARM_INTERRUPT_DISABLED;
+    uint8_t reset = RESET;
+    int err;
+
+    if ((err = I2C_write(dev, CONTROL, csel | uie | tie | aie | reset)) != 0) {
+        warnf("RX8900SA", "%02x  CONTROL write error:%d", dev.addr, err);
+        return err;
+    }
+
+    sleep_ms(RX8900SA_tSTA); // FIXME use alarm timer
 
     return 0;
 }

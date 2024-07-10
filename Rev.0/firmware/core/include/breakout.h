@@ -44,6 +44,7 @@ typedef enum {
     ERR_RX8900SA,
     ERR_U3,
     ERR_U4,
+    ERR_VLF,
     ERR_UNKNOWN,
 } err;
 
