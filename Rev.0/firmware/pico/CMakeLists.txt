@@ -9,6 +9,10 @@ set(CMAKE_C_STANDARD   11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
+add_compile_definitions(RX8900SA_VDET="${RX8900SA_VDET}")
+add_compile_definitions(RX8900SA_SWOFF="${RX8900SA_SWOFF}")
+add_compile_definitions(RX8900SA_BKSMP="${RX8900SA_BKSMP}")
+
 set(CORE "../core")
 set(LIB  "../lib")
 

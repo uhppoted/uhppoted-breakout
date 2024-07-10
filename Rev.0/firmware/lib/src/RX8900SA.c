@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <pico/stdlib.h>
 
@@ -75,14 +76,15 @@ const uint8_t RESET = 0x01;
 const uint8_t NO_RESET = 0x00;
 
 // BACKUP register
-const uint8_t BACKUP_DISABLED = 0x08;
-const uint8_t BACKUP_ENABLED = 0x00;
-const uint8_t BACKUP_SWITCH = 0x00;
-const uint8_t BACKUP_DIODE = 0x04;
+const uint8_t VDET_ENABLED = 0x00;
+const uint8_t VDET_DISABLED = 0x08;
+const uint8_t SWOFF_PCH = 0x00;
+const uint8_t SWOFF_DIODE = 0x04;
 const uint8_t VDET_2MS = 0x00;
 const uint8_t VDET_16MS = 0x01;
 const uint8_t VDET_128MS = 0x02;
 const uint8_t VDET_256MS = 0x03;
+const char *BKSMP[] = {"2ms", "16ms", "128ms", "256ms"};
 
 // weekdays
 const uint8_t SUNDAY = 0x01;
@@ -154,6 +156,7 @@ int RX8900SA_init(I2C dev) {
     }
 
     infof("RX8900SA", "power on ok");
+
     return ERR_OK;
 }
 
@@ -192,15 +195,37 @@ int RX8900SA_setup(I2C dev) {
         return err;
     }
 
-    // // ... battery backup
-    // uint8_t vdet = BACKUP_DISABLED;
-    // uint8_t swoff = BACKUP_DIODE;
-    // uint8_t bksmp = VDET_2MS;
-    //
-    // if ((err = I2C_write(dev, BACKUP, vdet | swoff | bksmp)) != 0) {
-    //     warnf("RX8900SA", "%02x  BACKUP write error:%d", dev.addr, err);
-    //     return err;
-    // }
+    // ... battery backup
+    uint8_t vdet = VDET_ENABLED;
+    uint8_t swoff = SWOFF_PCH;
+    uint8_t bksmp = VDET_2MS;
+
+    if (strncasecmp(RX8900SA_VDET, "disabled", 8) == 0) {
+        vdet = VDET_DISABLED;
+    }
+
+    if (strncasecmp(RX8900SA_SWOFF, "diode", 5) == 0) {
+        swoff = SWOFF_DIODE;
+    }
+
+    if (strncasecmp(RX8900SA_BKSMP, "2ms", 3) == 0) {
+        bksmp = VDET_2MS;
+    } else if (strncasecmp(RX8900SA_BKSMP, "16ms", 4) == 0) {
+        bksmp = VDET_16MS;
+    } else if (strncasecmp(RX8900SA_BKSMP, "128ms", 5) == 0) {
+        bksmp = VDET_128MS;
+    } else if (strncasecmp(RX8900SA_BKSMP, "256ms", 5) == 0) {
+        bksmp = VDET_256MS;
+    }
+
+    infof("RX8900SA", "VDET  %s", vdet == VDET_ENABLED ? "enabled" : "disabled");
+    infof("RX8900SA", "SWOFF %s", swoff == SWOFF_PCH ? "switch" : "diode");
+    infof("RX8900SA", "BKSMP %s", BKSMP[bksmp]);
+
+    if ((err = I2C_write(dev, BACKUP, vdet | swoff | bksmp)) != 0) {
+        warnf("RX8900SA", "%02x  BACKUP write error:%d", dev.addr, err);
+        return err;
+    }
 
     // ... all done
 

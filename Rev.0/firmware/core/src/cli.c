@@ -211,45 +211,9 @@ void exec(char *cmd) {
     }
 }
 
-void debugx(void *data) {
-    debugf("CLI", "debug - U4 set pullups");
-
-    // PULLUP pullups[16] = {
-    //     PULLUP_UP,
-    //     PULLUP_DOWN,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_NONE,
-    //     PULLUP_UP,
-    //     PULLUP_DOWN,
-    // };
-    // int err;
-
-    // if ((err = PCAL6416A_set_pullups(U4, pullups)) != ERR_OK) {
-    //     debugf("CLI", ">>>> DEBUG - OOOPS (%d)", err);
-    // } else {
-    //     debugf("CLI", ">>>> DEBUG - OK");
-    // }
-}
-
 void debug() {
-    struct closure op = {
-        .f = debugx,
-        .data = NULL,
-    };
-
-    if (!I2C0_push(&op)) {
-        set_error(ERR_QUEUE_FULL, "CLI", "debug: queue full");
-    }
+    debugf("CLI", "debug - RX8900SA VDET  %s", RX8900SA_VDET);
+    debugf("CLI", "debug - RX8900SA SWOFF %s", RX8900SA_SWOFF);
 }
 
 void state() {

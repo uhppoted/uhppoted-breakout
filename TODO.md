@@ -52,7 +52,7 @@
     - [x] Defer init::setup with alarm timer
     - [x] Defer reset::setup with alarm timer
     - [x] ready
-    - [ ] backup mode compile flags
+    - [x] VDET, SWOFF and BKSMP compile flags
 
 ### log
    - [x] Queue log writes
