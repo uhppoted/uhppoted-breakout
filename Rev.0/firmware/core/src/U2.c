@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <pico/stdlib.h>
 #include <pico/sync.h>
@@ -11,6 +12,8 @@
 
 void U2_on_interrupt(void);
 void U2_on_card_read(uint8_t reader, uint32_t v);
+void U2_on_keypad_digit(uint8_t reader, uint32_t v);
+void U2_on_keycode(const char *code, int length);
 bool U2_tick(repeating_timer_t *rt);
 int bits(uint32_t v);
 
@@ -26,8 +29,8 @@ const uint8_t R4D1 = 0x80; // reader 4 D1
 
 const uint8_t D0[4] = {R1D0, R2D0, R3D0, R4D0};
 const uint8_t D1[4] = {R1D1, R2D1, R3D1, R4D1};
-const int32_t U2_TICK = 10;          // ms
-const int32_t U2_READ_TIMEOUT = 100; // ms
+const int32_t U2_TICK = 1;          // ms
+const int32_t U2_READ_TIMEOUT = 10; // ms
 
 typedef struct reader {
     uint64_t data;
@@ -35,8 +38,20 @@ typedef struct reader {
     uint8_t timer;
 } reader;
 
+typedef struct keypad {
+    char code[16];
+    uint32_t index;
+} code;
+
+typedef struct keycode {
+    char digit;
+    uint32_t code4;
+    uint32_t code8;
+} keycode;
+
 struct {
     struct reader readers[4];
+    struct keypad keypads[4];
     repeating_timer_t timer;
     mutex_t guard;
 } U2x = {
@@ -45,6 +60,12 @@ struct {
         {.data = 0x00000000, .count = 0, .timer = 0},
         {.data = 0x00000000, .count = 0, .timer = 0},
         {.data = 0x00000000, .count = 0, .timer = 0},
+    },
+    .keypads = {
+        {.code = {}, .index = 0},
+        {.code = {}, .index = 0},
+        {.code = {}, .index = 0},
+        {.code = {}, .index = 0},
     }};
 
 const PULLUP U2_PULLUPS[8] = {
@@ -58,6 +79,23 @@ const PULLUP U2_PULLUPS[8] = {
     PULLUP_UP, // DO4
     PULLUP_UP, // DI4
 };
+
+const keycode KEYCODES[] = {
+    {'0', 0, 0x00f0},
+    {'1', 1, 0x00e1},
+    {'2', 2, 0x00d2},
+    {'3', 3, 0x00c3},
+    {'4', 4, 0x00b4},
+    {'5', 5, 0x00a5},
+    {'6', 6, 0x0096},
+    {'7', 7, 0x0087},
+    {'8', 8, 0x0078},
+    {'9', 9, 0x0069},
+    {'*', 10, 0x005a},
+    {'#', 11, 0x004b},
+};
+
+const int KEYCODES_SIZE = sizeof(KEYCODES) / sizeof(keycode);
 
 void U2_setup() {
     infof("U2", "setup");
@@ -107,7 +145,7 @@ void U2_start() {
     gpio_add_raw_irq_handler(IOX_INT0, U2_on_interrupt);
     gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, true);
 
-    add_repeating_timer_ms(U2_TICK, U2_tick, NULL, &U2x.timer);
+    add_repeating_timer_us(U2_TICK * 1000, U2_tick, NULL, &U2x.timer);
 }
 
 /*
@@ -124,11 +162,17 @@ bool U2_tick(repeating_timer_t *rt) {
             }
 
             if (reader->timer > U2_READ_TIMEOUT) {
+                if (U2x.readers[i].count == 26) {
+                    U2_on_card_read(door, reader->data);
+                } else if (U2x.readers[i].count == 4) {
+                    U2_on_keypad_digit(door, reader->data & 0x0000000f);
+                } else {
+                    debugf("U2", "reader %d timeout (%d)", door, U2x.readers[i].count);
+                }
+
                 reader->data = 0x00000000;
                 reader->count = 0;
                 reader->timer = 0;
-
-                debugf("U2", "reader %d timeout", door);
             }
 
             reader++;
@@ -189,12 +233,14 @@ void U2_wio(uint8_t inputs) {
             reader->count++;
         }
 
-        if (U2x.readers[i].count == 26) {
-            U2_on_card_read(door, reader->data);
-            reader->data = 0x00000000;
-            reader->count = 0;
-            reader->timer = 0;
-        }
+        reader->timer = 0;
+
+        // if (U2x.readers[i].count == 26) {
+        //     U2_on_card_read(door, reader->data);
+        //     reader->data = 0x00000000;
+        //     reader->count = 0;
+        //     reader->timer = 0;
+        // }
 
         reader++;
         door++;
@@ -213,6 +259,56 @@ void U2_on_card_read(uint8_t reader, uint32_t v) {
     uint32_t card = code & 0x0000ffff;
 
     infof("U2", "READER %d  CARD %-3u%-5u %s", reader, facility_code, card, ok ? "ok" : "error");
+}
+
+void U2_on_keypad_digit(uint8_t reader, uint32_t v) {
+    int keycode = v & 0x000000ff;
+
+    if (reader < 1 || reader > 4) {
+        return;
+    }
+
+    for (int i = 0; i < KEYCODES_SIZE; i++) {
+        if (KEYCODES[i].code4 == keycode || KEYCODES[i].code8 == keycode) {
+            char digit = KEYCODES[i].digit;
+            struct keypad *keypad = U2x.keypads + (reader - 1);
+
+            if (keypad->index < sizeof(keypad->code)) {
+                keypad->code[keypad->index++] = digit;
+
+                if (keypad->index >= sizeof(keypad->code)) {
+                    U2_on_keycode(keypad->code, keypad->index);
+                    keypad->index = 0;
+                } else if (digit == '*' || digit == '#') {
+                    U2_on_keycode(keypad->code, keypad->index);
+                    keypad->index = 0;
+                } else {
+                    // code.alarm = add_alarm_in_ms(KEYCODE_TIMEOUT, keycode_timeout, &code, true);
+                }
+            }
+
+            break;
+        }
+    }
+}
+
+void U2_on_keycode(const char *code, int length) {
+    if (length > 0) {
+        int N = length + 1;
+        char *keycode;
+
+        if ((keycode = calloc(N, 1)) != NULL) {
+            snprintf(keycode, N, "%s", code);
+
+            // uint32_t msg = MSG_CODE | ((uint32_t)s & 0x0fffffff); // SRAM_BASE is 0x20000000
+            // if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+            //     free(s);
+            // }
+
+            infof("U2", "KEYCODE %s", keycode);
+            free(keycode);
+        }
+    }
 }
 
 // Ref. https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel

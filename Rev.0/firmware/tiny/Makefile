@@ -6,6 +6,7 @@ RX8900SA_SWOFF ?= switch
 RX8900SA_BKSMP ?= 2ms
 
 .PHONY: format
+.PHONY: telnet
 
 clean: 
 	rm -rf build
@@ -27,3 +28,6 @@ run: build
 
 tty:
 	 minicom -b 115200 -o -D $(PORT)
+
+telnet:
+	 telnet 10.0.0.78 4242

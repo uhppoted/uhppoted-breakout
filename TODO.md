@@ -6,6 +6,9 @@
 
 - [ ] pico: txrx/uart conflict
 - [ ] debounce simulation
+- [ ] controller ID
+      - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
+      - compile time constant
 
 ### CLI
     - [ ] reboot
@@ -19,6 +22,9 @@
     - [x] Decode all readers
     - [x] Read timeout
     - [ ] Decode keypad
+          - code timeout
+    - [ ] Max timeout/chattering
+    - [ ] Read interval/rate
     - (?) Continuous read 
           - Use I2C1 to check last register (a la I2C0)
           - Request with address at start of card/keypad read, continuous otherwise
