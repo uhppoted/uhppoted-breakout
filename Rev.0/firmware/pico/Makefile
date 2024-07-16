@@ -4,6 +4,9 @@ PORT=/dev/tty.usbmodem14201
 RX8900SA_VDET ?= disabled
 RX8900SA_SWOFF ?= switch
 RX8900SA_BKSMP ?= 2ms
+I2C0_CLOCK ?= 100kHz
+I2C1_CLOCK ?= 400kHz
+
 
 .PHONY: format
 
@@ -12,7 +15,9 @@ clean: CMakeLists.txt
 	mkdir -p build
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
-	       cmake -DRX8900SA_VDET="$(RX8900SA_VDET)" -DRX8900SA_SWOFF="$(RX8900SA_SWOFF)" -DRX8900SA_BKSMP="$(RX8900SA_BKSMP)" ..
+	       cmake -DI2C0_CLOCK="100kHz" -DI2C1_CLOCK="400kHz" \
+	             -DRX8900SA_VDET="$(RX8900SA_VDET)" -DRX8900SA_SWOFF="$(RX8900SA_SWOFF)" -DRX8900SA_BKSMP="$(RX8900SA_BKSMP)" \
+	             ..
 
 format: clean
 	clang-format -i src/*.c

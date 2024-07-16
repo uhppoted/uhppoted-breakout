@@ -12,6 +12,8 @@ set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 add_compile_definitions(RX8900SA_VDET="${RX8900SA_VDET}")
 add_compile_definitions(RX8900SA_SWOFF="${RX8900SA_SWOFF}")
 add_compile_definitions(RX8900SA_BKSMP="${RX8900SA_BKSMP}")
+add_compile_definitions(I2C0_CLOCK="${I2C0_CLOCK}")
+add_compile_definitions(I2C1_CLOCK="${I2C1_CLOCK}")
 
 set(CORE "../core")
 set(LIB  "../lib")

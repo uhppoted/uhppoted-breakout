@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <hardware/i2c.h>
 #include <pico/stdlib.h>
@@ -13,7 +14,11 @@ struct {
 } I2C0;
 
 void I2C0_init() {
-    uint f = i2c_init(i2c0, 100 * 1000); // 100kHz
+    if (strncasecmp(I2C0_CLOCK, "400kHz", 6) == 0) {
+        uint f = i2c_init(i2c0, 400 * 1000); // 400kHz
+    } else {
+        uint f = i2c_init(i2c0, 100 * 1000); // 100kHz
+    }
 
     gpio_init(I2C0_SCL);
     gpio_init(I2C0_SDA);

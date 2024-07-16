@@ -212,8 +212,8 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    debugf("CLI", "debug - RX8900SA VDET  %s", RX8900SA_VDET);
-    debugf("CLI", "debug - RX8900SA SWOFF %s", RX8900SA_SWOFF);
+    debugf("CLI", "debug - I2C0 CLOCK  %s", I2C0_CLOCK);
+    debugf("CLI", "debug - I2C1 CLOCK  %s", I2C1_CLOCK);
 }
 
 void state() {

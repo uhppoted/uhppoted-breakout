@@ -29,7 +29,7 @@
     - (?) Continuous read 
           - Use I2C1 to check last register (a la I2C0)
           - Request with address at start of card/keypad read, continuous otherwise
-    - (?) 100kHz/400kHz compile flag
+    - [x] 100kHz/400kHz compile flag
 
 ### U3 PCAL6408A
 
