@@ -29,8 +29,9 @@ const uint8_t R4D1 = 0x80; // reader 4 D1
 
 const uint8_t D0[4] = {R1D0, R2D0, R3D0, R4D0};
 const uint8_t D1[4] = {R1D1, R2D1, R3D1, R4D1};
-const int32_t U2_TICK = 1;          // ms
-const int32_t U2_READ_TIMEOUT = 10; // ms
+const int32_t U2_TICK = 1;            // ms
+const int32_t U2_READ_TIMEOUT = 10;   // ms
+const int32_t U2_CODE_TIMEOUT = 2500; // ms
 
 typedef struct reader {
     uint64_t data;
@@ -41,6 +42,7 @@ typedef struct reader {
 typedef struct keypad {
     char code[16];
     uint32_t index;
+    uint16_t timer;
 } code;
 
 typedef struct keycode {
@@ -62,10 +64,10 @@ struct {
         {.data = 0x00000000, .count = 0, .timer = 0},
     },
     .keypads = {
-        {.code = {}, .index = 0},
-        {.code = {}, .index = 0},
-        {.code = {}, .index = 0},
-        {.code = {}, .index = 0},
+        {.code = {}, .index = 0, .timer = 0},
+        {.code = {}, .index = 0, .timer = 0},
+        {.code = {}, .index = 0, .timer = 0},
+        {.code = {}, .index = 0, .timer = 0},
     }};
 
 const PULLUP U2_PULLUPS[8] = {
@@ -154,8 +156,8 @@ void U2_start() {
 bool U2_tick(repeating_timer_t *rt) {
     if (mutex_try_enter(&U2x.guard, NULL)) {
         uint8_t door = 1;
-        struct reader *reader = U2x.readers;
 
+        struct reader *reader = U2x.readers;
         for (int i = 0; i < 4; i++) {
             if (reader->count > 0) {
                 reader->timer += U2_TICK;
@@ -179,6 +181,21 @@ bool U2_tick(repeating_timer_t *rt) {
 
             reader++;
             door++;
+        }
+
+        struct keypad *keypad = U2x.keypads;
+        for (int i = 0; i < 4; i++) {
+            if (keypad->index > 0) {
+                keypad->timer += U2_TICK;
+
+                if (keypad->timer >= U2_CODE_TIMEOUT) {
+                    U2_on_keycode(keypad->code, keypad->index);
+                    keypad->index = 0;
+                    keypad->timer = 0;
+                }
+            }
+
+            keypad++;
         }
 
         mutex_exit(&U2x.guard);
@@ -257,6 +274,7 @@ void U2_on_card_read(uint8_t reader, uint32_t v) {
 }
 
 void U2_on_keypad_digit(uint8_t reader, uint32_t v) {
+    struct keypad *keypad = U2x.keypads + (reader - 1);
     int keycode = v & 0x000000ff;
 
     if (reader < 1 || reader > 4) {
@@ -266,7 +284,6 @@ void U2_on_keypad_digit(uint8_t reader, uint32_t v) {
     for (int i = 0; i < KEYCODES_SIZE; i++) {
         if (KEYCODES[i].code4 == keycode || KEYCODES[i].code8 == keycode) {
             char digit = KEYCODES[i].digit;
-            struct keypad *keypad = U2x.keypads + (reader - 1);
 
             if (keypad->index < sizeof(keypad->code)) {
                 keypad->code[keypad->index++] = digit;
@@ -274,11 +291,13 @@ void U2_on_keypad_digit(uint8_t reader, uint32_t v) {
                 if (keypad->index >= sizeof(keypad->code)) {
                     U2_on_keycode(keypad->code, keypad->index);
                     keypad->index = 0;
+                    keypad->timer = 0;
                 } else if (digit == '*' || digit == '#') {
                     U2_on_keycode(keypad->code, keypad->index);
                     keypad->index = 0;
+                    keypad->timer = 0;
                 } else {
-                    // code.alarm = add_alarm_in_ms(KEYCODE_TIMEOUT, keycode_timeout, &code, true);
+                    keypad->timer = 0;
                 }
             }
 

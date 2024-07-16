@@ -21,9 +21,9 @@
 ### U2 PCAL6408A
     - [x] Decode all readers
     - [x] Read timeout
-    - [ ] Decode keypad
+    - [x] Decode keypad
           - [x] 8-bit keycodes
-          - [ ] code timeout
+          - [x] process keycode on code timeout
     - [ ] Max timeout/chattering
     - [ ] Limit read rate/implement read interval
     - (?) Continuous read 
