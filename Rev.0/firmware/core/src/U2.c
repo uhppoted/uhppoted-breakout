@@ -163,6 +163,13 @@ bool U2_tick(repeating_timer_t *rt) {
                 reader->timer += U2_TICK;
             }
 
+            // NTS: invalid input stream, so limit count to prevent it looping around.
+            //      The invalid card/code will be processed if/when there is a 10ms interval
+            //      in the data stream.
+            if (reader->count > 64) {
+                reader->count = 64;
+            }
+
             if (reader->timer > U2_READ_TIMEOUT) {
                 if (U2x.readers[i].count == 26) {
                     U2_on_card_read(door, reader->data);

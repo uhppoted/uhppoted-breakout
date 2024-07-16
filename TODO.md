@@ -24,7 +24,7 @@
     - [x] Decode keypad
           - [x] 8-bit keycodes
           - [x] process keycode on code timeout
-    - [ ] Max timeout/chattering
+    - [x] Max timeout/chattering
     - [ ] Limit read rate/implement read interval
     - (?) Continuous read 
           - Use I2C1 to check last register (a la I2C0)
