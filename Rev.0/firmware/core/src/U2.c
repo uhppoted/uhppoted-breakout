@@ -166,6 +166,8 @@ bool U2_tick(repeating_timer_t *rt) {
                     U2_on_card_read(door, reader->data);
                 } else if (U2x.readers[i].count == 4) {
                     U2_on_keypad_digit(door, reader->data & 0x0000000f);
+                } else if (U2x.readers[i].count == 8) {
+                    U2_on_keypad_digit(door, reader->data & 0x000000ff);
                 } else {
                     debugf("U2", "reader %d timeout (%d)", door, U2x.readers[i].count);
                 }
@@ -234,13 +236,6 @@ void U2_wio(uint8_t inputs) {
         }
 
         reader->timer = 0;
-
-        // if (U2x.readers[i].count == 26) {
-        //     U2_on_card_read(door, reader->data);
-        //     reader->data = 0x00000000;
-        //     reader->count = 0;
-        //     reader->timer = 0;
-        // }
 
         reader++;
         door++;

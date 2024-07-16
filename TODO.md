@@ -22,43 +22,20 @@
     - [x] Decode all readers
     - [x] Read timeout
     - [ ] Decode keypad
-          - code timeout
+          - [x] 8-bit keycodes
+          - [ ] code timeout
     - [ ] Max timeout/chattering
-    - [ ] Read interval/rate
+    - [ ] Limit read rate/implement read interval
     - (?) Continuous read 
           - Use I2C1 to check last register (a la I2C0)
           - Request with address at start of card/keypad read, continuous otherwise
     - (?) 100kHz/400kHz compile flag
 
 ### U3 PCAL6408A
-    - [x] fix pullups function
-    - [x] fix open drain function
-    - [x] PCAL6408A write
-    - [x] PCAL6408A output drive
-    - [x] PCAL6408A readback
-    - [x] Chattering input detection
 
 ### U4 PCAL6416A
-    - [x] rework as clocked update
-    - [x] rework relay set/clear as ticked operations
-    - [x] rework LED set/clear as ticked operations
-    - [x] rework SYS,IN, ERR as ticked operations
-    - [x] inline (https://stackoverflow.com/questions/31108159/what-is-the-use-of-the-inline-keyword-in-c)
-    - [x] sanity check PI4IOE5V6416 state against U4x.outputs
-    - [x] invert SYS, IN and ERR LEDs
-    - [x] initial readback always reads back 0x0000
-    - [x] check polarity
-    - [x] set output drive
-    - [x] fix pullups function
-    - [x] PCAL6416A read
-    - [x] PCAL6416A set interrupts
-    - [x] PCAL6416A isr
 
 ### U5 RX8900SA
-    - [x] Defer init::setup with alarm timer
-    - [x] Defer reset::setup with alarm timer
-    - [x] ready
-    - [x] VDET, SWOFF and BKSMP compile flags
 
 ### log
    - [x] Queue log writes
