@@ -9,10 +9,14 @@
 - [ ] controller ID
       - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
       - compile time constant
+- [ ] Remove unused I2C0/I2C1 functions
+
+### Watchdog
+  - [ ] initialise
+  - [ ] reset
+  - [ ] reboot
 
 ### CLI
-    - [ ] reboot
-    - [ ] render state
     - (?) command line
     - (?) UI thread
     - [ ] Dangling '['
@@ -25,17 +29,8 @@
           - [x] 8-bit keycodes
           - [x] process keycode on code timeout
     - [x] Max timeout/chattering
-    - [ ] Limit read rate/implement read interval
-    - (?) Continuous read 
-          - Use I2C1 to check last register (a la I2C0)
-          - Request with address at start of card/keypad read, continuous otherwise
+    - [x] Limit read rate
     - [x] 100kHz/400kHz compile flag
-
-### U3 PCAL6408A
-
-### U4 PCAL6416A
-
-### U5 RX8900SA
 
 ### log
    - [x] Queue log writes
@@ -63,6 +58,7 @@
 ### OTA
    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
    - https://www.youtube.com/watch?v=4-dle5L9REs
+   - https://monocypher.org
 
 ## R&D
 - [x] Relay pin voltages
@@ -105,3 +101,7 @@
     - https://www.adafruit.com/product/4739
     - https://www.adafruit.com/product/1385
 11. https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/
+12. External flash
+    - https://mcuoneclipse.com/2022/12/04/add-extra-storage-to-the-raspberry-pi-pico-with-w25q128-and-littlefs
+
+

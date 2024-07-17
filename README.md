@@ -10,7 +10,12 @@ The breakout board substitutes the removable CPU board with a hackable board tha
 
 ## Raison d'être
 
-Mostly curiosity?
+Mostly curiosity? But .. it also opens up the possibility of:
+- IPv6
+- TLS
+- onboard WiFi
+- interfacing with off brand readers and keypads
+- custom access control requirements
 
 ## Roadmap
 
@@ -21,11 +26,12 @@ Mostly curiosity?
 Initial proof of concept, designed to be relatively easy to hand solder and debug:
 - All the components are on the front (top) of the PCB
 - It uses the ever-so-cute _WaveShare_ _RP2040-Tiny_ module
+- Through-hole components where convenient
 
 <img width="640" src="documentation/images/Rev.0.jpg">
 <img width="320" src="documentation/images/front.png"><img width="320" src="documentation/images/back.png">
 
-### Errata
+#### Errata
 1. Requires Schottky barrier diode and resistor on RX8900SA backup battery.
 2. Add-on mounting holes are for RaspberryPi Pico.
 
