@@ -1,5 +1,6 @@
-#include <hardware/pio.h>
 #include <pico/stdlib.h>
+
+#include <hardware/pio.h>
 
 #include <breakout.h>
 #include <log.h>
@@ -12,13 +13,15 @@ bool on_tick(repeating_timer_t *);
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
 
 struct {
+    bool LED;
+    bool reboot;
     struct repeating_timer timer;
-    bool state;
-} sysled = {
-    .state = false,
+} sys = {
+    .LED = false,
+    .reboot = false,
 };
 
-bool sysinit() {
+bool sys_init() {
     // ... WS2812 LED
     PIO pio = pio0;
     int sm = 0;
@@ -26,7 +29,7 @@ bool sysinit() {
 
     ws2812_program_init(pio, sm, offset, 16, 800000, true);
 
-    if (!add_repeating_timer_ms(1000, on_tick, &sysled, &sysled.timer)) {
+    if (!add_repeating_timer_ms(1000, on_tick, &sys, &sys.timer)) {
         return false;
     }
 
@@ -46,17 +49,31 @@ bool on_tick(repeating_timer_t *t) {
     return true;
 }
 
-/* Blinks SYSLED.
+/* Blinks SYSLED and resets watchdog.
  *
  */
-void tick() {
-    sysled.state = !sysled.state;
+void sys_tick() {
+    sys.LED = !sys.LED;
 
-    if (sysled.state) {
+    if (sys.LED) {
         put_rgb(8, 0, 0);
     } else {
         put_rgb(0, 8, 0);
     }
+
+    if (!sys.reboot) {
+        uint32_t msg = MSG_WATCHDOG;
+        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+            set_error(ERR_QUEUE_FULL, "SYS", "watchdog: queue full");
+        }
+    }
+}
+
+/* Sets sys.reboot flag to inhibit watchdog reset.
+ *
+ */
+void sys_reboot() {
+    sys.reboot = true;
 }
 
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {

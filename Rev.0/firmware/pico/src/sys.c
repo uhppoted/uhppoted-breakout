@@ -22,10 +22,13 @@
 bool on_tick(repeating_timer_t *);
 
 struct {
+    bool reboot;
     struct repeating_timer timer;
-} sys;
+} sys = {
+    .reboot = false,
+};
 
-bool sysinit() {
+bool sys_init() {
     // ... SYS LED
 #ifndef PICO_DEFAULT_LED_PIN
 #warning blink example requires a board with a regular LED
@@ -69,11 +72,25 @@ bool on_tick(repeating_timer_t *t) {
     return true;
 }
 
-/* SYSLED blink callback.
+/* Blinks SYSLED and resets watchdog.
  *
  */
-void tick() {
+void sys_tick() {
     bool on = gpio_get(PICO_DEFAULT_LED_PIN);
 
     gpio_put(PICO_DEFAULT_LED_PIN, !on);
+
+    if (!sys.reboot) {
+        uint32_t msg = MSG_WATCHDOG;
+        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+            set_error(ERR_QUEUE_FULL, "SYS", "watchdog: queue full");
+        }
+    }
+}
+
+/* Sets sys.reboot flag to inhibit watchdog reset.
+ *
+ */
+void sys_reboot() {
+    sys.reboot = true;
 }

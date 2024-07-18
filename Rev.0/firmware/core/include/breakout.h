@@ -11,6 +11,7 @@ extern const uint32_t MSG_USB;
 extern const uint32_t MSG_WIO;
 extern const uint32_t MSG_U3;
 extern const uint32_t MSG_TICK;
+extern const uint32_t MSG_WATCHDOG;
 
 extern const uint I2C0_SDA;
 extern const uint I2C0_SCL;

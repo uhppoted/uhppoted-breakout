@@ -43,6 +43,7 @@
 (?) Slightly larger pads for soldering
 (?) https://www.chipquik.com/store/product_info.php?products_id=1900050
 (?) Jumper VBAT to VDD for no battery option
+(?) https://www.flux.ai/p
 
 ### RX8900SA
 1. RX8025

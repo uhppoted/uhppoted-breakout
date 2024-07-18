@@ -71,4 +71,5 @@ target_link_libraries(
     hardware_i2c
     hardware_pio 
     hardware_uart
+    hardware_watchdog
 )

@@ -1,5 +1,6 @@
 #pragma once
 
-extern bool sysinit();
+extern bool sys_init();
+extern void sys_tick();
+extern void sys_reboot();
 extern void dispatch(uint32_t);
-extern void tick();

@@ -2,6 +2,8 @@
 
 #include <pico/stdlib.h>
 
+#include <hardware/watchdog.h>
+
 #include <U2.h>
 #include <U3.h>
 #include <breakout.h>
@@ -36,6 +38,10 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_TICK) {
-        tick();
+        sys_tick();
+    }
+
+    if ((v & MSG) == MSG_WATCHDOG) {
+        watchdog_update();
     }
 }

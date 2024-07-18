@@ -14,6 +14,7 @@
 #include <cli.h>
 #include <log.h>
 #include <state.h>
+#include <sys.h>
 #include <txrx.h>
 
 typedef struct CLI {
@@ -46,8 +47,8 @@ void get_doors();
 void get_buttons();
 
 void state();
-void reset();
 void scan();
+void reboot();
 
 void clear();
 void help();
@@ -196,10 +197,10 @@ void exec(char *cmd) {
         get_buttons();
     } else if (strncasecmp(cmd, "state", 5) == 0) {
         state();
-    } else if (strncasecmp(cmd, "reset", 5) == 0) {
-        reset();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
         scan();
+    } else if (strncasecmp(cmd, "reboot", 6) == 0) {
+        reboot();
     } else if (strncasecmp(cmd, "clear", 5) == 0) {
         clear();
     } else if (strncasecmp(cmd, "help", 4) == 0) {
@@ -223,10 +224,6 @@ void state() {
     printf(">>> U3    %s\n", get_error(ERR_U3) ? "error" : "ok");
     printf(">>> U4    %s\n", get_error(ERR_U4) ? "error" : "ok");
     printf(">>> other %s\n", get_error(ERR_UNKNOWN) ? "error" : "ok");
-}
-
-void reset() {
-    RTC_reset();
 }
 
 void get_datetime() {
@@ -455,6 +452,14 @@ void scan() {
     I2C1_scan();
 }
 
+/* Tight loop until watchdog reboots the system.
+ *
+ */
+void reboot() {
+    printf("   ... rebooting ... ");
+    sys_reboot();
+}
+
 /* Clears the terminal.
  *
  */
@@ -486,8 +491,8 @@ void help() {
     printf("  get buttons\n");
     printf("\n");
     printf("  state\n");
-    printf("  reset\n");
     printf("  scan\n");
+    printf("  reboot\n");
     printf("\n");
     printf("  clear\n");
     printf("  help\n");

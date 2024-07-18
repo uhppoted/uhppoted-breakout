@@ -11,26 +11,15 @@
       - compile time constant
 - [ ] Remove unused I2C0/I2C1 functions
 
-### Watchdog
-  - [ ] initialise
-  - [ ] reset
-  - [ ] reboot
-
 ### CLI
-    - (?) command line
-    - (?) UI thread
+    - [ ] command area
     - [ ] Dangling '['
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
-### U2 PCAL6408A
-    - [x] Decode all readers
-    - [x] Read timeout
-    - [x] Decode keypad
-          - [x] 8-bit keycodes
-          - [x] process keycode on code timeout
-    - [x] Max timeout/chattering
-    - [x] Limit read rate
-    - [x] 100kHz/400kHz compile flag
+### Watchdog
+  - [x] enable
+  - [x] reset
+  - [x] reboot
 
 ### log
    - [x] Queue log writes
@@ -75,10 +64,6 @@
       - (?) https://www.flickr.com/photos/28521811@N04/
       - (?) https://github.com/stevenj/GenPinoutSVG
       - (?) https://yaqwsx.github.io/Pinion/
-
-## KiCad schematic
-- https://www.flux.ai/p
-
 
 ## Notes
 
