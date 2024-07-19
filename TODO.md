@@ -1,8 +1,8 @@
 # TODO
 
-- [x] Rev 0.1
+- [x] Schematic/PCB Rev 0.1
       - [x] RTC Schottky diodes and resistor
-      - [ ] Tidy up PCB layout
+      - [x] Rework PCB layout
 
 - [ ] pico: txrx/uart conflict
 - [ ] debounce simulation
