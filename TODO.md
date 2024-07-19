@@ -1,9 +1,5 @@
 # TODO
 
-- [x] Schematic/PCB Rev 0.1
-      - [x] RTC Schottky diodes and resistor
-      - [x] Rework PCB layout
-
 - [ ] pico: txrx/uart conflict
 - [ ] debounce simulation
 - [ ] controller ID
@@ -12,14 +8,21 @@
 - [ ] Remove unused I2C0/I2C1 functions
 
 ### CLI
-    - [ ] command area
+    - [ ] command line
+          - [ ] set initial scroll area
+          - [x] set scroll area
+          - [x] print command results to command area
+          - [ ] initialise on connected
+          - [ ] reset command timer on rx char
+          - [x] ANSI/VT100 codes
+          - (?) help panel
     - [ ] Dangling '['
+    - [ ] Print date/time on startup
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
-### Watchdog
-  - [x] enable
-  - [x] reset
-  - [x] reboot
+### U5 RX8900SA
+    - [ ] initialise on-chip RTC from RX8900SA
+    - [ ] store date/time to PSRAM
 
 ### log
    - [x] Queue log writes

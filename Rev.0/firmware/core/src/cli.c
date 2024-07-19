@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,9 +19,11 @@
 #include <txrx.h>
 
 typedef struct CLI {
-    int32_t timer;
-    int ix;
+    int rows;
+    int columns;
     char buffer[64];
+    int ix;
+    int32_t timer;
 } CLI;
 
 const uint32_t CLI_TIMEOUT = 10000; // ms
@@ -29,6 +32,8 @@ const uint8_t height = 25;
 int64_t cli_timeout(alarm_id_t id, void *data);
 void echo(const char *line);
 void clearline();
+void cpr(char *cmd);
+void display(const char *fmt, ...);
 void exec(char *cmd);
 
 void get_datetime();
@@ -54,16 +59,25 @@ void clear();
 void help();
 void debug();
 
+CLI cli = {
+    .rows = 40,
+    .columns = 120,
+    .buffer = {0},
+    .ix = 0,
+    .timer = -1,
+};
+
+extern const char *TERMINAL_CLEAR;
+extern const char *TERMINAL_QUERY;
+extern const char *TERMINAL_SET_SCROLL_AREA;
+extern const char *TERMINAL_ECHO;
+extern const char *TERMINAL_CLEARLINE;
+extern const char *TERMINAL_DISPLAY;
+
 /** Processes received characters.
  *
  */
 void rx(char *received) {
-    static CLI cli = {
-        .timer = -1,
-        .ix = 0,
-        .buffer = {0},
-    };
-
     if (cli.timer > 0) {
         cancel_alarm(cli.timer);
         cli.timer = 0;
@@ -84,16 +98,17 @@ void rx(char *received) {
             continue;
         }
 
-        // // VT100 escape code?
-        // if (cli.buffer[0] == 27 && ch == 'R' && (cli.ix < sizeof(cli.buffer) - 1)) { // VT100 cursor position report
-        //     cli.buffer[cli.ix++] = ch;
-        //     cli.buffer[cli.ix] = 0;
-        //
-        //     cpr(&cli.buffer[1]);
-        //     memset(cli.buffer, 0, sizeof(cli.buffer));
-        //     cli.ix = 0;
-        //     continue;
-        // }
+        // // VT100 cursor position report (ESC[#;#R)
+        if (cli.buffer[0] == 27 && ch == 'R' && (cli.ix < sizeof(cli.buffer) - 1)) {
+            cli.buffer[cli.ix++] = ch;
+            cli.buffer[cli.ix] = 0;
+
+            cpr(&cli.buffer[1]);
+            memset(cli.buffer, 0, sizeof(cli.buffer));
+            cli.ix = 0;
+
+            continue;
+        }
 
         // backspace?
         if (ch == 8) {
@@ -114,7 +129,7 @@ void rx(char *received) {
             cli.buffer[cli.ix++] = ch;
             cli.buffer[cli.ix] = 0;
 
-            // ... echo if normal command and not a VT100 code
+            // ... echo if normal command and not a VT100/ANSI code
             if (cli.buffer[0] != 27) {
                 echo(cli.buffer);
             }
@@ -139,33 +154,102 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
     return 0;
 }
 
-/* Redisplays the current command buffer and clears trailing characters.
+/* Clears the terminal and queries window size
+ *
+ * Ref. https://www.gnu.org/software/screen/manual/html_node/Control-Sequences.html
+ *      - ESC c          Reset to Initial State
+ *      - ESC H          Erase entire Screen
+ *      - ESC [2J        Erase entire Screen
+ *      - ESC 7          Save cursor and attributes (VT100)
+ *      - ESC 8          Restore cursor and attributes (VT100)
+ *      - ESC [s         Save cursor and attributes (ANSI)
+ *      - ESC [u         Restore cursor and attributes (ANSI)
+ *      - ESC [###;###H  Set cursor position
+ *      - ESC [6n        Send cursor position report
+ *      - ESC [###;###r  Set scroll area
+ */
+void clear() {
+    // ... reset terminal and clear screen
+    fputs(TERMINAL_CLEAR, stdout);
+    fflush(stdout);
+
+    // ... get window size
+    fputs(TERMINAL_QUERY, stdout);
+    fflush(stdout);
+}
+
+/* Cursor position report.
+ *  Sets the scrolling window with space at the bottom for the command echo.
+ *      - ESC [###;###r  Set scroll area
+ */
+void cpr(char *cmd) {
+    int rows;
+    int cols;
+    int rc = sscanf(cmd, "[%d;%dR", &rows, &cols);
+
+    if (rc > 0) {
+        cli.rows = rows;
+        cli.columns = cols;
+
+        if (rows > 20) {
+            int h = rows - 5;
+            char s[24];
+
+            snprintf(s, sizeof(s), TERMINAL_SET_SCROLL_AREA, h); // ANSI
+            fputs(s, stdout);
+            fflush(stdout);
+        }
+    }
+}
+
+/* Saves the cursor position, displays the current command buffer and then restores
+ *  the cursor position
  *
  */
 void echo(const char *cmd) {
+    int h = cli.rows - 4;
     char s[64];
-    snprintf(s, sizeof(s), "\r>> %s\033[0K", cmd);
+
+    snprintf(s, sizeof(s), TERMINAL_ECHO, h, cmd); // ANSI
     fputs(s, stdout);
     fflush(stdout);
 }
 
 /* Saves the cursor position, clears the command line, redisplays the prompt and then
- * restores the cursor position.
+ *   restores the cursor position.
  *
  */
 void clearline() {
-    //     char s[24];
-    //     snprintf(s, sizeof(s), "\0337\033[%d;0H>> \033[0K\0338", height);
-    //     fputs(s, stdout);
-    //     fflush(stdout);
-    //
-    echo("");
+    int h = cli.rows - 4;
+    char s[24];
+
+    snprintf(s, sizeof(s), TERMINAL_CLEARLINE, h); // ANSI
+    fputs(s, stdout);
+    fflush(stdout);
+}
+
+/* Saves the cursor position, displays the command output and then restores the cursor
+ *   position
+ *
+ */
+void display(const char *fmt, ...) {
+    int y = cli.rows - 3;
+    char text[256];
+    char s[256];
+
+    va_list args;
+
+    va_start(args, fmt);
+    vsnprintf(text, sizeof(text), fmt, args);
+    va_end(args);
+
+    snprintf(s, sizeof(s), TERMINAL_DISPLAY, y, text);
+    fputs(s, stdout);
+    fflush(stdout);
 }
 
 void exec(char *cmd) {
     char s[128];
-
-    printf("\n");
 
     if (strncasecmp(cmd, "get datetime", 12) == 0) {
         get_datetime();
@@ -208,7 +292,7 @@ void exec(char *cmd) {
     } else if (strncasecmp(cmd, "debug", 5) == 0) {
         debug();
     } else {
-        printf(">>>> ???? %s\n", cmd);
+        display("unknown command (%s)\n", cmd);
     }
 }
 
@@ -218,12 +302,12 @@ void debug() {
 }
 
 void state() {
-    printf(">>> I2C   %s\n", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
-    printf(">>> queue %s\n", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
-    printf(">>> RTC   %s\n", get_error(ERR_RX8900SA) ? "error" : "ok");
-    printf(">>> U3    %s\n", get_error(ERR_U3) ? "error" : "ok");
-    printf(">>> U4    %s\n", get_error(ERR_U4) ? "error" : "ok");
-    printf(">>> other %s\n", get_error(ERR_UNKNOWN) ? "error" : "ok");
+    debugf("CLI", ">>> I2C   %s\n", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
+    debugf("CLI", ">>> queue %s\n", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
+    debugf("CLI", ">>> RTC   %s\n", get_error(ERR_RX8900SA) ? "error" : "ok");
+    debugf("CLI", ">>> U3    %s\n", get_error(ERR_U3) ? "error" : "ok");
+    debugf("CLI", ">>> U4    %s\n", get_error(ERR_U4) ? "error" : "ok");
+    debugf("CLI", ">>> other %s\n", get_error(ERR_UNKNOWN) ? "error" : "ok");
 }
 
 void get_datetime() {
@@ -233,7 +317,7 @@ void get_datetime() {
     RTC_get_date(date, 11);
     RTC_get_time(time, 11);
 
-    printf(">>> %s %s\n", date, time);
+    display("get-datetime: %s %s\n", date, time);
 }
 
 void set_datetime(const char *cmd) {
@@ -248,18 +332,18 @@ void set_datetime(const char *cmd) {
     if ((rc = sscanf(cmd, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day, &hour, &minute, &second)) == 6) {
         RTC_set_date(year, month, day);
         RTC_set_time(hour, minute, second);
-        printf("ok\n");
+        display("set-datetime: ok");
         return;
     }
 
     if ((rc = sscanf(cmd, "%04d-%02d-%02d %02d:%02d", &year, &month, &day, &hour, &minute)) == 5) {
         RTC_set_date(year, month, day);
         RTC_set_time(hour, minute, 0);
-        printf("ok\n");
+        display("set-datetime: ok");
         return;
     }
 
-    printf(">> invalid date (%s)\n", cmd);
+    display("*** INVALID DATE/TIME (%s)", cmd);
 }
 
 void get_date() {
@@ -267,7 +351,7 @@ void get_date() {
 
     RTC_get_date(date, 11);
 
-    printf(">>> %s\n", date);
+    display("get-date: %s", date);
 }
 
 void set_date(const char *cmd) {
@@ -278,11 +362,11 @@ void set_date(const char *cmd) {
 
     if ((rc = sscanf(cmd, "%04d-%02d-%02d", &year, &month, &day)) == 3) {
         RTC_set_date(year, month, day);
-        printf("ok\n");
+        display("set-date: ok");
         return;
     }
 
-    printf(">> invalid date (%s)\n", cmd);
+    display("*** INVALID DATE (%s)", cmd);
 }
 
 void get_time() {
@@ -290,7 +374,7 @@ void get_time() {
 
     RTC_get_time(time, 11);
 
-    printf(">>> %s\n", time);
+    display("get-time: %s", time);
 }
 
 void set_time(const char *cmd) {
@@ -301,17 +385,17 @@ void set_time(const char *cmd) {
 
     if ((rc = sscanf(cmd, "%02d:%02d:%02d", &hour, &minute, &second)) == 3) {
         RTC_set_time(hour, minute, second);
-        printf("ok\n");
+        display("set-time: ok");
         return;
     }
 
     if ((rc = sscanf(cmd, "%02d:%02d", &hour, &minute)) == 2) {
         RTC_set_time(hour, minute, 0);
-        printf("ok\n");
+        display("set-time: ok");
         return;
     }
 
-    printf(">> invalid time (%s)\n", cmd);
+    display("*** INVALID TIME (%s)", cmd);
 }
 
 void get_weekday() {
@@ -319,7 +403,7 @@ void get_weekday() {
 
     RTC_get_dow(weekday, 10);
 
-    printf(">>> %s\n", weekday);
+    display("get-weekday: %s", weekday);
 }
 
 void unlock_door(const char *cmd) {
@@ -331,7 +415,7 @@ void unlock_door(const char *cmd) {
 
         if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
             U4_set_relay(relay, 5000);
-            printf("ok\n");
+            display("unlock door: ok");
         }
     }
 }
@@ -345,7 +429,7 @@ void lock_door(const char *cmd) {
 
         if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
             U4_clear_relay(relay);
-            printf("ok\n");
+            display("lock-door: ok");
         }
     }
 }
@@ -364,7 +448,7 @@ void set_LED(const char *cmd, bool state) {
             } else {
                 U4_clear_LED(LED);
             }
-            printf("ok\n");
+            display("set-LED: ok");
             return;
         }
 
@@ -374,7 +458,7 @@ void set_LED(const char *cmd, bool state) {
             } else {
                 U4_clear_ERR();
             }
-            printf("ok\n");
+            display("set-ERR: ok");
             return;
         }
 
@@ -384,7 +468,7 @@ void set_LED(const char *cmd, bool state) {
             } else {
                 U4_clear_IN();
             }
-            printf("ok\n");
+            display("set-IN: ok");
             return;
         }
 
@@ -394,7 +478,7 @@ void set_LED(const char *cmd, bool state) {
             } else {
                 U4_clear_SYS();
             }
-            printf("ok\n");
+            display("set-SYS: ok");
             return;
         }
     }
@@ -409,25 +493,25 @@ void blink_LED(const char *cmd) {
 
         if ((rc = sscanf(cmd, "%u", &LED)) == 1) {
             U4_blink_LED(LED, 5, 500);
-            printf("ok\n");
+            display("blink-LED: ok");
             return;
         }
 
         if (strncasecmp(cmd, "ERR", 3) == 0) {
             U4_blink_ERR(5, 500);
-            printf("ok\n");
+            display("blink-ERR: ok");
             return;
         }
 
         if (strncasecmp(cmd, "IN", 2) == 0) {
             U4_blink_IN(5, 500);
-            printf("ok\n");
+            display("blink-IN: ok");
             return;
         }
 
         if (strncasecmp(cmd, "SYS", 3) == 0) {
             U4_blink_SYS(5, 500);
-            printf("ok\n");
+            display("blink-SYS: ok");
             return;
         }
     }
@@ -436,14 +520,14 @@ void blink_LED(const char *cmd) {
 void get_doors() {
     for (uint8_t door = 1; door <= 4; door++) {
         bool open = U3_get_door(door);
-        printf(">>> door %u %s\n", door, open ? "open" : "closed");
+        display("door %u %s", door, open ? "open" : "closed");
     };
 }
 
 void get_buttons() {
     for (uint8_t door = 1; door <= 4; door++) {
         bool pressed = U3_get_button(door);
-        printf(">>> button %u %s\n", door, pressed ? "pressed" : "released");
+        display("button %u %s", door, pressed ? "pressed" : "released");
     };
 }
 
@@ -456,45 +540,35 @@ void scan() {
  *
  */
 void reboot() {
-    printf("   ... rebooting ... ");
+    display("... rebooting ... ");
     sys_reboot();
 }
 
-/* Clears the terminal.
- *
- */
-void clear() {
-    fputs("\033c\033[2J", stdout);
-    fflush(stdout);
-
-    // set_scroll_area();
-}
-
 void help() {
-    printf("BREAKOUT Rev.0\n");
-    printf("\n");
-    printf("Commands:\n");
-    printf("  get date\n");
-    printf("  set date <YYYY-MM-DD>\n");
-    printf("  get time\n");
-    printf("  set time <HH:MM:SS>\n");
-    printf("  get datetime\n");
-    printf("  set datetime <YYYY-MM-DD HH:MM:SS>\n");
-    printf("  get weekday\n");
-    printf("\n");
-    printf("  unlock door <1|2|3|4>\n");
-    printf("  lock door <1|2|3|4>\n");
-    printf("  set LED <1|2|3|4|SYS|IN|ERR>\n");
-    printf("  clear LED <1|2|3|4|SYS|IN|ERR>\n");
-    printf("\n");
-    printf("  get doors\n");
-    printf("  get buttons\n");
-    printf("\n");
-    printf("  state\n");
-    printf("  scan\n");
-    printf("  reboot\n");
-    printf("\n");
-    printf("  clear\n");
-    printf("  help\n");
-    printf("\n");
+    infof("CLI", "BREAKOUT Rev.0");
+    infof("CLI", "");
+    infof("CLI", "Commands:");
+    infof("CLI", "  get date");
+    infof("CLI", "  set date <YYYY-MM-DD>");
+    infof("CLI", "  get time");
+    infof("CLI", "  set time <HH:MM:SS>");
+    infof("CLI", "  get datetime");
+    infof("CLI", "  set datetime <YYYY-MM-DD HH:MM:SS>");
+    infof("CLI", "  get weekday");
+    infof("CLI", "");
+    infof("CLI", "  unlock door <1|2|3|4>");
+    infof("CLI", "  lock door <1|2|3|4>");
+    infof("CLI", "  set LED <1|2|3|4|SYS|IN|ERR>");
+    infof("CLI", "  clear LED <1|2|3|4|SYS|IN|ERR>");
+    infof("CLI", "");
+    infof("CLI", "  get doors");
+    infof("CLI", "  get buttons");
+    infof("CLI", "");
+    infof("CLI", "  state");
+    infof("CLI", "  scan");
+    infof("CLI", "  reboot");
+    infof("CLI", "");
+    infof("CLI", "  clear");
+    infof("CLI", "  help");
+    infof("CLI", "");
 }
