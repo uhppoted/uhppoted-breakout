@@ -73,6 +73,37 @@ extern const char *TERMINAL_SET_SCROLL_AREA;
 extern const char *TERMINAL_ECHO;
 extern const char *TERMINAL_CLEARLINE;
 extern const char *TERMINAL_DISPLAY;
+extern const char *TERMINAL_AT;
+
+const char *HELP[] = {
+    "",
+    "",
+    "BREAKOUT Rev.0",
+    "",
+    "Commands:",
+    "  get date",
+    "  set date <YYYY-MM-DD>",
+    "  get time",
+    "  set time <HH:MM:SS>",
+    "  get datetime",
+    "  set datetime <YYYY-MM-DD HH:MM:SS>",
+    "  get weekday",
+    "",
+    "  unlock door <1|2|3|4>",
+    "  lock door <1|2|3|4>",
+    "  set LED <1|2|3|4|SYS|IN|ERR>",
+    "  clear LED <1|2|3|4|SYS|IN|ERR>",
+    "",
+    "  get doors",
+    "  get buttons",
+    "",
+    "  state",
+    "  scan",
+    "  reboot",
+    "",
+    "  clear",
+    "  help",
+    ""};
 
 /** Processes received characters.
  *
@@ -156,17 +187,6 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
 
 /* Clears the terminal and queries window size
  *
- * Ref. https://www.gnu.org/software/screen/manual/html_node/Control-Sequences.html
- *      - ESC c          Reset to Initial State
- *      - ESC H          Erase entire Screen
- *      - ESC [2J        Erase entire Screen
- *      - ESC 7          Save cursor and attributes (VT100)
- *      - ESC 8          Restore cursor and attributes (VT100)
- *      - ESC [s         Save cursor and attributes (ANSI)
- *      - ESC [u         Restore cursor and attributes (ANSI)
- *      - ESC [###;###H  Set cursor position
- *      - ESC [6n        Send cursor position report
- *      - ESC [###;###r  Set scroll area
  */
 void clear() {
     // ... reset terminal and clear screen
@@ -179,8 +199,8 @@ void clear() {
 }
 
 /* Cursor position report.
+ *
  *  Sets the scrolling window with space at the bottom for the command echo.
- *      - ESC [###;###r  Set scroll area
  */
 void cpr(char *cmd) {
     int rows;
@@ -195,7 +215,7 @@ void cpr(char *cmd) {
             int h = rows - 5;
             char s[24];
 
-            snprintf(s, sizeof(s), TERMINAL_SET_SCROLL_AREA, h); // ANSI
+            snprintf(s, sizeof(s), TERMINAL_SET_SCROLL_AREA, h);
             fputs(s, stdout);
             fflush(stdout);
         }
@@ -210,7 +230,7 @@ void echo(const char *cmd) {
     int h = cli.rows - 4;
     char s[64];
 
-    snprintf(s, sizeof(s), TERMINAL_ECHO, h, cmd); // ANSI
+    snprintf(s, sizeof(s), TERMINAL_ECHO, h, cmd);
     fputs(s, stdout);
     fflush(stdout);
 }
@@ -223,7 +243,7 @@ void clearline() {
     int h = cli.rows - 4;
     char s[24];
 
-    snprintf(s, sizeof(s), TERMINAL_CLEARLINE, h); // ANSI
+    snprintf(s, sizeof(s), TERMINAL_CLEARLINE, h);
     fputs(s, stdout);
     fflush(stdout);
 }
@@ -545,30 +565,14 @@ void reboot() {
 }
 
 void help() {
-    infof("CLI", "BREAKOUT Rev.0");
-    infof("CLI", "");
-    infof("CLI", "Commands:");
-    infof("CLI", "  get date");
-    infof("CLI", "  set date <YYYY-MM-DD>");
-    infof("CLI", "  get time");
-    infof("CLI", "  set time <HH:MM:SS>");
-    infof("CLI", "  get datetime");
-    infof("CLI", "  set datetime <YYYY-MM-DD HH:MM:SS>");
-    infof("CLI", "  get weekday");
-    infof("CLI", "");
-    infof("CLI", "  unlock door <1|2|3|4>");
-    infof("CLI", "  lock door <1|2|3|4>");
-    infof("CLI", "  set LED <1|2|3|4|SYS|IN|ERR>");
-    infof("CLI", "  clear LED <1|2|3|4|SYS|IN|ERR>");
-    infof("CLI", "");
-    infof("CLI", "  get doors");
-    infof("CLI", "  get buttons");
-    infof("CLI", "");
-    infof("CLI", "  state");
-    infof("CLI", "  scan");
-    infof("CLI", "  reboot");
-    infof("CLI", "");
-    infof("CLI", "  clear");
-    infof("CLI", "  help");
-    infof("CLI", "");
+    int N = sizeof(HELP) / sizeof(char *);
+    int X = cli.columns - 48;
+    int Y = 0;
+    char s[128];
+
+    for (int i = 0; i < N; i++) {
+        snprintf(s, sizeof(s), TERMINAL_AT, Y + i, X, HELP[i]);
+        fputs(s, stdout);
+        fflush(stdout);
+    }
 }

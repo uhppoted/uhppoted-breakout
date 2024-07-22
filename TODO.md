@@ -9,13 +9,13 @@
 
 ### CLI
     - [ ] command line
-          - [ ] help panel
-          - [ ] set initial scroll area
+          - [x] ANSI/VT100 codes
           - [x] set scroll area
           - [x] print command results to command area
+          - [x] help panel
+          - [ ] set initial scroll area
           - [ ] initialise on connected
           - [ ] reset command timer on rx char
-          - [x] ANSI/VT100 codes
     - [ ] Dangling '['
     - [ ] Print date/time on startup
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
