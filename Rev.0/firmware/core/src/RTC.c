@@ -183,7 +183,10 @@ void RTC_read(void *data) {
                 RTC.dow = dow;
             }
 
-            RTC.ready = true;
+            if (!RTC.ready) {
+                RTC.ready = true;
+                infof("RTC", "READY %04d-%02d-%02d %02d:%02d:%02d", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
+            }
 
             mutex_exit(&RTC.guard);
         }

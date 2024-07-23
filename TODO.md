@@ -19,10 +19,10 @@
           - [ ] initialise on connected
           - [ ] reset command timer on rx char
     - [ ] Dangling '['
-    - [ ] Print date/time on startup
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
 ### U5 RX8900SA
+    - [x] Print date/time on ready
     - [ ] initialise on-chip RTC from RX8900SA
 
 ### log
