@@ -1,18 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <hardware/uart.h>
 #include <pico/stdlib.h>
 
-#include <U2.h>
-#include <U3.h>
 #include <breakout.h>
-#include <cli.h>
 #include <log.h>
 #include <state.h>
 #include <sys.h>
 #include <tty.h>
-#include <txrx.h>
 
 #define BAUD_RATE 115200
 #define DATA_BITS 8

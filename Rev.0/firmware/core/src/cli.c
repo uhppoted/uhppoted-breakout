@@ -16,7 +16,6 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
-#include <txrx.h>
 
 typedef struct CLI {
     int rows;

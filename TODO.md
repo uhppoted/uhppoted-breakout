@@ -7,6 +7,8 @@
       - compile time constant
 - [x] Remove unused I2C0/I2C1 functions
 
+### SMP
+
 ### CLI
     - [ ] command line
           - [x] ANSI/VT100 codes

@@ -13,8 +13,8 @@
 #include <RTC.h>
 #include <breakout.h>
 #include <log.h>
+#include <smp.h>
 #include <sys.h>
-#include <txrx.h>
 
 #define VERSION "v0.0"
 #define I2C0SDA 12
@@ -63,12 +63,12 @@ int main() {
     // ... initialise RTC, IO expanders and serial port
     RTC_init();
     IOX_init();
-    TXRX_init();
+    SMP_init();
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();
     IOX_start();
-    TXRX_start();
+    SMP_start();
 
     // ... run loop
     while (true) {

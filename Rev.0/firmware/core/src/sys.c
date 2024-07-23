@@ -9,8 +9,8 @@
 #include <breakout.h>
 #include <cli.h>
 #include <log.h>
+#include <smp.h>
 #include <sys.h>
-#include <txrx.h>
 
 void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_DEBUG) {
@@ -27,7 +27,7 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_RX) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        TXRX_rx(b);
+        SMP_rx(b);
         free(b);
     }
 
