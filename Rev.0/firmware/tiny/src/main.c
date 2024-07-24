@@ -5,7 +5,6 @@
 #include <pico/multicore.h>
 #include <pico/stdlib.h>
 
-#include <hardware/rtc.h>
 #include <hardware/watchdog.h>
 
 #include <I2C0.h>
@@ -75,7 +74,6 @@ int main() {
     RTC_start();
     IOX_start();
     SMP_start();
-    rtc_init();
 
     // ... run loop
     while (true) {

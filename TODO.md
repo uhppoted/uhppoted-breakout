@@ -27,7 +27,7 @@
 
 ### U5 RX8900SA
     - [x] Print date/time on ready
-    - [ ] initialise on-chip RTC from RX8900SA
+    - [x] initialise on-chip RTC from RX8900SA
     - (?) Initial delay for on-board RTC
 
 ### log

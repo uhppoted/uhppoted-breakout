@@ -77,6 +77,7 @@ typedef struct datetime {
 void RTC_init() {
     infof("RTC", "init");
 
+    // ... initialise RX8900SA
     int err;
 
     if ((err = RX8900SA_init(U5)) == ERR_OK) {
@@ -91,6 +92,7 @@ void RTC_init() {
 
     mutex_init(&RTC.guard);
 
+    // ... initialise on-board RTC
     datetime_t t = {
         .year = 2020,
         .month = 1,
@@ -101,6 +103,7 @@ void RTC_init() {
         .sec = 0,
     };
 
+    rtc_init();
     rtc_set_datetime(&t);
 
     infof("RTC", "initialised %p", &RTC);
@@ -138,7 +141,7 @@ void RTC_setup() {
 }
 
 /*
- * Starts scheduled update.
+ * Synchronizes on-board RTC to RX8900SA every 60s.
  */
 void RTC_start() {
     infof("RTC", "start");
@@ -152,7 +155,7 @@ void RTC_start() {
         set_error(ERR_QUEUE_FULL, "RTC", "update: queue full");
     }
 
-    add_repeating_timer_ms(1000, RTC_on_update, NULL, &RTC.timer);
+    add_repeating_timer_ms(60000, RTC_on_update, NULL, &RTC.timer);
 }
 
 bool RTC_on_update(repeating_timer_t *rt) {
@@ -297,11 +300,19 @@ void RTC_reset() {
 
 void RTC_get_date(char *yymmmdd, int N) {
     if (RTC.initialised && RTC.ready) {
-        mutex_enter_blocking(&RTC.guard);
-        uint16_t year = RTC.year;
-        uint8_t month = RTC.month;
-        uint8_t day = RTC.day;
-        mutex_exit(&RTC.guard);
+        // mutex_enter_blocking(&RTC.guard);
+        // uint16_t year = RTC.year;
+        // uint8_t month = RTC.month;
+        // uint8_t day = RTC.day;
+        // mutex_exit(&RTC.guard);
+
+        datetime_t dt;
+
+        rtc_get_datetime(&dt);
+
+        uint16_t year = dt.year;
+        uint8_t month = dt.month;
+        uint8_t day = dt.day;
 
         snprintf(yymmmdd, N, "%04u-%02u-%02u", year, month, day);
     } else {
@@ -320,24 +331,41 @@ void RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
         dt->yyyymmdd.day = day;
         dt->yyyymmdd.dow = weekday;
 
-        closure task = {
+        closure write = {
             .f = RTC_write,
             .data = dt,
         };
 
-        if (!I2C0_push(&task)) {
+        closure read = {
+            .f = RTC_read,
+            .data = &RTC,
+        };
+
+        if (!I2C0_push(&write)) {
             set_error(ERR_QUEUE_FULL, "RTC", "set-date: queue full");
+        }
+
+        if (!I2C0_push(&read)) {
+            set_error(ERR_QUEUE_FULL, "RTC", "update: queue full");
         }
     }
 }
 
 void RTC_get_time(char *HHmmss, int N) {
     if (RTC.initialised && RTC.ready) {
-        mutex_enter_blocking(&RTC.guard);
-        uint8_t hour = RTC.hour;
-        uint8_t minute = RTC.minute;
-        uint8_t second = RTC.second;
-        mutex_exit(&RTC.guard);
+        // mutex_enter_blocking(&RTC.guard);
+        // uint8_t hour = RTC.hour;
+        // uint8_t minute = RTC.minute;
+        // uint8_t second = RTC.second;
+        // mutex_exit(&RTC.guard);
+
+        datetime_t dt;
+
+        rtc_get_datetime(&dt);
+
+        uint8_t hour = dt.hour;
+        uint8_t minute = dt.min;
+        uint8_t second = dt.sec;
 
         snprintf(HHmmss, N, "%02u:%02u:%02u", hour, minute, second);
     } else {
@@ -354,12 +382,21 @@ void RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
         dt->HHmmss.minute = minute;
         dt->HHmmss.second = second;
 
-        closure task = {
+        closure write = {
             .f = RTC_write,
             .data = dt,
         };
 
-        if (!I2C0_push(&task)) {
+        closure read = {
+            .f = RTC_read,
+            .data = &RTC,
+        };
+
+        if (!I2C0_push(&write)) {
+            set_error(ERR_QUEUE_FULL, "RTC", "set-time: queue full");
+        }
+
+        if (!I2C0_push(&read)) {
             set_error(ERR_QUEUE_FULL, "RTC", "set-time: queue full");
         }
     }
@@ -367,23 +404,45 @@ void RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
 
 void RTC_get_dow(char *weekday, int N) {
     if (RTC.initialised && RTC.ready) {
-        mutex_enter_blocking(&RTC.guard);
-        uint8_t dow = RTC.dow;
-        mutex_exit(&RTC.guard);
+        // mutex_enter_blocking(&RTC.guard);
+        // uint8_t dow = RTC.dow;
+        // mutex_exit(&RTC.guard);
+        //
+        // if (RTC.dow == SUNDAY) {
+        //     snprintf(weekday, N, "Sunday");
+        // } else if (RTC.dow == MONDAY) {
+        //     snprintf(weekday, N, "Monday");
+        // } else if (RTC.dow == TUESDAY) {
+        //     snprintf(weekday, N, "Tuesday");
+        // } else if (RTC.dow == WEDNESDAY) {
+        //     snprintf(weekday, N, "Wednesday");
+        // } else if (RTC.dow == THURSDAY) {
+        //     snprintf(weekday, N, "Thursday");
+        // } else if (RTC.dow == FRIDAY) {
+        //     snprintf(weekday, N, "Friday");
+        // } else if (RTC.dow == SATURDAY) {
+        //     snprintf(weekday, N, "Saturday");
+        // } else {
+        //     snprintf(weekday, N, "???");
+        // }
 
-        if (RTC.dow == SUNDAY) {
+        datetime_t dt;
+
+        rtc_get_datetime(&dt);
+
+        if (dt.dotw == 0) {
             snprintf(weekday, N, "Sunday");
-        } else if (RTC.dow == MONDAY) {
+        } else if (dt.dotw == 1) {
             snprintf(weekday, N, "Monday");
-        } else if (RTC.dow == TUESDAY) {
+        } else if (dt.dotw == 2) {
             snprintf(weekday, N, "Tuesday");
-        } else if (RTC.dow == WEDNESDAY) {
+        } else if (dt.dotw == 3) {
             snprintf(weekday, N, "Wednesday");
-        } else if (RTC.dow == THURSDAY) {
+        } else if (dt.dotw == 4) {
             snprintf(weekday, N, "Thursday");
-        } else if (RTC.dow == FRIDAY) {
+        } else if (dt.dotw == 5) {
             snprintf(weekday, N, "Friday");
-        } else if (RTC.dow == SATURDAY) {
+        } else if (dt.dotw == 6) {
             snprintf(weekday, N, "Saturday");
         } else {
             snprintf(weekday, N, "???");
