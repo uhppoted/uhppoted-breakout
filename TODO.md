@@ -5,7 +5,6 @@
 - [ ] controller ID
       - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
       - compile time constant
-- [x] Remove unused I2C0/I2C1 functions
 
 ### SMP
 
@@ -15,9 +14,11 @@
           - [x] set scroll area
           - [x] print command results to command area
           - [x] help panel
-          - [ ] set initial scroll area
           - [ ] initialise on connected
+                - [ ] // FIXME remove - delay to let USB initialise
+          - [ ] set initial scroll area
           - [ ] reset command timer on rx char
+          - [ ] timeout is weird
     - [ ] Dangling '['
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 

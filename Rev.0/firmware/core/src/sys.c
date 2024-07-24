@@ -33,7 +33,7 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_TTY) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        rx(b);
+        cli_rx(b);
         free(b);
     }
 

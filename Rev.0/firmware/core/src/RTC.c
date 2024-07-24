@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <hardware/rtc.h>
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
@@ -17,6 +18,7 @@ void RTC_read(void *data);
 void RTC_write(void *data);
 bool RTC_on_update(repeating_timer_t *rt);
 uint8_t dow(uint16_t year, uint8_t month, uint8_t day);
+uint8_t weekday2dow(uint8_t weekday);
 
 struct {
     bool initialised;
@@ -36,13 +38,13 @@ struct {
     .initialised = false,
     .ready = false,
 
-    .year = 2000,
-    .month = 12,
-    .day = 31,
+    .year = 2020,
+    .month = 1,
+    .day = 1,
     .hour = 0,
     .minute = 0,
     .second = 0,
-    .dow = 1,
+    .dow = 0x08, // Wednesday
 };
 
 typedef enum {
@@ -89,6 +91,18 @@ void RTC_init() {
 
     mutex_init(&RTC.guard);
 
+    datetime_t t = {
+        .year = 2020,
+        .month = 1,
+        .day = 1,
+        .dotw = 3,
+        .hour = 0,
+        .min = 0,
+        .sec = 0,
+    };
+
+    rtc_set_datetime(&t);
+
     infof("RTC", "initialised %p", &RTC);
 }
 
@@ -129,6 +143,15 @@ void RTC_setup() {
 void RTC_start() {
     infof("RTC", "start");
 
+    closure task = {
+        .f = RTC_read,
+        .data = &RTC,
+    };
+
+    if (!I2C0_push(&task)) {
+        set_error(ERR_QUEUE_FULL, "RTC", "update: queue full");
+    }
+
     add_repeating_timer_ms(1000, RTC_on_update, NULL, &RTC.timer);
 }
 
@@ -156,36 +179,55 @@ void RTC_read(void *data) {
         uint8_t hour = 0;
         uint8_t minute = 0;
         uint8_t second = 0;
-        uint8_t dow = 0;
+        uint8_t weekday = 0;
+        bool ok = true;
         int err;
 
         if (mutex_try_enter(&RTC.guard, NULL)) {
+
             if ((err = RX8900SA_get_date(U5, &year, &month, &day)) != ERR_OK) {
                 set_error(ERR_RX8900SA, "RTC", "get-date error %d", err);
+                ok = false;
             } else {
                 RTC.year = year;
                 RTC.month = month;
                 RTC.day = day;
-                RTC.dow = dow;
             }
 
             if ((err = RX8900SA_get_time(U5, &hour, &minute, &second)) != ERR_OK) {
                 set_error(ERR_RX8900SA, "RTC", "get-time error %d", err);
+                ok = false;
             } else {
                 RTC.hour = hour;
                 RTC.minute = minute;
                 RTC.second = second;
             }
 
-            if ((err = RX8900SA_get_dow(U5, &dow)) != ERR_OK) {
+            if ((err = RX8900SA_get_dow(U5, &weekday)) != ERR_OK) {
                 set_error(ERR_RX8900SA, "RTC", "get-dow error %d", err);
+                ok = false;
             } else {
-                RTC.dow = dow;
+                RTC.dow = weekday;
             }
 
-            if (!RTC.ready) {
+            if (!RTC.ready && ok) {
                 RTC.ready = true;
                 infof("RTC", "READY %04d-%02d-%02d %02d:%02d:%02d", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
+            }
+
+            // // ... update onboard RTC
+            if (ok) {
+                datetime_t t = {
+                    .year = RTC.year,
+                    .month = RTC.month,
+                    .day = RTC.day,
+                    .dotw = weekday2dow(weekday),
+                    .hour = RTC.hour,
+                    .min = RTC.minute,
+                    .sec = RTC.second,
+                };
+
+                rtc_set_datetime(&t);
             }
 
             mutex_exit(&RTC.guard);
@@ -378,5 +420,25 @@ uint8_t dow(uint16_t year, uint8_t month, uint8_t day) {
         return SATURDAY;
     default:
         return SUNDAY;
+    }
+}
+
+uint8_t weekday2dow(uint8_t weekday) {
+    if (weekday == SUNDAY) {
+        return 0;
+    } else if (weekday == MONDAY) {
+        return 1;
+    } else if (weekday == TUESDAY) {
+        return 2;
+    } else if (weekday == WEDNESDAY) {
+        return 3;
+    } else if (weekday == THURSDAY) {
+        return 4;
+    } else if (weekday == FRIDAY) {
+        return 5;
+    } else if (weekday == SATURDAY) {
+        return 6;
+    } else {
+        return 0;
     }
 }

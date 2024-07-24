@@ -66,11 +66,14 @@ pico_add_extra_outputs(breakout)
 
 target_link_libraries(
     breakout 
+
     pico_stdlib
     pico_multicore
     pico_sync
+
     hardware_i2c
     hardware_pio 
     hardware_uart
     hardware_watchdog
+    hardware_rtc
 )

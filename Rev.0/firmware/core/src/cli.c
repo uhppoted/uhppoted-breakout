@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "hardware/rtc.h"
 #include "pico/stdlib.h"
+#include "pico/util/datetime.h"
 
 #include <I2C0.h>
 #include <I2C1.h>
@@ -104,10 +106,19 @@ const char *HELP[] = {
     "  help",
     ""};
 
+/** Sets the scroll area.
+ *
+ */
+void cli_init() {
+    // printf(">>> INIT\n");
+    // fputs(TERMINAL_QUERY, stdout);
+    // fflush(stdout);
+}
+
 /** Processes received characters.
  *
  */
-void rx(char *received) {
+void cli_rx(char *received) {
     if (cli.timer > 0) {
         cancel_alarm(cli.timer);
         cli.timer = 0;
@@ -128,7 +139,7 @@ void rx(char *received) {
             continue;
         }
 
-        // // VT100 cursor position report (ESC[#;#R)
+        // cursor position report (ESC[#;#R)
         if (cli.buffer[0] == 27 && ch == 'R' && (cli.ix < sizeof(cli.buffer) - 1)) {
             cli.buffer[cli.ix++] = ch;
             cli.buffer[cli.ix] = 0;
@@ -316,8 +327,14 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    debugf("CLI", "debug - I2C0 CLOCK  %s", I2C0_CLOCK);
-    debugf("CLI", "debug - I2C1 CLOCK  %s", I2C1_CLOCK);
+    datetime_t t;
+
+    rtc_get_datetime(&t);
+
+    char s[128];
+    datetime_to_str(s, 128, &t);
+
+    display("RTC %s", s);
 }
 
 void state() {

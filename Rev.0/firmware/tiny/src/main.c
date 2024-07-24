@@ -5,6 +5,7 @@
 #include <pico/multicore.h>
 #include <pico/stdlib.h>
 
+#include <hardware/rtc.h>
 #include <hardware/watchdog.h>
 
 #include <I2C0.h>
@@ -12,6 +13,7 @@
 #include <IOX.h>
 #include <RTC.h>
 #include <breakout.h>
+#include <cli.h>
 #include <log.h>
 #include <smp.h>
 #include <sys.h>
@@ -57,7 +59,7 @@ int main() {
     I2C1_init();
 
     multicore_launch_core1(I2C0_run);
-    sleep_ms(1000);
+    sleep_ms(1000); // FIXME remove - delay to let USB initialise
     printf(">> BREAKOUT %s\n", VERSION);
 
     // ... initialise RTC, IO expanders and serial port
@@ -69,6 +71,7 @@ int main() {
     RTC_start();
     IOX_start();
     SMP_start();
+    rtc_init();
 
     // ... run loop
     while (true) {
@@ -78,6 +81,10 @@ int main() {
 
         if ((v & MSG) == MSG_USB) {
             bool connected = (v & 0x0fffffff) == 1;
+            if (connected) {
+                cli_init();
+            }
+
             infof("SYS", "USB connected: %s", connected ? "yes" : "no");
         }
     }
