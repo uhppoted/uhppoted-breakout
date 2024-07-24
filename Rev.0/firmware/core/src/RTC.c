@@ -104,6 +104,7 @@ void RTC_init() {
     };
 
     rtc_init();
+    sleep_us(64);
     rtc_set_datetime(&t);
 
     infof("RTC", "initialised %p", &RTC);

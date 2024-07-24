@@ -60,8 +60,8 @@ int main() {
     I2C1_init();
 
     multicore_launch_core1(I2C0_run);
+    
     sleep_ms(1000); // FIXME remove - delay to let USB initialise
-
     snprintf(s, sizeof(s), ">> BREAKOUT %s", VERSION);
     println(s);
 
