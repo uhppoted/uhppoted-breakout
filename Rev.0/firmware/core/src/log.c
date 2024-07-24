@@ -5,6 +5,8 @@
 
 #include <pico/util/queue.h>
 
+#include <sys.h>
+
 struct {
     queue_t queue;
     repeating_timer_t timer;
@@ -30,7 +32,7 @@ bool log_tick(repeating_timer_t *rt) {
     char *msg = NULL;
     if (queue_try_remove(&LOG.queue, &msg)) {
         if (msg != NULL) {
-            printf("%s\n", msg);
+            println(msg);
             free(msg);
         }
     }

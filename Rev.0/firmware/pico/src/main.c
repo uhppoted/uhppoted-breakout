@@ -53,11 +53,15 @@ int main() {
     }
 
     // ... initialise FIFO, timers and I2C
+    char s[64];
+
     I2C0_init();
     I2C1_init();
 
     multicore_launch_core1(I2C0_run);
-    printf(">> BREAKOUT %s\n", VERSION);
+
+    snprintf(s,sizeof(s),">> BREAKOUT %s", VERSION);
+    println(s);
 
     // ... initialise RTC, IO expanders and serial port
     RTC_init();

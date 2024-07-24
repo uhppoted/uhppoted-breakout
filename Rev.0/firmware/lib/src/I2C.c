@@ -3,7 +3,7 @@
 
 #include <I2C.h>
 #include <breakout.h>
-#include <log.h>
+#include <sys.h>
 
 bool reserved_addr(uint8_t addr);
 
@@ -114,26 +114,38 @@ int I2C_read_all(I2C dev, uint8_t reg, uint8_t *data, int N) {
 
 // Performs a 1-byte dummy read of all unreserved I2C addresses.
 void I2C_scan(i2c_inst_t *bus, const char *title) {
-    printf("\n%s\n", title);
-    printf("   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F\n");
+    char s[128];
+    int ix = 0;
+
+    snprintf(s, sizeof(s), "\n%s", title);
+    println(s);
+
+    snprintf(s, sizeof(s), "   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F");
+    println(s);
 
     for (int addr = 0; addr < (1 << 7); ++addr) {
         if (addr % 16 == 0) {
-            printf("%02x ", addr);
+            ix += sprintf(&s[ix], "%02x ", addr);
         }
 
         // ... skip over any reserved addresses.
         uint8_t data;
 
         if (reserved_addr(addr)) {
-            printf("x");
+            ix += sprintf(&s[ix], "x");
         } else if (i2c_read_blocking(bus, addr, &data, 1, false) < 0) {
-            printf(".");
+            ix += sprintf(&s[ix], ".");
         } else {
-            printf("@");
+            ix += sprintf(&s[ix], "@");
         }
 
-        printf(addr % 16 == 15 ? "\n" : "  ");
+        if (addr % 16 == 15) {
+            println(s);
+            ix = 0;
+            continue;
+        }
+
+        ix += sprintf(&s[ix], "  ");
     }
 }
 

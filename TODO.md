@@ -22,9 +22,13 @@
     - [ ] Dangling '['
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
+### I2C
+    - [ ] scan 'guard'
+
 ### U5 RX8900SA
     - [x] Print date/time on ready
     - [ ] initialise on-chip RTC from RX8900SA
+    - (?) Initial delay for on-board RTC
 
 ### log
    - [x] Queue log writes

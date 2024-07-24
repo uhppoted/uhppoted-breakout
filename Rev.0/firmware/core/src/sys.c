@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <pico/stdlib.h>
@@ -44,4 +45,12 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_WATCHDOG) {
         watchdog_update();
     }
+}
+
+void print(const char *msg) {
+    printf("%s", msg);
+}
+
+void println(const char *msg) {
+    printf("%s\n", msg);
 }

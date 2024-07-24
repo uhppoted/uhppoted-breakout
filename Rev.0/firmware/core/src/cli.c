@@ -199,13 +199,8 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
  *
  */
 void clear() {
-    // ... reset terminal and clear screen
-    fputs(TERMINAL_CLEAR, stdout);
-    fflush(stdout);
-
-    // ... get window size
-    fputs(TERMINAL_QUERY, stdout);
-    fflush(stdout);
+    print(TERMINAL_CLEAR);
+    print(TERMINAL_QUERY);
 }
 
 /* Cursor position report.
@@ -226,8 +221,7 @@ void cpr(char *cmd) {
             char s[24];
 
             snprintf(s, sizeof(s), TERMINAL_SET_SCROLL_AREA, h);
-            fputs(s, stdout);
-            fflush(stdout);
+            print(s);
         }
     }
 }
@@ -241,8 +235,7 @@ void echo(const char *cmd) {
     char s[64];
 
     snprintf(s, sizeof(s), TERMINAL_ECHO, h, cmd);
-    fputs(s, stdout);
-    fflush(stdout);
+    print(s);
 }
 
 /* Saves the cursor position, clears the command line, redisplays the prompt and then
@@ -254,8 +247,7 @@ void clearline() {
     char s[24];
 
     snprintf(s, sizeof(s), TERMINAL_CLEARLINE, h);
-    fputs(s, stdout);
-    fflush(stdout);
+    print(s);
 }
 
 /* Saves the cursor position, displays the command output and then restores the cursor
@@ -274,8 +266,7 @@ void display(const char *fmt, ...) {
     va_end(args);
 
     snprintf(s, sizeof(s), TERMINAL_DISPLAY, y, text);
-    fputs(s, stdout);
-    fflush(stdout);
+    print(s);
 }
 
 void exec(char *cmd) {
@@ -588,7 +579,6 @@ void help() {
 
     for (int i = 0; i < N; i++) {
         snprintf(s, sizeof(s), TERMINAL_AT, Y + i, X, HELP[i]);
-        fputs(s, stdout);
-        fflush(stdout);
+        print(s);
     }
 }
