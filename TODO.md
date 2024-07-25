@@ -21,7 +21,8 @@
           - [ ] initialise on connected
           - [ ] set initial scroll area
           - [ ] reset command timer on rx char
-          - [ ] timeout is weird
+          - [x] timeout is weird
+                - **because** add_alarm is inside for loop
     - [ ] Dangling '['
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 

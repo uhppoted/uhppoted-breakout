@@ -27,7 +27,7 @@ typedef struct CLI {
     int32_t timer;
 } CLI;
 
-const uint32_t CLI_TIMEOUT = 10000; // ms
+const uint32_t CLI_TIMEOUT = 5000; // ms
 const uint8_t height = 25;
 
 int64_t cli_timeout(alarm_id_t id, void *data);
@@ -158,10 +158,6 @@ void cli_rx(char *received) {
                 echo(cli.buffer);
             }
 
-            if (cli.ix > 0) {
-                cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
-            }
-
             continue;
         }
 
@@ -175,9 +171,12 @@ void cli_rx(char *received) {
                 echo(cli.buffer);
             }
 
-            cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
             continue;
         }
+    }
+
+    if (cli.ix > 0) {
+        cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
     }
 }
 
