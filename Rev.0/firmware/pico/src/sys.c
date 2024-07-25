@@ -11,6 +11,8 @@
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
+extern void sysinit();
+
 bool on_tick(repeating_timer_t *);
 
 struct {
@@ -49,7 +51,8 @@ bool sys_init() {
 
     uart_set_irq_enables(uart0, true, false);
 
-    // ... logging
+    // ... system stuff
+    sysinit();
     log_init();
 
     return true;

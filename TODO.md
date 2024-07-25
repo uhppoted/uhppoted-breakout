@@ -1,12 +1,16 @@
 # TODO
 
-- [ ] pico: txrx/uart conflict
 - [ ] debounce simulation
 - [ ] controller ID
       - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
       - compile time constant
 
 ### SMP
+   - [ ] SYN
+   - [ ] usb_init
+   - [ ] Enable FIFO
+   - [ ] pico: txrx/uart conflict
+   - https://www.baeldung.com/cs/bisync
 
 ### CLI
     - [ ] command line
@@ -15,7 +19,6 @@
           - [x] print command results to command area
           - [x] help panel
           - [ ] initialise on connected
-                - [ ] // FIXME remove - delay to let USB initialise
           - [ ] set initial scroll area
           - [ ] reset command timer on rx char
           - [ ] timeout is weird
@@ -25,12 +28,8 @@
 ### I2C
     - [ ] scan 'guard'
 
-### U5 RX8900SA
-    - [x] Print date/time on ready
-    - [x] initialise on-chip RTC from RX8900SA
-    - [x] Initial delay for on-board RTC
-
 ### log
+   - [ ] // FIXME remove - delay to let USB initialise
    - [x] Queue log writes
    - [ ] MSG_LOG
    - [ ] Pop first log entry on full
@@ -38,20 +37,10 @@
    - [ ] Partially printing in tight loop (check return value of printf ?)
    - [ ] Wait for USB connected
                
-## UART
-   - [ ] usb_init
-   - [ ] Enable FIFO
-   - [ ] // FIXME use struct with length (or match on SOM/EOM or something)
-   - https://forums.raspberrypi.com/viewtopic.php?t=327189
-   - https://stackoverflow.com/questions/76367736/uart-tx-produce-endless-interrupts-how-to-acknowlage-the-interrupt
-   - https://www.baeldung.com/cs/bisync
-   - https://stackoverflow.com/questions/51609813/serial-communication-in-c-for-raspberry-pi
-   - https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
-   - https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
-
 ## PiZeroW
    - [ ] Reduce power consumption
    - [ ] NB: 24/7 operation - Cam said to ask him
+   - (?) Use Nerves
 
 ### OTA
    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
@@ -97,5 +86,11 @@
 11. https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/
 12. External flash
     - https://mcuoneclipse.com/2022/12/04/add-extra-storage-to-the-raspberry-pi-pico-with-w25q128-and-littlefs
+13. https://forums.raspberrypi.com/viewtopic.php?t=327189
+14. https://stackoverflow.com/questions/76367736/uart-tx-produce-endless-interrupts-how-to-acknowlage-the-interrupt
+15. https://www.baeldung.com/cs/bisync
+16. https://stackoverflow.com/questions/51609813/serial-communication-in-c-for-raspberry-pi
+17. https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
+18. https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
 
 

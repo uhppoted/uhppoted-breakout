@@ -9,6 +9,8 @@
 
 #include "ws2812.pio.h"
 
+extern void sysinit();
+
 bool on_tick(repeating_timer_t *);
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
 
@@ -34,6 +36,7 @@ bool sys_init() {
     }
 
     // ... system stuff
+    sysinit();
     usb_init();
     log_init();
 

@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <pico/stdlib.h>
-
 #include <hardware/watchdog.h>
+#include <pico/stdlib.h>
+#include <pico/sync.h>
 
 #include <U2.h>
 #include <U3.h>
@@ -12,6 +12,16 @@
 #include <log.h>
 #include <smp.h>
 #include <sys.h>
+
+struct {
+    queue_t queue;
+    mutex_t guard;
+} SYSTEM;
+
+void sysinit() {
+    queue_init(&SYSTEM.queue, sizeof(char *), 64);
+    mutex_init(&SYSTEM.guard);
+}
 
 void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_DEBUG) {
@@ -48,9 +58,13 @@ void dispatch(uint32_t v) {
 }
 
 void print(const char *msg) {
+    mutex_enter_blocking(&SYSTEM.guard);
     printf("%s", msg);
+    mutex_exit(&SYSTEM.guard);
 }
 
 void println(const char *msg) {
+    mutex_enter_blocking(&SYSTEM.guard);
     printf("%s\n", msg);
+    mutex_exit(&SYSTEM.guard);
 }
