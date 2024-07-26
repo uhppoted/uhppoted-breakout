@@ -29,7 +29,7 @@
     - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
 ### I2C
-    - [ ] scan 'guard'
+    - [x] scan 'guard'
 
 ### log
    - [ ] // FIXME remove - delay to let USB initialise

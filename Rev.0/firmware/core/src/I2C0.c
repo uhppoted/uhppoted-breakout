@@ -3,6 +3,7 @@
 
 #include <hardware/i2c.h>
 #include <pico/stdlib.h>
+#include <pico/sync.h>
 
 #include <I2C.h>
 #include <I2C0.h>
@@ -11,6 +12,7 @@
 
 struct {
     queue_t queue;
+    mutex_t guard;
 } I2C0;
 
 void I2C0_init() {
@@ -30,6 +32,7 @@ void I2C0_init() {
     gpio_pull_up(I2C0_SCL);
 
     queue_init(&I2C0.queue, sizeof(closure), 32);
+    mutex_init(&I2C0.guard);
 }
 
 void I2C0_run() {
@@ -37,7 +40,10 @@ void I2C0_run() {
 
     while (true) {
         queue_remove_blocking(&I2C0.queue, &v);
+
+        mutex_enter_blocking(&I2C0.guard);
         v.f(v.data);
+        mutex_exit(&I2C0.guard);
     }
 }
 
@@ -51,5 +57,7 @@ bool I2C0_push(const closure *v) {
 }
 
 void I2C0_scan() {
+    mutex_enter_blocking(&I2C0.guard);
     I2C_scan(i2c0, "I2C0 bus scan");
+    mutex_exit(&I2C0.guard);
 }

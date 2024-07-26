@@ -4,6 +4,7 @@
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
+#include <I2C1.h>
 #include <PCAL6408A.h>
 #include <U2.h>
 #include <breakout.h>
@@ -14,6 +15,7 @@ struct reader;
 struct keypad;
 
 void U2_on_interrupt(void);
+void U2_read(void);
 void U2_on_card_read(uint8_t door, uint32_t v);
 void U2_on_keypad_digit(uint8_t door, uint32_t v);
 void U2_on_keycode(uint8_t door, const char *code, int length);
@@ -252,32 +254,36 @@ void U2_tick_keypad(uint8_t door, struct keypad *keypad) {
     }
 }
 
-void U2_on_interrupt(void) {
-    uint8_t isr;
-    uint8_t inputs;
-    int err;
-
+void U2_on_interrupt() {
     if ((gpio_get_irq_event_mask(IOX_INT0) & GPIO_IRQ_LEVEL_LOW) != 0) {
         gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, false);
 
-        if ((err = PCAL6408A_isr(U2, &isr)) != ERR_OK) {
-            warnf("U2", "error reading PCAL6408A ISR (%d)", err);
-        }
-
-        if ((err = PCAL6408A_read(U2, &inputs)) != ERR_OK) {
-            warnf("U2", "error reading PCAL6408A inputs (%d)", err);
-        } else {
-            uint32_t v = inputs & isr;
-            uint32_t msg = MSG_WIO | (v & 0x0fffffff);
-
-            if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-                set_error(ERR_QUEUE_FULL, "U2", "interrupt: queue full");
-            }
-        }
+        I2C1_run(U2_read);
 
         // Ref. https://github.com/raspberrypi/pico-sdk/issues/108
         busy_wait_us_32(tRST);
         gpio_set_irq_enabled(IOX_INT0, GPIO_IRQ_LEVEL_LOW, true);
+    }
+}
+
+void U2_read() {
+    int err;
+    uint8_t isr;
+    uint8_t inputs;
+
+    if ((err = PCAL6408A_isr(U2, &isr)) != ERR_OK) {
+        warnf("U2", "error reading PCAL6408A ISR (%d)", err);
+    }
+
+    if ((err = PCAL6408A_read(U2, &inputs)) != ERR_OK) {
+        warnf("U2", "error reading PCAL6408A inputs (%d)", err);
+    } else {
+        uint32_t v = inputs & isr;
+        uint32_t msg = MSG_WIO | (v & 0x0fffffff);
+
+        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+            set_error(ERR_QUEUE_FULL, "U2", "interrupt: queue full");
+        }
     }
 }
 
