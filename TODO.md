@@ -5,6 +5,9 @@
       - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
       - compile time constant
 
+### emulator
+    - [ ] get-controller
+
 ### SSMP
    - [x] disable print/println in SMP mode
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK

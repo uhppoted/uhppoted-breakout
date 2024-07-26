@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/pkg/term"
+
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/UT0311"
 )
 
 const VERSION = "v0.0"
@@ -30,6 +32,12 @@ func main() {
 
 			time.Sleep(1 * time.Second)
 		}
+	}()
+
+	go func() {
+		uto311 := UT0311.UT0311{}
+
+		uto311.Run()
 	}()
 
 	interrupt := make(chan os.Signal, 1)
