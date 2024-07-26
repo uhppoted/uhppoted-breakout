@@ -5,10 +5,10 @@
       - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
       - compile time constant
 
-### SMP
+### SSMP
    - [x] disable print/println in SMP mode
-   - [ ] SYN-SYN-ENQ/SYN-SYN-ACK
-         - [ ] not able to close term on idle
+   - [x] SYN-SYN-ENQ/SYN-SYN-ACK
+         - [x] not able to close term on idle
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict

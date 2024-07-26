@@ -46,13 +46,13 @@ func read() error {
 	} else {
 		println("  ... connected")
 
-		defer func() {
-			println("closing")
-			if err := t.Close(); err != nil {
-				fmt.Printf("  *** ERROR %v\n", err)
-			}
-			println("closed")
-		}()
+		// NTS: term.Close hangs indefinitely if a read is pending
+		//      (seems happy enough to reopen the connection in any event)
+		// defer func() {
+		// 	if err := t.Close(); err != nil {
+		// 		fmt.Printf("  *** ERROR %v\n", err)
+		// 	}
+		// }()
 
 		if err := t.SetRaw(); err != nil {
 			return err
@@ -105,8 +105,6 @@ func read() error {
 			}
 		}
 
-		println("good to go")
-
 		defer func() {
 			println("exiting apparently")
 		}()
@@ -120,11 +118,9 @@ func read() error {
 				fmt.Printf(">>> READ %v\n", string(reply))
 
 			case <-idle:
-				fmt.Printf(">>> IDLE\n")
 				return fmt.Errorf("idle")
 
 			case err := <-errors:
-				fmt.Printf(">>> ERROR %v\n", err)
 				return err
 			}
 		}
