@@ -6,7 +6,7 @@
       - compile time constant
 
 ### SMP
-   - [ ] disable print/println in SMP mode
+   - [x] disable print/println in SMP mode
    - [ ] SYN-SYN-ENQ/SYN-SYN-ACK
          - [ ] not able to close term on idle
    - [ ] usb_init

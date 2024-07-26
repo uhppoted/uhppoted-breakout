@@ -10,7 +10,7 @@
 #include <breakout.h>
 #include <cli.h>
 #include <log.h>
-#include <smp.h>
+#include <ssmp.h>
 #include <sys.h>
 
 struct {
@@ -43,7 +43,7 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_RX) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        smp_rx(b);
+        ssmp_rx(b);
         free(b);
     }
 
@@ -51,7 +51,7 @@ void dispatch(uint32_t v) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
 
         if (SYSTEM.mode == MODE_SMP) {
-            smp_rx(b);
+            ssmp_rx(b);
         } else {
             cli_rx(b);
         }
@@ -69,13 +69,17 @@ void dispatch(uint32_t v) {
 }
 
 void print(const char *msg) {
-    mutex_enter_blocking(&SYSTEM.guard);
-    printf("%s", msg);
-    mutex_exit(&SYSTEM.guard);
+    if (SYSTEM.mode == MODE_CLI) {
+        mutex_enter_blocking(&SYSTEM.guard);
+        printf("%s", msg);
+        mutex_exit(&SYSTEM.guard);
+    }
 }
 
 void println(const char *msg) {
-    mutex_enter_blocking(&SYSTEM.guard);
-    printf("%s\n", msg);
-    mutex_exit(&SYSTEM.guard);
+    if (SYSTEM.mode == MODE_CLI) {
+        mutex_enter_blocking(&SYSTEM.guard);
+        printf("%s\n", msg);
+        mutex_exit(&SYSTEM.guard);
+    }
 }

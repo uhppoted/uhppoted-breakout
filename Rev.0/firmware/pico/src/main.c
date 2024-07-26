@@ -13,7 +13,7 @@
 #include <RTC.h>
 #include <breakout.h>
 #include <log.h>
-#include <smp.h>
+#include <ssmp.h>
 #include <sys.h>
 
 #define VERSION "v0.0"
@@ -65,12 +65,12 @@ int main() {
     // ... initialise RTC, IO expanders and serial port
     RTC_init();
     IOX_init();
-    smp_init();
+    ssmp_init();
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();
     IOX_start();
-    smp_start();
+    ssmp_start();
 
     // ... run loop
     while (true) {
