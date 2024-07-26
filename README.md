@@ -1,4 +1,4 @@
-![build](https://github.com/uhppoted/uhppote-breakout/workflows/build/badge.svg)
+![build](https://github.com/uhppoted/uhppoted-breakout/workflows/build/badge.svg)
 
 # uhppoted-breakout
 
