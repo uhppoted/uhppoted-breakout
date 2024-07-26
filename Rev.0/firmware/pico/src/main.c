@@ -59,18 +59,18 @@ int main() {
 
     multicore_launch_core1(I2C0_run);
 
-    snprintf(s,sizeof(s),">> BREAKOUT %s", VERSION);
+    snprintf(s, sizeof(s), ">> BREAKOUT %s", VERSION);
     println(s);
 
     // ... initialise RTC, IO expanders and serial port
     RTC_init();
     IOX_init();
-    SMP_init();
+    smp_init();
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();
     IOX_start();
-    SMP_start();
+    smp_start();
 
     // ... run loop
     while (true) {

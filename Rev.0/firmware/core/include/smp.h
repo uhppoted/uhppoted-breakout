@@ -1,6 +1,5 @@
 #pragma once
 
-extern void SMP_init();
-extern void SMP_start();
-extern void SMP_rx();
-extern void SMP_debug();
+extern void smp_init();
+extern void smp_start();
+extern void smp_rx();

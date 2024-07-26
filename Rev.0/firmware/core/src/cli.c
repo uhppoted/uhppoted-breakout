@@ -76,6 +76,11 @@ extern const char *TERMINAL_CLEARLINE;
 extern const char *TERMINAL_DISPLAY;
 extern const char *TERMINAL_AT;
 
+extern const char ENQ;
+extern const char SYN;
+const char CR = '\n';
+const char LF = '\r';
+
 const char *HELP[] = {
     "",
     "",
@@ -128,8 +133,23 @@ void cli_rx(char *received) {
     for (int i = 0; i < N; i++) {
         char ch = received[i];
 
+        // SYN?
+        if (ch == SYN) {
+            memset(cli.buffer, 0, sizeof(cli.buffer));
+            cli.ix = 0;
+            continue;
+        }
+
+        // ENQ?
+        if (ch == ENQ && cli.ix == 0) {
+            memset(cli.buffer, 0, sizeof(cli.buffer));
+            cli.ix = 0;
+            set_mode(MODE_SMP);
+            continue;
+        }
+
         // CRLF ?
-        if (ch == '\n' || ch == '\r') {
+        if (ch == CR || ch == LF) {
             if (cli.ix > 0) {
                 exec(cli.buffer);
             }

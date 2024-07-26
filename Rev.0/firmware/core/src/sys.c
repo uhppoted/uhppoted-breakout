@@ -14,6 +14,7 @@
 #include <sys.h>
 
 struct {
+    mode mode;
     queue_t queue;
     mutex_t guard;
 } SYSTEM;
@@ -21,6 +22,10 @@ struct {
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
     mutex_init(&SYSTEM.guard);
+}
+
+void set_mode(mode mode) {
+    SYSTEM.mode = mode;
 }
 
 void dispatch(uint32_t v) {
@@ -38,13 +43,19 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_RX) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        SMP_rx(b);
+        smp_rx(b);
         free(b);
     }
 
     if ((v & MSG) == MSG_TTY) {
         char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
-        cli_rx(b);
+
+        if (SYSTEM.mode == MODE_SMP) {
+            smp_rx(b);
+        } else {
+            cli_rx(b);
+        }
+
         free(b);
     }
 

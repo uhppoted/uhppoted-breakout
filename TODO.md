@@ -6,7 +6,9 @@
       - compile time constant
 
 ### SMP
-   - [ ] SYN
+   - [ ] disable print/println in SMP mode
+   - [ ] SYN-SYN-ENQ/SYN-SYN-ACK
+         - [ ] not able to close term on idle
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict

@@ -68,12 +68,12 @@ int main() {
     // ... initialise RTC, IO expanders and serial port
     RTC_init();
     IOX_init();
-    SMP_init();
+    smp_init();
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();
     IOX_start();
-    SMP_start();
+    smp_start();
 
     // ... run loop
     while (true) {
