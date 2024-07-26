@@ -1,3 +1,5 @@
+![build](https://github.com/uhppoted/uhppote-breakout/workflows/build/badge.svg)
+
 # uhppoted-breakout
 
 Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers. 
