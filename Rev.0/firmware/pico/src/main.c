@@ -12,15 +12,19 @@
 #include <IOX.h>
 #include <RTC.h>
 #include <breakout.h>
+#include <cli.h>
 #include <log.h>
 #include <ssmp.h>
 #include <sys.h>
 
-#define VERSION "v0.0"
-#define I2C0SDA 8
-#define I2C0SCL 9
-#define I2C1SDA 2
-#define I2C1SCL 3
+#define _VERSION "v0.0"
+#define _I2C0SDA 8
+#define _I2C0SCL 9
+#define _I2C1SDA 2
+#define _I2C1SCL 3
+
+const char *VERSION = _VERSION;
+const uint32_t WATCHDOG_TIMEOUT = 5000; // ms
 
 const uint32_t MSG = 0xf0000000;
 const uint32_t MSG_DEBUG = 0x00000000;
@@ -31,15 +35,13 @@ const uint32_t MSG_TTY = 0xd0000000;
 const uint32_t MSG_WATCHDOG = 0xe0000000;
 const uint32_t MSG_TICK = 0xf0000000;
 
-const uint32_t WATCHDOG_TIMEOUT = 5000; // ms
-
 queue_t queue;
 
 int main() {
     bi_decl(bi_program_description("uhppoted-breakout"));
-    bi_decl(bi_program_version_string(VERSION));
-    bi_decl(bi_2pins_with_func(I2C0SDA, I2C0SCL, GPIO_FUNC_I2C));
-    bi_decl(bi_2pins_with_func(I2C1SDA, I2C1SCL, GPIO_FUNC_I2C));
+    bi_decl(bi_program_version_string(_VERSION));
+    bi_decl(bi_2pins_with_func(_I2C0SDA, _I2C0SCL, GPIO_FUNC_I2C));
+    bi_decl(bi_2pins_with_func(_I2C1SDA, _I2C1SCL, GPIO_FUNC_I2C));
 
     stdio_init_all();
     watchdog_enable(WATCHDOG_TIMEOUT, true);
@@ -71,6 +73,8 @@ int main() {
     RTC_start();
     IOX_start();
     ssmp_start();
+
+    cli_init();
 
     // ... run loop
     while (true) {

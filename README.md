@@ -15,6 +15,7 @@ The breakout board substitutes the removable CPU board with a hackable board tha
 Mostly curiosity? But .. it also opens up the possibility of:
 - IPv6
 - TLS
+- UDP multicast
 - onboard WiFi
 - interfacing with off brand readers and keypads
 - custom access control requirements

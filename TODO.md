@@ -11,31 +11,20 @@
 ### SSMP
    - [x] disable print/println in SMP mode
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK
-         - [x] not able to close term on idle
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
    - https://www.baeldung.com/cs/bisync
 
 ### CLI
-    - [ ] command line
-          - [x] ANSI/VT100 codes
-          - [x] set scroll area
-          - [x] print command results to command area
-          - [x] help panel
-          - [ ] initialise on connected
-          - [ ] set initial scroll area
-          - [ ] reset command timer on rx char
-          - [x] timeout is weird
-                - **because** add_alarm is inside for loop
-    - [ ] Dangling '['
-    - https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
-
-### I2C
-    - [x] scan 'guard'
+   - [x] initialise on connected
+   - [x] set initial scroll area
+   - [x] Dangling '['
+   - [ ] // FIXME remove - delay to let USB initialise
+         - [ ] move queue from log to sys
+         - [ ] pico ?
 
 ### log
-   - [ ] // FIXME remove - delay to let USB initialise
    - [x] Queue log writes
    - [ ] MSG_LOG
    - [ ] Pop first log entry on full
@@ -98,5 +87,6 @@
 16. https://stackoverflow.com/questions/51609813/serial-communication-in-c-for-raspberry-pi
 17. https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
 18. https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
+19. https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 
 
