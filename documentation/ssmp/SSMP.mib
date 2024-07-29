@@ -1,0 +1,46 @@
+UHPPOTED-SSMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+uhppotedSSMP MODULE-IDENTITY
+    LAST-UPDATED "202407290000Z"
+    ORGANIZATION "github.com/uhppoted"
+    CONTACT-INFO    
+        "email: uhppoted.development@gmail.com"
+    DESCRIPTION
+        "MIB objects for the uhppoted breakout board"
+    REVISION "202407290000Z"
+        DESCRIPTION "First draft"
+    ::= { enterprises 65536 }
+
+system OBJECT IDENTIFIER ::= { uhppotedSSMP 1 }
+controller OBJECT IDENTIFIER ::= { system 1 }
+
+controllerId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer object representing the controller ID."
+    ::= { controller 1 }
+
+controllerGroup OBJECT-GROUP
+    OBJECTS { controllerId }
+    STATUS  current
+    DESCRIPTION
+        "Controller configuration information."
+    ::= { system 2 }
+
+compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for the controllerId object."
+    MODULE  -- this module
+    MANDATORY-GROUPS { controllerGroup }
+    ::= { system 3 }
+
+END

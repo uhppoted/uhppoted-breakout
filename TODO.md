@@ -11,6 +11,7 @@
 ### SSMP
    - [x] disable print/println in SMP mode
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK
+   - [ ] MIB
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
