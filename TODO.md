@@ -34,6 +34,7 @@
                
 ### emulator
     - [ ] get-controller
+    - [ ] // TODO: exponential backoff
     - [ ] tinygo
 
 ## PiZeroW

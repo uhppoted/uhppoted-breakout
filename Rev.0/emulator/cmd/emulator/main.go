@@ -95,7 +95,7 @@ func read() error {
 				fmt.Printf("  SYN-SYN-ENQ\n")
 			}
 
-			timeout := time.After(2500 * time.Millisecond)
+			timeout := time.After(30000 * time.Millisecond)
 
 		loop:
 			for {
