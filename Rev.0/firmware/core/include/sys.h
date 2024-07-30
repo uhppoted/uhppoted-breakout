@@ -12,4 +12,5 @@ extern void dispatch(uint32_t);
 
 extern void print(const char *);
 extern void println(const char *);
+extern void printx(char *);
 extern void set_mode(mode);

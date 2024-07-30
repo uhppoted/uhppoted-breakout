@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include <hardware/watchdog.h>
 #include <pico/stdlib.h>
@@ -18,6 +20,8 @@ struct {
     queue_t queue;
     mutex_t guard;
 } SYSTEM;
+
+const int32_t FLUSH = 1000; // ms
 
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
@@ -81,5 +85,45 @@ void println(const char *msg) {
         mutex_enter_blocking(&SYSTEM.guard);
         printf("%s\n", msg);
         mutex_exit(&SYSTEM.guard);
+    }
+}
+
+void printx(char *msg) {
+    if (SYSTEM.mode != MODE_CLI || msg == NULL) {
+        free(msg);
+        return;
+    }
+
+    if (mutex_try_enter(&SYSTEM.guard, NULL)) {
+        printf("%s", msg);
+        free(msg);
+
+        // ... write any pending messages
+        char *pending = NULL;
+
+        while (queue_try_remove(&SYSTEM.queue, &pending)) {
+            int remaining = strlen(pending);
+            int ix = 0;
+            int N;
+
+            while (remaining > 0) {
+                fflush(stdout);
+                if ((N = fwrite(&pending[ix], 1, remaining, stdout)) > 0) {
+                    remaining -= N;
+                    ix += N;
+                } else {
+                    sleep_ms(100);
+                }
+            }
+
+            free(pending);
+        }
+
+        mutex_exit(&SYSTEM.guard);
+        return;
+    }
+
+    if (!queue_try_add(&SYSTEM.queue, &msg)) {
+        free(msg);
     }
 }

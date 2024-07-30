@@ -5,17 +5,16 @@
       - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
       - compile time constant
 
-### emulator
-    - [ ] get-controller
-
 ### SSMP
    - [x] disable print/println in SMP mode
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK
    - [ ] MIB
+   - [ ] GET
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
    - https://www.baeldung.com/cs/bisync
+   - http://www.tcpipguide.com/free/t_SNMPVersion2SNMPv2MessageFormats-5.htm
 
 ### CLI
    - [x] initialise on connected
@@ -33,6 +32,10 @@
    - [ ] Partially printing in tight loop (check return value of printf ?)
    - [ ] Wait for USB connected
                
+### emulator
+    - [ ] get-controller
+    - [ ] tinygo
+
 ## PiZeroW
    - [ ] Reduce power consumption
    - [ ] NB: 24/7 operation - Cam said to ask him

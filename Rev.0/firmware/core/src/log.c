@@ -45,7 +45,7 @@ void debugf(const char *tag, const char *fmt, ...) {
     char format[N + 32];
     char *msg = (char *)calloc(LOG_MSGLENGTH, sizeof(char));
 
-    snprintf(format, sizeof(format), "%-5s  %-10s %s", "DEBUG", tag, fmt);
+    snprintf(format, sizeof(format), "%-5s  %-10s %s\n", "DEBUG", tag, fmt);
 
     va_list args;
 
@@ -53,9 +53,7 @@ void debugf(const char *tag, const char *fmt, ...) {
     vsnprintf(msg, LOG_MSGLENGTH, format, args);
     va_end(args);
 
-    if (queue_is_full(&LOG.queue) || !queue_try_add(&LOG.queue, &msg)) {
-        free(msg);
-    }
+    printx(msg);
 }
 
 void infof(const char *tag, const char *fmt, ...) {
