@@ -22,7 +22,10 @@
    - [x] Dangling '['
    - [ ] // FIXME remove - delay to let USB initialise
          - [x] move queue from log to sys
-         - [ ] hold in queue until USB connected
+         - [x] hold in queue until USB connected
+         - [x] fix dropped messages
+         - [x] // FIXME unblock in sys
+         - [ ] drop block of old messages when queue full (and add '...')
          - [ ] pico ?
 
 ### log

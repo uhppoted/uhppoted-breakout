@@ -1,6 +1,9 @@
+#include <stdio.h>
+
 #include <pico/stdlib.h>
 
 #include <breakout.h>
+#include <cli.h>
 #include <log.h>
 #include <state.h>
 #include <sys.h>
@@ -11,6 +14,7 @@
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
+extern const char *VERSION;
 extern void sysinit();
 
 bool on_tick(repeating_timer_t *);
@@ -52,7 +56,15 @@ bool sys_init() {
     uart_set_irq_enables(uart0, true, false);
 
     // ... system stuff
+    char s[64];
+
+    snprintf(s, sizeof(s), "-----  BREAKOUT   %s", VERSION);
+
     sysinit();
+    cli_init();
+    println(s);
+
+    // ... other stuff
     log_init();
 
     return true;

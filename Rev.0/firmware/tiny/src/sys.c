@@ -1,14 +1,19 @@
+#include <stdio.h>
+
 #include <pico/stdlib.h>
 
 #include <hardware/pio.h>
 
 #include <breakout.h>
+#include <cli.h>
 #include <log.h>
 #include <state.h>
+#include <sys.h>
 #include <usb.h>
 
 #include "ws2812.pio.h"
 
+extern const char *VERSION;
 extern void sysinit();
 
 bool on_tick(repeating_timer_t *);
@@ -36,7 +41,15 @@ bool sys_init() {
     }
 
     // ... system stuff
+    char s[64];
+
+    snprintf(s, sizeof(s), "-----  BREAKOUT   %s", VERSION);
+
     sysinit();
+    cli_init();
+    println(s);
+
+    // ... other stuff
     usb_init();
     log_init();
 

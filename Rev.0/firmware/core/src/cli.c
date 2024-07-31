@@ -68,8 +68,6 @@ CLI cli = {
     .timer = -1,
 };
 
-extern const char *VERSION;
-
 extern const char *TERMINAL_CLEAR;
 extern const char *TERMINAL_QUERY;
 extern const char *TERMINAL_SET_SCROLL_AREA;
@@ -117,13 +115,8 @@ const char *HELP[] = {
  *
  */
 void cli_init() {
-    char s[64];
-
-    snprintf(s, sizeof(s), "-----  BREAKOUT   %s", VERSION);
-
     print(TERMINAL_CLEAR);
     print(TERMINAL_QUERY);
-    println(s);
 }
 
 /** Processes received characters.

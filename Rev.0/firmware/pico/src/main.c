@@ -12,7 +12,6 @@
 #include <IOX.h>
 #include <RTC.h>
 #include <breakout.h>
-#include <cli.h>
 #include <log.h>
 #include <ssmp.h>
 #include <sys.h>
@@ -61,9 +60,6 @@ int main() {
 
     multicore_launch_core1(I2C0_run);
 
-    snprintf(s, sizeof(s), ">> BREAKOUT %s", VERSION);
-    println(s);
-
     // ... initialise RTC, IO expanders and serial port
     RTC_init();
     IOX_init();
@@ -73,8 +69,6 @@ int main() {
     RTC_start();
     IOX_start();
     ssmp_start();
-
-    cli_init();
 
     // ... run loop
     while (true) {

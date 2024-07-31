@@ -1,6 +1,7 @@
 #pragma once
 
 typedef enum {
+    MODE_UNKNOWN,
     MODE_CLI,
     MODE_SMP,
 } mode;

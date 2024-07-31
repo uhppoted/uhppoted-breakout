@@ -12,7 +12,6 @@
 #include <IOX.h>
 #include <RTC.h>
 #include <breakout.h>
-#include <cli.h>
 #include <log.h>
 #include <ssmp.h>
 #include <sys.h>
@@ -48,6 +47,7 @@ int main() {
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
 
+    // ... initialise system
     if (!sys_init()) {
         warnf("SYS", "ERROR INITIALISING SYSTEM");
         return -1;
@@ -81,7 +81,7 @@ int main() {
             bool connected = (v & 0x0fffffff) == 1;
             infof("SYS", "USB connected: %s", connected ? "yes" : "no");
             if (connected) {
-                cli_init();
+                set_mode(MODE_CLI);
             }
         }
     }

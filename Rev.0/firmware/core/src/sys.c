@@ -19,7 +19,9 @@ struct {
     mode mode;
     queue_t queue;
     mutex_t guard;
-} SYSTEM;
+} SYSTEM = {
+    .mode = MODE_UNKNOWN,
+};
 
 const int32_t FLUSH = 1000; // ms
 
@@ -32,6 +34,11 @@ void sysinit() {
 
 void set_mode(mode mode) {
     SYSTEM.mode = mode;
+
+    // ... unblock queue
+    if (mode == MODE_CLI) {
+        print("");
+    }
 }
 
 void dispatch(uint32_t v) {
@@ -75,50 +82,61 @@ void dispatch(uint32_t v) {
 }
 
 void print(const char *msg) {
-    if (SYSTEM.mode == MODE_CLI && msg != NULL) {
-        int N = strlen(msg) + 1;
-        char *s = (char *)calloc(N, sizeof(char));
+    int N = 256; // strlen(msg) + 1;
+    char *s = (char *)calloc(N, sizeof(char));
 
-        snprintf(s, N, "%s", msg);
+    snprintf(s, N, "%s", msg);
+
+    if (SYSTEM.mode == MODE_CLI) {
         _print(s);
+    } else if (!queue_try_add(&SYSTEM.queue, &s)) {
+        free(s);
     }
 }
 
 void println(const char *msg) {
-    if (SYSTEM.mode == MODE_CLI && msg != NULL) {
-        int N = strlen(msg) + 2;
-        char *s = (char *)calloc(N, sizeof(char));
+    int N = 256; // strlen(msg) + 2;
+    char *s = (char *)calloc(N, sizeof(char));
 
-        snprintf(s, N, "%s\n", msg);
+    snprintf(s, N, "%s\n", msg);
+
+    if (SYSTEM.mode == MODE_CLI) {
         _print(s);
+    } else if (!queue_try_add(&SYSTEM.queue, &s)) {
+        free(s);
     }
 }
 
 void _print(char *msg) {
     if (mutex_try_enter(&SYSTEM.guard, NULL)) {
-        printf("%s", msg);
-        free(msg);
-
         // ... write any pending messages
         char *pending = NULL;
 
         while (queue_try_remove(&SYSTEM.queue, &pending)) {
-            int remaining = strlen(pending);
-            int ix = 0;
-            int N;
-
-            while (remaining > 0) {
-                fflush(stdout);
-                if ((N = fwrite(&pending[ix], 1, remaining, stdout)) > 0) {
-                    remaining -= N;
-                    ix += N;
-                } else {
-                    sleep_ms(100);
-                }
-            }
-
+            fflush(stdout);
+            printf("%s", pending);
             free(pending);
+
+            // int remaining = strlen(pending);
+            // int ix = 0;
+            // int N;
+
+            // while (remaining > 0) {
+            //     fflush(stdout);
+            //     if ((N = fwrite(&pending[ix], 1, remaining, stdout)) > 0) {
+            //         remaining -= N;
+            //         ix += N;
+            //     } else {
+            //         sleep_ms(100);
+            //     }
+            // }
+
+            // free(pending);
         }
+
+        // ... write current message
+        printf("%s", msg);
+        free(msg);
 
         mutex_exit(&SYSTEM.guard);
         return;
