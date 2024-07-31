@@ -23,6 +23,8 @@ struct {
 
 const int32_t FLUSH = 1000; // ms
 
+void _print(char *msg);
+
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
     mutex_init(&SYSTEM.guard);
@@ -73,27 +75,26 @@ void dispatch(uint32_t v) {
 }
 
 void print(const char *msg) {
-    if (SYSTEM.mode == MODE_CLI) {
-        mutex_enter_blocking(&SYSTEM.guard);
-        printf("%s", msg);
-        mutex_exit(&SYSTEM.guard);
+    if (SYSTEM.mode == MODE_CLI && msg != NULL) {
+        int N = strlen(msg) + 1;
+        char *s = (char *)calloc(N, sizeof(char));
+
+        snprintf(s, N, "%s", msg);
+        _print(s);
     }
 }
 
 void println(const char *msg) {
-    if (SYSTEM.mode == MODE_CLI) {
-        mutex_enter_blocking(&SYSTEM.guard);
-        printf("%s\n", msg);
-        mutex_exit(&SYSTEM.guard);
+    if (SYSTEM.mode == MODE_CLI && msg != NULL) {
+        int N = strlen(msg) + 2;
+        char *s = (char *)calloc(N, sizeof(char));
+
+        snprintf(s, N, "%s\n", msg);
+        _print(s);
     }
 }
 
-void printx(char *msg) {
-    if (SYSTEM.mode != MODE_CLI || msg == NULL) {
-        free(msg);
-        return;
-    }
-
+void _print(char *msg) {
     if (mutex_try_enter(&SYSTEM.guard, NULL)) {
         printf("%s", msg);
         free(msg);

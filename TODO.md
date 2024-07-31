@@ -21,7 +21,8 @@
    - [x] set initial scroll area
    - [x] Dangling '['
    - [ ] // FIXME remove - delay to let USB initialise
-         - [ ] move queue from log to sys
+         - [x] move queue from log to sys
+         - [ ] hold in queue until USB connected
          - [ ] pico ?
 
 ### log

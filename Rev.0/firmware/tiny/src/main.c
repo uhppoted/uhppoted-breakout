@@ -64,7 +64,7 @@ int main() {
     IOX_init();
     ssmp_init();
 
-    sleep_ms(1000); // FIXME remove - delay to let USB initialise
+    sleep_ms(2500); // FIXME remove - delay to let USB initialise
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();
