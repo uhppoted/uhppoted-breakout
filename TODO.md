@@ -27,6 +27,7 @@
          - [x] // FIXME unblock in sys
          - [x] drop block of old messages when queue full (and add '...')
          - [x] _print
+         - [ ] USB disconnected => mode unknown
          - [ ] pico ?
                - (?) ping for terminal ID
 
