@@ -41,6 +41,8 @@
                
 ### emulator
     - [ ] get-controller
+          - [x] from MIB
+          - [ ] populate MIB from SSMP
     - [ ] // TODO: exponential backoff
     - [ ] tinygo
 

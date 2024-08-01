@@ -1,43 +1,44 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
-	"slices"
 	"syscall"
-	"time"
-
-	"github.com/pkg/term"
 
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/UT0311"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/ssmp"
 )
 
 const VERSION = "v0.0"
-const USB = "/dev/tty.usbmodem14201"
-const SYN byte = 22
-const ENQ byte = 5
-const ACK byte = 6
 
-var SYN_SYN_ACK = []byte{SYN, SYN, ACK}
+var options = struct {
+	USB string
+}{
+	USB: "",
+}
 
 func main() {
-	fmt.Printf("uhppoted-breakout::emulator %v\n\n", VERSION)
+	infof("uhppoted-breakout::emulator %v", VERSION)
+
+	flag.StringVar(&options.USB, "usb", options.USB, "USB TTY device")
+	flag.Parse()
+
+	if options.USB == "" {
+		errorf("invalid USB TTY device")
+		os.Exit(1)
+	}
 
 	go func() {
-		for {
-			if err := read(); err != nil {
-				fmt.Printf("  *** ERROR %v\n", err)
-			}
-
-			time.Sleep(1 * time.Second)
-		}
+		ssmp.SSMP{
+			USB: options.USB,
+		}.Run()
 	}()
 
 	go func() {
-		uto311 := UT0311.UT0311{}
-
-		uto311.Run()
+		UT0311.UT0311{}.Run()
 	}()
 
 	interrupt := make(chan os.Signal, 1)
@@ -48,91 +49,10 @@ func main() {
 	fmt.Printf("  ... interrupted\n")
 }
 
-func read() error {
-	if t, err := term.Open(USB, term.Speed(115200), term.RawMode); err != nil {
-		return err
-	} else {
-		println("  ... connected")
+func infof(format string, args ...any) {
+	log.Infof("emulator", format, args...)
+}
 
-		// NTS: term.Close hangs indefinitely if a read is pending
-		//      (seems happy enough to reopen the connection in any event)
-		// defer func() {
-		// 	if err := t.Close(); err != nil {
-		// 		fmt.Printf("  *** ERROR %v\n", err)
-		// 	}
-		// }()
-
-		if err := t.SetRaw(); err != nil {
-			return err
-		}
-
-		// ... read
-		pipe := make(chan []byte)
-		errors := make(chan error)
-
-		go func() {
-			buffer := make([]byte, 256)
-
-			for {
-				if N, err := t.Read(buffer); err != nil {
-					errors <- err
-					return
-				} else if N > 0 {
-					pipe <- buffer[0:N]
-				}
-			}
-		}()
-
-		// ... send SYN-SYN-ENQ until acknowledged
-	enq:
-		for {
-			cmd := []byte{SYN, SYN, ENQ}
-			if N, err := t.Write(cmd); err != nil {
-				return err
-			} else if N != len(cmd) {
-				return fmt.Errorf("error sending initial ENQ")
-			} else {
-				fmt.Printf("  SYN-SYN-ENQ\n")
-			}
-
-			timeout := time.After(30000 * time.Millisecond)
-
-		loop:
-			for {
-				select {
-				case reply := <-pipe:
-					if slices.Equal(reply, SYN_SYN_ACK) {
-						fmt.Printf("  ACK\n")
-						break enq
-					}
-
-				case <-timeout:
-					fmt.Printf("  TIMEOUT\n")
-					break loop
-				}
-			}
-		}
-
-		defer func() {
-			println("exiting apparently")
-		}()
-
-		// ... TX/RX loop
-		idle := time.After(5000 * time.Millisecond)
-
-		for {
-			select {
-			case reply := <-pipe:
-				fmt.Printf(">>> READ %v\n", string(reply))
-
-			case <-idle:
-				return fmt.Errorf("idle")
-
-			case err := <-errors:
-				return err
-			}
-		}
-
-		return nil
-	}
+func errorf(format string, args ...any) {
+	log.Errorf("emulator", format, args...)
 }

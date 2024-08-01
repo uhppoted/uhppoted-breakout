@@ -6,6 +6,10 @@ import (
 )
 
 func init() {
+	h := handler{}
+	logger := slog.New(&h)
+
+	slog.SetDefault(logger)
 	slog.SetLogLoggerLevel(slog.LevelDebug)
 }
 
