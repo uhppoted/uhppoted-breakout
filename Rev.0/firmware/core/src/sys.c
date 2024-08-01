@@ -27,6 +27,7 @@ const int32_t FLUSH = 1000; // ms
 
 void _push(char *);
 void _flush();
+void _print(const char *);
 
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
@@ -83,21 +84,25 @@ void dispatch(uint32_t v) {
 }
 
 void print(const char *msg) {
-    int N = 256; // strlen(msg) + 1;
-    char *s = (char *)calloc(N, sizeof(char));
+    int N = 256;
+    char *s;
 
-    snprintf(s, N, "%s", msg);
-    _push(s);
-    _flush();
+    if ((s = (char *)calloc(N, sizeof(char))) != NULL) {
+        snprintf(s, N, "%s", msg);
+        _push(s);
+        _flush();
+    }
 }
 
 void println(const char *msg) {
-    int N = 256; // strlen(msg) + 2;
-    char *s = (char *)calloc(N, sizeof(char));
+    int N = 256;
+    char *s;
 
-    snprintf(s, N, "%s\n", msg);
-    _push(s);
-    _flush();
+    if ((s = (char *)calloc(N, sizeof(char))) != NULL) {
+        snprintf(s, N, "%s\n", msg);
+        _push(s);
+        _flush();
+    }
 }
 
 void _push(char *msg) {
@@ -109,11 +114,13 @@ void _push(char *msg) {
             }
         }
 
-        char *dots = (char *)calloc(8, sizeof(char));
+        char *dots;
 
-        snprintf(dots, 8, "...\n", msg);
-        if (!queue_try_add(&SYSTEM.queue, &dots)) {
-            free(dots);
+        if ((dots = (char *)calloc(8, sizeof(char))) != NULL) {
+            snprintf(dots, 8, "...\n", msg);
+            if (!queue_try_add(&SYSTEM.queue, &dots)) {
+                free(dots);
+            }
         }
     }
 
@@ -134,27 +141,30 @@ void _flush() {
         char *pending = NULL;
 
         while (queue_try_remove(&SYSTEM.queue, &pending)) {
-            fflush(stdout);
-            printf("%s", pending);
+            _print(pending);
             free(pending);
-
-            // int remaining = strlen(pending);
-            // int ix = 0;
-            // int N;
-
-            // while (remaining > 0) {
-            //     fflush(stdout);
-            //     if ((N = fwrite(&pending[ix], 1, remaining, stdout)) > 0) {
-            //         remaining -= N;
-            //         ix += N;
-            //     } else {
-            //         sleep_ms(100);
-            //     }
-            // }
-
-            // free(pending);
         }
 
         mutex_exit(&SYSTEM.guard);
+    }
+}
+
+/* Prints all of a message to stdout.
+ *
+ */
+void _print(const char *msg) {
+    int remaining = strlen(msg);
+    int ix = 0;
+    int N;
+
+    while (remaining > 0) {
+        fflush(stdout);
+
+        if ((N = fwrite(&msg[ix], 1, remaining, stdout)) <= 0) {
+            return;
+        } else {
+            remaining -= N;
+            ix += N;
+        }
     }
 }

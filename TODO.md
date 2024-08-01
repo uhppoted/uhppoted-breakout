@@ -26,7 +26,7 @@
          - [x] fix dropped messages
          - [x] // FIXME unblock in sys
          - [x] drop block of old messages when queue full (and add '...')
-         - [ ] _print to print all of a message i.e. check printf return
+         - [x] _print
          - [ ] pico ?
                - (?) ping for terminal ID
 
