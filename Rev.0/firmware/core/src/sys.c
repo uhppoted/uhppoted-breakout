@@ -25,7 +25,8 @@ struct {
 
 const int32_t FLUSH = 1000; // ms
 
-void _print(char *msg);
+void _push(char *);
+void _flush();
 
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
@@ -86,12 +87,8 @@ void print(const char *msg) {
     char *s = (char *)calloc(N, sizeof(char));
 
     snprintf(s, N, "%s", msg);
-
-    if (SYSTEM.mode == MODE_CLI) {
-        _print(s);
-    } else if (!queue_try_add(&SYSTEM.queue, &s)) {
-        free(s);
-    }
+    _push(s);
+    _flush();
 }
 
 void println(const char *msg) {
@@ -99,17 +96,41 @@ void println(const char *msg) {
     char *s = (char *)calloc(N, sizeof(char));
 
     snprintf(s, N, "%s\n", msg);
+    _push(s);
+    _flush();
+}
 
-    if (SYSTEM.mode == MODE_CLI) {
-        _print(s);
-    } else if (!queue_try_add(&SYSTEM.queue, &s)) {
-        free(s);
+void _push(char *msg) {
+    if (queue_is_full(&SYSTEM.queue)) {
+        for (int i = 0; i < 4; i++) {
+            char *pending = NULL;
+            if (queue_try_remove(&SYSTEM.queue, &pending)) {
+                free(pending);
+            }
+        }
+
+        char *dots = (char *)calloc(8, sizeof(char));
+
+        snprintf(dots, 8, "...\n", msg);
+        if (!queue_try_add(&SYSTEM.queue, &dots)) {
+            free(dots);
+        }
+    }
+
+    if (!queue_try_add(&SYSTEM.queue, &msg)) {
+        free(msg);
     }
 }
 
-void _print(char *msg) {
+/* Flushes all pending messages to stdout.
+ *
+ */
+void _flush() {
+    if (SYSTEM.mode != MODE_CLI) {
+        return;
+    }
+
     if (mutex_try_enter(&SYSTEM.guard, NULL)) {
-        // ... write any pending messages
         char *pending = NULL;
 
         while (queue_try_remove(&SYSTEM.queue, &pending)) {
@@ -134,15 +155,6 @@ void _print(char *msg) {
             // free(pending);
         }
 
-        // ... write current message
-        printf("%s", msg);
-        free(msg);
-
         mutex_exit(&SYSTEM.guard);
-        return;
-    }
-
-    if (!queue_try_add(&SYSTEM.queue, &msg)) {
-        free(msg);
     }
 }

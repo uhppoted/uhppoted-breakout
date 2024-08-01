@@ -20,13 +20,15 @@
    - [x] initialise on connected
    - [x] set initial scroll area
    - [x] Dangling '['
-   - [ ] // FIXME remove - delay to let USB initialise
+   - [x] // FIXME remove - delay to let USB initialise
          - [x] move queue from log to sys
          - [x] hold in queue until USB connected
          - [x] fix dropped messages
          - [x] // FIXME unblock in sys
-         - [ ] drop block of old messages when queue full (and add '...')
+         - [x] drop block of old messages when queue full (and add '...')
+         - [ ] _print to print all of a message i.e. check printf return
          - [ ] pico ?
+               - (?) ping for terminal ID
 
 ### log
    - [x] Queue log writes
