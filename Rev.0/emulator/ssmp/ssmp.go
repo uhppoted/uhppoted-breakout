@@ -13,6 +13,10 @@ type SSMP struct {
 	USB string
 }
 
+func Get(oid []uint32) (any, error) {
+	return uint32(405419896), nil
+}
+
 func (ssmp SSMP) Run() {
 	for {
 		if err := read(ssmp.USB); err != nil {

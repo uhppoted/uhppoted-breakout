@@ -6,7 +6,7 @@
       - compile time constant
 
 ### SSMP
-   - [x] disable print/println in SMP mode
+   - [x] disable print/println in SSMP mode
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK
    - [ ] MIB
    - [ ] GET
@@ -27,18 +27,10 @@
          - [x] // FIXME unblock in sys
          - [x] drop block of old messages when queue full (and add '...')
          - [x] _print
-         - [ ] USB disconnected => mode unknown
+         - [x] USB disconnected => mode unknown
          - [ ] pico ?
                - (?) ping for terminal ID
 
-### log
-   - [x] Queue log writes
-   - [ ] MSG_LOG
-   - [ ] Pop first log entry on full
-   - [ ] Print '...' after queue full
-   - [ ] Partially printing in tight loop (check return value of printf ?)
-   - [ ] Wait for USB connected
-               
 ### emulator
     - [ ] get-controller
           - [x] from MIB

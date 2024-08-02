@@ -107,7 +107,7 @@ void println(const char *msg) {
 
 void _push(char *msg) {
     if (queue_is_full(&SYSTEM.queue)) {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 16; i++) {
             char *pending = NULL;
             if (queue_try_remove(&SYSTEM.queue, &pending)) {
                 free(pending);
