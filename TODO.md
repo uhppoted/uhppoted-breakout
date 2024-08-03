@@ -15,6 +15,7 @@
    - [ ] pico: txrx/uart conflict
    - https://www.baeldung.com/cs/bisync
    - http://www.tcpipguide.com/free/t_SNMPVersion2SNMPv2MessageFormats-5.htm
+   - https://www.ranecommercial.com/legacy/note161.html
 
 ### CLI
    - [x] initialise on connected

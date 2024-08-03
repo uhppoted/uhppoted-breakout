@@ -2,10 +2,14 @@ package ssmp
 
 import (
 	"fmt"
+	syslog "log"
+	"os"
 	"slices"
 	"time"
 
+	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/term"
+
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
 )
 
@@ -14,6 +18,37 @@ type SSMP struct {
 }
 
 func Get(oid []uint32) (any, error) {
+	logger := gosnmp.NewLogger(syslog.New(os.Stdout, "", 0))
+
+	pdu := gosnmp.SnmpPDU{
+		Value: nil,
+		Name:  ".1.3.6.655136.1.1",
+		Type:  gosnmp.Null,
+	}
+
+	packet := gosnmp.SnmpPacket{
+		Version:         gosnmp.Version1,
+		ContextEngineID: "ssmp",
+		ContextName:     "ssmp",
+		Community:       "public",
+		PDUType:         gosnmp.GetRequest,
+		MsgID:           1,
+		RequestID:       1,
+		MsgMaxSize:      512,
+		Error:           gosnmp.NoError,
+		ErrorIndex:      0,
+		NonRepeaters:    0,
+		MaxRepetitions:  0,
+		Variables:       []gosnmp.SnmpPDU{pdu},
+		Logger:          logger,
+	}
+
+	if bytes, err := packet.MarshalMsg(); err != nil {
+		fmt.Printf(">>>>>>>>> ERROR %v\n", err)
+	} else {
+		fmt.Printf(">>>>>>>>> PDU %v\n", bytes)
+	}
+
 	return uint32(405419896), nil
 }
 
