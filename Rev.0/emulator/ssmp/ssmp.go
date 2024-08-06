@@ -5,6 +5,7 @@ import (
 	syslog "log"
 	"os"
 	"slices"
+	"sync/atomic"
 	"time"
 
 	"github.com/gosnmp/gosnmp"
@@ -16,6 +17,14 @@ import (
 type SSMP struct {
 	USB string
 }
+
+type request struct {
+	id     uint32
+	packet []byte
+}
+
+var write = make(chan request)
+var rqid = atomic.Uint32{}
 
 func Get(oid []uint32) (any, error) {
 	logger := gosnmp.NewLogger(syslog.New(os.Stdout, "", 0))
@@ -44,9 +53,17 @@ func Get(oid []uint32) (any, error) {
 	}
 
 	if bytes, err := packet.MarshalMsg(); err != nil {
-		fmt.Printf(">>>>>>>>> ERROR %v\n", err)
+		return nil, err
 	} else {
-		fmt.Printf(">>>>>>>>> PDU %v\n", bytes)
+		id := rqid.Add(1)
+		if encoded, err := encode(id, bytes); err != nil {
+			return nil, err
+		} else {
+			write <- request{
+				id:     id,
+				packet: encoded,
+			}
+		}
 	}
 
 	return uint32(405419896), nil
@@ -54,7 +71,7 @@ func Get(oid []uint32) (any, error) {
 
 func (ssmp SSMP) Run() {
 	for {
-		if err := read(ssmp.USB); err != nil {
+		if err := ssmp.read(); err != nil {
 			errorf("%v", err)
 		}
 
@@ -62,8 +79,8 @@ func (ssmp SSMP) Run() {
 	}
 }
 
-func read(USB string) error {
-	if t, err := term.Open(USB, term.Speed(115200), term.RawMode); err != nil {
+func (ssmp SSMP) read() error {
+	if t, err := term.Open(ssmp.USB, term.Speed(9600), term.RawMode); err != nil {
 		return err
 	} else {
 		infof("connected")
@@ -109,7 +126,7 @@ func read(USB string) error {
 				debugf("SYN-SYN-ENQ")
 			}
 
-			timeout := time.After(30000 * time.Millisecond)
+			timeout := time.After(1000 * time.Millisecond)
 
 		loop:
 			for {
@@ -128,12 +145,20 @@ func read(USB string) error {
 		}
 
 		// ... TX/RX loop
-		idle := time.After(5000 * time.Millisecond)
+		idle := time.After(39000 * time.Millisecond)
 
 		for {
 			select {
 			case reply := <-pipe:
-				debugf("read %v", string(reply))
+				debugf("read %v %v", len(reply), reply)
+
+			case request := <-write:
+				debugf("write %v", request)
+				if N, err := t.Write(request.packet); err != nil {
+					warnf("write error (%v)", err)
+				} else {
+					debugf("write (%v bytes)", N)
+				}
 
 			case <-idle:
 				return fmt.Errorf("idle")

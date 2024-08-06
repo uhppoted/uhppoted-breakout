@@ -10,6 +10,7 @@
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK
    - [ ] MIB
    - [ ] GET
+         - // FIXME doesn't work with binary protocol
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
