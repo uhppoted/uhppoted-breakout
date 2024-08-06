@@ -76,6 +76,10 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_TICK) {
         sys_tick();
+
+        if (SYSTEM.mode == MODE_UNKNOWN) {
+            cli_ping();
+        }
     }
 
     if ((v & MSG) == MSG_WATCHDOG) {

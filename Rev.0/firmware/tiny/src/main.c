@@ -80,7 +80,6 @@ int main() {
         if ((v & MSG) == MSG_USB) {
             bool connected = (v & 0x0fffffff) == 1;
             if (connected) {
-                set_mode(MODE_CLI);
                 infof("SYS", "USB connected");
             } else {
                 set_mode(MODE_UNKNOWN);

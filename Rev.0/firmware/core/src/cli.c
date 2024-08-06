@@ -69,7 +69,9 @@ CLI cli = {
 };
 
 extern const char *TERMINAL_CLEAR;
-extern const char *TERMINAL_QUERY;
+extern const char *TERMINAL_QUERY_CODE;
+extern const char *TERMINAL_QUERY_STATUS;
+extern const char *TERMINAL_QUERY_SIZE;
 extern const char *TERMINAL_SET_SCROLL_AREA;
 extern const char *TERMINAL_ECHO;
 extern const char *TERMINAL_CLEARLINE;
@@ -116,7 +118,14 @@ const char *HELP[] = {
  */
 void cli_init() {
     print(TERMINAL_CLEAR);
-    print(TERMINAL_QUERY);
+    print(TERMINAL_QUERY_STATUS);
+}
+
+/** Queries the terminal ID 'out of band'.
+ *
+ */
+void cli_ping() {
+    printf(TERMINAL_QUERY_STATUS);
 }
 
 /** Processes received characters.
@@ -158,7 +167,31 @@ void cli_rx(char *received) {
             continue;
         }
 
-        // cursor position report (ESC[#;#R)
+        // report device code
+        if (cli.buffer[0] == 27 && cli.buffer[1] == '[' && ch == 'c' && (cli.ix < sizeof(cli.buffer) - 1)) {
+            cli.buffer[cli.ix++] = ch;
+            cli.buffer[cli.ix] = 0;
+
+            memset(cli.buffer, 0, sizeof(cli.buffer));
+            cli.ix = 0;
+            continue;
+        }
+
+        // report device status
+        if (cli.buffer[0] == 27 && cli.buffer[1] == '[' && ch == 'n' && (cli.ix < sizeof(cli.buffer) - 1)) {
+            cli.buffer[cli.ix++] = ch;
+            cli.buffer[cli.ix] = 0;
+
+            if (cli.buffer[2] == '0') {
+                set_mode(MODE_CLI);
+            }
+
+            memset(cli.buffer, 0, sizeof(cli.buffer));
+            cli.ix = 0;
+            continue;
+        }
+
+        // report cursor position (ESC[#;#R)
         if (cli.buffer[0] == 27 && ch == 'R' && (cli.ix < sizeof(cli.buffer) - 1)) {
             cli.buffer[cli.ix++] = ch;
             cli.buffer[cli.ix] = 0;
@@ -218,7 +251,7 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
  */
 void clear() {
     print(TERMINAL_CLEAR);
-    print(TERMINAL_QUERY);
+    print(TERMINAL_QUERY_SIZE);
 }
 
 /* Cursor position report.

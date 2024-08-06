@@ -30,8 +30,10 @@
          - [x] drop block of old messages when queue full (and add '...')
          - [x] _print
          - [x] USB disconnected => mode unknown
-         - [ ] pico ?
-               - (?) ping for terminal ID
+         - [x] MODE_UNKNOWN: ping for terminal status
+         - [ ] CLI idle - ping for terminal status
+         - [ ] LED yellow/green for CLI mode
+         - [ ] LED blue/green for SSMP mode
 
 ### emulator
     - [ ] get-controller
