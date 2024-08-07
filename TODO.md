@@ -11,6 +11,8 @@
    - [ ] MIB
    - [ ] GET
          - [x] // FIXME doesn't work with binary protocol
+         - [ ] DLE
+         - [ ] text
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict

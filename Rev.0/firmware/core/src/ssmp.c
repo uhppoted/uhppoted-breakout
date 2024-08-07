@@ -107,13 +107,17 @@ void ssmp_rx(const struct buffer *received) {
             continue;
         }
 
-        // // ETX?
-        // if (ch == ETX) {
-        //     ssmp_get(SSMP.buffer, SSMP.ix);
-        //     memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-        //     SSMP.ix = 0;
-        //     continue;
-        // }
+        // ETX?
+        if (ch == ETX) {
+            if (SSMP.ix < sizeof(SSMP.buffer)) {
+                SSMP.buffer[SSMP.ix++] = ch;
+                ssmp_get(SSMP.buffer, SSMP.ix);
+            }
+
+            memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
+            SSMP.ix = 0;
+            continue;
+        }
 
         // ... accumulate message
         if (SSMP.ix < sizeof(SSMP.buffer)) {
@@ -121,10 +125,6 @@ void ssmp_rx(const struct buffer *received) {
         } else {
             memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
             SSMP.ix = 0;
-        }
-
-        if (SSMP.ix > 0) {
-            ssmp_get(SSMP.buffer, SSMP.ix);
         }
     }
 }
@@ -138,27 +138,27 @@ void ssmp_ack() {
 }
 
 void ssmp_get(const uint8_t *buffer, int N) {
-    // char reply[] = {SYN, SYN, SOH, 0, 0, 0, 1, STX, b0, b1, b2, b3, ETX};
-    uint8_t *reply = (char *)calloc(N + 9, sizeof(uint8_t));
+    // uint8_t *reply = (char *)calloc(N + 9, sizeof(uint8_t));
+    uint8_t *reply = (char *)calloc(N + 2, sizeof(uint8_t));
     uint8_t *p = reply;
 
     *p++ = SYN;
     *p++ = SYN;
-    *p++ = SOH;
-    *p++ = (N >> 24) & 0xff;
-    *p++ = (N >> 16) & 0xff;
-    *p++ = (N >> 8) & 0xff;
-    *p++ = (N >> 0) & 0xff;
-    *p++ = STX;
+    // *p++ = SOH;
+    // *p++ = (N >> 24) & 0xff;
+    // *p++ = (N >> 16) & 0xff;
+    // *p++ = (N >> 8) & 0xff;
+    // *p++ = (N >> 0) & 0xff;
+    // *p++ = STX;
 
     for (int i = 0; i < N; i++) {
         *p++ = buffer[i];
     }
 
-    *p++ = ETX;
+    // *p++ = ETX;
 
     fflush(stdout);
-    fwrite(reply, 1, N + 9, stdout);
+    fwrite(reply, 1, N + 2, stdout);
     fflush(stdout);
 }
 
