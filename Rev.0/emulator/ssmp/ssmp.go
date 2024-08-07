@@ -19,8 +19,8 @@ type SSMP struct {
 }
 
 type request struct {
-	id     uint32
 	packet []byte
+	pipe   chan []byte
 }
 
 var write = make(chan request)
@@ -30,9 +30,9 @@ func Get(oid []uint32) (any, error) {
 	logger := gosnmp.NewLogger(syslog.New(os.Stdout, "", 0))
 
 	pdu := gosnmp.SnmpPDU{
-		Value: nil,
+		Value: uint32(405419896),
 		Name:  ".1.3.6.655136.1.1",
-		Type:  gosnmp.Null,
+		Type:  gosnmp.Uinteger32,
 	}
 
 	packet := gosnmp.SnmpPacket{
@@ -55,18 +55,32 @@ func Get(oid []uint32) (any, error) {
 	if bytes, err := packet.MarshalMsg(); err != nil {
 		return nil, err
 	} else {
-		id := uint32(1) // rqid.Add(1)
-		if encoded, err := encode(id, bytes); err != nil {
-			return nil, err
-		} else {
-			write <- request{
-				id:     id,
-				packet: encoded,
+		rq := request{
+			packet: bytes,
+			pipe:   make(chan []byte),
+		}
+
+		timeout := time.After(500 * time.Millisecond)
+
+		write <- rq
+		select {
+		case reply := <-rq.pipe:
+			debugf("reply to SSMP GET request (%v)", reply)
+
+			if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
+				return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+			} else if v, ok := value.(uint32); !ok {
+				return 0, fmt.Errorf("invalid valid in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+			} else {
+				return v, nil
 			}
+
+		case <-timeout:
+			return 0, fmt.Errorf("no reply to SSMP GET %v request", ".1.3.6.655136.1.1")
 		}
 	}
 
-	return uint32(405419896), nil
+	return 0, fmt.Errorf("SSMP GET %v failed", ".1.3.6.655136.1.1")
 }
 
 func (ssmp SSMP) Run() {
@@ -80,6 +94,8 @@ func (ssmp SSMP) Run() {
 }
 
 func (ssmp SSMP) read() error {
+	handlers := map[uint32]request{}
+
 	if t, err := term.Open(ssmp.USB, term.Speed(9600), term.RawMode); err != nil {
 		return err
 	} else {
@@ -149,15 +165,35 @@ func (ssmp SSMP) read() error {
 
 		for {
 			select {
-			case reply := <-pipe:
-				debugf("read %v %v", len(reply), reply)
+			case msg := <-pipe:
+				debugf("read %v %v", len(msg), msg)
+				if id, reply, err := decode(msg); err != nil {
+					warnf("read error (%v)", err)
+				} else {
+					debugf("read %v %v", id, reply)
+
+					if h, ok := handlers[id]; ok {
+						h.pipe <- reply
+					} else {
+						warnf("read error (%v)", fmt.Errorf("missing handler for message %v", id))
+					}
+
+					delete(handlers, id)
+				}
 
 			case request := <-write:
 				debugf("write %v", request)
-				if N, err := t.Write(request.packet); err != nil {
+				id := uint32(1) // rqid.Add(1)
+				if encoded, err := encode(id, request.packet); err != nil {
 					warnf("write error (%v)", err)
+				} else if N, err := t.Write(encoded); err != nil {
+					warnf("write error (%v)", err)
+				} else if N != len(encoded) {
+					warnf("write error (%v)", fmt.Errorf("sent %v bytes of %v)", N, len(encoded)))
 				} else {
 					debugf("write (%v bytes)", N)
+
+					handlers[id] = request
 				}
 
 			case <-idle:
@@ -170,6 +206,22 @@ func (ssmp SSMP) read() error {
 
 		return nil
 	}
+}
+
+func get(msg []uint8, OID string) (any, error) {
+	snmp := gosnmp.GoSNMP{}
+
+	if packet, err := snmp.SnmpDecodePacket(msg); err != nil {
+		return nil, err
+	} else {
+		for _, pdu := range packet.Variables {
+			if pdu.Name == OID {
+				return pdu.Value, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("OID %v not found", OID)
 }
 
 func debugf(format string, args ...any) {

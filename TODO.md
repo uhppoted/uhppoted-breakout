@@ -5,19 +5,29 @@
       - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
       - compile time constant
 
+### emulator
+    - [ ] get-controller
+          - [x] from MIB
+          - [ ] populate MIB from SSMP
+          - [ ] errors pipe in request
+          - [ ] prune handlers
+          - [ ] move encoding to encoding/BER
+          - [ ] move encoding to encoding/bisync
+          - [ ] use SNMP request/message ID
+    - [ ] walk MIB to initialise/refresh cache
+    - [ ] // TODO: exponential backoff
+    - [ ] tinygo
+
+
 ### SSMP
    - [x] disable print/println in SSMP mode
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK
    - [ ] MIB
    - [ ] GET
          - [x] // FIXME doesn't work with binary protocol
-         - [x] DLE
-```
-write [22 22 1 0 0 0 1 2 48 37 2 1 0 4 6 112 117 98 108 105 99 160 24 2 1 1 2 1 0 2 1 0 48 13 48 11 6 7 43 6 167 254 32 1 1 5 0 3]
-read  [22 22 1 0 0 0 1 2 48 37 2 1 0 4 6 112 117 98 108 105 99 160 24 2 1 1 2 1 0 2 1 0 48 13 48 11 6 7 43 6 167 254 32 1 1 5 0 3]
-```
-         - (?) hexadecimal text
-   - [ ] usb_init
+         - [x] decode::DLE 
+         - [ ] return SnmpGetResponse
+         - [ ] encode::DLE 
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
    - https://www.baeldung.com/cs/bisync
@@ -35,13 +45,6 @@ read  [22 22 1 0 0 0 1 2 48 37 2 1 0 4 6 112 117 98 108 105 99 160 24 2 1 1 2 1 
     - [ ] CLI idle - ping for terminal status
     - [ ] dropping last typed character if echo uses sys::print
           - printf works but sys::print doesn't
-
-### emulator
-    - [ ] get-controller
-          - [x] from MIB
-          - [ ] populate MIB from SSMP
-    - [ ] // TODO: exponential backoff
-    - [ ] tinygo
 
 ## PiZeroW
    - [ ] Reduce power consumption
