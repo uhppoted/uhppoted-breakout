@@ -57,13 +57,13 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_RX) {
-        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
+        struct buffer *b = (struct buffer *)(SRAM_BASE | (v & 0x0fffffff));
         ssmp_rx(b);
         free(b);
     }
 
     if ((v & MSG) == MSG_TTY) {
-        char *b = (char *)(SRAM_BASE | (v & 0x0fffffff));
+        struct buffer *b = (struct buffer *)(SRAM_BASE | (v & 0x0fffffff));
 
         if (SYSTEM.mode == MODE_SMP) {
             ssmp_rx(b);

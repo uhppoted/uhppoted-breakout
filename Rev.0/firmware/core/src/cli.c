@@ -118,7 +118,7 @@ const char *HELP[] = {
  */
 void cli_init() {
     print(TERMINAL_CLEAR);
-    print(TERMINAL_QUERY_STATUS);
+    print(TERMINAL_QUERY_SIZE);
 }
 
 /** Queries the terminal ID 'out of band'.
@@ -131,15 +131,15 @@ void cli_ping() {
 /** Processes received characters.
  *
  */
-void cli_rx(char *received) {
+void cli_rx(const struct buffer *received) {
     if (cli.timer > 0) {
         cancel_alarm(cli.timer);
         cli.timer = 0;
     }
 
-    int N = strlen(received);
+    int N = received->N;
     for (int i = 0; i < N; i++) {
-        char ch = received[i];
+        char ch = received->data[i];
 
         // SYN?
         if (ch == SYN) {
@@ -283,10 +283,8 @@ void cpr(char *cmd) {
  */
 void echo(const char *cmd) {
     int h = cli.rows - 4;
-    char s[64];
 
-    snprintf(s, sizeof(s), TERMINAL_ECHO, h, cmd);
-    print(s);
+    printf(TERMINAL_ECHO, h, cmd);
 }
 
 /* Saves the cursor position, clears the command line, redisplays the prompt and then

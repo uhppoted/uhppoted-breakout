@@ -86,10 +86,11 @@ void on_ssmp() {
     // }
 }
 
-void ssmp_rx(const char *received) {
-    int N = strlen(received); // FIXME doesn't work with binary protocol
+void ssmp_rx(const struct buffer *received) {
+    int N = received->N;
+
     for (int i = 0; i < N; i++) {
-        char ch = received[i];
+        uint8_t ch = received->data[i];
 
         // SYN?
         if (ch == SYN) {

@@ -10,31 +10,25 @@
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK
    - [ ] MIB
    - [ ] GET
-         - // FIXME doesn't work with binary protocol
+         - [x] // FIXME doesn't work with binary protocol
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
    - https://www.baeldung.com/cs/bisync
    - http://www.tcpipguide.com/free/t_SNMPVersion2SNMPv2MessageFormats-5.htm
    - https://www.ranecommercial.com/legacy/note161.html
-   - (?) [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
+   - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
 
 ### CLI
-   - [x] initialise on connected
-   - [x] set initial scroll area
-   - [x] Dangling '['
-   - [x] // FIXME remove - delay to let USB initialise
-         - [x] move queue from log to sys
-         - [x] hold in queue until USB connected
-         - [x] fix dropped messages
-         - [x] // FIXME unblock in sys
-         - [x] drop block of old messages when queue full (and add '...')
-         - [x] _print
-         - [x] USB disconnected => mode unknown
-         - [x] MODE_UNKNOWN: ping for terminal status
-         - [ ] CLI idle - ping for terminal status
-         - [ ] LED yellow/green for CLI mode
-         - [ ] LED blue/green for SSMP mode
+    - [x] initialise on connected
+    - [x] set initial scroll area
+    - [x] Dangling '['
+    - [x] // FIXME remove - delay to let USB initialise
+    - [ ] dropping last typed character
+          - figure out why printf works but sys::print doesn't
+    - [ ] LED yellow/green for CLI mode
+    - [ ] LED blue/green for SSMP mode
+    - [ ] CLI idle - ping for terminal status
 
 ### emulator
     - [ ] get-controller

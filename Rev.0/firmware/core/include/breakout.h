@@ -51,5 +51,5 @@ typedef enum {
 
 typedef struct buffer {
     int N;
-    uint8_t *data;
+    uint8_t data[256];
 } buffer;

@@ -56,10 +56,11 @@ bool on_usb_rx(repeating_timer_t *rt) {
         }
 
         if (ix > 0) {
-            char *b;
+            struct buffer *b;
 
-            if ((b = calloc(ix + 1, 1)) != NULL) {
-                memmove(b, buffer, ix);
+            if ((b = (struct buffer *)malloc(sizeof(struct buffer))) != NULL) {
+                b->N = ix;
+                memmove(b->data, buffer, ix);
                 uint32_t msg = MSG_TTY | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
                 if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
                     set_error(ERR_QUEUE_FULL, "USB", "rx: queue full");

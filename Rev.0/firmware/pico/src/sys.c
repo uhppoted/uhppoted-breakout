@@ -7,7 +7,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
-#include <tty.h>
+#include <uart.h>
 
 #define BAUD_RATE 115200
 #define DATA_BITS 8
@@ -50,7 +50,7 @@ bool sys_init() {
     uart_set_format(uart0, DATA_BITS, STOP_BITS, PARITY);
     uart_set_fifo_enabled(uart0, false);
 
-    irq_set_exclusive_handler(UART0_IRQ, on_tty_rx);
+    irq_set_exclusive_handler(UART0_IRQ, on_uart_rx);
     irq_set_enabled(UART0_IRQ, true);
 
     uart_set_irq_enables(uart0, true, false);
