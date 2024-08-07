@@ -55,7 +55,7 @@ func Get(oid []uint32) (any, error) {
 	if bytes, err := packet.MarshalMsg(); err != nil {
 		return nil, err
 	} else {
-		id := rqid.Add(1)
+		id := uint32(1) // rqid.Add(1)
 		if encoded, err := encode(id, bytes); err != nil {
 			return nil, err
 		} else {

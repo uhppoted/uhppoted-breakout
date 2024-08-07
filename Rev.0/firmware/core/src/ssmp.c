@@ -20,6 +20,7 @@ const char STX = 2;
 const char ETX = 3;
 const char ENQ = 5;
 const char ACK = 6;
+const char DLE = 16;
 const char NAK = 21;
 const char SYN = 22;
 
@@ -28,13 +29,15 @@ void on_ssmp();
 struct {
     char buffer[512];
     int ix;
+    bool DLE;
 } SSMP = {
     .buffer = {0},
     .ix = 0,
+    .DLE = false,
 };
 
 void ssmp_ack();
-void ssmp_get();
+void ssmp_echo();
 
 void ssmp_init() {
     debugf("SSMP", "init");
@@ -92,39 +95,57 @@ void ssmp_rx(const struct buffer *received) {
     for (int i = 0; i < N; i++) {
         uint8_t ch = received->data[i];
 
-        // SYN?
-        if (ch == SYN) {
-            memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-            SSMP.ix = 0;
-            continue;
-        }
+        // ... escape?
+        if (SSMP.DLE) {
+            SSMP.DLE = false;
 
-        // ENQ?
-        if (ch == ENQ && SSMP.ix == 0) {
-            memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-            SSMP.ix = 0;
-            ssmp_ack();
-            continue;
-        }
-
-        // ETX?
-        if (ch == ETX) {
             if (SSMP.ix < sizeof(SSMP.buffer)) {
                 SSMP.buffer[SSMP.ix++] = ch;
-                ssmp_get(SSMP.buffer, SSMP.ix);
+            } else {
+                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
+                SSMP.ix = 0;
+            }
+        } else {
+            // SYN?
+            if (ch == SYN) {
+                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
+                SSMP.ix = 0;
+                continue;
             }
 
-            memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-            SSMP.ix = 0;
-            continue;
-        }
+            // ENQ?
+            if (ch == ENQ && SSMP.ix == 0) {
+                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
+                SSMP.ix = 0;
+                ssmp_ack();
+                continue;
+            }
 
-        // ... accumulate message
-        if (SSMP.ix < sizeof(SSMP.buffer)) {
-            SSMP.buffer[SSMP.ix++] = ch;
-        } else {
-            memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-            SSMP.ix = 0;
+            // ETX?
+            if (ch == ETX) {
+                if (SSMP.ix < sizeof(SSMP.buffer)) {
+                    SSMP.buffer[SSMP.ix++] = ch;
+                    ssmp_echo(SSMP.buffer, SSMP.ix);
+                }
+
+                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
+                SSMP.ix = 0;
+                continue;
+            }
+
+            // DLE?
+            if (ch == DLE) {
+                SSMP.DLE = true;
+                continue;
+            }
+
+            // ... accumulate message
+            if (SSMP.ix < sizeof(SSMP.buffer)) {
+                SSMP.buffer[SSMP.ix++] = ch;
+            } else {
+                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
+                SSMP.ix = 0;
+            }
         }
     }
 }
@@ -137,7 +158,7 @@ void ssmp_ack() {
     fflush(stdout);
 }
 
-void ssmp_get(const uint8_t *buffer, int N) {
+void ssmp_echo(const uint8_t *buffer, int N) {
     // uint8_t *reply = (char *)calloc(N + 9, sizeof(uint8_t));
     uint8_t *reply = (char *)calloc(N + 2, sizeof(uint8_t));
     uint8_t *p = reply;
@@ -161,23 +182,3 @@ void ssmp_get(const uint8_t *buffer, int N) {
     fwrite(reply, 1, N + 2, stdout);
     fflush(stdout);
 }
-
-// void ssmp_debug() {
-//     bool enabled = uart_is_enabled(uart0);
-//     bool writeable = uart_is_writable(uart0);
-//     bool readable = uart_is_readable(uart0);
-//     // uart_get_hw(uart)->cr = UART_UARTCR_UARTEN_BITS | UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS;
-//
-//     debugf("SMP", "pins: TX:%d  RX:%d", UART0_TX, UART0_RX);
-//     debugf("SMP", "UART0: enabled:%s read:%s write:%s",
-//            enabled ? "Y" : "N",
-//            readable ? "Y" : "N",
-//            writeable ? "Y" : "N");
-//
-//     if (writeable) {
-//         uart_putc(uart0, 'X');
-//         // const char *s = "qwerty";
-//         //
-//         // uart_write_blocking (uart0, s, 6);
-//     }
-// }

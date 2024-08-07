@@ -11,8 +11,12 @@
    - [ ] MIB
    - [ ] GET
          - [x] // FIXME doesn't work with binary protocol
-         - [ ] DLE
-         - [ ] text
+         - [x] DLE
+```
+write [22 22 1 0 0 0 1 2 48 37 2 1 0 4 6 112 117 98 108 105 99 160 24 2 1 1 2 1 0 2 1 0 48 13 48 11 6 7 43 6 167 254 32 1 1 5 0 3]
+read  [22 22 1 0 0 0 1 2 48 37 2 1 0 4 6 112 117 98 108 105 99 160 24 2 1 1 2 1 0 2 1 0 48 13 48 11 6 7 43 6 167 254 32 1 1 5 0 3]
+```
+         - (?) hexadecimal text
    - [ ] usb_init
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
@@ -26,11 +30,11 @@
     - [x] set initial scroll area
     - [x] Dangling '['
     - [x] // FIXME remove - delay to let USB initialise
-    - [ ] dropping last typed character
-          - figure out why printf works but sys::print doesn't
     - [ ] LED yellow/green for CLI mode
     - [ ] LED blue/green for SSMP mode
     - [ ] CLI idle - ping for terminal status
+    - [ ] dropping last typed character if echo uses sys::print
+          - printf works but sys::print doesn't
 
 ### emulator
     - [ ] get-controller
