@@ -3,6 +3,8 @@ package MIB
 import (
 	"net"
 	"net/netip"
+
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
 )
 
 type V interface {
@@ -33,12 +35,16 @@ var mib = map[string]field{
 
 func Get[T V](tag string, defval T) T {
 	if f, ok := mib[tag]; ok && f.get != nil {
-		if u, err := f.get(); err == nil {
-			if v, ok := u.(T); ok {
-				return v
-			}
+		if u, err := f.get(); err != nil {
+			warnf("GET %v (%v)", tag, err)
+		} else if v, ok := u.(T); ok {
+			return v
 		}
 	}
 
 	return defval
+}
+
+func warnf(format string, args ...any) {
+	log.Warnf("MIB", format, args...)
 }

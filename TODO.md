@@ -10,10 +10,13 @@
           - [x] from MIB
           - [ ] populate MIB from SSMP
           - [ ] errors pipe in request
-          - [ ] prune handlers
-          - [ ] move encoding to encoding/BER
-          - [ ] move encoding to encoding/bisync
-          - [ ] use SNMP request/message ID
+    - [x] move encoding to encoding/BER
+    - [x] move encoding to encoding/bisync
+    - [ ] decode - DLE 
+    - [ ] decode - partial packets
+    - [ ] use SNMP request/message ID
+    - [ ] prune handlers
+    - [ ] check that goroutines in ssmp::listen terminate on return
     - [ ] idle poll
     - [ ] walk MIB to initialise/refresh cache
     - [ ] // TODO: exponential backoff
@@ -27,7 +30,7 @@
    - [ ] GET
          - [x] // FIXME doesn't work with binary protocol
          - [x] decode::DLE 
-         - [ ] return SnmpGetResponse
+         - [x] return SnmpGetResponse
          - [ ] encode::DLE 
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict

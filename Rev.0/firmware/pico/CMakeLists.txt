@@ -45,6 +45,8 @@ add_executable(breakout
   ${LIB}/src/RX8900SA.c
   ${LIB}/src/PCAL6408A.c
   ${LIB}/src/PCAL6416A.c
+
+  ${LIB}/src/encoding/bisync/bisync.c
 )
 
 target_include_directories(breakout 

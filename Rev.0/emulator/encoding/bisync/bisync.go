@@ -1,4 +1,4 @@
-package ssmp
+package bisync
 
 import (
 	"bytes"
@@ -14,9 +14,18 @@ const ACK byte = 6
 const DLE byte = 16
 const SYN byte = 22
 
-var SYN_SYN_ACK = []byte{SYN, SYN, ACK}
+var Enq = []byte{SYN, SYN, ENQ}
+var Ack = []byte{SYN, SYN, ACK}
 
-func encode(msgid uint32, packet []byte) ([]byte, error) {
+type Bisync struct {
+}
+
+type Message struct {
+	Header uint32
+	Packet []byte
+}
+
+func (codec Bisync) Encode(msg Message) ([]byte, error) {
 	var b bytes.Buffer
 
 	// ... preamble
@@ -35,7 +44,7 @@ func encode(msgid uint32, packet []byte) ([]byte, error) {
 
 	{
 		buffer := make([]byte, 4)
-		binary.BigEndian.PutUint32(buffer, msgid)
+		binary.BigEndian.PutUint32(buffer, msg.Header)
 
 		for _, byte := range buffer {
 			switch byte {
@@ -65,8 +74,8 @@ func encode(msgid uint32, packet []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	for ix := 0; ix < len(packet); ix++ {
-		byte := packet[ix]
+	for ix := 0; ix < len(msg.Packet); ix++ {
+		byte := msg.Packet[ix]
 		switch byte {
 		case SYN,
 			SOH,
@@ -95,7 +104,7 @@ func encode(msgid uint32, packet []byte) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func decode(msg []uint8) (uint32, []byte, error) {
+func (codec *Bisync) Decode(msg []uint8) ([]Message, error) {
 	packet := bytes.Buffer{}
 	msgid := uint32(0)
 	ix := 0
@@ -110,7 +119,7 @@ func decode(msg []uint8) (uint32, []byte, error) {
 	}
 
 	if msg[ix] != SOH {
-		return 0, nil, fmt.Errorf("missing SOH")
+		return nil, fmt.Errorf("missing SOH")
 	} else {
 		ix++
 	}
@@ -123,7 +132,7 @@ func decode(msg []uint8) (uint32, []byte, error) {
 			msgid <<= 8
 			msgid += uint32(b)
 		} else {
-			return 0, nil, fmt.Errorf("missing message ID")
+			return nil, fmt.Errorf("missing message ID")
 		}
 	}
 
@@ -137,7 +146,7 @@ func decode(msg []uint8) (uint32, []byte, error) {
 	}
 
 	if msg[ix] != STX {
-		return 0, nil, fmt.Errorf("missing STX")
+		return nil, fmt.Errorf("missing STX")
 	} else {
 		ix++
 	}
@@ -146,17 +155,22 @@ func decode(msg []uint8) (uint32, []byte, error) {
 		if b := msg[ix]; b == ETX {
 			break
 		} else if err := packet.WriteByte(b); err != nil {
-			return 0, nil, err
+			return nil, err
 		} else {
 			ix++
 		}
 	}
 
 	if msg[ix] != ETX {
-		return 0, nil, fmt.Errorf("missing ETX")
+		return nil, fmt.Errorf("missing ETX")
 	} else {
 		ix++
 	}
 
-	return msgid, packet.Bytes(), nil
+	return []Message{
+		Message{
+			Header: msgid,
+			Packet: packet.Bytes(),
+		},
+	}, nil
 }

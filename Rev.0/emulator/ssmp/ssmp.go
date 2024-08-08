@@ -11,6 +11,8 @@ import (
 	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/term"
 
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/BER"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/bisync"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
 )
 
@@ -30,9 +32,9 @@ func Get(oid []uint32) (any, error) {
 	logger := gosnmp.NewLogger(syslog.New(os.Stdout, "", 0))
 
 	pdu := gosnmp.SnmpPDU{
-		Value: uint32(405419896),
+		Value: gosnmp.Null,
 		Name:  ".1.3.6.655136.1.1",
-		Type:  gosnmp.Uinteger32,
+		Type:  gosnmp.Null,
 	}
 
 	packet := gosnmp.SnmpPacket{
@@ -52,7 +54,7 @@ func Get(oid []uint32) (any, error) {
 		Logger:          logger,
 	}
 
-	if bytes, err := packet.MarshalMsg(); err != nil {
+	if bytes, err := BER.Encode(packet); err != nil {
 		return nil, err
 	} else {
 		rq := request{
@@ -70,7 +72,7 @@ func Get(oid []uint32) (any, error) {
 			if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
 				return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
 			} else if v, ok := value.(uint32); !ok {
-				return 0, fmt.Errorf("invalid valid in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+				return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
 			} else {
 				return v, nil
 			}
@@ -84,8 +86,76 @@ func Get(oid []uint32) (any, error) {
 }
 
 func (ssmp SSMP) Run() {
+	rx := make(chan []byte)
+	tx := make(chan []byte)
+	handlers := map[uint32]request{}
+
+	// ... reply channel
+	go func() {
+		codec := bisync.Bisync{}
+
+		for {
+			select {
+			case msg := <-rx:
+				debugf("reply %v", msg)
+				replies, err := codec.Decode(msg)
+				if err != nil {
+					warnf("reply error (%v)", err)
+				}
+
+				for _, reply := range replies {
+					debugf("reply %v %v", rqid, reply)
+
+					rqid := reply.Header
+
+					if h, ok := handlers[rqid]; !ok {
+						warnf("reply %v (missing handler)", rqid)
+					} else {
+						select {
+						case h.pipe <- reply.Packet:
+							debugf("reply %v ok", rqid)
+						default:
+							warnf("reply %v (pipe closed)", rqid)
+						}
+					}
+
+					delete(handlers, rqid)
+				}
+			}
+		}
+	}()
+
+	// ... request channel
+	go func() {
+		codec := bisync.Bisync{}
+
+		for {
+			select {
+			case request := <-write:
+				debugf("request %v", request)
+
+				msg := bisync.Message{
+					Header: 1, // FIXME use request ID from packet
+					Packet: request.packet,
+				}
+
+				if encoded, err := codec.Encode(msg); err != nil {
+					warnf("request error (%v)", err)
+				} else {
+					select {
+					case tx <- encoded:
+						handlers[1] = request // FIXME use request ID from packet
+					default:
+						warnf("TX queue blocked")
+					}
+				}
+			}
+		}
+	}()
+
+	// ... listener
 	for {
-		if err := ssmp.read(); err != nil {
+		if err := ssmp.listen(tx, rx); err != nil {
 			errorf("%v", err)
 		}
 
@@ -93,9 +163,7 @@ func (ssmp SSMP) Run() {
 	}
 }
 
-func (ssmp SSMP) read() error {
-	handlers := map[uint32]request{}
-
+func (ssmp SSMP) listen(tx chan []byte, rx chan []byte) error {
 	if t, err := term.Open(ssmp.USB, term.Speed(115200), term.RawMode); err != nil {
 		return err
 	} else {
@@ -133,7 +201,7 @@ func (ssmp SSMP) read() error {
 		// ... send SYN-SYN-ENQ until acknowledged
 	enq:
 		for {
-			cmd := []byte{SYN, SYN, ENQ}
+			cmd := bisync.Enq
 			if N, err := t.Write(cmd); err != nil {
 				return err
 			} else if N != len(cmd) {
@@ -148,7 +216,7 @@ func (ssmp SSMP) read() error {
 			for {
 				select {
 				case reply := <-pipe:
-					if slices.Equal(reply, SYN_SYN_ACK) {
+					if slices.Equal(reply, bisync.Ack) {
 						debugf("ACK")
 						break enq
 					}
@@ -166,34 +234,34 @@ func (ssmp SSMP) read() error {
 		for {
 			select {
 			case msg := <-pipe:
-				debugf("read %v %v", len(msg), msg)
-				if id, reply, err := decode(msg); err != nil {
-					warnf("read error (%v)", err)
+				if len(msg) > 20 {
+					debugf("read  (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
+						len(msg),
+						msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
+						msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
 				} else {
-					debugf("read %v %v", id, reply)
-
-					if h, ok := handlers[id]; ok {
-						h.pipe <- reply
-					} else {
-						warnf("read error (%v)", fmt.Errorf("missing handler for message %v", id))
-					}
-
-					delete(handlers, id)
+					debugf("read  (%v bytes) %v", len(msg), msg)
 				}
 
-			case request := <-write:
-				debugf("write %v", request)
-				id := uint32(1) // rqid.Add(1)
-				if encoded, err := encode(id, request.packet); err != nil {
-					warnf("write error (%v)", err)
-				} else if N, err := t.Write(encoded); err != nil {
-					warnf("write error (%v)", err)
-				} else if N != len(encoded) {
-					warnf("write error (%v)", fmt.Errorf("sent %v bytes of %v)", N, len(encoded)))
-				} else {
-					debugf("write (%v bytes)", N)
+				select {
+				case rx <- msg:
+					debugf("read  ok")
+				default:
+					warnf("RX queue blocked")
+				}
 
-					handlers[id] = request
+			case msg := <-tx:
+				if N, err := t.Write(msg); err != nil {
+					warnf("write error (%v)", err)
+				} else if N != len(msg) {
+					warnf("write error (%v)", fmt.Errorf("sent %v bytes of %v)", N, len(msg)))
+				} else if len(msg) > 20 {
+					debugf("write (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
+						N,
+						msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
+						msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
+				} else {
+					debugf("write (%v bytes) %v", N, msg)
 				}
 
 			case <-idle:
@@ -209,10 +277,10 @@ func (ssmp SSMP) read() error {
 }
 
 func get(msg []uint8, OID string) (any, error) {
-	snmp := gosnmp.GoSNMP{}
-
-	if packet, err := snmp.SnmpDecodePacket(msg); err != nil {
+	if packet, err := BER.Decode(msg); err != nil {
 		return nil, err
+	} else if packet == nil {
+		return nil, fmt.Errorf("invalid SSMP packet (%v)", packet)
 	} else {
 		for _, pdu := range packet.Variables {
 			if pdu.Name == OID {

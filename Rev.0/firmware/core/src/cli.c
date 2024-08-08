@@ -15,6 +15,7 @@
 #include <U3.h>
 #include <U4.h>
 #include <cli.h>
+#include <encoding/bisync/bisync.h>
 #include <log.h>
 #include <state.h>
 #include <sys.h>
@@ -78,8 +79,6 @@ extern const char *TERMINAL_CLEARLINE;
 extern const char *TERMINAL_DISPLAY;
 extern const char *TERMINAL_AT;
 
-extern const char ENQ;
-extern const char SYN;
 const char CR = '\n';
 const char LF = '\r';
 

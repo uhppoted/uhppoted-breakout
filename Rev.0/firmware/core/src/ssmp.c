@@ -6,6 +6,7 @@
 #include <pico/stdlib.h>
 
 #include <breakout.h>
+#include <encoding/bisync/bisync.h>
 #include <log.h>
 #include <ssmp.h>
 #include <state.h>
@@ -15,14 +16,19 @@
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
-const char SOH = 1;
-const char STX = 2;
-const char ETX = 3;
-const char ENQ = 5;
-const char ACK = 6;
-const char DLE = 16;
-const char NAK = 21;
-const char SYN = 22;
+// clang-format off
+const uint8_t RESPONSE[] = {
+    22, 22, 
+    1, 0, 0, 0, 1, 
+    2, 
+    48,  41,  2,   1,   0,  4,   6,  112, 
+    117, 98,  108, 105, 99, 162, 28, 2, 
+    1,   1,   2,   1,   0,  2,   1,  0,
+    48,  17,  48,  15,  6,  7,   43, 6,
+    167, 254, 32,  1,   1,  71,  4,  24, 
+    42,  55,  120, 
+    3};
+// clang-format on
 
 void on_ssmp();
 
@@ -37,7 +43,8 @@ struct {
 };
 
 void ssmp_ack();
-void ssmp_echo();
+void ssmp_get(const uint8_t *buffer, int N);
+void ssmp_echo(const uint8_t *buffer, int N);
 
 void ssmp_init() {
     debugf("SSMP", "init");
@@ -125,7 +132,8 @@ void ssmp_rx(const struct buffer *received) {
             if (ch == ETX) {
                 if (SSMP.ix < sizeof(SSMP.buffer)) {
                     SSMP.buffer[SSMP.ix++] = ch;
-                    ssmp_echo(SSMP.buffer, SSMP.ix);
+                    ssmp_get(SSMP.buffer, SSMP.ix);
+                    // ssmp_echo(SSMP.buffer, SSMP.ix);
                 }
 
                 memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
@@ -158,6 +166,11 @@ void ssmp_ack() {
     fflush(stdout);
 }
 
+void ssmp_get(const uint8_t *buffer, int N) {
+    fwrite(RESPONSE, 1, sizeof(RESPONSE), stdout);
+    fflush(stdout);
+}
+
 void ssmp_echo(const uint8_t *buffer, int N) {
     // uint8_t *reply = (char *)calloc(N + 9, sizeof(uint8_t));
     uint8_t *reply = (char *)calloc(N + 2, sizeof(uint8_t));
@@ -178,7 +191,7 @@ void ssmp_echo(const uint8_t *buffer, int N) {
 
     // *p++ = ETX;
 
-    fflush(stdout);
     fwrite(reply, 1, N + 2, stdout);
     fflush(stdout);
+    free(reply);
 }
