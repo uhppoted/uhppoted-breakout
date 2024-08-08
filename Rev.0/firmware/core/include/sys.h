@@ -3,7 +3,7 @@
 typedef enum {
     MODE_UNKNOWN,
     MODE_CLI,
-    MODE_SMP,
+    MODE_SSMP,
 } mode;
 
 extern bool sys_init();
@@ -14,3 +14,4 @@ extern void dispatch(uint32_t);
 extern void print(const char *);
 extern void println(const char *);
 extern void set_mode(mode);
+extern mode get_mode();

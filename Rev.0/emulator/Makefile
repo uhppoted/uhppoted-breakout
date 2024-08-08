@@ -1,3 +1,5 @@
+PORT=/dev/tty.usbmodem14201
+
 .DEFAULT_GOAL := build
 .PHONY: format
 
@@ -12,3 +14,6 @@ run: build
 
 get-controller:
 	../../../uhppote-cli/bin/uhppote-cli get-device 405419896
+
+tty:
+	 minicom -b 115200 -o -D $(PORT)

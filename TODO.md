@@ -14,6 +14,7 @@
           - [ ] move encoding to encoding/BER
           - [ ] move encoding to encoding/bisync
           - [ ] use SNMP request/message ID
+    - [ ] idle poll
     - [ ] walk MIB to initialise/refresh cache
     - [ ] // TODO: exponential backoff
     - [ ] tinygo
@@ -34,14 +35,17 @@
    - http://www.tcpipguide.com/free/t_SNMPVersion2SNMPv2MessageFormats-5.htm
    - https://www.ranecommercial.com/legacy/note161.html
    - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
+   - https://people.ece.cornell.edu/land/courses/ece4760/RP2040/C_SDK_random/index_random.html
+   - https://forums.raspberrypi.com/viewtopic.php?t=302960
 
 ### CLI
     - [x] initialise on connected
     - [x] set initial scroll area
     - [x] Dangling '['
     - [x] // FIXME remove - delay to let USB initialise
-    - [ ] LED yellow/green for CLI mode
-    - [ ] LED blue/green for SSMP mode
+    - [x] LED yellow/green for UNKNOWN mode
+    - [x] LED red/green for CLI mode
+    - [x] LED blue/green for SSMP mode
     - [ ] CLI idle - ping for terminal status
     - [ ] dropping last typed character if echo uses sys::print
           - printf works but sys::print doesn't
@@ -55,6 +59,7 @@
    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
    - https://www.youtube.com/watch?v=4-dle5L9REs
    - https://monocypher.org
+   - https://groupgets.com/products/pureconnect
 
 ## R&D
 - [x] Relay pin voltages

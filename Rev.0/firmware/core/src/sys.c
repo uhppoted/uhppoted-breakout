@@ -34,6 +34,19 @@ void sysinit() {
     mutex_init(&SYSTEM.guard);
 }
 
+mode get_mode() {
+    switch (SYSTEM.mode) {
+    case MODE_CLI:
+        return MODE_CLI;
+
+    case MODE_SSMP:
+        return MODE_SSMP;
+
+    default:
+        return MODE_UNKNOWN;
+    }
+}
+
 void set_mode(mode mode) {
     SYSTEM.mode = mode;
 
@@ -65,7 +78,7 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_TTY) {
         struct buffer *b = (struct buffer *)(SRAM_BASE | (v & 0x0fffffff));
 
-        if (SYSTEM.mode == MODE_SMP) {
+        if (SYSTEM.mode == MODE_SSMP) {
             ssmp_rx(b);
         } else {
             cli_rx(b);

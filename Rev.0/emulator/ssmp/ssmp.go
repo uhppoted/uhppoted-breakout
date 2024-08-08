@@ -96,7 +96,7 @@ func (ssmp SSMP) Run() {
 func (ssmp SSMP) read() error {
 	handlers := map[uint32]request{}
 
-	if t, err := term.Open(ssmp.USB, term.Speed(9600), term.RawMode); err != nil {
+	if t, err := term.Open(ssmp.USB, term.Speed(115200), term.RawMode); err != nil {
 		return err
 	} else {
 		infof("connected")

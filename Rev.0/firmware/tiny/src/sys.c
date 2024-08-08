@@ -72,7 +72,18 @@ void sys_tick() {
     sys.LED = !sys.LED;
 
     if (sys.LED) {
-        put_rgb(8, 0, 0);
+        switch (get_mode()) {
+        case MODE_CLI:
+            put_rgb(8, 0, 0); // red
+            break;
+
+        case MODE_SSMP:
+            put_rgb(0, 0, 96); // blue
+            break;
+
+        default:
+            put_rgb(6, 4, 0); // yellow'ish
+        }
     } else {
         put_rgb(0, 8, 0);
     }

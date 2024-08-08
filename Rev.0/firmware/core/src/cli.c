@@ -152,7 +152,7 @@ void cli_rx(const struct buffer *received) {
         if (ch == ENQ && cli.ix == 0) {
             memset(cli.buffer, 0, sizeof(cli.buffer));
             cli.ix = 0;
-            set_mode(MODE_SMP);
+            set_mode(MODE_SSMP);
             continue;
         }
 
