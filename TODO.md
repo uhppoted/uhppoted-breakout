@@ -12,7 +12,7 @@
           - [ ] errors pipe in request
     - [x] move encoding to encoding/BER
     - [x] move encoding to encoding/bisync
-    - [ ] decode - DLE 
+    - [x] decode - DLE 
     - [ ] decode - partial packets
     - [ ] use SNMP request/message ID
     - [ ] prune handlers
@@ -31,7 +31,9 @@
          - [x] // FIXME doesn't work with binary protocol
          - [x] decode::DLE 
          - [x] return SnmpGetResponse
-         - [ ] encode::DLE 
+         - [x] encode::DLE 
+         - [ ] CRC
+   - [ ] SSMP idle - revert to MODE_UNKNOWN ?
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
    - https://www.baeldung.com/cs/bisync

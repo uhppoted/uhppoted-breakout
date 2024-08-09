@@ -92,7 +92,11 @@ func (ssmp SSMP) Run() {
 
 	// ... reply channel
 	go func() {
-		codec := bisync.Bisync{}
+		codec := bisync.Bisync{
+			SOH: false,
+			STX: false,
+			DLE: false,
+		}
 
 		for {
 			select {

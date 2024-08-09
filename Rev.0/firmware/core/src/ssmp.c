@@ -18,33 +18,30 @@
 
 // clang-format off
 const uint8_t RESPONSE[] = {
-    22, 22, 
-    1, 0, 0, 0, 1, 
-    2, 
     48,  41,  2,   1,   0,  4,   6,  112, 
     117, 98,  108, 105, 99, 162, 28, 2, 
     1,   1,   2,   1,   0,  2,   1,  0,
     48,  17,  48,  15,  6,  7,   43, 6,
     167, 254, 32,  1,   1,  71,  4,  24, 
-    42,  55,  120, 
-    3};
+    42,  55,  120};
 // clang-format on
-
-void on_ssmp();
-
-struct {
-    char buffer[512];
-    int ix;
-    bool DLE;
-} SSMP = {
-    .buffer = {0},
-    .ix = 0,
-    .DLE = false,
-};
 
 void ssmp_ack();
 void ssmp_get(const uint8_t *buffer, int N);
 void ssmp_echo(const uint8_t *buffer, int N);
+void on_ssmp();
+
+struct {
+    struct bisync codec;
+} SSMP = {
+    .codec = {
+        .buffer = {0},
+        .ix = 0,
+        .DLE = false,
+        .enq = ssmp_ack,
+        .received = ssmp_get,
+    },
+};
 
 void ssmp_init() {
     debugf("SSMP", "init");
@@ -97,69 +94,11 @@ void on_ssmp() {
 }
 
 void ssmp_rx(const struct buffer *received) {
-    int N = received->N;
-
-    for (int i = 0; i < N; i++) {
-        uint8_t ch = received->data[i];
-
-        // ... escape?
-        if (SSMP.DLE) {
-            SSMP.DLE = false;
-
-            if (SSMP.ix < sizeof(SSMP.buffer)) {
-                SSMP.buffer[SSMP.ix++] = ch;
-            } else {
-                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-                SSMP.ix = 0;
-            }
-        } else {
-            // SYN?
-            if (ch == SYN) {
-                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-                SSMP.ix = 0;
-                continue;
-            }
-
-            // ENQ?
-            if (ch == ENQ && SSMP.ix == 0) {
-                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-                SSMP.ix = 0;
-                ssmp_ack();
-                continue;
-            }
-
-            // ETX?
-            if (ch == ETX) {
-                if (SSMP.ix < sizeof(SSMP.buffer)) {
-                    SSMP.buffer[SSMP.ix++] = ch;
-                    ssmp_get(SSMP.buffer, SSMP.ix);
-                    // ssmp_echo(SSMP.buffer, SSMP.ix);
-                }
-
-                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-                SSMP.ix = 0;
-                continue;
-            }
-
-            // DLE?
-            if (ch == DLE) {
-                SSMP.DLE = true;
-                continue;
-            }
-
-            // ... accumulate message
-            if (SSMP.ix < sizeof(SSMP.buffer)) {
-                SSMP.buffer[SSMP.ix++] = ch;
-            } else {
-                memset(SSMP.buffer, 0, sizeof(SSMP.buffer));
-                SSMP.ix = 0;
-            }
-        }
-    }
+    bisync_decode(&SSMP.codec, received->data, received->N);
 }
 
 void ssmp_ack() {
-    char reply[] = {SYN, SYN, ACK};
+    const char *reply = SYN_SYN_ACK;
 
     fflush(stdout);
     fwrite(reply, 1, 3, stdout);
@@ -167,8 +106,13 @@ void ssmp_ack() {
 }
 
 void ssmp_get(const uint8_t *buffer, int N) {
-    fwrite(RESPONSE, 1, sizeof(RESPONSE), stdout);
+    uint8_t header[] = {0, 0, 0, 1};
+
+    message msg = bisync_encode(header, sizeof(header), RESPONSE, sizeof(RESPONSE));
+
+    fwrite(msg.data, sizeof(uint8_t), msg.N, stdout);
     fflush(stdout);
+    free(msg.data);
 }
 
 void ssmp_echo(const uint8_t *buffer, int N) {

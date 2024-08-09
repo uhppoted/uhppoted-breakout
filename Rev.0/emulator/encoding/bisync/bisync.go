@@ -3,7 +3,6 @@ package bisync
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 )
 
 const SOH byte = 1
@@ -18,6 +17,9 @@ var Enq = []byte{SYN, SYN, ENQ}
 var Ack = []byte{SYN, SYN, ACK}
 
 type Bisync struct {
+	SOH bool
+	STX bool
+	DLE bool
 }
 
 type Message struct {
@@ -105,72 +107,40 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 }
 
 func (codec *Bisync) Decode(msg []uint8) ([]Message, error) {
+	messages := []Message{}
 	packet := bytes.Buffer{}
-	msgid := uint32(0)
-	ix := 0
+	msgid := uint32(1) // FIXME get from message
 
-	// .. get message header
-	for ix < len(msg) {
-		if b := msg[ix]; b == SOH {
-			break
-		} else {
-			ix++
+	for _, b := range msg {
+		if codec.DLE && codec.STX {
+			if err := packet.WriteByte(b); err != nil {
+				return messages, err
+			}
+
+			codec.DLE = false
+
+		} else if b == SOH {
+			codec.SOH = true
+			codec.STX = false
+		} else if b == STX {
+			codec.SOH = false
+			codec.STX = true
+		} else if b == ETX {
+			codec.SOH = false
+			codec.STX = false
+
+			messages = append(messages, Message{
+				Header: msgid,
+				Packet: packet.Bytes(),
+			})
+		} else if b == DLE {
+			codec.DLE = true
+		} else if codec.STX {
+			if err := packet.WriteByte(b); err != nil {
+				return messages, err
+			}
 		}
 	}
 
-	if msg[ix] != SOH {
-		return nil, fmt.Errorf("missing SOH")
-	} else {
-		ix++
-	}
-
-	for i := 0; i < 4; i++ {
-		if ix < len(msg) {
-			b := msg[ix]
-			ix++
-
-			msgid <<= 8
-			msgid += uint32(b)
-		} else {
-			return nil, fmt.Errorf("missing message ID")
-		}
-	}
-
-	// ... get message content
-	for ix < len(msg) {
-		if b := msg[ix]; b == STX {
-			break
-		} else {
-			ix++
-		}
-	}
-
-	if msg[ix] != STX {
-		return nil, fmt.Errorf("missing STX")
-	} else {
-		ix++
-	}
-
-	for ix < len(msg) {
-		if b := msg[ix]; b == ETX {
-			break
-		} else if err := packet.WriteByte(b); err != nil {
-			return nil, err
-		} else {
-			ix++
-		}
-	}
-
-	if msg[ix] != ETX {
-		return nil, fmt.Errorf("missing ETX")
-	} else {
-		ix++
-	}
-
-	return []Message{
-		Message{
-			Header: msgid,
-			Packet: packet.Bytes(),
-		},
-	}, nil
+	return messages, nil
 }
