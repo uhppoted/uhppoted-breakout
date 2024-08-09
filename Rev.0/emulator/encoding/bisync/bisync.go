@@ -2,7 +2,6 @@ package bisync
 
 import (
 	"bytes"
-	"encoding/binary"
 )
 
 const SOH byte = 1
@@ -23,7 +22,7 @@ type Bisync struct {
 }
 
 type Message struct {
-	Header uint32
+	Header []byte
 	Packet []byte
 }
 
@@ -40,15 +39,12 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 	}
 
 	// ... encode message header
-	if err := b.WriteByte(SOH); err != nil {
-		return nil, err
-	}
+	if len(msg.Header) > 0 {
+		if err := b.WriteByte(SOH); err != nil {
+			return nil, err
+		}
 
-	{
-		buffer := make([]byte, 4)
-		binary.BigEndian.PutUint32(buffer, msg.Header)
-
-		for _, byte := range buffer {
+		for _, byte := range msg.Header {
 			switch byte {
 			case SYN,
 				SOH,
@@ -58,15 +54,10 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 				if err := b.WriteByte(DLE); err != nil {
 					return nil, err
 				}
+			}
 
-				if err := b.WriteByte(byte); err != nil {
-					return nil, err
-				}
-
-			default:
-				if err := b.WriteByte(byte); err != nil {
-					return nil, err
-				}
+			if err := b.WriteByte(byte); err != nil {
+				return nil, err
 			}
 		}
 	}
@@ -108,13 +99,21 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 
 func (codec *Bisync) Decode(msg []uint8) ([]Message, error) {
 	messages := []Message{}
+	header := bytes.Buffer{}
 	packet := bytes.Buffer{}
-	msgid := uint32(1) // FIXME get from message
 
 	for _, b := range msg {
-		if codec.DLE && codec.STX {
-			if err := packet.WriteByte(b); err != nil {
-				return messages, err
+		if codec.DLE {
+			if codec.SOH {
+				if err := header.WriteByte(b); err != nil {
+					return messages, err
+				}
+			}
+
+			if codec.STX {
+				if err := packet.WriteByte(b); err != nil {
+					return messages, err
+				}
 			}
 
 			codec.DLE = false
@@ -130,11 +129,15 @@ func (codec *Bisync) Decode(msg []uint8) ([]Message, error) {
 			codec.STX = false
 
 			messages = append(messages, Message{
-				Header: msgid,
+				Header: header.Bytes(),
 				Packet: packet.Bytes(),
 			})
 		} else if b == DLE {
 			codec.DLE = true
+		} else if codec.SOH {
+			if err := header.WriteByte(b); err != nil {
+				return messages, err
+			}
 		} else if codec.STX {
 			if err := packet.WriteByte(b); err != nil {
 				return messages, err
