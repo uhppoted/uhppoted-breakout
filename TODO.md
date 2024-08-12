@@ -12,10 +12,12 @@
           - [ ] errors pipe in request
     - [x] move encoding to encoding/BER
     - [x] move encoding to encoding/bisync
-    - [ ] decode - DLE 
-    - [ ] CsRC
-    - [ ] decode - partial packets
+    - [x] decode - DLE 
+    - [x] require STX-ETX framing
     - [ ] use SNMP request/message ID
+    - [ ] CRC
+    - [x] limit packet size
+    - (?) decode - partial packets
     - [ ] prune handlers
     - [ ] check that goroutines in ssmp::listen terminate on return
     - [ ] idle poll
@@ -33,8 +35,9 @@
          - [x] decode::DLE 
          - [x] return SnmpGetResponse
          - [x] encode::DLE 
+         - [x] require STX-ETX framing
          - [ ] CRC
-   - [ ] SSMP idle - revert to MODE_UNKNOWN ?
+   - [ ] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
    - https://www.baeldung.com/cs/bisync

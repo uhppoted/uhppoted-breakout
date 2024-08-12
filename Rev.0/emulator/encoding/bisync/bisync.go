@@ -2,6 +2,7 @@ package bisync
 
 import (
 	"bytes"
+	"fmt"
 )
 
 const SOH byte = 1
@@ -12,6 +13,9 @@ const ACK byte = 6
 const DLE byte = 16
 const SYN byte = 22
 
+const HEADER_SIZE = 128
+const PACKET_SIZE = 512
+
 var Enq = []byte{SYN, SYN, ENQ}
 var Ack = []byte{SYN, SYN, ACK}
 
@@ -19,11 +23,24 @@ type Bisync struct {
 	SOH bool
 	STX bool
 	DLE bool
+
+	header bytes.Buffer
+	packet bytes.Buffer
 }
 
 type Message struct {
 	Header []byte
 	Packet []byte
+}
+
+func NewBisync() *Bisync {
+	return &Bisync{
+		SOH:    false,
+		STX:    false,
+		DLE:    false,
+		header: bytes.Buffer{},
+		packet: bytes.Buffer{},
+	}
 }
 
 func (codec Bisync) Encode(msg Message) ([]byte, error) {
@@ -39,7 +56,7 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 	}
 
 	// ... encode message header
-	if len(msg.Header) > 0 {
+	if msg.Header != nil {
 		if err := b.WriteByte(SOH); err != nil {
 			return nil, err
 		}
@@ -98,52 +115,89 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 }
 
 func (codec *Bisync) Decode(msg []uint8) ([]Message, error) {
+	messages, err := codec.decode(msg)
+	if err != nil {
+		codec.reset()
+	}
+
+	return messages, err
+}
+
+func (codec *Bisync) decode(msg []uint8) ([]Message, error) {
 	messages := []Message{}
-	header := bytes.Buffer{}
-	packet := bytes.Buffer{}
 
 	for _, b := range msg {
 		if codec.DLE {
 			if codec.SOH {
-				if err := header.WriteByte(b); err != nil {
+				if err := codec.header.WriteByte(b); err != nil {
 					return messages, err
 				}
 			}
 
 			if codec.STX {
-				if err := packet.WriteByte(b); err != nil {
+				if err := codec.packet.WriteByte(b); err != nil {
 					return messages, err
 				}
 			}
 
 			codec.DLE = false
 
-		} else if b == SOH {
-			codec.SOH = true
-			codec.STX = false
-		} else if b == STX {
-			codec.SOH = false
-			codec.STX = true
-		} else if b == ETX {
-			codec.SOH = false
-			codec.STX = false
+		} else {
+			switch b {
+			case SOH:
+				codec.SOH = true
+				codec.STX = false
 
-			messages = append(messages, Message{
-				Header: header.Bytes(),
-				Packet: packet.Bytes(),
-			})
-		} else if b == DLE {
-			codec.DLE = true
-		} else if codec.SOH {
-			if err := header.WriteByte(b); err != nil {
-				return messages, err
-			}
-		} else if codec.STX {
-			if err := packet.WriteByte(b); err != nil {
-				return messages, err
+			case STX:
+				codec.SOH = false
+				codec.STX = true
+
+			case ETX:
+				codec.SOH = false
+				codec.STX = false
+
+				messages = append(messages, Message{
+					Header: codec.header.Bytes(),
+					Packet: codec.packet.Bytes(),
+				})
+
+				codec.reset()
+
+			case DLE:
+				codec.DLE = true
+
+			default:
+				if codec.SOH {
+					if codec.header.Len() < HEADER_SIZE {
+						if err := codec.header.WriteByte(b); err != nil {
+							return messages, err
+						}
+					} else {
+						return messages, fmt.Errorf("header overflow")
+					}
+				}
+
+				if codec.STX {
+					if codec.packet.Len() < PACKET_SIZE {
+						if err := codec.packet.WriteByte(b); err != nil {
+							return messages, err
+						}
+					} else {
+						return messages, fmt.Errorf("buffer overflow")
+					}
+				}
 			}
 		}
 	}
 
 	return messages, nil
+}
+
+func (codec *Bisync) reset() {
+	codec.SOH = false
+	codec.STX = false
+	codec.DLE = false
+
+	codec.header.Reset()
+	codec.packet.Reset()
 }

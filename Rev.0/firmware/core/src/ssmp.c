@@ -27,7 +27,7 @@ const uint8_t RESPONSE[] = {
 // clang-format on
 
 void ssmp_ack();
-void ssmp_get(const uint8_t *buffer, int N);
+void ssmp_get(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 void ssmp_echo(const uint8_t *buffer, int N);
 void on_ssmp();
 
@@ -35,9 +35,13 @@ struct {
     struct bisync codec;
 } SSMP = {
     .codec = {
-        .buffer = {0},
+        .header = {0},
+        .data = {0},
+        .hx = 0,
         .ix = 0,
         .DLE = false,
+        .SOH = false,
+        .STX = false,
         .enq = ssmp_ack,
         .received = ssmp_get,
     },
@@ -105,10 +109,8 @@ void ssmp_ack() {
     fflush(stdout);
 }
 
-void ssmp_get(const uint8_t *buffer, int N) {
-    uint8_t header[] = {0, 0, 0, 1};
-
-    message msg = bisync_encode(header, sizeof(header), RESPONSE, sizeof(RESPONSE));
+void ssmp_get(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
+    message msg = bisync_encode(NULL, 0, RESPONSE, sizeof(RESPONSE));
 
     fwrite(msg.data, sizeof(uint8_t), msg.N, stdout);
     fflush(stdout);

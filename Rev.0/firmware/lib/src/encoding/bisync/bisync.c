@@ -14,6 +14,15 @@ const uint8_t SYN = 22;
 
 const char SYN_SYN_ACK[] = {SYN, SYN, ACK};
 
+void bisync_reset(struct bisync *codec) {
+    memset(codec->header, 0, sizeof(codec->header));
+    memset(codec->data, 0, sizeof(codec->data));
+    codec->hx = 0;
+    codec->ix = 0;
+    codec->SOH = false;
+    codec->STX = false;
+}
+
 void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
     for (int i = 0; i < N; i++) {
         uint8_t ch = buffer[i];
@@ -22,43 +31,60 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
         if (codec->DLE) {
             codec->DLE = false;
 
-            if (codec->ix < sizeof(codec->buffer)) {
-                codec->buffer[codec->ix++] = ch;
-            } else {
-                memset(codec->buffer, 0, sizeof(codec->buffer));
-                codec->ix = 0;
+            if (codec->SOH) {
+                if (codec->hx < sizeof(codec->header)) {
+                    codec->header[codec->hx++] = ch;
+                } else {
+                    bisync_reset(codec);
+                }
+            }
+
+            if (codec->STX) {
+                if (codec->ix < sizeof(codec->data)) {
+                    codec->data[codec->ix++] = ch;
+                } else {
+                    bisync_reset(codec);
+                }
             }
         } else {
             // SYN?
             if (ch == SYN) {
-                memset(codec->buffer, 0, sizeof(codec->buffer));
-                codec->ix = 0;
+                bisync_reset(codec);
                 continue;
             }
 
             // ENQ?
             if (ch == ENQ && codec->ix == 0) {
-                memset(codec->buffer, 0, sizeof(codec->buffer));
-                codec->ix = 0;
-
+                bisync_reset(codec);
                 if (codec->enq != NULL) {
                     codec->enq();
                 }
                 continue;
             }
 
+            // SOH?
+            if (ch == SOH) {
+                bisync_reset(codec);
+                codec->SOH = true;
+                continue;
+            }
+
+            // STX?
+            if (ch == STX) {
+                codec->SOH = false;
+                codec->STX = true;
+                continue;
+            }
+
             // ETX?
             if (ch == ETX) {
-                if (codec->ix < sizeof(codec->buffer)) {
-                    codec->buffer[codec->ix++] = ch;
-
+                if (codec->ix < sizeof(codec->data)) {
                     if (codec->received != NULL) {
-                        codec->received(codec->buffer, codec->ix);
+                        codec->received(codec->header, codec->hx, codec->data, codec->ix);
                     }
                 }
 
-                memset(codec->buffer, 0, sizeof(codec->buffer));
-                codec->ix = 0;
+                bisync_reset(codec);
                 continue;
             }
 
@@ -69,11 +95,20 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
             }
 
             // ... accumulate message
-            if (codec->ix < sizeof(codec->buffer)) {
-                codec->buffer[codec->ix++] = ch;
-            } else {
-                memset(codec->buffer, 0, sizeof(codec->buffer));
-                codec->ix = 0;
+            if (codec->SOH) {
+                if (codec->hx < sizeof(codec->header)) {
+                    codec->header[codec->hx++] = ch;
+                } else {
+                    bisync_reset(codec);
+                }
+            }
+
+            if (codec->STX) {
+                if (codec->ix < sizeof(codec->data)) {
+                    codec->data[codec->ix++] = ch;
+                } else {
+                    bisync_reset(codec);
+                }
             }
         }
     }

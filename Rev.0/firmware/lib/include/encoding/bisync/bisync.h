@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 typedef void (*bisync_enq)();
-typedef void (*bisync_msg)(const uint8_t *, int N);
+typedef void (*bisync_msg)(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 
 typedef struct message {
     uint8_t *data;
@@ -12,9 +12,13 @@ typedef struct message {
 } message;
 
 typedef struct bisync {
-    char buffer[512];
+    char header[128];
+    char data[512];
+    int hx;
     int ix;
     bool DLE;
+    bool SOH;
+    bool STX;
 
     bisync_enq enq;
     bisync_msg received;
@@ -32,4 +36,4 @@ extern const uint8_t SYN;
 extern const char SYN_SYN_ACK[];
 
 extern void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N);
-extern message bisync_encode(const uint8_t *header, int header_size, const uint8_t *data, int data_size);
+extern message bisync_encode(const uint8_t *header, int header_len, const uint8_t *data, int data_len);

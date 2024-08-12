@@ -1,7 +1,6 @@
 package ssmp
 
 import (
-	"encoding/binary"
 	"fmt"
 	syslog "log"
 	"os"
@@ -93,11 +92,7 @@ func (ssmp SSMP) Run() {
 
 	// ... reply channel
 	go func() {
-		codec := bisync.Bisync{
-			SOH: false,
-			STX: false,
-			DLE: false,
-		}
+		codec := bisync.NewBisync()
 
 		for {
 			select {
@@ -111,11 +106,7 @@ func (ssmp SSMP) Run() {
 				for _, reply := range replies {
 					debugf("reply %v %v", rqid, reply)
 
-					rqid := uint32(0)
-					if len(reply.Header) >= 4 {
-						rqid = binary.BigEndian.Uint32(reply.Header)
-					}
-
+					rqid := uint32(1) // FIXME hardcoded until firmware encodes packet
 					if h, ok := handlers[rqid]; !ok {
 						warnf("reply %v (missing handler)", rqid)
 					} else {
@@ -143,7 +134,7 @@ func (ssmp SSMP) Run() {
 				debugf("request %v", request)
 
 				msg := bisync.Message{
-					Header: []byte{0x00, 0x00, 0x00, 0x01}, // FIXME use request ID from packet
+					Header: nil,
 					Packet: request.packet,
 				}
 
