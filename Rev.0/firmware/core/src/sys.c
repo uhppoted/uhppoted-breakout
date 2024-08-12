@@ -90,7 +90,7 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_TICK) {
         sys_tick();
 
-        if (SYSTEM.mode == MODE_UNKNOWN) {
+        if (SYSTEM.mode == MODE_UNKNOWN || SYSTEM.mode == MODE_CLI) {
             cli_ping();
         }
     }

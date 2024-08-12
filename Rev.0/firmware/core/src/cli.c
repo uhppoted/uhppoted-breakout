@@ -26,12 +26,16 @@ typedef struct CLI {
     char buffer[64];
     int ix;
     int32_t timer;
+    int32_t ping;
 } CLI;
 
-const uint32_t CLI_TIMEOUT = 5000; // ms
+const uint32_t CLI_TIMEOUT = 5000;     // ms
+const uint32_t CLI_PING_TIMEOUT = 250; // ms
 const uint8_t height = 25;
 
 int64_t cli_timeout(alarm_id_t id, void *data);
+int64_t cli_ping_timeout(alarm_id_t id, void *data);
+
 void echo(const char *line);
 void clearline();
 void cpr(char *cmd);
@@ -124,6 +128,7 @@ void cli_init() {
  *
  */
 void cli_ping() {
+    cli.ping = add_alarm_in_ms(CLI_PING_TIMEOUT, cli_ping_timeout, (CLI *)&cli, true);
     printf(TERMINAL_QUERY_STATUS);
 }
 
@@ -183,6 +188,7 @@ void cli_rx(const struct buffer *received) {
 
             if (cli.buffer[2] == '0') {
                 set_mode(MODE_CLI);
+                cancel_alarm(cli.ping);
             }
 
             memset(cli.buffer, 0, sizeof(cli.buffer));
@@ -241,6 +247,17 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
     cli->timer = 0;
 
     clearline();
+
+    return 0;
+}
+
+/* 'ping' timeout handler. Sets the system 'mode' to 'unknown'.
+ *
+ */
+int64_t cli_ping_timeout(alarm_id_t id, void *data) {
+    if (get_mode() == MODE_CLI) {
+        set_mode(MODE_UNKNOWN);
+    }
 
     return 0;
 }

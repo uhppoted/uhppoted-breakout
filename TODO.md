@@ -12,7 +12,8 @@
           - [ ] errors pipe in request
     - [x] move encoding to encoding/BER
     - [x] move encoding to encoding/bisync
-    - [x] decode - DLE 
+    - [ ] decode - DLE 
+    - [ ] CsRC
     - [ ] decode - partial packets
     - [ ] use SNMP request/message ID
     - [ ] prune handlers
@@ -51,7 +52,7 @@
     - [x] LED yellow/green for UNKNOWN mode
     - [x] LED red/green for CLI mode
     - [x] LED blue/green for SSMP mode
-    - [ ] CLI idle - ping for terminal status
+    - [x] CLI idle - ping for terminal status
     - [ ] dropping last typed character if echo uses sys::print
           - printf works but sys::print doesn't
 
