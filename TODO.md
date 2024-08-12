@@ -1,9 +1,6 @@
 # TODO
 
 - [ ] debounce simulation
-- [ ] controller ID
-      - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
-      - compile time constant
 
 ### emulator
     - [ ] get-controller
@@ -14,9 +11,9 @@
     - [x] move encoding to encoding/bisync
     - [x] decode - DLE 
     - [x] require STX-ETX framing
-    - [ ] use SNMP request/message ID
-    - [ ] CRC
     - [x] limit packet size
+    - [x] use SNMP request/message ID
+    - [ ] CRC
     - (?) decode - partial packets
     - [ ] prune handlers
     - [ ] check that goroutines in ssmp::listen terminate on return
@@ -46,6 +43,11 @@
    - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
    - https://people.ece.cornell.edu/land/courses/ece4760/RP2040/C_SDK_random/index_random.html
    - https://forums.raspberrypi.com/viewtopic.php?t=302960
+
+### MIB
+    - [ ] controller ID
+          - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
+          - compile time constant
 
 ### CLI
     - [x] initialise on connected

@@ -21,8 +21,8 @@ type SSMP struct {
 }
 
 type request struct {
-	packet []byte
-	pipe   chan []byte
+	packet gosnmp.SnmpPacket
+	pipe   chan gosnmp.SnmpPacket
 }
 
 var write = make(chan request)
@@ -54,32 +54,28 @@ func Get(oid []uint32) (any, error) {
 		Logger:          logger,
 	}
 
-	if bytes, err := BER.Encode(packet); err != nil {
-		return nil, err
-	} else {
-		rq := request{
-			packet: bytes,
-			pipe:   make(chan []byte),
+	rq := request{
+		packet: packet,
+		pipe:   make(chan gosnmp.SnmpPacket),
+	}
+
+	timeout := time.After(500 * time.Millisecond)
+
+	write <- rq
+	select {
+	case reply := <-rq.pipe:
+		debugf("reply to SSMP GET request (%v)", reply)
+
+		if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
+			return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+		} else if v, ok := value.(uint32); !ok {
+			return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+		} else {
+			return v, nil
 		}
 
-		timeout := time.After(500 * time.Millisecond)
-
-		write <- rq
-		select {
-		case reply := <-rq.pipe:
-			debugf("reply to SSMP GET request (%v)", reply)
-
-			if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
-				return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
-			} else if v, ok := value.(uint32); !ok {
-				return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
-			} else {
-				return v, nil
-			}
-
-		case <-timeout:
-			return 0, fmt.Errorf("no reply to SSMP GET %v request", ".1.3.6.655136.1.1")
-		}
+	case <-timeout:
+		return 0, fmt.Errorf("no reply to SSMP GET %v request", ".1.3.6.655136.1.1")
 	}
 
 	return 0, fmt.Errorf("SSMP GET %v failed", ".1.3.6.655136.1.1")
@@ -97,22 +93,15 @@ func (ssmp SSMP) Run() {
 		for {
 			select {
 			case msg := <-rx:
-				debugf("reply %v", msg)
-				replies, err := codec.Decode(msg)
-				if err != nil {
-					warnf("reply error (%v)", err)
-				}
-
+				replies := received(msg, codec)
 				for _, reply := range replies {
-					debugf("reply %v %v", rqid, reply)
+					rqid := reply.RequestID
 
-					rqid := uint32(1) // FIXME hardcoded until firmware encodes packet
 					if h, ok := handlers[rqid]; !ok {
 						warnf("reply %v (missing handler)", rqid)
 					} else {
 						select {
-						case h.pipe <- reply.Packet:
-							debugf("reply %v ok", rqid)
+						case h.pipe <- reply:
 						default:
 							warnf("reply %v (pipe closed)", rqid)
 						}
@@ -126,27 +115,15 @@ func (ssmp SSMP) Run() {
 
 	// ... request channel
 	go func() {
-		codec := bisync.Bisync{}
+		codec := bisync.NewBisync()
 
 		for {
 			select {
 			case request := <-write:
-				debugf("request %v", request)
-
-				msg := bisync.Message{
-					Header: nil,
-					Packet: request.packet,
-				}
-
-				if encoded, err := codec.Encode(msg); err != nil {
+				if err := send(request.packet, codec, tx); err != nil {
 					warnf("request error (%v)", err)
 				} else {
-					select {
-					case tx <- encoded:
-						handlers[1] = request // FIXME use request ID from packet
-					default:
-						warnf("TX queue blocked")
-					}
+					handlers[request.packet.RequestID] = request
 				}
 			}
 		}
@@ -154,7 +131,7 @@ func (ssmp SSMP) Run() {
 
 	// ... listener
 	for {
-		if err := ssmp.listen(tx, rx); err != nil {
+		if err := listen(ssmp.USB, tx, rx); err != nil {
 			errorf("%v", err)
 		}
 
@@ -162,8 +139,60 @@ func (ssmp SSMP) Run() {
 	}
 }
 
-func (ssmp SSMP) listen(tx chan []byte, rx chan []byte) error {
-	if t, err := term.Open(ssmp.USB, term.Speed(115200), term.RawMode); err != nil {
+func send(packet gosnmp.SnmpPacket, codec *bisync.Bisync, tx chan []byte) error {
+	if bytes, err := BER.Encode(packet); err != nil {
+		return err
+	} else {
+		msg := bisync.Message{
+			Header: nil,
+			Packet: bytes,
+		}
+
+		if encoded, err := codec.Encode(msg); err != nil {
+			return err
+		} else {
+			select {
+			case tx <- encoded:
+				return nil
+
+			default:
+				return fmt.Errorf("TX queue blocked")
+			}
+		}
+	}
+}
+
+func received(msg []byte, codec *bisync.Bisync) []gosnmp.SnmpPacket {
+	var packets []gosnmp.SnmpPacket
+
+	replies, err := codec.Decode(msg)
+	if err != nil {
+		warnf("%v", err)
+	}
+
+	for _, reply := range replies {
+		if packet, err := BER.Decode(reply.Packet); err != nil {
+			warnf("%v", err)
+		} else if packet != nil {
+			packets = append(packets, *packet)
+		}
+	}
+
+	return packets
+}
+
+func get(packet gosnmp.SnmpPacket, OID string) (any, error) {
+	for _, pdu := range packet.Variables {
+		if pdu.Name == OID {
+			return pdu.Value, nil
+		}
+	}
+
+	return nil, fmt.Errorf("OID %v not found", OID)
+}
+
+func listen(USB string, tx chan []byte, rx chan []byte) error {
+	if t, err := term.Open(USB, term.Speed(115200), term.RawMode); err != nil {
 		return err
 	} else {
 		infof("connected")
@@ -273,22 +302,6 @@ func (ssmp SSMP) listen(tx chan []byte, rx chan []byte) error {
 
 		return nil
 	}
-}
-
-func get(msg []uint8, OID string) (any, error) {
-	if packet, err := BER.Decode(msg); err != nil {
-		return nil, err
-	} else if packet == nil {
-		return nil, fmt.Errorf("invalid SSMP packet (%v)", packet)
-	} else {
-		for _, pdu := range packet.Variables {
-			if pdu.Name == OID {
-				return pdu.Value, nil
-			}
-		}
-	}
-
-	return nil, fmt.Errorf("OID %v not found", OID)
 }
 
 func debugf(format string, args ...any) {
