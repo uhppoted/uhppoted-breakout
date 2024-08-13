@@ -54,7 +54,8 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
             }
 
             // ENQ?
-            if (ch == ENQ && codec->ix == 0) {
+            // if (ch == ENQ && codec->ix == 0) {
+            if (ch == ENQ) {
                 bisync_reset(codec);
                 if (codec->enq != NULL) {
                     codec->enq();
@@ -132,6 +133,7 @@ message bisync_encode(const uint8_t *header, int header_size, const uint8_t *dat
         for (int i = 0; i < header_size; i++) {
             switch (header[i]) {
             case SYN:
+            case ENQ:
             case SOH:
             case STX:
             case ETX:
@@ -146,6 +148,7 @@ message bisync_encode(const uint8_t *header, int header_size, const uint8_t *dat
         for (int i = 0; i < data_size; i++) {
             switch (data[i]) {
             case SYN:
+            case ENQ:
             case SOH:
             case STX:
             case ETX:

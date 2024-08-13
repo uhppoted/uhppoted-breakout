@@ -4,12 +4,14 @@
 
 #include <hardware/uart.h>
 #include <pico/stdlib.h>
+#include <pico/time.h>
 
 #include <breakout.h>
 #include <encoding/bisync/bisync.h>
 #include <log.h>
 #include <ssmp.h>
 #include <state.h>
+#include <sys.h>
 
 #define BAUD_RATE 115200
 #define DATA_BITS 8
@@ -26,13 +28,16 @@ const uint8_t RESPONSE[] = {
     42,  55,  120};
 // clang-format on
 
-void ssmp_ack();
+const int64_t SSMP_IDLE = 5000; // ms
+
+void ssmp_enq();
 void ssmp_get(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 void ssmp_echo(const uint8_t *buffer, int N);
 void on_ssmp();
 
 struct {
     struct bisync codec;
+    absolute_time_t touched;
 } SSMP = {
     .codec = {
         .header = {0},
@@ -42,9 +47,10 @@ struct {
         .DLE = false,
         .SOH = false,
         .STX = false,
-        .enq = ssmp_ack,
+        .enq = ssmp_enq,
         .received = ssmp_get,
     },
+    .touched = 0,
 };
 
 void ssmp_init() {
@@ -60,6 +66,8 @@ void ssmp_init() {
     // uart_set_hw_flow(uart0, false, false);
     // uart_set_fifo_enabled(uart0, false);
 
+    SSMP.touched = get_absolute_time();
+
     infof("SSMP", "initialised");
 }
 
@@ -70,6 +78,21 @@ void ssmp_start() {
     // irq_set_exclusive_handler(UART0_IRQ, on_smp);
     // irq_set_enabled(UART0_IRQ, true);
     // uart_set_irq_enables(uart0, true, false);
+}
+
+void ssmp_ping() {
+    if (get_mode() == MODE_SSMP) {
+        absolute_time_t now = get_absolute_time();
+        int64_t delta = absolute_time_diff_us(SSMP.touched, now) / 1000;
+
+        // char s[64];
+        // snprintf(s, sizeof(s), "%lld   %lld   %lld %s", SSMP.touched, now / 1000, delta, llabs(delta) > SSMP_IDLE ? "idle" : " busy");
+        // printf(s);
+
+        if (llabs(delta) > SSMP_IDLE) {
+            set_mode(MODE_UNKNOWN);
+        }
+    }
 }
 
 void on_ssmp() {
@@ -101,7 +124,9 @@ void ssmp_rx(const struct buffer *received) {
     bisync_decode(&SSMP.codec, received->data, received->N);
 }
 
-void ssmp_ack() {
+void ssmp_enq() {
+    SSMP.touched = get_absolute_time();
+
     const char *reply = SYN_SYN_ACK;
 
     fflush(stdout);
@@ -110,6 +135,8 @@ void ssmp_ack() {
 }
 
 void ssmp_get(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
+    SSMP.touched = get_absolute_time();
+
     message msg = bisync_encode(NULL, 0, RESPONSE, sizeof(RESPONSE));
 
     fwrite(msg.data, sizeof(uint8_t), msg.N, stdout);

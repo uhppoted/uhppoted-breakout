@@ -64,6 +64,7 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 		for _, byte := range msg.Header {
 			switch byte {
 			case SYN,
+				ENQ,
 				SOH,
 				STX,
 				ETX,
@@ -88,6 +89,7 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 		byte := msg.Packet[ix]
 		switch byte {
 		case SYN,
+			ENQ,
 			SOH,
 			STX,
 			ETX,

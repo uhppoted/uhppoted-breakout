@@ -84,7 +84,17 @@ func Get(oid []uint32) (any, error) {
 func (ssmp SSMP) Run() {
 	rx := make(chan []byte)
 	tx := make(chan []byte)
+	pipe := make(chan []byte)
+	errors := make(chan error)
 	handlers := map[uint32]request{}
+
+	defer func() {
+		close(pipe)
+	}()
+
+	defer func() {
+		close(errors)
+	}()
 
 	// ... reply channel
 	go func() {
@@ -131,7 +141,7 @@ func (ssmp SSMP) Run() {
 
 	// ... listener
 	for {
-		if err := listen(ssmp.USB, tx, rx); err != nil {
+		if err := listen(ssmp.USB, tx, rx, pipe, errors); err != nil {
 			errorf("%v", err)
 		}
 
@@ -191,7 +201,7 @@ func get(packet gosnmp.SnmpPacket, OID string) (any, error) {
 	return nil, fmt.Errorf("OID %v not found", OID)
 }
 
-func listen(USB string, tx chan []byte, rx chan []byte) error {
+func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors chan error) error {
 	if t, err := term.Open(USB, term.Speed(115200), term.RawMode); err != nil {
 		return err
 	} else {
@@ -209,14 +219,19 @@ func listen(USB string, tx chan []byte, rx chan []byte) error {
 			return err
 		}
 
+		time.Sleep(100 * time.Millisecond)
+
 		// ... read
-		pipe := make(chan []byte)
-		errors := make(chan error)
+		closed := false
+
+		defer func() {
+			closed = true
+		}()
 
 		go func() {
 			buffer := make([]byte, 256)
 
-			for {
+			for !closed {
 				if N, err := t.Read(buffer); err != nil {
 					errors <- err
 					return
@@ -226,7 +241,7 @@ func listen(USB string, tx chan []byte, rx chan []byte) error {
 			}
 		}()
 
-		// ... send SYN-SYN-ENQ until acknowledged
+		// ... send SYN-SYN-ENQ at 1s intervals until acknowledged
 	enq:
 		for {
 			cmd := bisync.Enq
@@ -257,7 +272,8 @@ func listen(USB string, tx chan []byte, rx chan []byte) error {
 		}
 
 		// ... TX/RX loop
-		idle := time.After(39000 * time.Millisecond)
+		idle := time.After(15000 * time.Millisecond)
+		ping := time.Tick(2500 * time.Millisecond)
 
 		for {
 			select {
@@ -294,6 +310,16 @@ func listen(USB string, tx chan []byte, rx chan []byte) error {
 
 			case <-idle:
 				return fmt.Errorf("idle")
+
+			case <-ping:
+				cmd := bisync.Enq
+				if N, err := t.Write(cmd); err != nil {
+					warnf("ping error (%v)", err)
+				} else if N != len(cmd) {
+					warnf("ping error (sent %v of %v bytes)", N, len(cmd))
+				} else {
+					debugf("SYN-SYN-ENQ")
+				}
 
 			case err := <-errors:
 				return err

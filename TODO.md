@@ -13,10 +13,11 @@
     - [x] require STX-ETX framing
     - [x] limit packet size
     - [x] use SNMP request/message ID
+    - [ ] ENQ/ACK loop - use codec (because buffer might have e.g. CLI pings)
     - [ ] CRC
+    - [ ] Fix 'read' goroutine that never exits
     - (?) decode - partial packets
     - [ ] prune handlers
-    - [ ] check that goroutines in ssmp::listen terminate on return
     - [ ] idle poll
     - [ ] walk MIB to initialise/refresh cache
     - [ ] // TODO: exponential backoff
@@ -34,7 +35,7 @@
          - [x] encode::DLE 
          - [x] require STX-ETX framing
          - [ ] CRC
-   - [ ] SSMP idle - revert to MODE_UNKNOWN
+   - [x] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
    - https://www.baeldung.com/cs/bisync
