@@ -236,6 +236,7 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 					errors <- err
 					return
 				} else if N > 0 {
+					fmt.Printf(">>> READ %v %v\n", N, buffer[0:N])
 					pipe <- buffer[0:N]
 				}
 			}
@@ -260,9 +261,10 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 				select {
 				case reply := <-pipe:
 					if slices.Equal(reply, bisync.Ack) {
-						debugf("ACK")
-						break enq
+						// debugf("ACK")
+						// 	break enq
 					}
+					break enq
 
 				case <-timeout:
 					warnf("TIMEOUT")

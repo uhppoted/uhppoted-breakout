@@ -7,7 +7,9 @@
 #include <pico/time.h>
 
 #include <breakout.h>
+#include <encoding/BER/BER.h>
 #include <encoding/bisync/bisync.h>
+#include <encoding/encoding.h>
 #include <log.h>
 #include <ssmp.h>
 #include <state.h>
@@ -18,21 +20,10 @@
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
-// clang-format off
-const uint8_t RESPONSE[] = {
-    48,  41,  2,   1,   0,  4,   6,  112, 
-    117, 98,  108, 105, 99, 162, 28, 2, 
-    1,   1,   2,   1,   0,  2,   1,  0,
-    48,  17,  48,  15,  6,  7,   43, 6,
-    167, 254, 32,  1,   1,  71,  4,  24, 
-    42,  55,  120};
-// clang-format on
-
 const int64_t SSMP_IDLE = 5000; // ms
 
 void ssmp_enq();
-void ssmp_get(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
-void ssmp_echo(const uint8_t *buffer, int N);
+void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 void on_ssmp();
 
 struct {
@@ -48,7 +39,7 @@ struct {
         .SOH = false,
         .STX = false,
         .enq = ssmp_enq,
-        .received = ssmp_get,
+        .received = ssmp_received,
     },
     .touched = 0,
 };
@@ -115,7 +106,7 @@ void on_ssmp() {
     //             free(b);
     //         }
     //     }
-
+    //
     //     ix = 0;
     // }
 }
@@ -134,37 +125,23 @@ void ssmp_enq() {
     fflush(stdout);
 }
 
-void ssmp_get(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
+void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
     SSMP.touched = get_absolute_time();
 
-    message msg = bisync_encode(NULL, 0, RESPONSE, sizeof(RESPONSE));
+    const struct packet request = BER_decode(data, data_len);
+    const struct packet reply = {
+        .tag = PACKET_GET_RESPONSE,
+        .get_response = {
+            .request_id = request.get.request_id,
+        },
+    };
 
-    fwrite(msg.data, sizeof(uint8_t), msg.N, stdout);
+    message packed = BER_encode(reply);
+    message encoded = bisync_encode(NULL, 0, packed.data, packed.N);
+
+    fwrite(encoded.data, sizeof(uint8_t), encoded.N, stdout);
     fflush(stdout);
-    free(msg.data);
-}
 
-void ssmp_echo(const uint8_t *buffer, int N) {
-    // uint8_t *reply = (char *)calloc(N + 9, sizeof(uint8_t));
-    uint8_t *reply = (char *)calloc(N + 2, sizeof(uint8_t));
-    uint8_t *p = reply;
-
-    *p++ = SYN;
-    *p++ = SYN;
-    // *p++ = SOH;
-    // *p++ = (N >> 24) & 0xff;
-    // *p++ = (N >> 16) & 0xff;
-    // *p++ = (N >> 8) & 0xff;
-    // *p++ = (N >> 0) & 0xff;
-    // *p++ = STX;
-
-    for (int i = 0; i < N; i++) {
-        *p++ = buffer[i];
-    }
-
-    // *p++ = ETX;
-
-    fwrite(reply, 1, N + 2, stdout);
-    fflush(stdout);
-    free(reply);
+    free(packed.data);
+    free(encoded.data);
 }

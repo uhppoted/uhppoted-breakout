@@ -21,7 +21,9 @@ format:
 	clang-format -i src/*.c
 	clang-format -i ../core/src/*.c ../core/include/*.h
 	clang-format -i ../lib/src/*.c  ../lib/include/*.h
+	clang-format -i ../lib/include/encoding/*.h
 	clang-format -i ../lib/src/encoding/bisync/*.c  ../lib/include/encoding/bisync/*.h
+	clang-format -i ../lib/src/encoding/BER/*.c  ../lib/include/encoding/BER/*.h
 
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make

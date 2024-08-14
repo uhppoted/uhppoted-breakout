@@ -3,13 +3,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <encoding/encoding.h>
+
 typedef void (*bisync_enq)();
 typedef void (*bisync_msg)(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
-
-typedef struct message {
-    uint8_t *data;
-    int N;
-} message;
 
 typedef struct bisync {
     char header[128];

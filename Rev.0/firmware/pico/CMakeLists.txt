@@ -47,6 +47,7 @@ add_executable(breakout
   ${LIB}/src/PCAL6416A.c
 
   ${LIB}/src/encoding/bisync/bisync.c
+  ${LIB}/src/encoding/BER/BER.c
 )
 
 target_include_directories(breakout 

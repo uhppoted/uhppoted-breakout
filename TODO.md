@@ -5,7 +5,6 @@
 ### emulator
     - [ ] get-controller
           - [x] from MIB
-          - [ ] populate MIB from SSMP
           - [ ] errors pipe in request
     - [x] move encoding to encoding/BER
     - [x] move encoding to encoding/bisync
@@ -34,6 +33,7 @@
          - [x] return SnmpGetResponse
          - [x] encode::DLE 
          - [x] require STX-ETX framing
+         - [x] BER
          - [ ] CRC
    - [x] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO
