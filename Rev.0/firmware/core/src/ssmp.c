@@ -120,11 +120,9 @@ void ssmp_enq() {
 
     const char *reply = SYN_SYN_ACK;
 
-    printf(">>");
     fflush(stdout);
     fwrite(reply, 1, 3, stdout);
     fflush(stdout);
-    printf("<<");
 }
 
 void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {

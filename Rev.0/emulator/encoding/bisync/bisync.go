@@ -28,9 +28,10 @@ type Bisync struct {
 	packet bytes.Buffer
 }
 
-type Message struct {
-	Header []byte
-	Packet []byte
+type callback interface {
+	OnENQ()
+	OnACK()
+	OnMessage(header []uint8, content []uint8)
 }
 
 func NewBisync() *Bisync {
@@ -43,7 +44,7 @@ func NewBisync() *Bisync {
 	}
 }
 
-func (codec Bisync) Encode(msg Message) ([]byte, error) {
+func (codec Bisync) Encode(header []uint8, packet []uint8) ([]byte, error) {
 	var b bytes.Buffer
 
 	// ... preamble
@@ -56,15 +57,16 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 	}
 
 	// ... encode message header
-	if msg.Header != nil {
+	if header != nil {
 		if err := b.WriteByte(SOH); err != nil {
 			return nil, err
 		}
 
-		for _, byte := range msg.Header {
+		for _, byte := range header {
 			switch byte {
 			case SYN,
 				ENQ,
+				ACK,
 				SOH,
 				STX,
 				ETX,
@@ -85,11 +87,12 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 		return nil, err
 	}
 
-	for ix := 0; ix < len(msg.Packet); ix++ {
-		byte := msg.Packet[ix]
+	for ix := 0; ix < len(packet); ix++ {
+		byte := packet[ix]
 		switch byte {
 		case SYN,
 			ENQ,
+			ACK,
 			SOH,
 			STX,
 			ETX,
@@ -116,29 +119,27 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (codec *Bisync) Decode(msg []uint8) ([]any, error) {
-	messages, err := codec.decode(msg)
-	if err != nil {
+func (codec *Bisync) Decode(msg []uint8, f callback) error {
+	if err := codec.decode(msg, f); err != nil {
 		codec.reset()
+		return err
 	}
 
-	return messages, err
+	return nil
 }
 
-func (codec *Bisync) decode(msg []uint8) ([]any, error) {
-	messages := []any{}
-
+func (codec *Bisync) decode(msg []uint8, f callback) error {
 	for _, b := range msg {
 		if codec.DLE {
 			if codec.SOH {
 				if err := codec.header.WriteByte(b); err != nil {
-					return messages, err
+					return err
 				}
 			}
 
 			if codec.STX {
 				if err := codec.packet.WriteByte(b); err != nil {
-					return messages, err
+					return err
 				}
 			}
 
@@ -155,30 +156,35 @@ func (codec *Bisync) decode(msg []uint8) ([]any, error) {
 
 			case ENQ:
 				if codec.packet.Len() == 0 {
-					messages = append(messages, []uint8{ENQ})
+					if f != nil {
+						f.OnENQ()
+					}
 				}
 
 				codec.reset()
 
 			case ACK:
 				if codec.packet.Len() == 0 {
-					messages = append(messages, []uint8{ACK})
+					if f != nil {
+						f.OnACK()
+					}
 				}
 
 				codec.reset()
 
 			case STX:
+				println("STX")
 				codec.SOH = false
 				codec.STX = true
 
 			case ETX:
+				println("ETX")
 				codec.SOH = false
 				codec.STX = false
 
-				messages = append(messages, Message{
-					Header: codec.header.Bytes(),
-					Packet: codec.packet.Bytes(),
-				})
+				if f != nil {
+					f.OnMessage(codec.header.Bytes(), codec.packet.Bytes())
+				}
 
 				codec.reset()
 
@@ -189,27 +195,27 @@ func (codec *Bisync) decode(msg []uint8) ([]any, error) {
 				if codec.SOH {
 					if codec.header.Len() < HEADER_SIZE {
 						if err := codec.header.WriteByte(b); err != nil {
-							return messages, err
+							return err
 						}
 					} else {
-						return messages, fmt.Errorf("header overflow")
+						return fmt.Errorf("header overflow")
 					}
 				}
 
 				if codec.STX {
 					if codec.packet.Len() < PACKET_SIZE {
 						if err := codec.packet.WriteByte(b); err != nil {
-							return messages, err
+							return err
 						}
 					} else {
-						return messages, fmt.Errorf("buffer overflow")
+						return fmt.Errorf("buffer overflow")
 					}
 				}
 			}
 		}
 	}
 
-	return messages, nil
+	return nil
 }
 
 func (codec *Bisync) reset() {

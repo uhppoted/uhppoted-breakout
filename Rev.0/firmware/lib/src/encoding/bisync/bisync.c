@@ -14,6 +14,8 @@ const uint8_t SYN = 22;
 
 const char SYN_SYN_ACK[] = {SYN, SYN, ACK};
 
+bool escape(uint8_t b);
+
 void bisync_reset(struct bisync *codec) {
     memset(codec->header, 0, sizeof(codec->header));
     memset(codec->data, 0, sizeof(codec->data));
@@ -27,7 +29,7 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
     for (int i = 0; i < N; i++) {
         uint8_t ch = buffer[i];
 
-        // ... escape?
+        // ... escaped?
         if (codec->DLE) {
             codec->DLE = false;
 
@@ -131,30 +133,16 @@ message bisync_encode(const uint8_t *header, int header_size, const uint8_t *dat
 
     if (header != NULL) {
         for (int i = 0; i < header_size; i++) {
-            switch (header[i]) {
-            case SYN:
-            case ENQ:
-            case SOH:
-            case STX:
-            case ETX:
-            case DLE:
+            if (escape(header[i])) {
                 N += 1;
-                break;
             }
         }
     }
 
     if (data != NULL) {
         for (int i = 0; i < data_size; i++) {
-            switch (data[i]) {
-            case SYN:
-            case ENQ:
-            case SOH:
-            case STX:
-            case ETX:
-            case DLE:
+            if (escape(data[i])) {
                 N += 1;
-                break;
             }
         }
     }
@@ -173,14 +161,8 @@ message bisync_encode(const uint8_t *header, int header_size, const uint8_t *dat
     if (header != NULL) {
         *p++ = SOH;
         for (int i = 0; i < header_size; i++) {
-            switch (header[i]) {
-            case SYN:
-            case SOH:
-            case STX:
-            case ETX:
-            case DLE:
+            if (escape(header[i])) {
                 *p++ = DLE;
-                break;
             }
 
             *p++ = header[i];
@@ -190,14 +172,8 @@ message bisync_encode(const uint8_t *header, int header_size, const uint8_t *dat
     *p++ = STX;
     if (data != NULL) {
         for (int i = 0; i < data_size; i++) {
-            switch (data[i]) {
-            case SYN:
-            case SOH:
-            case STX:
-            case ETX:
-            case DLE:
+            if (escape(data[i])) {
                 *p++ = DLE;
-                break;
             }
 
             *p++ = data[i];
@@ -206,4 +182,20 @@ message bisync_encode(const uint8_t *header, int header_size, const uint8_t *dat
     *p++ = ETX;
 
     return m;
+}
+
+bool escape(uint8_t b) {
+    switch (b) {
+    case SYN:
+    case ENQ:
+    case ACK:
+    case SOH:
+    case STX:
+    case ETX:
+    case DLE:
+        return true;
+
+    default:
+        return false;
+    }
 }

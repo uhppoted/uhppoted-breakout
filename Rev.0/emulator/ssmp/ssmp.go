@@ -4,7 +4,6 @@ import (
 	"fmt"
 	syslog "log"
 	"os"
-	"slices"
 	"sync/atomic"
 	"time"
 
@@ -153,12 +152,7 @@ func send(packet gosnmp.SnmpPacket, codec *bisync.Bisync, tx chan []byte) error 
 	if bytes, err := BER.Encode(packet); err != nil {
 		return err
 	} else {
-		msg := bisync.Message{
-			Header: nil,
-			Packet: bytes,
-		}
-
-		if encoded, err := codec.Encode(msg); err != nil {
+		if encoded, err := codec.Encode(nil, bytes); err != nil {
 			return err
 		} else {
 			select {
@@ -172,33 +166,55 @@ func send(packet gosnmp.SnmpPacket, codec *bisync.Bisync, tx chan []byte) error 
 	}
 }
 
+type handler struct {
+	onENQ     func()
+	onACK     func()
+	onMessage func(header []uint8, data []uint8)
+}
+
+func (h handler) OnENQ() {
+	if h.onENQ != nil {
+		h.onENQ()
+	}
+}
+
+func (h handler) OnACK() {
+	if h.onACK != nil {
+		h.onACK()
+	}
+}
+
+func (h handler) OnMessage(header []uint8, content []uint8) {
+	if h.onMessage != nil {
+		h.onMessage(header, content)
+	}
+}
+
 func received(msg []byte, codec *bisync.Bisync) []gosnmp.SnmpPacket {
 	var packets []gosnmp.SnmpPacket
 
-	replies, err := codec.Decode(msg)
-	if err != nil {
-		warnf("%v", err)
-	}
+	h := handler{
+		onENQ: func() {
+			debugf("ENQ")
+		},
 
-	for _, reply := range replies {
-		switch v := reply.(type) {
-		case []byte:
-			if slices.Equal(v, []uint8{bisync.ENQ}) {
-				debugf("ENQ")
-			} else if slices.Equal(v, []uint8{bisync.ACK}) {
-				debugf("ACK")
-			}
+		onACK: func() {
+			debugf("ACK")
+		},
 
-		case bisync.Message:
-			if packet, err := BER.Decode(v.Packet); err != nil {
+		onMessage: func(header []uint8, content []uint8) {
+			if packet, err := BER.Decode(content); err != nil {
 				warnf("%v", err)
 			} else if packet == nil {
-				debugf("ooops %v", packet)
+				warnf("invalid packet (%v)", packet)
 			} else {
-				infof("gotcha %v", packet)
 				packets = append(packets, *packet)
 			}
-		}
+		},
+	}
+
+	if err := codec.Decode(msg, h); err != nil {
+		warnf("%v", err)
 	}
 
 	return packets
@@ -256,6 +272,13 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 
 		// ... send SYN-SYN-ENQ at 1s intervals until acknowledged
 		codec := bisync.NewBisync()
+		acknowledged := false
+
+		h := handler{
+			onACK: func() {
+				acknowledged = true
+			},
+		}
 
 	enq:
 		for {
@@ -274,17 +297,11 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 			for {
 				select {
 				case reply := <-pipe:
-					if list, err := codec.Decode(reply); err != nil {
+					if err := codec.Decode(reply, h); err != nil {
 						return err
-					} else {
-						for _, r := range list {
-							if v, ok := r.([]uint8); ok {
-								if slices.Equal(v, []uint8{bisync.ACK}) {
-									debugf("ACK")
-									break enq
-								}
-							}
-						}
+					} else if acknowledged {
+						debugf("ACK")
+						break enq
 					}
 
 				case <-timeout:
@@ -322,13 +339,13 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 					warnf("write error (%v)", err)
 				} else if N != len(msg) {
 					warnf("write error (%v)", fmt.Errorf("sent %v bytes of %v)", N, len(msg)))
-				} else if len(msg) > 20 {
-					debugf("write (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
-						N,
-						msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
-						msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
-				} else {
-					debugf("write (%v bytes) %v", N, msg)
+					// } else if len(msg) > 20 {
+					// 	debugf("write (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
+					// 		N,
+					// 		msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
+					// 		msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
+					// } else {
+					// 	debugf("write (%v bytes) %v", N, msg)
 				}
 
 			case <-idle:
