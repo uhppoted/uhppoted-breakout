@@ -116,7 +116,7 @@ func (codec Bisync) Encode(msg Message) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (codec *Bisync) Decode(msg []uint8) ([]Message, error) {
+func (codec *Bisync) Decode(msg []uint8) ([]any, error) {
 	messages, err := codec.decode(msg)
 	if err != nil {
 		codec.reset()
@@ -125,8 +125,8 @@ func (codec *Bisync) Decode(msg []uint8) ([]Message, error) {
 	return messages, err
 }
 
-func (codec *Bisync) decode(msg []uint8) ([]Message, error) {
-	messages := []Message{}
+func (codec *Bisync) decode(msg []uint8) ([]any, error) {
+	messages := []any{}
 
 	for _, b := range msg {
 		if codec.DLE {
@@ -146,9 +146,26 @@ func (codec *Bisync) decode(msg []uint8) ([]Message, error) {
 
 		} else {
 			switch b {
+			case SYN:
+				codec.reset()
+
 			case SOH:
 				codec.SOH = true
 				codec.STX = false
+
+			case ENQ:
+				if codec.packet.Len() == 0 {
+					messages = append(messages, []uint8{ENQ})
+				}
+
+				codec.reset()
+
+			case ACK:
+				if codec.packet.Len() == 0 {
+					messages = append(messages, []uint8{ACK})
+				}
+
+				codec.reset()
 
 			case STX:
 				codec.SOH = false

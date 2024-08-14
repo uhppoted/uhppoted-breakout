@@ -12,7 +12,9 @@
     - [x] require STX-ETX framing
     - [x] limit packet size
     - [x] use SNMP request/message ID
-    - [ ] ENQ/ACK loop - use codec (because buffer might have e.g. CLI pings)
+    - [ ] ENQ/ACK loop - use codec
+          - (?) use common rx codec??
+          - (?) Use callback to handle decoded messages
     - [ ] CRC
     - [ ] Fix 'read' goroutine that never exits
     - (?) decode - partial packets

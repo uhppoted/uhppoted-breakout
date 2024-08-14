@@ -181,10 +181,23 @@ func received(msg []byte, codec *bisync.Bisync) []gosnmp.SnmpPacket {
 	}
 
 	for _, reply := range replies {
-		if packet, err := BER.Decode(reply.Packet); err != nil {
-			warnf("%v", err)
-		} else if packet != nil {
-			packets = append(packets, *packet)
+		switch v := reply.(type) {
+		case []byte:
+			if slices.Equal(v, []uint8{bisync.ENQ}) {
+				debugf("ENQ")
+			} else if slices.Equal(v, []uint8{bisync.ACK}) {
+				debugf("ACK")
+			}
+
+		case bisync.Message:
+			if packet, err := BER.Decode(v.Packet); err != nil {
+				warnf("%v", err)
+			} else if packet == nil {
+				debugf("ooops %v", packet)
+			} else {
+				infof("gotcha %v", packet)
+				packets = append(packets, *packet)
+			}
 		}
 	}
 
@@ -236,13 +249,14 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 					errors <- err
 					return
 				} else if N > 0 {
-					fmt.Printf(">>> READ %v %v\n", N, buffer[0:N])
 					pipe <- buffer[0:N]
 				}
 			}
 		}()
 
 		// ... send SYN-SYN-ENQ at 1s intervals until acknowledged
+		codec := bisync.NewBisync()
+
 	enq:
 		for {
 			cmd := bisync.Enq
@@ -260,11 +274,18 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 			for {
 				select {
 				case reply := <-pipe:
-					if slices.Equal(reply, bisync.Ack) {
-						// debugf("ACK")
-						// 	break enq
+					if list, err := codec.Decode(reply); err != nil {
+						return err
+					} else {
+						for _, r := range list {
+							if v, ok := r.([]uint8); ok {
+								if slices.Equal(v, []uint8{bisync.ACK}) {
+									debugf("ACK")
+									break enq
+								}
+							}
+						}
 					}
-					break enq
 
 				case <-timeout:
 					warnf("TIMEOUT")
@@ -280,18 +301,18 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 		for {
 			select {
 			case msg := <-pipe:
-				if len(msg) > 20 {
-					debugf("read  (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
-						len(msg),
-						msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
-						msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
-				} else {
-					debugf("read  (%v bytes) %v", len(msg), msg)
-				}
+				// if len(msg) > 20 {
+				// 	debugf("read  (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
+				// 		len(msg),
+				// 		msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
+				// 		msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
+				// } else {
+				// 	debugf("read  (%v bytes) %v", len(msg), msg)
+				// }
 
 				select {
 				case rx <- msg:
-					debugf("read  ok")
+					// debugf("read  ok")
 				default:
 					warnf("RX queue blocked")
 				}
