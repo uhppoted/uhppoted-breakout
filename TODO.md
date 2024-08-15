@@ -1,6 +1,7 @@
 # TODO
 
 - [ ] debounce simulation
+- [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 
 ### emulator
     - [ ] get-controller
@@ -64,6 +65,7 @@
     - [x] CLI idle - ping for terminal status
     - [ ] dropping last typed character if echo uses sys::print
           - printf works but sys::print doesn't
+          - parse **whole** terminal message buffer (may contain multiple messages)
 
 ## PiZeroW
    - [ ] Reduce power consumption

@@ -122,6 +122,7 @@ const char *HELP[] = {
 void cli_init() {
     print(TERMINAL_CLEAR);
     print(TERMINAL_QUERY_SIZE);
+    // print(TERMINAL_QUERY_CODE);
 }
 
 /** Queries the terminal ID 'out of band'.
@@ -142,6 +143,34 @@ void cli_rx(const struct buffer *received) {
     }
 
     int N = received->N;
+
+    // terminal message?
+    if (N > 0 && received->data[0] == 27) {
+        const char *data = received->data;
+
+        // ... report device code ?
+        // e.g. [27 91 53 55 59 50 48 50 82 27 91 63 49 59 50 99 ]
+        if (N >= 5 && data[0] == 27 && data[1] == '[' && data[N - 1] == 'c') {
+        }
+
+        // ... report device status?
+        if (N >= 4 && data[0] == 27 && data[1] == '[' && data[2] == '0' && data[3] == 'n') {
+            set_mode(MODE_CLI);
+            cancel_alarm(cli.ping);
+        }
+
+        // ... report cursor position (ESC[#;#R)
+        // e.g. [27 91 53 55 59 50 48 50 82 ]
+        if (N >= 6 && data[0] == 27 && data[1] == '[' && data[N - 1] == 'R') {
+            char *code = strndup(&data[2], N - 3);
+
+            cpr(code);
+            free(code);
+        }
+
+        return;
+    }
+
     for (int i = 0; i < N; i++) {
         char ch = received->data[i];
 
@@ -160,6 +189,13 @@ void cli_rx(const struct buffer *received) {
             continue;
         }
 
+        // ESC?
+        if (ch == 27) {
+            memset(cli.buffer, 0, sizeof(cli.buffer));
+            cli.ix = 0;
+            return;
+        }
+
         // CRLF ?
         if (ch == CR || ch == LF) {
             if (cli.ix > 0) {
@@ -168,43 +204,6 @@ void cli_rx(const struct buffer *received) {
 
             memset(cli.buffer, 0, sizeof(cli.buffer));
             cli.ix = 0;
-            continue;
-        }
-
-        // report device code
-        if (cli.buffer[0] == 27 && cli.buffer[1] == '[' && ch == 'c' && (cli.ix < sizeof(cli.buffer) - 1)) {
-            cli.buffer[cli.ix++] = ch;
-            cli.buffer[cli.ix] = 0;
-
-            memset(cli.buffer, 0, sizeof(cli.buffer));
-            cli.ix = 0;
-            continue;
-        }
-
-        // report device status
-        if (cli.buffer[0] == 27 && cli.buffer[1] == '[' && ch == 'n' && (cli.ix < sizeof(cli.buffer) - 1)) {
-            cli.buffer[cli.ix++] = ch;
-            cli.buffer[cli.ix] = 0;
-
-            if (cli.buffer[2] == '0') {
-                set_mode(MODE_CLI);
-                cancel_alarm(cli.ping);
-            }
-
-            memset(cli.buffer, 0, sizeof(cli.buffer));
-            cli.ix = 0;
-            continue;
-        }
-
-        // report cursor position (ESC[#;#R)
-        if (cli.buffer[0] == 27 && ch == 'R' && (cli.ix < sizeof(cli.buffer) - 1)) {
-            cli.buffer[cli.ix++] = ch;
-            cli.buffer[cli.ix] = 0;
-
-            cpr(&cli.buffer[1]);
-            memset(cli.buffer, 0, sizeof(cli.buffer));
-            cli.ix = 0;
-
             continue;
         }
 
@@ -277,7 +276,7 @@ void clear() {
 void cpr(char *cmd) {
     int rows;
     int cols;
-    int rc = sscanf(cmd, "[%d;%dR", &rows, &cols);
+    int rc = sscanf(cmd, "%d;%d", &rows, &cols);
 
     if (rc > 0) {
         cli.rows = rows;
@@ -299,6 +298,11 @@ void cpr(char *cmd) {
  */
 void echo(const char *cmd) {
     int h = cli.rows - 4;
+    // char s[64];
+    // int h = cli.rows - 4;
+
+    // snprintf(s, sizeof(s), TERMINAL_ECHO, h, cmd);
+    // print(s);
 
     printf(TERMINAL_ECHO, h, cmd);
 }
