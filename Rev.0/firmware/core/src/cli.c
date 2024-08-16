@@ -35,6 +35,7 @@ const uint8_t height = 25;
 
 int64_t cli_timeout(alarm_id_t id, void *data);
 int64_t cli_ping_timeout(alarm_id_t id, void *data);
+void cli_on_terminal_report(const char *buffer, int N);
 
 void echo(const char *line);
 void clearline();
@@ -121,8 +122,9 @@ const char *HELP[] = {
  */
 void cli_init() {
     print(TERMINAL_CLEAR);
+    print(TERMINAL_QUERY_CODE);
     print(TERMINAL_QUERY_SIZE);
-    // print(TERMINAL_QUERY_CODE);
+    printf(TERMINAL_QUERY_STATUS);
 }
 
 /** Queries the terminal ID 'out of band'.
@@ -147,25 +149,18 @@ void cli_rx(const struct buffer *received) {
     // terminal message?
     if (N > 0 && received->data[0] == 27) {
         const char *data = received->data;
+        int ix = 0;
 
-        // ... report device code ?
-        // e.g. [27 91 53 55 59 50 48 50 82 27 91 63 49 59 50 99 ]
-        if (N >= 5 && data[0] == 27 && data[1] == '[' && data[N - 1] == 'c') {
-        }
+        while (ix < N) {
+            if (data[ix] == 27) {
+                int jx = ix;
+                while (++jx < N && data[jx] != 27) {
+                }
 
-        // ... report device status?
-        if (N >= 4 && data[0] == 27 && data[1] == '[' && data[2] == '0' && data[3] == 'n') {
-            set_mode(MODE_CLI);
-            cancel_alarm(cli.ping);
-        }
+                cli_on_terminal_report(&data[ix], jx - ix);
+            }
 
-        // ... report cursor position (ESC[#;#R)
-        // e.g. [27 91 53 55 59 50 48 50 82 ]
-        if (N >= 6 && data[0] == 27 && data[1] == '[' && data[N - 1] == 'R') {
-            char *code = strndup(&data[2], N - 3);
-
-            cpr(code);
-            free(code);
+            ix++;
         }
 
         return;
@@ -233,6 +228,31 @@ void cli_rx(const struct buffer *received) {
 
     if (cli.ix > 0) {
         cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
+    }
+}
+
+/** Processes ANSI/VT100 terminal report.
+ *
+ */
+void cli_on_terminal_report(const char *data, int N) {
+    // ... report device code ?
+    // e.g. [27 91 53 55 59 50 48 50 82 27 91 63 49 59 50 99 ]
+    if (N >= 5 && data[0] == 27 && data[1] == '[' && data[N - 1] == 'c') {
+    }
+
+    // ... report device status?
+    if (N >= 4 && data[0] == 27 && data[1] == '[' && data[2] == '0' && data[3] == 'n') {
+        set_mode(MODE_CLI);
+        cancel_alarm(cli.ping);
+    }
+
+    // ... report cursor position (ESC[#;#R)
+    // e.g. [27 91 53 55 59 50 48 50 82 ]
+    if (N >= 6 && data[0] == 27 && data[1] == '[' && data[N - 1] == 'R') {
+        char *code = strndup(&data[2], N - 3);
+
+        cpr(code);
+        free(code);
     }
 }
 

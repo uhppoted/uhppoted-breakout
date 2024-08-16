@@ -63,9 +63,9 @@
     - [x] LED red/green for CLI mode
     - [x] LED blue/green for SSMP mode
     - [x] CLI idle - ping for terminal status
-    - [ ] dropping last typed character if echo uses sys::print
-          - printf works but sys::print doesn't
-          - parse **whole** terminal message buffer (may contain multiple messages)
+    - [x] parse buffer with multiple terminal report messages
+    - [ ] echo weirdness: printf works but sys::print doesn't
+    - [ ] parse commands using strtok
 
 ## PiZeroW
    - [ ] Reduce power consumption
