@@ -37,8 +37,12 @@
          - [x] return SnmpGetResponse
          - [x] encode::DLE 
          - [x] require STX-ETX framing
-         - [x] BER
          - [ ] CRC
+         - [ ] BER
+               - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
+```
+2024-08-16 15:33:33 DEBUG  SSMP             write (58 bytes) [22 22 2 48 37 16 2 16 1 0 4 16 6 112 117 98 108 105 99 160 ...]
+```
    - [x] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict

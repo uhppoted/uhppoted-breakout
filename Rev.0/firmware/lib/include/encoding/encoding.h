@@ -15,10 +15,12 @@ typedef struct packet {
     PACKET tag;
     union {
         struct {
+            uint8_t version;
             uint32_t request_id;
         } get;
 
         struct {
+            uint8_t version;
             uint32_t request_id;
         } get_response;
     };

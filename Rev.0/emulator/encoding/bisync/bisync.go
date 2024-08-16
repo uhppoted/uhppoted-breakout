@@ -173,12 +173,10 @@ func (codec *Bisync) decode(msg []uint8, f callback) error {
 				codec.reset()
 
 			case STX:
-				println("STX")
 				codec.SOH = false
 				codec.STX = true
 
 			case ETX:
-				println("ETX")
 				codec.SOH = false
 				codec.STX = false
 

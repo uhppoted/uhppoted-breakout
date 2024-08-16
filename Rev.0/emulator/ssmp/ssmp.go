@@ -318,14 +318,16 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 		for {
 			select {
 			case msg := <-pipe:
-				// if len(msg) > 20 {
-				// 	debugf("read  (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
-				// 		len(msg),
-				// 		msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
-				// 		msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
-				// } else {
-				// 	debugf("read  (%v bytes) %v", len(msg), msg)
-				// }
+				if msg[0] != 22 {
+					debugf("read  (%v bytes) %v", len(msg), string(msg))
+				} else if len(msg) > 20 {
+					debugf("read  (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
+						len(msg),
+						msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
+						msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
+				} else {
+					debugf("read  (%v bytes) %v", len(msg), msg)
+				}
 
 				select {
 				case rx <- msg:
@@ -339,13 +341,13 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 					warnf("write error (%v)", err)
 				} else if N != len(msg) {
 					warnf("write error (%v)", fmt.Errorf("sent %v bytes of %v)", N, len(msg)))
-					// } else if len(msg) > 20 {
-					// 	debugf("write (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
-					// 		N,
-					// 		msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
-					// 		msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
-					// } else {
-					// 	debugf("write (%v bytes) %v", N, msg)
+				} else if len(msg) > 20 {
+					debugf("write (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
+						N,
+						msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],
+						msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16], msg[17], msg[18], msg[19])
+				} else {
+					debugf("write (%v bytes) %v", N, msg)
 				}
 
 			case <-idle:
