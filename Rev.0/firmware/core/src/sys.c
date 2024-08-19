@@ -185,13 +185,13 @@ void _print(const char *msg) {
     int N;
 
     while (remaining > 0) {
-        fflush(stdout);
-
         if ((N = fwrite(&msg[ix], 1, remaining, stdout)) <= 0) {
-            return;
+            break;
         } else {
             remaining -= N;
             ix += N;
         }
     }
+
+    fflush(stdout);
 }

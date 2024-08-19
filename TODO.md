@@ -1,6 +1,7 @@
 # TODO
 
 - [ ] debounce simulation
+      - (?) TinyML
 - [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 
 ### emulator
@@ -68,7 +69,7 @@
     - [x] LED blue/green for SSMP mode
     - [x] CLI idle - ping for terminal status
     - [x] parse buffer with multiple terminal report messages
-    - [ ] echo weirdness: printf works but sys::print doesn't
+    - [x] echo weirdness: printf works but sys::print doesn't
     - [ ] parse commands using strtok
 
 ## PiZeroW

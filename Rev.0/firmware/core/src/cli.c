@@ -139,11 +139,6 @@ void cli_ping() {
  *
  */
 void cli_rx(const struct buffer *received) {
-    if (cli.timer > 0) {
-        cancel_alarm(cli.timer);
-        cli.timer = 0;
-    }
-
     int N = received->N;
 
     // terminal message?
@@ -166,6 +161,12 @@ void cli_rx(const struct buffer *received) {
         return;
     }
 
+    // ... typed characters presumably
+    if (cli.timer > 0) {
+        cancel_alarm(cli.timer);
+        cli.timer = 0;
+    }
+
     for (int i = 0; i < N; i++) {
         char ch = received->data[i];
 
@@ -181,14 +182,14 @@ void cli_rx(const struct buffer *received) {
             memset(cli.buffer, 0, sizeof(cli.buffer));
             cli.ix = 0;
             set_mode(MODE_SSMP);
-            continue;
+            break;
         }
 
         // ESC?
         if (ch == 27) {
             memset(cli.buffer, 0, sizeof(cli.buffer));
             cli.ix = 0;
-            return;
+            break; // NTS: really not expecting and ESC character
         }
 
         // CRLF ?
@@ -217,11 +218,7 @@ void cli_rx(const struct buffer *received) {
             cli.buffer[cli.ix++] = ch;
             cli.buffer[cli.ix] = 0;
 
-            // ... echo if normal command and not a VT100/ANSI code
-            if (cli.buffer[0] != 27) {
-                echo(cli.buffer);
-            }
-
+            echo(cli.buffer);
             continue;
         }
     }
@@ -317,14 +314,11 @@ void cpr(char *cmd) {
  *
  */
 void echo(const char *cmd) {
+    char s[64];
     int h = cli.rows - 4;
-    // char s[64];
-    // int h = cli.rows - 4;
 
-    // snprintf(s, sizeof(s), TERMINAL_ECHO, h, cmd);
-    // print(s);
-
-    printf(TERMINAL_ECHO, h, cmd);
+    snprintf(s, sizeof(s), TERMINAL_ECHO, h, cmd);
+    print(s);
 }
 
 /* Saves the cursor position, clears the command line, redisplays the prompt and then
