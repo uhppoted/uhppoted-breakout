@@ -15,6 +15,7 @@
 #include <U3.h>
 #include <U4.h>
 #include <cli.h>
+#include <encoding/BER/BER.h>
 #include <encoding/bisync/bisync.h>
 #include <log.h>
 #include <state.h>
@@ -401,14 +402,13 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    datetime_t t;
+    const uint8_t packet[] = {
+        48, 37, 16, 2, 16, 1, 0, 4, 16, 6, 112, 117, 98, 108, 105, 99,
+        160, 24, 16, 2, 16, 1, 16, 1, 16, 2, 16, 1, 0, 16, 2, 16,
+        1, 0, 48, 13, 48, 11, 16, 6, 7, 43, 16, 6, 167, 254, 32, 16,
+        1, 16, 1, 16, 5, 0};
 
-    rtc_get_datetime(&t);
-
-    char s[128];
-    datetime_to_str(s, 128, &t);
-
-    display("RTC %s", s);
+    BER_decode(packet, sizeof(packet));
 }
 
 void state() {
