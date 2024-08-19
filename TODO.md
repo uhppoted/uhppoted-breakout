@@ -42,17 +42,11 @@
          - [ ] BER
                - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
 ```
-seq   48 
-      37 
-      16 2 16 1 0 4 16 6 112 117 98 108 105 99 160 24 16 2 16 1 16 1 16 2 16 1 0 16 2 16 1 0 48 13 48 11 16,
-
-OID   6
-      7
-      43 16 6 167 254 32 16
-        
-bool  1 16
-bool  1 16
-null  5 0
+seq   48
+      37
+      2  1 0 4 6 112 117 98 108 105 99 160 24 2  1   1
+      2  1 0 2 1 0   48  13 48  11  6  7   43 6  167 254
+      32 1 1 5 0
 ```
    - [x] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO

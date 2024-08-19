@@ -94,22 +94,22 @@ void unpack(const uint8_t *bytes, int N, int *ix) {
 
 void unpack_boolean(const uint8_t *message, int N, int *ix) {
     // ... length
-    uint32_t length = 1;
-    // if (*ix < N) {
-    //     uint8_t b = message[*ix];
-    //     *ix += 1;
+    uint32_t length = 0;
+    if (*ix < N) {
+        uint8_t b = message[*ix];
+        *ix += 1;
 
-    //     if (b & 0x80 == 0x80) {
-    //         length = (uint32_t)(b & 0x7f);
-    //     } else {
-    //         int len = b & 0x7f;
-    //         for (int i = 0; i < len && *ix < N; i++) {
-    //             length <<= 8;
-    //             length += (uint32_t)(message[*ix]);
-    //             *ix += 1;
-    //         }
-    //     }
-    // }
+        if (b & 0x80 == 0x80) {
+            length = (uint32_t)(b & 0x7f);
+        } else {
+            int len = b & 0x7f;
+            for (int i = 0; i < len && *ix < N; i++) {
+                length <<= 8;
+                length += (uint32_t)(message[*ix]);
+                *ix += 1;
+            }
+        }
+    }
 
     printf("::boolean     N:%d  ix:%d  length:%lu  end:%d\n", N, *ix, length, *ix + (int)length);
 
@@ -118,22 +118,22 @@ void unpack_boolean(const uint8_t *message, int N, int *ix) {
 
 void unpack_null(const uint8_t *message, int N, int *ix) {
     // ... length
-    uint32_t length = 1;
-    // if (*ix < N) {
-    //     uint8_t b = message[*ix];
-    //     *ix += 1;
+    uint32_t length = 0;
+    if (*ix < N) {
+        uint8_t b = message[*ix];
+        *ix += 1;
 
-    //     if (b & 0x80 == 0x80) {
-    //         length = (uint32_t)(b & 0x7f);
-    //     } else {
-    //         int len = b & 0x7f;
-    //         for (int i = 0; i < len && *ix < N; i++) {
-    //             length <<= 8;
-    //             length += (uint32_t)(message[*ix]);
-    //             *ix += 1;
-    //         }
-    //     }
-    // }
+        if (b & 0x80 == 0x80) {
+            length = (uint32_t)(b & 0x7f);
+        } else {
+            int len = b & 0x7f;
+            for (int i = 0; i < len && *ix < N; i++) {
+                length <<= 8;
+                length += (uint32_t)(message[*ix]);
+                *ix += 1;
+            }
+        }
+    }
 
     printf("::null        N:%d  ix:%d  length:%lu  end:%d\n", N, *ix, length, *ix + (int)length);
 
