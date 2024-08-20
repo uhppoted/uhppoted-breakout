@@ -7,3 +7,12 @@
 
 struct message BER_encode(const struct packet p);
 struct packet BER_decode(const uint8_t *message, int N);
+
+/* internal use only */
+
+typedef struct field {
+
+} field;
+
+typedef field *fieldp;
+typedef fieldp *fields;
