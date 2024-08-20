@@ -4,16 +4,29 @@
 
 #include <encoding/BER/BER.h>
 
+void field_free(field *f);
+void fields_free(fields list);
+
 void field_free(field *f) {
-    free(f);
+    if (f->tag == FIELD_SEQUENCE) {
+        fields_free(f->sequence.fields);
+    } else {
+        free(f);
+    }
 }
 
 void fields_free(fields list) {
-    fieldp *p = list;
+    if (list != NULL) {
+        fieldp *p = list;
 
-    while (*p != NULL) {
-        field_free(*p);
-        p++;
+        while (*p != NULL) {
+            printf(">>>> FFREE  tag:%d\n", (*p)->tag);
+
+            field_free(*p);
+            p++;
+        }
+
+        free(list);
     }
 }
 

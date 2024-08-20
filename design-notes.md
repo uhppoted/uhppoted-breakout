@@ -29,3 +29,6 @@
 - Vʜɪɢʜ = 0.7Vᴅᴅ (3.5V)
 - Vʜ    = 3.5V - 1.5V = 2V
 
+## SSMP
+1. Does not handle bignums.
+

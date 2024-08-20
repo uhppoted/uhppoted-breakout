@@ -40,6 +40,8 @@
          - [x] require STX-ETX framing
          - [ ] CRC
          - [ ] BER
+               - [ ] not unpacking multiple fields with different lengths correctly
+               - [ ] commonalise decode length
                - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
 ```
 seq   48
@@ -47,6 +49,9 @@ seq   48
       2  1 0 4 6 112 117 98 108 105 99 160 24 2  1   1
       2  1 0 2 1 0   48  13 48  11  6  7   43 6  167 254
       32 1 1 5 0
+
+int 2 1 0
+
 ```
    - [x] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO
