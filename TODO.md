@@ -41,7 +41,7 @@
          - [ ] CRC
          - [ ] BER
                - [x] not unpacking multiple fields with different lengths correctly
-               - [ ] commonalise decode length
+               - [x] commonalise decode length
                - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
 ```
 seq   48
