@@ -8,11 +8,15 @@ extern void fields_free(fields);
 extern fields fields_add(fields, field *);
 
 fields unpack(const uint8_t *message, int N);
-void unpack_boolean(const uint8_t *message, int N, int *ix);
-field *unpack_integer(const uint8_t *message, int N, int *ix);
-void unpack_null(const uint8_t *message, int N, int *ix);
-void unpack_OID(const uint8_t *message, int N, int *ix);
-field *unpack_sequence(const uint8_t *message, int N, int *ix);
+
+// clang-format off
+field *unpack_integer (const uint8_t *, int, int *);
+field *unpack_octets  (const uint8_t *, int, int *);
+field *unpack_null    (const uint8_t *, int, int *);
+field *unpack_OID     (const uint8_t *, int, int *);
+field *unpack_sequence(const uint8_t *, int, int *);
+field *unpack_PDU     (const uint8_t *, int, int *);
+// clang-format on
 
 uint32_t unpack_length(const uint8_t *message, int N, int *ix);
 
@@ -52,24 +56,38 @@ fields unpack(const uint8_t *bytes, int N) {
         ix += 1;
 
         switch (tag) {
-            // case FIELD_BOOLEAN:
-            //     unpack_boolean(bytes, N, &ix);
-            //     break;
-
         case FIELD_INTEGER:
-            unpack_integer(bytes, N, &ix);
+            if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
+                list = fields_add(list, f);
+            }
             break;
 
-            // case FIELD_NULL:
-            //     unpack_null(bytes, N, &ix);
-            //     break;
+        case FIELD_OCTET_STRING:
+            if ((f = unpack_octets(bytes, N, &ix)) != NULL) {
+                list = fields_add(list, f);
+            }
+            break;
 
-            // case FIELD_OID:
-            //     unpack_OID(bytes, N, &ix);
-            //     break;
+        case FIELD_NULL:
+            if ((f = unpack_null(bytes, N, &ix)) != NULL) {
+                list = fields_add(list, f);
+            }
+            break;
+
+        case FIELD_OID:
+            if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
+                list = fields_add(list, f);
+            }
+            break;
 
         case FIELD_SEQUENCE:
             if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
+                list = fields_add(list, f);
+            }
+            break;
+
+        case FIELD_PDU:
+            if ((f = unpack_PDU(bytes, N, &ix)) != NULL) {
                 list = fields_add(list, f);
             }
             break;
@@ -83,14 +101,6 @@ fields unpack(const uint8_t *bytes, int N) {
     fflush(stdout);
 
     return list;
-}
-
-void unpack_boolean(const uint8_t *message, int N, int *ix) {
-    uint32_t length = unpack_length(message, N, ix);
-
-    printf("::boolean     N:%d  ix:%-3d length:%lu  end:%d\n", N, *ix, length, *ix + (int)length);
-
-    *ix += length;
 }
 
 field *unpack_integer(const uint8_t *message, int N, int *ix) {
@@ -116,40 +126,117 @@ field *unpack_integer(const uint8_t *message, int N, int *ix) {
     return f;
 }
 
-void unpack_null(const uint8_t *message, int N, int *ix) {
+field *unpack_octets(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
+    uint8_t *octets = (uint8_t *)calloc(length, sizeof(uint8_t));
 
-    printf("::null        N:%d  ix:%-3d length:%lu  end:%d\n", N, *ix, length, *ix + (int)length);
+    memmove(octets, &message[*ix], length);
+
+    printf("::octets      N:%d  ix:%-3d length:%lu  octets:%s\n", N, *ix, length, strndup(octets, length));
+
+    // ... compose field
+    field *f = (field *)calloc(1, sizeof(field));
+    f->tag = FIELD_OCTET_STRING;
+    f->string.length = length;
+    f->string.octets = octets;
 
     *ix += length;
+
+    return f;
 }
 
-void unpack_OID(const uint8_t *message, int N, int *ix) {
+field *unpack_null(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
 
-    printf("::OID         N:%d  ix:%-3d length:%lu  end:%d\n", N, *ix, length, *ix + (int)length);
+    printf("::null        N:%d  ix:%-3d length:%lu\n", N, *ix, length);
+
+    // ... compose field
+    field *f = (field *)calloc(1, sizeof(field));
+    f->tag = FIELD_NULL;
 
     *ix += length;
+
+    return f;
+}
+
+field *unpack_OID(const uint8_t *message, int N, int *ix) {
+    uint32_t length = unpack_length(message, N, ix);
+    char *OID = (char *)calloc(256, sizeof(char));
+    char *p = OID;
+    char *end = p + 256;
+
+    p += snprintf(p, end - p, "0");
+
+    if (length > 0 && p < end) {
+        p += snprintf(p, end - p, ".%d", message[*ix] / 40);
+    }
+
+    if (length > 0 && p < end) {
+        p += snprintf(p, end - p, ".%d", message[*ix] % 40);
+    }
+
+    int i = 1;
+    while (i < length && p < end) {
+        uint64_t suboid = 0;
+
+        while (i < length && p < end) {
+            uint8_t b = message[*ix + i++];
+
+            suboid <<= 7;
+            suboid += (uint64_t)(b & 0x7f);
+
+            if ((b & 0x80) == 0x00) {
+                p += snprintf(p, end - p, ".%llu", suboid);
+                break;
+            }
+        }
+    }
+
+    printf("::OID         N:%d  ix:%-3d length:%lu  OID:%s\n", N, *ix, length, OID);
+
+    // ... compose field
+    field *f = (field *)calloc(1, sizeof(field));
+    f->tag = FIELD_OID;
+    f->OID.OID = OID;
+
+    *ix += length;
+
+    return f;
 }
 
 field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
 
-    printf("::sequence    N:%d  ix:%-3d length:%lu end:%d\n", N, *ix, length, *ix + (int)length);
+    printf("::sequence    N:%d  ix:%-3d length:%lu\n", N, *ix, length);
 
-    // ... unpack sequence
     fields list = unpack(&message[*ix], length);
 
     printf("::sequence/fields %p\n", list);
     fields_free(list);
 
     // ... 'k, done'
-    *ix += length;
-
     field *f = (field *)calloc(1, sizeof(field));
-
     f->tag = FIELD_SEQUENCE;
     f->sequence.fields = NULL;
+
+    *ix += length;
+
+    return f;
+}
+
+field *unpack_PDU(const uint8_t *message, int N, int *ix) {
+    uint32_t length = unpack_length(message, N, ix);
+
+    printf("::PDU         N:%d  ix:%-3d length:%lu\n", N, *ix, length);
+
+    fields list = unpack(&message[*ix], length);
+    fields_free(list);
+
+    field *f = (field *)calloc(1, sizeof(field));
+    f->tag = FIELD_PDU;
+    f->PDU.fields = NULL;
+
+    *ix += length;
 
     return f;
 }

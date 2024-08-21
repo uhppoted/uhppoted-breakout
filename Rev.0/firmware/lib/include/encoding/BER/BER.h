@@ -11,12 +11,14 @@ struct packet BER_decode(const uint8_t *message, int N);
 /* internal use only */
 
 typedef enum {
-    FIELD_UNKNOWN = 0,
-    FIELD_BOOLEAN = 1,
-    FIELD_INTEGER = 2,
-    FIELD_NULL = 5,
-    FIELD_OID = 6,
-    FIELD_SEQUENCE = 48,
+    FIELD_UNKNOWN = 0x00,
+    FIELD_BOOLEAN = 0x01,
+    FIELD_INTEGER = 0x02,
+    FIELD_OCTET_STRING = 0x04,
+    FIELD_NULL = 0x05,
+    FIELD_OID = 0x06,
+    FIELD_SEQUENCE = 0x30,
+    FIELD_PDU = 0xa0,
 } FIELD;
 
 typedef struct field field;
@@ -36,8 +38,24 @@ typedef struct field {
         } integer;
 
         struct {
+            int length;
+            uint8_t *octets;
+        } string;
+
+        struct {
+        } null;
+
+        struct {
+            char *OID;
+        } OID;
+
+        struct {
             fields fields;
         } sequence;
+
+        struct {
+            fields fields;
+        } PDU;
     };
 
 } field;
