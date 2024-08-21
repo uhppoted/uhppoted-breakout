@@ -40,7 +40,7 @@
          - [x] require STX-ETX framing
          - [ ] CRC
          - [ ] BER
-               - [ ] not unpacking multiple fields with different lengths correctly
+               - [x] not unpacking multiple fields with different lengths correctly
                - [ ] commonalise decode length
                - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
 ```

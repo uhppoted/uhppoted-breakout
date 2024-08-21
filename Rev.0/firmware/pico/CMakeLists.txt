@@ -50,6 +50,7 @@ add_executable(breakout
   ${LIB}/src/encoding/BER/encode.c
   ${LIB}/src/encoding/BER/decode.c
   ${LIB}/src/encoding/BER/fields.c
+  ${LIB}/src/encoding/BER/vector.c
 )
 
 target_include_directories(breakout 

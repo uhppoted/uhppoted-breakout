@@ -90,7 +90,7 @@ void unpack_boolean(const uint8_t *message, int N, int *ix) {
         uint8_t b = message[*ix];
         *ix += 1;
 
-        if (b & 0x80 == 0x80) {
+        if ((b & 0x80) == 0x00) {
             length = (uint32_t)(b & 0x7f);
         } else {
             int len = b & 0x7f;
@@ -115,7 +115,7 @@ field *unpack_integer(const uint8_t *message, int N, int *ix) {
         uint8_t b = message[*ix];
         *ix += 1;
 
-        if (b & 0x80 == 0x80) {
+        if ((b & 0x80) == 0x00) {
             length = (uint32_t)(b & 0x7f);
         } else {
             int len = b & 0x7f;
@@ -156,7 +156,7 @@ void unpack_null(const uint8_t *message, int N, int *ix) {
         uint8_t b = message[*ix];
         *ix += 1;
 
-        if (b & 0x80 == 0x80) {
+        if ((b & 0x80) == 0x00) {
             length = (uint32_t)(b & 0x7f);
         } else {
             int len = b & 0x7f;
@@ -180,7 +180,7 @@ void unpack_OID(const uint8_t *message, int N, int *ix) {
         uint8_t b = message[*ix];
         *ix += 1;
 
-        if (b & 0x80 == 0x80) {
+        if ((b & 0x80) == 0x00) {
             length = (uint32_t)(b & 0x7f);
         } else {
             int len = b & 0x7f;
@@ -204,7 +204,7 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
         uint8_t b = message[*ix];
         *ix += 1;
 
-        if (b & 0x80 == 0x80) {
+        if ((b & 0x80) == 0x00) {
             length = (uint32_t)(b & 0x7f);
         } else {
             int len = b & 0x7f;

@@ -23,6 +23,11 @@ typedef struct field field;
 typedef field *fieldp;
 typedef fieldp *fields;
 
+typedef struct vector {
+    int N;
+    field *fields[];
+} vector;
+
 typedef struct field {
     FIELD tag;
     union {
