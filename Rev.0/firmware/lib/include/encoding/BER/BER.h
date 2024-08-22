@@ -22,12 +22,11 @@ typedef enum {
 } FIELD;
 
 typedef struct field field;
-typedef field *fieldp;
-typedef fieldp *fields;
 
 typedef struct vector {
-    int N;
-    field *fields[];
+    int capacity;
+    int size;
+    field *fields[4];
 } vector;
 
 typedef struct field {
@@ -50,11 +49,11 @@ typedef struct field {
         } OID;
 
         struct {
-            fields fields;
+            vector *fields;
         } sequence;
 
         struct {
-            fields fields;
+            vector *fields;
         } PDU;
     };
 

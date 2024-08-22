@@ -4,10 +4,11 @@
 
 #include <encoding/BER/BER.h>
 
-extern void fields_free(fields);
-extern fields fields_add(fields, field *);
+extern vector *vector_new();
+extern vector *vector_free();
+extern vector *vector_add(vector *, field *);
 
-fields unpack(const uint8_t *message, int N);
+vector *unpack(const uint8_t *bytes, int N);
 
 // clang-format off
 field *unpack_integer (const uint8_t *, int, int *);
@@ -30,77 +31,71 @@ struct packet BER_decode(const uint8_t *message, int N) {
     };
 
     // ... unpack message
-    fields fields = unpack(message, N);
+    vector *fields = unpack(message, N);
 
     if (fields != NULL) {
-        fields_free(fields);
+        vector_free(fields);
     }
 
     return p;
 }
 
-fields unpack(const uint8_t *bytes, int N) {
-    fields list;
-    field *f;
-    int length = 0;
-    int ix = 0;
+vector *unpack(const uint8_t *bytes, int N) {
+    vector *v = vector_new();
 
-    if ((list = calloc(1, sizeof(fieldp))) == NULL) {
-        return NULL;
-    } else {
-        list[0] = NULL;
-    }
+    if (v != NULL) {
+        int ix = 0;
+        int count = 0;
+        field *f;
 
-    while (ix < N && ++length < 16) {
-        uint8_t tag = bytes[ix];
-        ix += 1;
+        while (ix < N && ++count < 16) {
+            uint8_t tag = bytes[ix++];
 
-        switch (tag) {
-        case FIELD_INTEGER:
-            if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
-                list = fields_add(list, f);
+            switch (tag) {
+            case FIELD_INTEGER:
+                if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+            case FIELD_OCTET_STRING:
+                if ((f = unpack_octets(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+            case FIELD_NULL:
+                if ((f = unpack_null(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+            case FIELD_OID:
+                if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+            case FIELD_SEQUENCE:
+                if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+            case FIELD_PDU:
+                if ((f = unpack_PDU(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+            default:
+                printf("::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
+                ix = N;
             }
-            break;
-
-        case FIELD_OCTET_STRING:
-            if ((f = unpack_octets(bytes, N, &ix)) != NULL) {
-                list = fields_add(list, f);
-            }
-            break;
-
-        case FIELD_NULL:
-            if ((f = unpack_null(bytes, N, &ix)) != NULL) {
-                list = fields_add(list, f);
-            }
-            break;
-
-        case FIELD_OID:
-            if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
-                list = fields_add(list, f);
-            }
-            break;
-
-        case FIELD_SEQUENCE:
-            if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
-                list = fields_add(list, f);
-            }
-            break;
-
-        case FIELD_PDU:
-            if ((f = unpack_PDU(bytes, N, &ix)) != NULL) {
-                list = fields_add(list, f);
-            }
-            break;
-
-        default:
-            printf("::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
-            ix = N;
         }
     }
 
-    fflush(stdout);
-
-    return list;
+    return v;
 }
 
 field *unpack_integer(const uint8_t *message, int N, int *ix) {
@@ -206,18 +201,14 @@ field *unpack_OID(const uint8_t *message, int N, int *ix) {
 
 field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
+    vector *fields = unpack(&message[*ix], length);
 
-    printf("::sequence    N:%d  ix:%-3d length:%lu\n", N, *ix, length);
+    printf("::sequence    N:%d  ix:%-3d length:%lu  fields:%d\n", N, *ix, length, fields->size);
 
-    fields list = unpack(&message[*ix], length);
-
-    printf("::sequence/fields %p\n", list);
-    fields_free(list);
-
-    // ... 'k, done'
+    // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
     f->tag = FIELD_SEQUENCE;
-    f->sequence.fields = NULL;
+    f->sequence.fields = fields;
 
     *ix += length;
 
@@ -226,15 +217,14 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
 
 field *unpack_PDU(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
+    vector *fields = unpack(&message[*ix], length);
 
-    printf("::PDU         N:%d  ix:%-3d length:%lu\n", N, *ix, length);
+    printf("::PDU         N:%d  ix:%-3d length:%lu  fields:%d\n", N, *ix, length, fields->size);
 
-    fields list = unpack(&message[*ix], length);
-    fields_free(list);
-
+    // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
     f->tag = FIELD_PDU;
-    f->PDU.fields = NULL;
+    f->PDU.fields = fields;
 
     *ix += length;
 
