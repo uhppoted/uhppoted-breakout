@@ -88,6 +88,18 @@ OID
 ✓ ::PDU         N:37  ix:13  length:24  fields:4
 ✓ ::sequence    N:39  ix:2   length:37  fields:3
 
+✓ >>> free 30
+✓ >>> free 02
+✓ >>> free 04
+✓ >>> free a0
+✓ >>> free 02
+✓ >>> free 02
+✓ >>> free 02
+✓ >>> free 30
+✓ >>> free 30
+✓ >>> free 06
+✓ >>> free 05
+
 ```
 
 

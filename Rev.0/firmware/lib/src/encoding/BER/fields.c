@@ -4,12 +4,28 @@
 
 #include <encoding/BER/BER.h>
 
+void vector_free(vector *);
+
 void field_free(field *f) {
-    if (f->tag == FIELD_SEQUENCE) {
-        // fields_free(f->sequence.fields);
-    } else {
-        free(f);
+    switch (f->tag) {
+    case FIELD_OCTET_STRING:
+        free(f->string.octets);
+        break;
+
+    case FIELD_OID:
+        free(f->OID.OID);
+        break;
+
+    case FIELD_SEQUENCE:
+        vector_free(f->sequence.fields);
+        break;
+
+    case FIELD_PDU:
+        vector_free(f->PDU.fields);
+        break;
     }
+
+    free(f);
 }
 
 vector *vector_new() {
@@ -30,6 +46,10 @@ vector *vector_new() {
 
 void vector_free(vector *v) {
     if (v != NULL) {
+        for (int i = 0; i < v->size; i++) {
+            field_free(v->fields[i]);
+        }
+
         free(v);
     }
 }
