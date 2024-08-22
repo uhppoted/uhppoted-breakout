@@ -1,10 +1,11 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <encoding/BER/BER.h>
 
 void vector_free(vector *);
+
+const int CAPACITY = 16;
 
 void field_free(field *f) {
     switch (f->tag) {
@@ -29,13 +30,14 @@ void field_free(field *f) {
 }
 
 vector *vector_new() {
-    int capacity = 16;
+    int capacity = CAPACITY;
     size_t size = sizeof(int) + sizeof(int) + capacity * sizeof(field *);
     vector *v = (vector *)malloc(size);
 
     if (v != NULL) {
         v->capacity = capacity;
         v->size = 0;
+
         for (int i = 0; i < capacity; i++) {
             v->fields[i] = NULL;
         }
@@ -60,6 +62,26 @@ vector *vector_add(vector *v, field *f) {
         v->size++;
 
         return v;
+    }
+
+    // .. reallocate and copy
+    int capacity = v->capacity + CAPACITY;
+    size_t size = sizeof(int) + sizeof(int) + capacity * sizeof(field *);
+    vector *u = (vector *)malloc(size);
+
+    if (u != NULL) {
+        u->capacity = capacity;
+        u->size = v->size;
+
+        for (int i = 0; i < capacity; i++) {
+            u->fields[i] = NULL;
+        }
+
+        for (int i = 0; i < v->size; i++) {
+            u->fields[i] = v->fields[i];
+        }
+
+        return vector_add(u, f);
     }
 
     return v;

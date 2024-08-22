@@ -102,7 +102,6 @@ OID
 
 ```
 
-
    - [x] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
