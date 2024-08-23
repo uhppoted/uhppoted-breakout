@@ -32,7 +32,7 @@ func Get(oid []uint32) (any, error) {
 
 	pdu := gosnmp.SnmpPDU{
 		Value: gosnmp.Null,
-		Name:  ".1.3.6.655136.1.1",
+		Name:  ".1.3.6.65536.1.1",
 		Type:  gosnmp.Null,
 	}
 
@@ -65,19 +65,19 @@ func Get(oid []uint32) (any, error) {
 	case reply := <-rq.pipe:
 		debugf("reply to SSMP GET request (%v)", reply)
 
-		if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
-			return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+		if value, err := get(reply, ".1.3.6.65536.1.1"); err != nil {
+			return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.65536.1.1")
 		} else if v, ok := value.(uint32); !ok {
-			return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+			return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.65536.1.1")
 		} else {
 			return v, nil
 		}
 
 	case <-timeout:
-		return 0, fmt.Errorf("no reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+		return 0, fmt.Errorf("no reply to SSMP GET %v request", ".1.3.6.65536.1.1")
 	}
 
-	return 0, fmt.Errorf("SSMP GET %v failed", ".1.3.6.655136.1.1")
+	return 0, fmt.Errorf("SSMP GET %v failed", ".1.3.6.65536.1.1")
 }
 
 func (ssmp SSMP) Run() {
