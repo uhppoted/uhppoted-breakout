@@ -21,8 +21,8 @@ void field_free(field *f) {
         vector_free(f->sequence.fields);
         break;
 
-    case FIELD_PDU:
-        vector_free(f->PDU.fields);
+    case FIELD_PDU_GET:
+        vector_free(f->get.fields);
         break;
     }
 

@@ -6,7 +6,7 @@
 #include <encoding/encoding.h>
 
 struct message BER_encode(const struct packet p);
-struct packet BER_decode(const uint8_t *message, int N);
+struct packet *BER_decode(const uint8_t *message, int N);
 
 /* internal use only */
 
@@ -18,7 +18,7 @@ typedef enum {
     FIELD_NULL = 0x05,
     FIELD_OID = 0x06,
     FIELD_SEQUENCE = 0x30,
-    FIELD_PDU = 0xa0,
+    FIELD_PDU_GET = 0xa0,
 } FIELD;
 
 typedef struct field field;
@@ -54,7 +54,7 @@ typedef struct field {
 
         struct {
             vector *fields;
-        } PDU;
+        } get;
     };
 
 } field;

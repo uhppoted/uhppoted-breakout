@@ -128,20 +128,25 @@ void ssmp_enq() {
 void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
     SSMP.touched = get_absolute_time();
 
-    const struct packet request = BER_decode(data, data_len);
-    const struct packet reply = {
-        .tag = PACKET_GET_RESPONSE,
-        .get_response = {
-            .request_id = request.get.request_id,
-        },
-    };
+    struct packet *request = BER_decode(data, data_len);
 
-    message packed = BER_encode(reply);
-    message encoded = bisync_encode(NULL, 0, packed.data, packed.N);
+    if (request != NULL && request->tag == PACKET_GET) {
+        const struct packet reply = {
+            .tag = PACKET_GET_RESPONSE,
+            .get_response = {
+                .request_id = request->get.request_id,
+            },
+        };
 
-    fwrite(encoded.data, sizeof(uint8_t), encoded.N, stdout);
-    fflush(stdout);
+        message packed = BER_encode(reply);
+        message encoded = bisync_encode(NULL, 0, packed.data, packed.N);
 
-    free(packed.data);
-    free(encoded.data);
+        fwrite(encoded.data, sizeof(uint8_t), encoded.N, stdout);
+        fflush(stdout);
+
+        free(packed.data);
+        free(encoded.data);
+    }
+
+    packet_free(request);
 }

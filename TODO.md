@@ -42,8 +42,11 @@
          - [ ] BER
                - [x] not unpacking multiple fields with different lengths correctly
                - [x] commonalise decode length
-               - [ ] free field list/fields
+               - [x] free field list/fields
+               - [ ] pack response
                - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
+         - [ ] GET
+               - [ ] free SSMP packet
 ```
 48 37
    2 1 0 

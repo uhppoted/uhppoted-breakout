@@ -15,8 +15,12 @@ typedef struct packet {
     PACKET tag;
     union {
         struct {
-            uint8_t version;
-            uint32_t request_id;
+            int64_t version;
+            char *community;
+            int64_t request_id;
+            int64_t error;
+            int64_t error_index;
+            char *OID;
         } get;
 
         struct {
@@ -30,3 +34,5 @@ typedef struct message {
     uint8_t *data;
     int N;
 } message;
+
+void packet_free(packet *);
