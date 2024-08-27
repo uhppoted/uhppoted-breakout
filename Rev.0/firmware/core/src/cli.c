@@ -403,40 +403,66 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    // clang-format off
-    const uint8_t msg[] = {
-        48, 37, 2, 1, 0, 4, 6, 112, 117, 98, 108, 105, 99,
-        160, 24, 
-             2, 1, 1, 
-             2, 1, 0, 
-             2, 1, 0, 
-             48, 13, 48, 11, 6, 7, 43, 6, 167, 254, 32, 1, 1, 5, 0,
-
-        // 48, 38, 2, 2, 0, 13, 4, 6, 112, 117, 98, 108, 105, 99,
-        // 160, 24, 2, 1, 1, 2, 1, 0, 2,
-        // 1, 0, 48, 13, 48, 11, 6, 7, 43, 6, 167, 254, 32,
-        // 1, 1, 5, 0,
+    packet p = {
+        .tag = PACKET_GET_RESPONSE,
+        .get_response = {
+            .version = 0,
+            .community = "public",
+            .request_id = 1,
+            .error = 0,
+            .error_index = 0,
+            .OID = "0.1.3.6.655136.1.1",
+            .value = {
+                .tag = VALUE_UINT32,
+                .integer = 405419896,
+            },
+        },
     };
-    // clang-format on
 
-    // printf("\n");
-    // for (int i = 0; i < 39; i++) {
-    //     printf("%02X", packet[i]);
-    // }
-    // printf("\n");
+    message msg = BER_encodex(p);
 
-    packet *p = BER_decode(msg, sizeof(msg));
+    printf("---\n");
+    for (int i = 0; i < msg.length; i++) {
+        printf(" %02X", msg.data[i]);
+    }
+    printf("\n---\n");
 
-    debugf("CLI", ">>> PDU/GET");
-    debugf("CLI", ">>> PDU/GET version     %lld", p->get.version);
-    debugf("CLI", ">>> PDU/GET community   %s", p->get.community);
-    debugf("CLI", ">>> PDU/GET request ID  %lld", p->get.request_id);
-    debugf("CLI", ">>> PDU/GET error       %lld", p->get.error);
-    debugf("CLI", ">>> PDU/GET error index %lld", p->get.error_index);
-    debugf("CLI", ">>> PDU/GET OID         %s", p->get.OID);
-    debugf("CLI", ">>> PDU/GET value       null");
+    free(msg.data);
 
-    packet_free(p);
+    // // clang-format off
+    // const uint8_t msg[] = {
+    //     48, 37, 2, 1, 0, 4, 6, 112, 117, 98, 108, 105, 99,
+    //     160, 24,
+    //          2, 1, 1,
+    //          2, 1, 0,
+    //          2, 1, 0,
+    //          48, 13, 48, 11, 6, 7, 43, 6, 167, 254, 32, 1, 1, 5, 0,
+    //
+    //     // 48, 38, 2, 2, 0, 13, 4, 6, 112, 117, 98, 108, 105, 99,
+    //     // 160, 24, 2, 1, 1, 2, 1, 0, 2,
+    //     // 1, 0, 48, 13, 48, 11, 6, 7, 43, 6, 167, 254, 32,
+    //     // 1, 1, 5, 0,
+    // };
+    // // clang-format on
+    //
+    // // printf("\n");
+    // // for (int i = 0; i < 39; i++) {
+    // //     printf("%02X", packet[i]);
+    // // }
+    // // printf("\n");
+    //
+    // packet *p = BER_decode(msg, sizeof(msg));
+    //
+    // debugf("CLI", ">>> PDU/GET");
+    // debugf("CLI", ">>> PDU/GET version     %lld", p->get.version);
+    // debugf("CLI", ">>> PDU/GET community   %s", p->get.community);
+    // debugf("CLI", ">>> PDU/GET request ID  %lld", p->get.request_id);
+    // debugf("CLI", ">>> PDU/GET error       %lld", p->get.error);
+    // debugf("CLI", ">>> PDU/GET error index %lld", p->get.error_index);
+    // debugf("CLI", ">>> PDU/GET OID         %s", p->get.OID);
+    // debugf("CLI", ">>> PDU/GET value       null");
+    //
+    // packet_free(p);
 }
 
 void state() {

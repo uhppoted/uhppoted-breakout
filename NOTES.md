@@ -53,3 +53,64 @@
 
 # Debouncing
 - https://www.eejournal.com/article/ultimate-guide-to-switch-debounce-part-1
+
+
+## BER
+
+```
+48 37
+   2 1 0 
+   4 6 112 117 98 108 105 99
+   160 24 
+       2  1 1
+       2  1 0
+       2  1 0
+       48 13 
+          48 11 
+             6 7 43 6 167 254 32 1 1
+             5 0
+
+::sequence        N:39  ix:2   length:37
+  ::integer       N:37  ix:2   length:1  value:0
+  ::octets        N:37  ix:5   length:6  value:public
+  ::PDU           N:37  ix:13  length:24
+    ::integer     N:24  ix:2   length:1  value:1
+    ::integer     N:24  ix:5   length:1  value:0
+    ::integer     N:24  ix:8   length:1  value:0
+    ::sequence    N:24  ix:11  length:13
+      ::sequence  N:13  ix:2   length:11
+        ::OID     N:11  ix:2   length:7
+        ::null    N:11  ix:11  length:0
+
+OID
+43  6 167 254 32  1  1
+43 06 A7  FE  20 01 01
+
+.1.3.....
+
+
+✓ ::integer     N:37  ix:2   length:1  value:0
+✓ ::octets      N:37  ix:5   length:6  octets:public
+✓ ::integer     N:24  ix:2   length:1  value:1
+✓ ::integer     N:24  ix:5   length:1  value:0
+✓ ::integer     N:24  ix:8   length:1  value:0
+✓ ::OID         N:11  ix:2   length:7  OID:0.1.3.6.655136.1.1
+✓ ::null        N:11  ix:11  length:0
+✓ ::sequence    N:13  ix:2   length:11  fields:2
+✓ ::sequence    N:24  ix:11  length:13  fields:1
+✓ ::PDU         N:37  ix:13  length:24  fields:4
+✓ ::sequence    N:39  ix:2   length:37  fields:3
+
+✓ >>> free 30
+✓ >>> free 02
+✓ >>> free 04
+✓ >>> free a0
+✓ >>> free 02
+✓ >>> free 02
+✓ >>> free 02
+✓ >>> free 30
+✓ >>> free 30
+✓ >>> free 06
+✓ >>> free 05
+
+```

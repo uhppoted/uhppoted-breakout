@@ -139,9 +139,9 @@ void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, i
         };
 
         message packed = BER_encode(reply);
-        message encoded = bisync_encode(NULL, 0, packed.data, packed.N);
+        message encoded = bisync_encode(NULL, 0, packed.data, packed.length);
 
-        fwrite(encoded.data, sizeof(uint8_t), encoded.N, stdout);
+        fwrite(encoded.data, sizeof(uint8_t), encoded.length, stdout);
         fflush(stdout);
 
         free(packed.data);

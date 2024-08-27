@@ -151,7 +151,7 @@ message bisync_encode(const uint8_t *header, int header_size, const uint8_t *dat
     // ... encode message
     message m = {
         .data = (uint8_t *)calloc(N, sizeof(uint8_t)),
-        .N = N,
+        .length = N,
     };
 
     uint8_t *p = m.data;

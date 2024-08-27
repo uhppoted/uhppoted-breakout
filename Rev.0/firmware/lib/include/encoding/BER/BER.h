@@ -6,6 +6,7 @@
 struct packet;
 
 struct message BER_encode(const struct packet p);
+struct message BER_encodex(const struct packet p);
 struct packet *BER_decode(const uint8_t *message, int N);
 
 /* internal use only */
