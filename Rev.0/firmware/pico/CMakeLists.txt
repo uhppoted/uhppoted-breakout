@@ -46,11 +46,11 @@ add_executable(breakout
   ${LIB}/src/PCAL6408A.c
   ${LIB}/src/PCAL6416A.c
 
-  ${LIB}/src/encoding/encoding.c
   ${LIB}/src/encoding/bisync/bisync.c
   ${LIB}/src/encoding/BER/encode.c
   ${LIB}/src/encoding/BER/decode.c
   ${LIB}/src/encoding/BER/fields.c
+  ${LIB}/src/encoding/SSMP/SSMP.c
 )
 
 target_include_directories(breakout 

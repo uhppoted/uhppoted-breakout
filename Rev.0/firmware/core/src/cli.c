@@ -16,6 +16,7 @@
 #include <U4.h>
 #include <cli.h>
 #include <encoding/BER/BER.h>
+#include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
 #include <log.h>
 #include <state.h>
@@ -403,7 +404,7 @@ void exec(char *cmd) {
 
 void debug() {
     // clang-format off
-    const uint8_t packet[] = {
+    const uint8_t msg[] = {
         48, 37, 2, 1, 0, 4, 6, 112, 117, 98, 108, 105, 99,
         160, 24, 
              2, 1, 1, 
@@ -424,7 +425,18 @@ void debug() {
     // }
     // printf("\n");
 
-    BER_decode(packet, sizeof(packet));
+    packet *p = BER_decode(msg, sizeof(msg));
+
+    debugf("CLI", ">>> PDU/GET");
+    debugf("CLI", ">>> PDU/GET version     %lld", p->get.version);
+    debugf("CLI", ">>> PDU/GET community   %s", p->get.community);
+    debugf("CLI", ">>> PDU/GET request ID  %lld", p->get.request_id);
+    debugf("CLI", ">>> PDU/GET error       %lld", p->get.error);
+    debugf("CLI", ">>> PDU/GET error index %lld", p->get.error_index);
+    debugf("CLI", ">>> PDU/GET OID         %s", p->get.OID);
+    debugf("CLI", ">>> PDU/GET value       null");
+
+    packet_free(p);
 }
 
 void state() {

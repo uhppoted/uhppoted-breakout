@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <encoding/BER/BER.h>
+#include <encoding/SSMP/SSMP.h>
 
 // clang-format off
 const uint8_t RESPONSE[] = {

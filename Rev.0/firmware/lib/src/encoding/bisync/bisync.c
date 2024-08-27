@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
 
 const uint8_t SOH = 1;

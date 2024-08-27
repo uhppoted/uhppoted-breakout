@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <encoding/BER/BER.h>
+#include <encoding/SSMP/SSMP.h>
 
 extern vector *vector_new();
 extern vector *vector_free();
@@ -22,15 +23,7 @@ field *unpack_get_request    (const uint8_t *, int, int *);
 uint32_t unpack_length(const uint8_t *message, int N, int *ix);
 
 struct packet *BER_decode(const uint8_t *message, int N) {
-    packet *p = (packet *)malloc(sizeof(packet));
-
-    p->tag = PACKET_UNKNOWN;
-    p->get.version = 0;
-    p->get.community = NULL;
-    p->get.request_id = 1;
-    p->get.error = 0;
-    p->get.error_index = 0;
-    p->get.OID = NULL;
+    packet *p = NULL;
 
     // ... unpack message
     vector *fields = unpack(message, N);
@@ -41,29 +34,34 @@ struct packet *BER_decode(const uint8_t *message, int N) {
 
             // ... SSMP GET request ?
             if (message.size > 2 && message.fields[2]->tag == FIELD_PDU_GET) {
-                p->tag = PACKET_GET;
+                int64_t version = 0;
+                char *community = NULL;
+                int64_t request_id = 0;
+                int64_t error = 0;
+                int64_t error_index = 0;
+                char *OID = NULL;
 
                 if (message.fields[0]->tag == FIELD_INTEGER) {
-                    p->get.version = message.fields[0]->integer.value;
+                    version = message.fields[0]->integer.value;
                 }
 
                 if (message.fields[1]->tag == FIELD_OCTET_STRING) {
-                    p->get.community = strndup(message.fields[1]->string.octets, message.fields[1]->string.length);
+                    community = strndup(message.fields[1]->string.octets, message.fields[1]->string.length);
                 }
 
                 if (message.fields[2]->sequence.fields != NULL) {
                     vector pdu = *message.fields[2]->sequence.fields;
 
                     if (pdu.size > 0 && pdu.fields[0]->tag == FIELD_INTEGER) {
-                        p->get.request_id = pdu.fields[0]->integer.value;
+                        request_id = pdu.fields[0]->integer.value;
                     }
 
                     if (pdu.size > 1 && pdu.fields[1]->tag == FIELD_INTEGER) {
-                        p->get.error = pdu.fields[1]->integer.value;
+                        error = pdu.fields[1]->integer.value;
                     }
 
                     if (pdu.size > 2 && pdu.fields[2]->tag == FIELD_INTEGER) {
-                        p->get.error_index = pdu.fields[2]->integer.value;
+                        error_index = pdu.fields[2]->integer.value;
                     }
 
                     if (pdu.size > 3 && pdu.fields[3]->tag == FIELD_SEQUENCE && pdu.fields[3]->sequence.fields != NULL) {
@@ -73,7 +71,7 @@ struct packet *BER_decode(const uint8_t *message, int N) {
                             vector rq = *content.fields[0]->sequence.fields;
 
                             if (rq.size > 0 && rq.fields[0]->tag == FIELD_OID) {
-                                p->get.OID = strdup(rq.fields[0]->OID.OID);
+                                OID = strdup(rq.fields[0]->OID.OID);
                             }
 
                             if (rq.size > 1 && rq.fields[1]->tag == FIELD_NULL) {
@@ -81,20 +79,13 @@ struct packet *BER_decode(const uint8_t *message, int N) {
                         }
                     }
                 }
+
+                p = ssmp_get(version, community, request_id, error, error_index, OID);
             }
         }
 
         vector_free(fields);
     }
-
-    printf(">>> PDU/GET\n");
-    printf(">>> PDU/GET version     %lld\n", p->get.version);
-    printf(">>> PDU/GET community   %s\n", p->get.community);
-    printf(">>> PDU/GET request ID  %lld\n", p->get.request_id);
-    printf(">>> PDU/GET error       %lld\n", p->get.error);
-    printf(">>> PDU/GET error index %lld\n", p->get.error_index);
-    printf(">>> PDU/GET OID         %s\n", p->get.OID);
-    printf(">>> PDU/GET value       null\n");
 
     return p;
 }
@@ -148,7 +139,7 @@ vector *unpack(const uint8_t *bytes, int N) {
                 break;
 
             default:
-                printf("::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
+                // printf("::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
                 ix = N;
             }
         }
@@ -168,7 +159,7 @@ field *unpack_integer(const uint8_t *message, int N, int *ix) {
         }
     }
 
-    printf("::integer     N:%d  ix:%-3d length:%lu  value:%lld\n", N, *ix, length, value);
+    // printf("::integer     N:%d  ix:%-3d length:%lu  value:%lld\n", N, *ix, length, value);
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
@@ -186,7 +177,7 @@ field *unpack_octets(const uint8_t *message, int N, int *ix) {
 
     memmove(octets, &message[*ix], length);
 
-    printf("::octets      N:%d  ix:%-3d length:%lu  octets:%s\n", N, *ix, length, strndup(octets, length));
+    // printf("::octets      N:%d  ix:%-3d length:%lu  octets:%s\n", N, *ix, length, strndup(octets, length));
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
@@ -202,7 +193,7 @@ field *unpack_octets(const uint8_t *message, int N, int *ix) {
 field *unpack_null(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
 
-    printf("::null        N:%d  ix:%-3d length:%lu\n", N, *ix, length);
+    // printf("::null        N:%d  ix:%-3d length:%lu\n", N, *ix, length);
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
@@ -246,7 +237,7 @@ field *unpack_OID(const uint8_t *message, int N, int *ix) {
         }
     }
 
-    printf("::OID         N:%d  ix:%-3d length:%lu  OID:%s\n", N, *ix, length, OID);
+    // printf("::OID         N:%d  ix:%-3d length:%lu  OID:%s\n", N, *ix, length, OID);
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
@@ -262,7 +253,7 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
     vector *fields = unpack(&message[*ix], length);
 
-    printf("::sequence    N:%d  ix:%-3d length:%lu  fields:%d\n", N, *ix, length, fields->size);
+    // printf("::sequence    N:%d  ix:%-3d length:%lu  fields:%d\n", N, *ix, length, fields->size);
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
@@ -278,7 +269,7 @@ field *unpack_get_request(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
     vector *fields = unpack(&message[*ix], length);
 
-    printf("::PDU         N:%d  ix:%-3d length:%lu  fields:%d\n", N, *ix, length, fields->size);
+    // printf("::PDU         N:%d  ix:%-3d length:%lu  fields:%d\n", N, *ix, length, fields->size);
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));

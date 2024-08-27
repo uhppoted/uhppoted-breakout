@@ -8,8 +8,8 @@
 
 #include <breakout.h>
 #include <encoding/BER/BER.h>
+#include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
-#include <encoding/encoding.h>
 #include <log.h>
 #include <ssmp.h>
 #include <state.h>

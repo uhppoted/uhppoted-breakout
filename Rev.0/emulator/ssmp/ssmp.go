@@ -2,8 +2,6 @@ package ssmp
 
 import (
 	"fmt"
-	syslog "log"
-	"os"
 	"sync/atomic"
 	"time"
 
@@ -11,6 +9,7 @@ import (
 	"github.com/pkg/term"
 
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/BER"
+	ssmp "github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/SSMP"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/bisync"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
 )
@@ -20,7 +19,7 @@ type SSMP struct {
 }
 
 type request struct {
-	packet gosnmp.SnmpPacket
+	packet ssmp.GetPacket
 	pipe   chan gosnmp.SnmpPacket
 }
 
@@ -28,29 +27,35 @@ var write = make(chan request)
 var rqid = atomic.Uint32{}
 
 func Get(oid []uint32) (any, error) {
-	logger := gosnmp.NewLogger(syslog.New(os.Stdout, "", 0))
+	// logger := gosnmp.NewLogger(syslog.New(os.Stdout, "", 0))
 
-	pdu := gosnmp.SnmpPDU{
-		Value: gosnmp.Null,
-		Name:  ".1.3.6.655136.1.1",
-		Type:  gosnmp.Null,
-	}
+	// pdu := gosnmp.SnmpPDU{
+	// 	Value: gosnmp.Null,
+	// 	Name:  ".1.3.6.655136.1.1",
+	// 	Type:  gosnmp.Null,
+	// }
 
-	packet := gosnmp.SnmpPacket{
-		Version:         gosnmp.Version1,
-		ContextEngineID: "ssmp",
-		ContextName:     "ssmp",
-		Community:       "public",
-		PDUType:         gosnmp.GetRequest,
-		MsgID:           1,
-		RequestID:       1,
-		MsgMaxSize:      512,
-		Error:           gosnmp.NoError,
-		ErrorIndex:      0,
-		NonRepeaters:    0,
-		MaxRepetitions:  0,
-		Variables:       []gosnmp.SnmpPDU{pdu},
-		Logger:          logger,
+	// packet := gosnmp.SnmpPacket{
+	// 	Version:         gosnmp.Version1,
+	// 	ContextEngineID: "ssmp",
+	// 	ContextName:     "ssmp",
+	// 	Community:       "public",
+	// 	PDUType:         gosnmp.GetRequest,
+	// 	MsgID:           1,
+	// 	RequestID:       1,
+	// 	MsgMaxSize:      512,
+	// 	Error:           gosnmp.NoError,
+	// 	ErrorIndex:      0,
+	// 	NonRepeaters:    0,
+	// 	MaxRepetitions:  0,
+	// 	Variables:       []gosnmp.SnmpPDU{pdu},
+	// 	Logger:          logger,
+	// }
+
+	packet := ssmp.GetPacket{
+		Community: "public",
+		RequestID: 1,
+		OID:       ".1.3.6.655136.1.1",
 	}
 
 	rq := request{
@@ -66,7 +71,6 @@ func Get(oid []uint32) (any, error) {
 		debugf("reply to SSMP GET request (%v)", reply)
 
 		if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
-			fmt.Printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> %v\n", err)
 			return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
 		} else if v, ok := value.(uint32); !ok {
 			return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
@@ -149,8 +153,8 @@ func (ssmp SSMP) Run() {
 	}
 }
 
-func send(packet gosnmp.SnmpPacket, codec *bisync.Bisync, tx chan []byte) error {
-	if bytes, err := BER.Encode(packet); err != nil {
+func send(packet ssmp.GetPacket, codec *bisync.Bisync, tx chan []byte) error {
+	if bytes, err := packet.Encode(); err != nil {
 		return err
 	} else {
 		if encoded, err := codec.Encode(nil, bytes); err != nil {
@@ -223,9 +227,6 @@ func received(msg []byte, codec *bisync.Bisync) []gosnmp.SnmpPacket {
 
 func get(packet gosnmp.SnmpPacket, OID string) (any, error) {
 	for _, pdu := range packet.Variables {
-		fmt.Printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> GOT      %v\n", pdu.Name)
-		fmt.Printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EXPECTED %v\n", OID)
-
 		if pdu.Name == OID {
 			return pdu.Value, nil
 		}

@@ -36,3 +36,4 @@ typedef struct message {
 } message;
 
 void packet_free(packet *);
+packet *ssmp_get(int64_t version, char *community, int64_t request_id, int64_t error, int64_t error_index, char *OID);
