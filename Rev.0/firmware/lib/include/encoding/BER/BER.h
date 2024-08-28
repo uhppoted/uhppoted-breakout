@@ -4,9 +4,10 @@
 #include <stdint.h>
 
 struct packet;
+struct field;
 
 struct message BER_encode(const struct packet p);
-struct message BER_encodex(const struct packet p);
+struct slice BER_encodex(const struct field f);
 struct packet *BER_decode(const uint8_t *message, int N);
 
 /* internal use only */
@@ -22,13 +23,16 @@ typedef enum {
     FIELD_PDU_GET = 0xa0,
 } FIELD;
 
-typedef struct field field;
-
 typedef struct vector {
     int capacity;
     int size;
-    field *fields[4];
+    struct field *fields[4];
 } vector;
+
+typedef struct slice {
+    int length;
+    uint8_t *bytes;
+} slice;
 
 typedef struct field {
     FIELD tag;

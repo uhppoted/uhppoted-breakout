@@ -403,31 +403,54 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    packet p = {
-        .tag = PACKET_GET_RESPONSE,
-        .get_response = {
-            .version = 0,
-            .community = "public",
-            .request_id = 1,
-            .error = 0,
-            .error_index = 0,
+    // packet p = {
+    //     .tag = PACKET_GET_RESPONSE,
+    //     .get_response = {
+    //         .version = 0,
+    //         .community = "public",
+    //         .request_id = 1,
+    //         .error = 0,
+    //         .error_index = 0,
+    //         .OID = "0.1.3.6.655136.1.1",
+    //         .value = {
+    //             .tag = VALUE_UINT32,
+    //             .integer = 405419896,
+    //         },
+    //     },
+    // };
+
+    // field f = {
+    //     .tag = FIELD_NULL,
+    //     .null = {
+    //     },
+    // };
+
+    // field f = {
+    //     .tag = FIELD_INTEGER,
+    //     .integer = {
+    //         .value = 405419896,
+    //         // .value = 9223372036854775807,
+    //         // .value = -9223372036854775807 - 1,
+    //         // .value = -1,
+    //     },
+    // };
+
+    field f = {
+        .tag = FIELD_OID,
+        .OID = {
             .OID = "0.1.3.6.655136.1.1",
-            .value = {
-                .tag = VALUE_UINT32,
-                .integer = 405419896,
-            },
         },
     };
 
-    message msg = BER_encodex(p);
+    slice s = BER_encodex(f);
 
     printf("---\n");
-    for (int i = 0; i < msg.length; i++) {
-        printf(" %02X", msg.data[i]);
+    for (int i = 0; i < s.length; i++) {
+        printf(" %02X", s.bytes[i]);
     }
     printf("\n---\n");
 
-    free(msg.data);
+    free(s.bytes);
 
     // // clang-format off
     // const uint8_t msg[] = {

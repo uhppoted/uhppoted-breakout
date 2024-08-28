@@ -24,3 +24,28 @@ packet *ssmp_get(int64_t version, char *community, int64_t request_id, int64_t e
 
     return p;
 }
+
+// message BER_encodex(const struct field f) {
+//     struct message m = {
+//         .data = NULL,
+//         .length = 0,
+//     };
+//
+//     if (p.tag == PACKET_GET_RESPONSE) {
+//         int N = 16;
+//         uint8_t *buffer = (uint8_t *)calloc(N, sizeof(uint8_t));
+//         int ix = 0;
+//         int len;
+//
+//         switch (p.get_response.value.tag) {
+//         default:
+//             len = pack_null(&buffer[ix], N - ix);
+//             ix += len;
+//         }
+//
+//         m.data = reverse(buffer, ix);
+//         m.length = ix;
+//     }
+//
+//     return m;
+// }
