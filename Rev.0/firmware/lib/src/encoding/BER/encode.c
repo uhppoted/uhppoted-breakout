@@ -132,7 +132,7 @@ slice pack_OID(const field *f) {
             first = 40 * v;
         }
 
-        if ((p = strtok_r(NULL, ".", &saveptr)) p != NULL) {
+        if ((p = strtok_r(NULL, ".", &saveptr)) != NULL) {
             uint32_t v = 0;
 
             if (sscanf(p, "%lu", &v) == 1) {
