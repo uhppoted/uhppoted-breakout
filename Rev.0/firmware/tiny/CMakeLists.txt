@@ -46,6 +46,7 @@ add_executable(breakout
   ${LIB}/src/PCAL6408A.c
   ${LIB}/src/PCAL6416A.c
 
+  ${LIB}/src/encoding/slice.c
   ${LIB}/src/encoding/bisync/bisync.c
   ${LIB}/src/encoding/BER/encode.c
   ${LIB}/src/encoding/BER/decode.c

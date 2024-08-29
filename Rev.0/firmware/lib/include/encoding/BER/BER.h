@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <encoding/slice.h>
+
 struct packet;
 struct field;
 
@@ -28,11 +30,6 @@ typedef struct vector {
     int size;
     struct field *fields[4];
 } vector;
-
-typedef struct slice {
-    int length;
-    uint8_t *bytes;
-} slice;
 
 typedef struct field {
     FIELD tag;

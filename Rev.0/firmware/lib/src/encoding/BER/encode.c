@@ -8,8 +8,7 @@
 slice pack_integer(const field *f);
 slice pack_null(const field *f);
 slice pack_OID(const field *f);
-
-// uint8_t *reverse(uint8_t *buffer, int N);
+slice pack_varint(const uint32_t length);
 
 // clang-format off
 const uint8_t RESPONSE[] = {
@@ -34,6 +33,7 @@ message BER_encode(const struct packet p) {
 
 slice BER_encodex(const struct field f) {
     struct slice s = {
+        .capacity = 0,
         .length = 0,
         .bytes = NULL,
     };
@@ -55,20 +55,6 @@ slice BER_encodex(const struct field f) {
     return s;
 }
 
-// uint8_t *reverse(uint8_t *buffer, int N) {
-//     uint8_t *p = &buffer[0];
-//     uint8_t *q = &buffer[N - 1];
-//
-//     for (int i = 0; i < N / 2; i++) {
-//         uint8_t v = *p;
-//
-//         *p++ = *q;
-//         *q-- = v;
-//     }
-//
-//     return buffer;
-// }
-
 slice pack_integer(const field *f) {
     uint8_t buffer[8] = {0};
     int ix = 0;
@@ -80,6 +66,7 @@ slice pack_integer(const field *f) {
     } while (v != 0 && ix < sizeof(buffer));
 
     slice s = {
+        .capacity = ix + 2,
         .length = ix + 2,
         .bytes = (uint8_t *)calloc(ix + 2, sizeof(uint8_t)),
     };
@@ -95,6 +82,7 @@ slice pack_integer(const field *f) {
 
 slice pack_null(const field *f) {
     slice s = {
+        .capacity = 2,
         .length = 2,
         .bytes = (uint8_t *)calloc(2, sizeof(uint8_t)),
     };
@@ -106,64 +94,101 @@ slice pack_null(const field *f) {
 }
 
 slice pack_OID(const field *f) {
+    slice buffer = {
+        .capacity = 64,
+        .length = 0,
+        .bytes = (uint8_t *)calloc(64, sizeof(uint8_t)),
+    };
+
     char *oid = strdup(f->OID.OID);
     char *saveptr;
     char *p = strtok_r(oid, ".", &saveptr);
-    uint32_t first = 0x00;
-    int len = 0;
 
-    // ... skip leading '0'
-    if (p != NULL) {
-        uint32_t v = 0;
-
-        if (sscanf(p, "%lu", &v) == 1) {
-            printf(">>> 1::%s  [%lu]\n", p, v);
-        }
-
+    // ... skip root '0'
+    if (p != NULL && strcmp(p, "0") == 0) {
         p = strtok_r(NULL, ".", &saveptr);
     }
 
     // ... special encoding for first byte (.1.3)
     if (p != NULL) {
-        uint32_t v = 0;
+        uint8_t b = 0;
 
+        uint32_t v = 0;
         if (sscanf(p, "%lu", &v) == 1) {
-            printf(">>> 2::%s  [%lu]\n", p, v);
-            first = 40 * v;
+            b = 40 * v;
         }
 
         if ((p = strtok_r(NULL, ".", &saveptr)) != NULL) {
             uint32_t v = 0;
-
             if (sscanf(p, "%lu", &v) == 1) {
-                printf(">>> 3::%s  [%lu]\n", p, v);
-                first += v;
+                b += v;
             }
         }
 
-        p = strtok_r(NULL, ".", &saveptr);
+        buffer.bytes[buffer.length++] = b;
 
-        len++;
+        p = strtok_r(NULL, ".", &saveptr);
     }
 
-    // while (p != NULL) {
-    //     printf(">> %s\n", p);
-    //     p = strtok_r(NULL, ".", &saveptr);
-    // };
+    // ... remaining sub-OIDs
+    while (p != NULL) {
+        uint32_t v = 0;
+        if (sscanf(p, "%lu", &v) == 1) {
+            slice bytes = pack_varint(v);
 
-    slice s = {
-        .length = 2 + len,
-        .bytes = (uint8_t *)calloc(2 + len, sizeof(uint8_t)),
-    };
+            slice_append(&buffer, bytes);
+            slice_free(&bytes);
+        }
 
-    s.bytes[0] = 0x06;
-    s.bytes[1] = len;
-
-    if (len > 0) {
-        s.bytes[2] = (uint8_t)first;
+        p = strtok_r(NULL, ".", &saveptr);
     }
 
     free(oid);
+
+    // ... copy to slice
+    slice length = pack_varint(buffer.length);
+
+    slice s = {
+        .capacity = 16 + buffer.length,
+        .length = 0,
+        .bytes = (uint8_t *)calloc(16 + buffer.length, sizeof(uint8_t)),
+    };
+
+    s.bytes[s.length++] = 0x06;
+    slice_append(&s, length);
+    slice_append(&s, buffer);
+
+    slice_free(&length);
+    slice_free(&buffer);
+
+    return s;
+}
+
+// Encodes a uint32 varint as a big-endian varint
+slice pack_varint(const uint32_t length) {
+    uint8_t buffer[8] = {0};
+    uint32_t v = length;
+    int ix = sizeof(buffer) - 1;
+
+    buffer[ix--] = v & 0x7f;
+    v >>= 7;
+
+    while (v != 0) {
+        buffer[ix--] = 0x80 | (v & 0x7f);
+        v >>= 7;
+    };
+
+    // ... copy to slice
+    slice s = {
+        .capacity = 16,
+        .length = 0,
+        .bytes = (uint8_t *)calloc(16, sizeof(uint8_t)),
+    };
+
+    ix++;
+    while (ix < sizeof(buffer)) {
+        s.bytes[s.length++] = buffer[ix++];
+    }
 
     return s;
 }

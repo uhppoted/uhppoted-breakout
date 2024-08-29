@@ -50,6 +50,8 @@
          30 0F 
             06 07 2B 06 A7 FE 20 01 01 
             47 04 18 2A 37 78
+
+>>>         06 07 2B 06 A7 FE 20 01 01
 ```
 
    - [x] SSMP idle - revert to MODE_UNKNOWN
