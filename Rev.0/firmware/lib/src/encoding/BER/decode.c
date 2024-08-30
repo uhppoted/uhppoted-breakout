@@ -5,10 +5,6 @@
 #include <encoding/BER/BER.h>
 #include <encoding/SSMP/SSMP.h>
 
-extern vector *vector_new();
-extern vector *vector_free();
-extern vector *vector_add(vector *, field *);
-
 vector *unpack(const uint8_t *bytes, int N);
 
 // clang-format off
@@ -85,6 +81,7 @@ struct packet *BER_decode(const uint8_t *message, int N) {
         }
 
         vector_free(fields);
+        free(fields);
     }
 
     return p;

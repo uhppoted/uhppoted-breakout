@@ -8,7 +8,7 @@ typedef struct slice {
     uint8_t *bytes;
 } slice;
 
-extern void slice_free(slice *);
-extern void slice_append(slice *dest, const slice src);
+extern slice make_slice(int size);
+extern void slice_free(slice *const);
+extern void slice_append(slice *constdest, const slice src);
 // uint8_t *slice_reverse(uint8_t *buffer, int N);
-

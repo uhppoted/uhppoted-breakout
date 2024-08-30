@@ -7,7 +7,7 @@ void vector_free(vector *);
 
 const int CAPACITY = 16;
 
-void field_free(field *f) {
+void field_free(field *const f) {
     switch (f->tag) {
     case FIELD_OCTET_STRING:
         free(f->string.octets);
@@ -19,14 +19,14 @@ void field_free(field *f) {
 
     case FIELD_SEQUENCE:
         vector_free(f->sequence.fields);
+        free(f->sequence.fields);
         break;
 
     case FIELD_PDU_GET:
         vector_free(f->get.fields);
+        free(f->get.fields);
         break;
     }
-
-    free(f);
 }
 
 vector *vector_new() {
@@ -46,13 +46,11 @@ vector *vector_new() {
     return v;
 }
 
-void vector_free(vector *v) {
+void vector_free(vector *const v) {
     if (v != NULL) {
         for (int i = 0; i < v->size; i++) {
             field_free(v->fields[i]);
         }
-
-        free(v);
     }
 }
 

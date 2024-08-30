@@ -419,30 +419,42 @@ void debug() {
     //     },
     // };
 
-    // field f = {
-    //     .tag = FIELD_NULL,
-    //     .null = {
-    //     },
-    // };
+    field fnull = {
+        .tag = FIELD_NULL,
+        .null = {},
+    };
 
-    // field f = {
-    //     .tag = FIELD_INTEGER,
-    //     .integer = {
-    //         .value = 405419896,
-    //         // .value = 9223372036854775807,
-    //         // .value = -9223372036854775807 - 1,
-    //         // .value = -1,
-    //     },
-    // };
+    field fint = {
+        .tag = FIELD_INTEGER,
+        .integer = {
+            .value = 405419896,
+            // .value = 9223372036854775807,
+            // .value = -9223372036854775807 - 1,
+            // .value = -1,
+        },
+    };
 
-    field f = {
+    field foid = {
         .tag = FIELD_OID,
         .OID = {
             .OID = "0.1.3.6.655136.1.1",
         },
     };
 
-    slice s = BER_encodex(f);
+    vector *fields = vector_new();
+
+    fields = vector_add(fields, &fnull);
+    fields = vector_add(fields, &fint);
+    fields = vector_add(fields, &foid);
+
+    field f = {
+        .tag = FIELD_SEQUENCE,
+        .sequence = {
+            .fields = fields,
+        },
+    };
+
+    slice s = BER_encode(f);
 
     printf("---\n");
     for (int i = 0; i < s.length; i++) {
@@ -450,7 +462,8 @@ void debug() {
     }
     printf("\n---\n");
 
-    free(s.bytes);
+    // field_free(&f);
+    // slice_free(&s);
 
     // // clang-format off
     // const uint8_t msg[] = {

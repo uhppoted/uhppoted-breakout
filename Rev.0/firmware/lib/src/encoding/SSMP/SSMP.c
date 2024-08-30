@@ -2,13 +2,12 @@
 
 #include <encoding/SSMP/SSMP.h>
 
-void packet_free(packet *p) {
+// NTS: expects 'p' to be free'd by caller
+void packet_free(packet *const p) {
     if (p != NULL && p->tag == PACKET_GET) {
         free(p->get.community);
         free(p->get.OID);
     }
-
-    free(p);
 }
 
 packet *ssmp_get(int64_t version, char *community, int64_t request_id, int64_t error, int64_t error_index, char *OID) {

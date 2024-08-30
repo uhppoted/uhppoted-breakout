@@ -1,9 +1,18 @@
 #include <stdlib.h>
 
-#include <encoding/slice.h>
+#include <types/slice.h>
 
+slice make_slice(int size) {
+    slice v = {
+        .capacity = size,
+        .length = 0,
+        .bytes = (uint8_t *)calloc(size, sizeof(uint8_t)),
+    };
 
-void slice_free(slice *slice) {
+    return v;
+}
+
+void slice_free(slice *const slice) {
     free(slice->bytes);
 
     slice->capacity = 0;
@@ -11,7 +20,7 @@ void slice_free(slice *slice) {
     slice->bytes = NULL;
 }
 
-void slice_append(slice *dest, slice src){
+void slice_append(slice *const dest, slice src) {
     for (int i = 0; i < src.length; i++) {
         dest->bytes[dest->length++] = src.bytes[i];
     }
@@ -30,4 +39,3 @@ void slice_append(slice *dest, slice src){
 //
 //     return buffer;
 // }
-

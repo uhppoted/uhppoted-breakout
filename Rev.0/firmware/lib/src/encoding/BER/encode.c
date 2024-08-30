@@ -8,6 +8,7 @@
 slice pack_integer(const field *f);
 slice pack_null(const field *f);
 slice pack_OID(const field *f);
+slice pack_sequence(const field *f);
 slice pack_varint(const uint32_t length);
 
 // clang-format off
@@ -20,7 +21,7 @@ const uint8_t RESPONSE[] = {
     42,  55,  120};
 // clang-format on
 
-message BER_encode(const struct packet p) {
+message BER_encodex(const struct packet p) {
     struct message m = {
         .data = (uint8_t *)calloc(sizeof(RESPONSE), sizeof(uint8_t)),
         .length = sizeof(RESPONSE),
@@ -31,7 +32,7 @@ message BER_encode(const struct packet p) {
     return m;
 }
 
-slice BER_encodex(const struct field f) {
+slice BER_encode(const struct field f) {
     struct slice s = {
         .capacity = 0,
         .length = 0,
@@ -49,6 +50,10 @@ slice BER_encodex(const struct field f) {
 
     case FIELD_OID:
         s = pack_OID(&f);
+        break;
+
+    case FIELD_SEQUENCE:
+        s = pack_sequence(&f);
         break;
     }
 
@@ -155,6 +160,37 @@ slice pack_OID(const field *f) {
     };
 
     s.bytes[s.length++] = 0x06;
+    slice_append(&s, length);
+    slice_append(&s, buffer);
+
+    slice_free(&length);
+    slice_free(&buffer);
+
+    return s;
+}
+
+slice pack_sequence(const field *f) {
+    // ... encode fields
+    slice buffer = make_slice(64);
+
+    if (f->sequence.fields != NULL) {
+        field *e;
+
+        for (int i = 0; i < f->sequence.fields->size; i++) {
+            if ((e = f->sequence.fields->fields[i]) != NULL) {
+                slice v = BER_encode(*e);
+
+                slice_append(&buffer, v);
+                slice_free(&v);
+            }
+        }
+    }
+
+    // ... copy to slice
+    slice s = make_slice(16 + buffer.length);
+    slice length = pack_varint(buffer.length);
+
+    s.bytes[s.length++] = 0x30;
     slice_append(&s, length);
     slice_append(&s, buffer);
 

@@ -1,5 +1,4 @@
 #include <encoding/encoding.h>
 
-void packet_free(packet *p) {
-    
+void packet_free(packet * const p) {
 }

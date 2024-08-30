@@ -21,6 +21,7 @@ format:
 	clang-format -i src/*.c
 	clang-format -i ../core/src/*.c ../core/include/*.h
 	clang-format -i ../lib/src/*.c  ../lib/include/*.h
+	clang-format -i ../lib/src/types/*.c           ../lib/include/types/*.h
 	clang-format -i ../lib/src/encoding/bisync/*.c ../lib/include/encoding/bisync/*.h
 	clang-format -i ../lib/src/encoding/BER/*.c    ../lib/include/encoding/BER/*.h
 	clang-format -i ../lib/src/encoding/SSMP/*.c   ../lib/include/encoding/SSMP/*.h

@@ -3,14 +3,21 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <encoding/slice.h>
+#include <types/slice.h>
 
 struct packet;
 struct field;
+struct vector;
 
-struct message BER_encode(const struct packet p);
-struct slice BER_encodex(const struct field f);
+struct message BER_encodex(const struct packet p);
+struct slice BER_encode(const struct field f);
 struct packet *BER_decode(const uint8_t *message, int N);
+
+extern void field_free(struct field *const);
+
+extern struct vector *vector_new();
+extern void vector_free(struct vector *const);
+extern struct vector *vector_add(struct vector *, struct field *);
 
 /* internal use only */
 
