@@ -441,29 +441,35 @@ void debug() {
         },
     };
 
-    vector *fields = vector_new();
+    field fsequence = {
+        .tag = FIELD_SEQUENCE,
+        .sequence = {
+            .fields = vector_new(),
+        },
+    };
 
-    fields = vector_add(fields, &fnull);
-    fields = vector_add(fields, &fint);
-    fields = vector_add(fields, &foid);
+    fsequence.sequence.fields = vector_add(fsequence.sequence.fields, &foid);
+    fsequence.sequence.fields = vector_add(fsequence.sequence.fields, &fint);
+    // fsequence.sequence.fields = vector_add(fsequence.sequence.fields, &fnull);
 
     field f = {
         .tag = FIELD_SEQUENCE,
         .sequence = {
-            .fields = fields,
+            .fields = vector_new(),
         },
     };
+
+    f.sequence.fields = vector_add(f.sequence.fields, &fsequence);
 
     slice s = BER_encode(f);
 
     printf("---\n");
     for (int i = 0; i < s.length; i++) {
         printf(" %02X", s.bytes[i]);
-    }
+    };
     printf("\n---\n");
 
-    // field_free(&f);
-    // slice_free(&s);
+    slice_free(&s);
 
     // // clang-format off
     // const uint8_t msg[] = {

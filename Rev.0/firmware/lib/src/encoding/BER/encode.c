@@ -17,7 +17,7 @@ const uint8_t RESPONSE[] = {
     117, 98,  108, 105, 99, 162, 28, 2, 
     1,   1,   2,   1,   0,  2,   1,  0,
     48,  17,  48,  15,  6,  7,   43, 6,
-    167, 254, 32,  1,   1,  71,  4,  24, 
+    167, 254, 32,  1,   1,  2,  4,  24, 
     42,  55,  120};
 // clang-format on
 
@@ -171,7 +171,7 @@ slice pack_OID(const field *f) {
 
 slice pack_sequence(const field *f) {
     // ... encode fields
-    slice buffer = make_slice(64);
+    slice buffer = slice_make(64);
 
     if (f->sequence.fields != NULL) {
         field *e;
@@ -187,7 +187,7 @@ slice pack_sequence(const field *f) {
     }
 
     // ... copy to slice
-    slice s = make_slice(16 + buffer.length);
+    slice s = slice_make(16 + buffer.length);
     slice length = pack_varint(buffer.length);
 
     s.bytes[s.length++] = 0x30;

@@ -27,31 +27,6 @@ var write = make(chan request)
 var rqid = atomic.Uint32{}
 
 func Get(oid []uint32) (any, error) {
-	// logger := gosnmp.NewLogger(syslog.New(os.Stdout, "", 0))
-
-	// pdu := gosnmp.SnmpPDU{
-	// 	Value: gosnmp.Null,
-	// 	Name:  ".1.3.6.655136.1.1",
-	// 	Type:  gosnmp.Null,
-	// }
-
-	// packet := gosnmp.SnmpPacket{
-	// 	Version:         gosnmp.Version1,
-	// 	ContextEngineID: "ssmp",
-	// 	ContextName:     "ssmp",
-	// 	Community:       "public",
-	// 	PDUType:         gosnmp.GetRequest,
-	// 	MsgID:           1,
-	// 	RequestID:       1,
-	// 	MsgMaxSize:      512,
-	// 	Error:           gosnmp.NoError,
-	// 	ErrorIndex:      0,
-	// 	NonRepeaters:    0,
-	// 	MaxRepetitions:  0,
-	// 	Variables:       []gosnmp.SnmpPDU{pdu},
-	// 	Logger:          logger,
-	// }
-
 	packet := ssmp.GetPacket{
 		Community: "public",
 		RequestID: 1,
@@ -72,10 +47,10 @@ func Get(oid []uint32) (any, error) {
 
 		if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
 			return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
-		} else if v, ok := value.(uint32); !ok {
+		} else if v, ok := value.(int); !ok {
 			return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
 		} else {
-			return v, nil
+			return uint32(v), nil
 		}
 
 	case <-timeout:
