@@ -45,11 +45,6 @@ typedef struct packet {
     };
 } packet;
 
-typedef struct message {
-    uint8_t *data;
-    int length;
-} message;
-
 void packet_free(packet *const);
 slice ssmp_encode(packet);
 

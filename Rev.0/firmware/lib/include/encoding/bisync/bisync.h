@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct message;
+#include <types/slice.h>
 
 typedef void (*bisync_enq)();
 typedef void (*bisync_msg)(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
@@ -33,4 +33,4 @@ extern const uint8_t SYN;
 extern const char SYN_SYN_ACK[];
 
 extern void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N);
-extern struct message bisync_encode(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
+extern slice bisync_encode(const uint8_t *header, int header_len, const uint8_t *data, int data_len);

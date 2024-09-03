@@ -148,13 +148,13 @@ void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, i
         };
 
         slice packed = ssmp_encode(reply);
-        message encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+        slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
-        fwrite(encoded.data, sizeof(uint8_t), encoded.length, stdout);
+        fwrite(encoded.bytes, sizeof(uint8_t), encoded.length, stdout);
         fflush(stdout);
 
         slice_free(&packed);
-        free(encoded.data);
+        slice_free(&encoded);
     }
 
     packet_free(request);

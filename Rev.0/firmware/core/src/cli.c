@@ -419,15 +419,22 @@ void debug() {
         },
     };
 
-    slice s = ssmp_encode(p);
+    slice packed = ssmp_encode(p);
+    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
-    printf("---\n");
-    for (int i = 0; i < s.length; i++) {
-        printf(" %02X", s.bytes[i]);
+    printf("--- %d\n", packed.length);
+    for (int i = 0; i < packed.length; i++) {
+        printf(" %02X", packed.bytes[i]);
+    };
+    printf("\n---\n");
+    printf("--- %d\n", encoded.length);
+    for (int i = 0; i < encoded.length; i++) {
+        printf(" %02X", encoded.bytes[i]);
     };
     printf("\n---\n");
 
-    slice_free(&s);
+    slice_free(&packed);
+    slice_free(&encoded);
 
     // // clang-format off
     // const uint8_t msg[] = {

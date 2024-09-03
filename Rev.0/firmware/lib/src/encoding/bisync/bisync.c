@@ -118,7 +118,7 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
     }
 }
 
-message bisync_encode(const uint8_t *header, int header_size, const uint8_t *data, int data_size) {
+slice bisync_encode(const uint8_t *header, int header_size, const uint8_t *data, int data_size) {
     // ... calculate message size
     int N = 2;
 
@@ -149,38 +149,37 @@ message bisync_encode(const uint8_t *header, int header_size, const uint8_t *dat
     }
 
     // ... encode message
-    message m = {
-        .data = (uint8_t *)calloc(N, sizeof(uint8_t)),
-        .length = N,
+    slice m = {
+        .capacity = N,
+        .length = 0,
+        .bytes = (uint8_t *)calloc(N, sizeof(uint8_t)),
     };
 
-    uint8_t *p = m.data;
-
-    *p++ = SYN;
-    *p++ = SYN;
+    m.bytes[m.length++] = SYN;
+    m.bytes[m.length++] = SYN;
 
     if (header != NULL) {
-        *p++ = SOH;
+        m.bytes[m.length++] = SOH;
         for (int i = 0; i < header_size; i++) {
             if (escape(header[i])) {
-                *p++ = DLE;
+                m.bytes[m.length++] = DLE;
             }
 
-            *p++ = header[i];
+            m.bytes[m.length++] = header[i];
         }
     }
 
-    *p++ = STX;
+    m.bytes[m.length++] = STX;
     if (data != NULL) {
         for (int i = 0; i < data_size; i++) {
             if (escape(data[i])) {
-                *p++ = DLE;
+                m.bytes[m.length++] = DLE;
             }
 
-            *p++ = data[i];
+            m.bytes[m.length++] = data[i];
         }
     }
-    *p++ = ETX;
+    m.bytes[m.length++] = ETX;
 
     return m;
 }

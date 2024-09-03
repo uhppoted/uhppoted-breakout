@@ -25,9 +25,12 @@
 
 
 ### SSMP
+   - https://www.baeldung.com/cs/bisync
    - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
-   - [x] disable print/println in SSMP mode
-   - [x] SYN-SYN-ENQ/SYN-SYN-ACK
+   - https://www.ranecommercial.com/legacy/note161.html
+   - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
+   - https://forums.raspberrypi.com/viewtopic.php?t=302960
+
    - [ ] MIB
    - [ ] GET
          - [ ] CRC
@@ -36,43 +39,19 @@
                - [x] commonalise decode length
                - [x] free field list/fields
                - [x] pack response
+               - [ ] check slice_free
+               - [ ] check field_free
+               - [ ] check vector_free
+               - [ ] check packet_free
          - [ ] GET
                - [x] free SSMP packet
-```
-30 29 
-   02 01 00 
-   04 06 70 75 62 6C 69 63 
-   A2 1C 
-      02 01 01 
-      02 01 00 
-      02 01 00 
-      30 11 
-         30 0F 
-            06 07 2B 06 A7 FE 20 01 01 
-            02 04 18 2A 37 78
-
->>>
-30 29
-   02 01 00 
-   04 06 70 75 62 6C 69 63 
-   A2 1C
-      02 01 01
-      02 01 00
-      02 01 00
-      30 11 30 0F
-         06 07 2B 06 A7 FE 20 01 01
-         02 04 18 2A 37 78
-```
+               - [ ] get from MIB
+               - [ ] return error if unknown
 
    - [x] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
-   - https://www.baeldung.com/cs/bisync
-   - http://www.tcpipguide.com/free/t_SNMPVersion2SNMPv2MessageFormats-5.htm
-   - https://www.ranecommercial.com/legacy/note161.html
-   - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
-   - https://people.ece.cornell.edu/land/courses/ece4760/RP2040/C_SDK_random/index_random.html
-   - https://forums.raspberrypi.com/viewtopic.php?t=302960
+
 
 ### MIB
     - [ ] controller ID
@@ -80,16 +59,6 @@
           - compile time constant
 
 ### CLI
-    - [x] initialise on connected
-    - [x] set initial scroll area
-    - [x] Dangling '['
-    - [x] // FIXME remove - delay to let USB initialise
-    - [x] LED yellow/green for UNKNOWN mode
-    - [x] LED red/green for CLI mode
-    - [x] LED blue/green for SSMP mode
-    - [x] CLI idle - ping for terminal status
-    - [x] parse buffer with multiple terminal report messages
-    - [x] echo weirdness: printf works but sys::print doesn't
     - [ ] parse commands using strtok
 
 ## PiZeroW
