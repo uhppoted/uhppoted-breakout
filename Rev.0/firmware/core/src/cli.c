@@ -403,65 +403,77 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    // packet p = {
-    //     .tag = PACKET_GET_RESPONSE,
-    //     .get_response = {
-    //         .version = 0,
-    //         .community = "public",
-    //         .request_id = 1,
-    //         .error = 0,
-    //         .error_index = 0,
-    //         .OID = "0.1.3.6.655136.1.1",
-    //         .value = {
-    //             .tag = VALUE_UINT32,
-    //             .integer = 405419896,
-    //         },
+    packet p = {
+        .tag = PACKET_GET_RESPONSE,
+        .version = 0,
+        .community = "public",
+        .get_response = {
+            .request_id = 1,
+            .error = 0,
+            .error_index = 0,
+            .OID = "0.1.3.6.655136.1.1",
+            .value = {
+                .tag = VALUE_UINT32,
+                .integer = 405419896,
+            },
+        },
+    };
+
+    // field fnull = {
+    //     .tag = FIELD_NULL,
+    //     .null = {},
+    // };
+
+    // field fint = {
+    //     .tag = FIELD_INTEGER,
+    //     .integer = {
+    //         .value = 405419896,
+    //         // .value = 9223372036854775807,
+    //         // .value = -9223372036854775807 - 1,
+    //         // .value = -1,
     //     },
     // };
 
-    field fnull = {
-        .tag = FIELD_NULL,
-        .null = {},
-    };
+    // field foid = {
+    //     .tag = FIELD_OID,
+    //     .OID = {
+    //         .OID = "0.1.3.6.655136.1.1",
+    //     },
+    // };
 
-    field fint = {
-        .tag = FIELD_INTEGER,
-        .integer = {
-            .value = 405419896,
-            // .value = 9223372036854775807,
-            // .value = -9223372036854775807 - 1,
-            // .value = -1,
-        },
-    };
+    // field fcontent = {
+    //     .tag = FIELD_SEQUENCE,
+    //     .sequence = {
+    //         .fields = vector_new(),
+    //     },
+    // };
 
-    field foid = {
-        .tag = FIELD_OID,
-        .OID = {
-            .OID = "0.1.3.6.655136.1.1",
-        },
-    };
+    // fcontent.sequence.fields = vector_add(fcontent.sequence.fields, &foid);
+    // fcontent.sequence.fields = vector_add(fcontent.sequence.fields, &fint);
+    // // fcontent.sequence.fields = vector_add(fsequence.sequence.fields, &fnull);
 
-    field fsequence = {
-        .tag = FIELD_SEQUENCE,
-        .sequence = {
-            .fields = vector_new(),
-        },
-    };
+    // field fseq = {
+    //     .tag = FIELD_SEQUENCE,
+    //     .sequence = {
+    //         .fields = vector_new(),
+    //     },
+    // };
 
-    fsequence.sequence.fields = vector_add(fsequence.sequence.fields, &foid);
-    fsequence.sequence.fields = vector_add(fsequence.sequence.fields, &fint);
-    // fsequence.sequence.fields = vector_add(fsequence.sequence.fields, &fnull);
+    // fseq.sequence.fields = vector_add(fseq.sequence.fields, &fcontent);
 
-    field f = {
-        .tag = FIELD_SEQUENCE,
-        .sequence = {
-            .fields = vector_new(),
-        },
-    };
+    // field fpdu = {
+    //     .tag = FIELD_PDU_GET_RESPONSE,
+    //     .get_response = {
+    //         .fields = vector_new(),
+    //     },
+    // };
 
-    f.sequence.fields = vector_add(f.sequence.fields, &fsequence);
+    // fpdu.sequence.fields = vector_add(fpdu.sequence.fields, &foid);
+    // fpdu.sequence.fields = vector_add(fpdu.sequence.fields, &fint);
 
-    slice s = BER_encode(f);
+    // slice s = BER_encode(fpdu);
+
+    slice s = ssmp_encode(p);
 
     printf("---\n");
     for (int i = 0; i < s.length; i++) {

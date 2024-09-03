@@ -42,7 +42,7 @@ struct packet *BER_decode(const uint8_t *message, int N) {
                 }
 
                 if (message.fields[1]->tag == FIELD_OCTET_STRING) {
-                    community = strndup(message.fields[1]->string.octets, message.fields[1]->string.length);
+                    community = strndup(message.fields[1]->octets.octets, message.fields[1]->octets.length);
                 }
 
                 if (message.fields[2]->sequence.fields != NULL) {
@@ -179,8 +179,8 @@ field *unpack_octets(const uint8_t *message, int N, int *ix) {
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
     f->tag = FIELD_OCTET_STRING;
-    f->string.length = length;
-    f->string.octets = octets;
+    f->octets.length = length;
+    f->octets.octets = octets;
 
     *ix += length;
 

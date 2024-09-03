@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include <types/slice.h>
+
 typedef enum {
     PACKET_UNKNOWN,
     PACKET_GET,
@@ -18,10 +20,10 @@ typedef struct datetime {
 
 typedef struct packet {
     PACKET tag;
+    int64_t version;
+    char *community;
     union {
         struct {
-            int64_t version;
-            char *community;
             int64_t request_id;
             int64_t error;
             int64_t error_index;
@@ -29,8 +31,6 @@ typedef struct packet {
         } get;
 
         struct {
-            uint8_t version;
-            char *community;
             uint32_t request_id;
             int64_t error;
             int64_t error_index;
@@ -51,4 +51,6 @@ typedef struct message {
 } message;
 
 void packet_free(packet *const);
+slice ssmp_encode(packet);
+
 packet *ssmp_get(int64_t version, char *community, int64_t request_id, int64_t error, int64_t error_index, char *OID);

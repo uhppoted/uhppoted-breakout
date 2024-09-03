@@ -10,7 +10,7 @@ const int CAPACITY = 16;
 void field_free(field *const f) {
     switch (f->tag) {
     case FIELD_OCTET_STRING:
-        free(f->string.octets);
+        free(f->octets.octets);
         break;
 
     case FIELD_OID:

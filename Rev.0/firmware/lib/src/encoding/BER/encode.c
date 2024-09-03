@@ -6,6 +6,7 @@
 #include <encoding/SSMP/SSMP.h>
 
 slice pack_integer(const field *f);
+slice pack_octets(const field *f);
 slice pack_null(const field *f);
 slice pack_OID(const field *f);
 slice pack_sequence(const field *f);
@@ -42,6 +43,10 @@ slice BER_encode(const struct field f) {
     switch (f.tag) {
     case FIELD_INTEGER:
         s = pack_integer(&f);
+        break;
+
+    case FIELD_OCTET_STRING:
+        s = pack_octets(&f);
         break;
 
     case FIELD_NULL:
@@ -81,6 +86,33 @@ slice pack_integer(const field *f) {
     for (int i = 0; i < ix; i++) {
         s.bytes[i + 2] = buffer[ix - i - 1];
     }
+
+    return s;
+}
+
+slice pack_octets(const field *f) {
+    slice s = {
+        .capacity = 64,
+        .length = 2,
+        .bytes = (uint8_t *)calloc(64, sizeof(uint8_t)),
+    };
+
+    s.bytes[0] = 0x04;
+    s.bytes[1] = 0x00;
+
+    slice length = pack_varint(f->octets.length);
+    slice octets = {
+        .capacity = f->octets.length,
+        .length = f->octets.length,
+        .bytes = (uint8_t *)calloc(f->octets.length, sizeof(uint8_t)),
+    };
+
+    memmove(octets.bytes, f->octets.octets, f->octets.length);
+
+    slice_append(&s, length);
+    slice_append(&s, octets);
+
+    slice_free(&octets);
 
     return s;
 }

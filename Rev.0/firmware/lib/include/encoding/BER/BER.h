@@ -30,6 +30,10 @@ typedef enum {
     FIELD_OID = 0x06,
     FIELD_SEQUENCE = 0x30,
     FIELD_PDU_GET = 0xa0,
+    // FIELD_PDU_GET_NEXT = 0xA1,
+    FIELD_PDU_GET_RESPONSE = 0xa2,
+    // FIELD_PDU_SET: 0xA3,
+    // FIELD_PDU_TRAP: 0xA4,
 } FIELD;
 
 typedef struct vector {
@@ -48,7 +52,7 @@ typedef struct field {
         struct {
             int length;
             uint8_t *octets;
-        } string;
+        } octets;
 
         struct {
         } null;
@@ -64,6 +68,10 @@ typedef struct field {
         struct {
             vector *fields;
         } get;
+
+        struct {
+            vector *fields;
+        } get_response;
     };
 
 } field;
