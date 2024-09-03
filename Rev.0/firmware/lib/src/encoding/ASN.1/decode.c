@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <encoding/BER/BER.h>
+#include <encoding/ASN.1/BER.h>
 #include <encoding/SSMP/SSMP.h>
 
 vector *unpack(const uint8_t *bytes, int N);
@@ -271,7 +271,7 @@ field *unpack_get_request(const uint8_t *message, int N, int *ix) {
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
     f->tag = FIELD_PDU_GET;
-    f->get.fields = fields;
+    f->pdu.fields = fields;
 
     *ix += length;
 

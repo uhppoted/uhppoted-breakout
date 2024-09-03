@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <encoding/BER/BER.h>
+#include <encoding/ASN.1/BER.h>
 #include <encoding/SSMP/SSMP.h>
 
 slice pack_integer(const field *f);
@@ -10,28 +10,8 @@ slice pack_octets(const field *f);
 slice pack_null(const field *f);
 slice pack_OID(const field *f);
 slice pack_sequence(const field *f);
+slice pack_pdu(const field *f);
 slice pack_varint(const uint32_t length);
-
-// clang-format off
-const uint8_t RESPONSE[] = {
-    48,  41,  2,   1,   0,  4,   6,  112, 
-    117, 98,  108, 105, 99, 162, 28, 2, 
-    1,   1,   2,   1,   0,  2,   1,  0,
-    48,  17,  48,  15,  6,  7,   43, 6,
-    167, 254, 32,  1,   1,  2,  4,  24, 
-    42,  55,  120};
-// clang-format on
-
-message BER_encodex(const struct packet p) {
-    struct message m = {
-        .data = (uint8_t *)calloc(sizeof(RESPONSE), sizeof(uint8_t)),
-        .length = sizeof(RESPONSE),
-    };
-
-    memmove(m.data, RESPONSE, m.length);
-
-    return m;
-}
 
 slice BER_encode(const struct field f) {
     struct slice s = {
@@ -60,6 +40,10 @@ slice BER_encode(const struct field f) {
     case FIELD_SEQUENCE:
         s = pack_sequence(&f);
         break;
+
+    case FIELD_PDU_GET_RESPONSE:
+        s = pack_pdu(&f);
+        break;
     }
 
     return s;
@@ -76,15 +60,20 @@ slice pack_integer(const field *f) {
     } while (v != 0 && ix < sizeof(buffer));
 
     slice s = {
-        .capacity = ix + 2,
-        .length = ix + 2,
-        .bytes = (uint8_t *)calloc(ix + 2, sizeof(uint8_t)),
+        .capacity = 64,
+        .length = 0,
+        .bytes = (uint8_t *)calloc(64, sizeof(uint8_t)),
     };
 
-    s.bytes[0] = 0x02;
-    s.bytes[1] = (uint8_t)ix;
+    s.bytes[s.length++] = 0x02;
+
+    slice length = pack_varint(ix);
+
+    slice_append(&s, length);
+    slice_free(&length);
+
     for (int i = 0; i < ix; i++) {
-        s.bytes[i + 2] = buffer[ix - i - 1];
+        s.bytes[s.length++] = buffer[ix - i - 1];
     }
 
     return s;
@@ -93,12 +82,11 @@ slice pack_integer(const field *f) {
 slice pack_octets(const field *f) {
     slice s = {
         .capacity = 64,
-        .length = 2,
+        .length = 0,
         .bytes = (uint8_t *)calloc(64, sizeof(uint8_t)),
     };
 
-    s.bytes[0] = 0x04;
-    s.bytes[1] = 0x00;
+    s.bytes[s.length++] = 0x04;
 
     slice length = pack_varint(f->octets.length);
     slice octets = {
@@ -112,6 +100,7 @@ slice pack_octets(const field *f) {
     slice_append(&s, length);
     slice_append(&s, octets);
 
+    slice_free(&length);
     slice_free(&octets);
 
     return s;
@@ -223,6 +212,46 @@ slice pack_sequence(const field *f) {
     slice length = pack_varint(buffer.length);
 
     s.bytes[s.length++] = 0x30;
+    slice_append(&s, length);
+    slice_append(&s, buffer);
+
+    slice_free(&length);
+    slice_free(&buffer);
+
+    return s;
+}
+
+slice pack_pdu(const field *f) {
+    // ... encode fields
+    slice buffer = slice_make(64);
+
+    if (f->pdu.fields != NULL) {
+        field *e;
+
+        for (int i = 0; i < f->pdu.fields->size; i++) {
+            if ((e = f->pdu.fields->fields[i]) != NULL) {
+                slice v = BER_encode(*e);
+
+                slice_append(&buffer, v);
+                slice_free(&v);
+            }
+        }
+    }
+
+    // ... copy to slice
+    slice s = slice_make(16 + buffer.length);
+    slice length = pack_varint(buffer.length);
+
+    switch (f->tag) {
+    case FIELD_PDU_GET:
+        s.bytes[s.length++] = 0xA0;
+        break;
+
+    case FIELD_PDU_GET_RESPONSE:
+        s.bytes[s.length++] = 0xA2;
+        break;
+    }
+
     slice_append(&s, length);
     slice_append(&s, buffer);
 

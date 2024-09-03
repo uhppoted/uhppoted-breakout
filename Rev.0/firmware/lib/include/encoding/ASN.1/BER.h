@@ -9,7 +9,6 @@ struct packet;
 struct field;
 struct vector;
 
-struct message BER_encodex(const struct packet p);
 struct slice BER_encode(const struct field f);
 struct packet *BER_decode(const uint8_t *message, int N);
 
@@ -67,11 +66,7 @@ typedef struct field {
 
         struct {
             vector *fields;
-        } get;
-
-        struct {
-            vector *fields;
-        } get_response;
+        } pdu;
     };
 
 } field;

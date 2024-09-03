@@ -15,7 +15,7 @@
 #include <U3.h>
 #include <U4.h>
 #include <cli.h>
-#include <encoding/BER/BER.h>
+#include <encoding/ASN.1/BER.h>
 #include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
 #include <log.h>
@@ -418,60 +418,6 @@ void debug() {
             },
         },
     };
-
-    // field fnull = {
-    //     .tag = FIELD_NULL,
-    //     .null = {},
-    // };
-
-    // field fint = {
-    //     .tag = FIELD_INTEGER,
-    //     .integer = {
-    //         .value = 405419896,
-    //         // .value = 9223372036854775807,
-    //         // .value = -9223372036854775807 - 1,
-    //         // .value = -1,
-    //     },
-    // };
-
-    // field foid = {
-    //     .tag = FIELD_OID,
-    //     .OID = {
-    //         .OID = "0.1.3.6.655136.1.1",
-    //     },
-    // };
-
-    // field fcontent = {
-    //     .tag = FIELD_SEQUENCE,
-    //     .sequence = {
-    //         .fields = vector_new(),
-    //     },
-    // };
-
-    // fcontent.sequence.fields = vector_add(fcontent.sequence.fields, &foid);
-    // fcontent.sequence.fields = vector_add(fcontent.sequence.fields, &fint);
-    // // fcontent.sequence.fields = vector_add(fsequence.sequence.fields, &fnull);
-
-    // field fseq = {
-    //     .tag = FIELD_SEQUENCE,
-    //     .sequence = {
-    //         .fields = vector_new(),
-    //     },
-    // };
-
-    // fseq.sequence.fields = vector_add(fseq.sequence.fields, &fcontent);
-
-    // field fpdu = {
-    //     .tag = FIELD_PDU_GET_RESPONSE,
-    //     .get_response = {
-    //         .fields = vector_new(),
-    //     },
-    // };
-
-    // fpdu.sequence.fields = vector_add(fpdu.sequence.fields, &foid);
-    // fpdu.sequence.fields = vector_add(fpdu.sequence.fields, &fint);
-
-    // slice s = BER_encode(fpdu);
 
     slice s = ssmp_encode(p);
 

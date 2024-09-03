@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <encoding/BER/BER.h>
+#include <encoding/ASN.1/BER.h>
 #include <encoding/SSMP/SSMP.h>
 
-slice ssmp_encode_get_response(packet);
+slice packet_encode_get_response(packet);
 
 // NTS: expects 'p' to be free'd by caller
 void packet_free(packet *const p) {
@@ -15,9 +15,9 @@ void packet_free(packet *const p) {
     }
 }
 
-slice packet_encode(packet p) {
+slice ssmp_encode(packet p) {
     if (p.tag == PACKET_GET_RESPONSE) {
-        return ssmp_encode_get_response(p);
+        return packet_encode_get_response(p);
     }
 
     slice s = {
@@ -29,7 +29,7 @@ slice packet_encode(packet p) {
     return s;
 }
 
-slice ssmp_encode(packet p) {
+slice packet_encode_get_response(packet p) {
     field version = {
         .tag = FIELD_INTEGER,
         .integer = {
@@ -45,6 +45,72 @@ slice ssmp_encode(packet p) {
         },
     };
 
+    field rqid = {
+        .tag = FIELD_INTEGER,
+        .integer = {
+            .value = p.get_response.request_id,
+        },
+    };
+
+    field error = {
+        .tag = FIELD_INTEGER,
+        .integer = {
+            .value = p.get_response.error,
+        },
+    };
+
+    field error_index = {
+        .tag = FIELD_INTEGER,
+        .integer = {
+            .value = p.get_response.error_index,
+        },
+    };
+
+    field oid = {
+        .tag = FIELD_OID,
+        .OID = {
+            .OID = p.get_response.OID,
+        },
+    };
+
+    field value = {
+        .tag = FIELD_INTEGER,
+        .integer = {
+            .value = p.get_response.value.integer,
+        },
+    };
+
+    field item = {
+        .tag = FIELD_SEQUENCE,
+        .sequence = {
+            .fields = vector_new(),
+        },
+    };
+
+    item.sequence.fields = vector_add(item.sequence.fields, &oid);
+    item.sequence.fields = vector_add(item.sequence.fields, &value);
+
+    field list = {
+        .tag = FIELD_SEQUENCE,
+        .sequence = {
+            .fields = vector_new(),
+        },
+    };
+
+    list.sequence.fields = vector_add(list.sequence.fields, &item);
+
+    field pdu = {
+        .tag = FIELD_PDU_GET_RESPONSE,
+        .sequence = {
+            .fields = vector_new(),
+        },
+    };
+
+    pdu.pdu.fields = vector_add(pdu.pdu.fields, &rqid);
+    pdu.pdu.fields = vector_add(pdu.pdu.fields, &error);
+    pdu.pdu.fields = vector_add(pdu.pdu.fields, &error_index);
+    pdu.pdu.fields = vector_add(pdu.pdu.fields, &list);
+
     field response = {
         .tag = FIELD_SEQUENCE,
         .sequence = {
@@ -54,6 +120,7 @@ slice ssmp_encode(packet p) {
 
     response.sequence.fields = vector_add(response.sequence.fields, &version);
     response.sequence.fields = vector_add(response.sequence.fields, &community);
+    response.sequence.fields = vector_add(response.sequence.fields, &pdu);
 
     return BER_encode(response);
 }

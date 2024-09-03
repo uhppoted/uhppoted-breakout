@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <encoding/BER/BER.h>
+#include <encoding/ASN.1/BER.h>
 
 void vector_free(vector *);
 
@@ -23,8 +23,8 @@ void field_free(field *const f) {
         break;
 
     case FIELD_PDU_GET:
-        vector_free(f->get.fields);
-        free(f->get.fields);
+        vector_free(f->pdu.fields);
+        free(f->pdu.fields);
         break;
     }
 }

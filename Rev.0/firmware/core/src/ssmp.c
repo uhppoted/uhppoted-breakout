@@ -7,7 +7,7 @@
 #include <pico/time.h>
 
 #include <breakout.h>
-#include <encoding/BER/BER.h>
+#include <encoding/ASN.1/BER.h>
 #include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
 #include <log.h>
@@ -133,18 +133,27 @@ void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, i
     if (request != NULL && request->tag == PACKET_GET) {
         const struct packet reply = {
             .tag = PACKET_GET_RESPONSE,
+            .version = 0,
+            .community = "public",
             .get_response = {
                 .request_id = request->get.request_id,
+                .error = 0,
+                .error_index = 0,
+                .OID = "0.1.3.6.655136.1.1",
+                .value = {
+                    .tag = VALUE_UINT32,
+                    .integer = 405419896,
+                },
             },
         };
 
-        message packed = BER_encodex(reply);
-        message encoded = bisync_encode(NULL, 0, packed.data, packed.length);
+        slice packed = ssmp_encode(reply);
+        message encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
         fwrite(encoded.data, sizeof(uint8_t), encoded.length, stdout);
         fflush(stdout);
 
-        free(packed.data);
+        slice_free(&packed);
         free(encoded.data);
     }
 

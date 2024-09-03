@@ -25,17 +25,17 @@
 
 
 ### SSMP
+   - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
    - [x] disable print/println in SSMP mode
    - [x] SYN-SYN-ENQ/SYN-SYN-ACK
    - [ ] MIB
    - [ ] GET
          - [ ] CRC
-         - [ ] BER
+         - [x] BER
                - [x] not unpacking multiple fields with different lengths correctly
                - [x] commonalise decode length
                - [x] free field list/fields
-               - [ ] pack response
-               - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
+               - [x] pack response
          - [ ] GET
                - [x] free SSMP packet
 ```
@@ -51,11 +51,17 @@
             06 07 2B 06 A7 FE 20 01 01 
             02 04 18 2A 37 78
 
->>>         06 07 2B 06 A7 FE 20 01 01
->>>   30 11 
-         30 0F 
-            06 07 2B 06 A7 FE 20 01 01
-            02 04 18 2A 37 78
+>>>
+30 29
+   02 01 00 
+   04 06 70 75 62 6C 69 63 
+   A2 1C
+      02 01 01
+      02 01 00
+      02 01 00
+      30 11 30 0F
+         06 07 2B 06 A7 FE 20 01 01
+         02 04 18 2A 37 78
 ```
 
    - [x] SSMP idle - revert to MODE_UNKNOWN
