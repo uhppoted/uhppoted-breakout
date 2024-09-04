@@ -43,7 +43,7 @@
                - [ ] check packet_free
          - [ ] GET
                - [x] free SSMP packet
-               - [ ] get from MIB
+               - [x] get from MIB
                - [ ] return error if unknown
 
    - [x] SSMP idle - revert to MODE_UNKNOWN

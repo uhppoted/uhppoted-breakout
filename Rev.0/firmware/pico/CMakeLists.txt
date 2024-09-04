@@ -34,6 +34,7 @@ add_executable(breakout
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
   ${CORE}/src/ssmp.c
+  ${CORE}/src/MIB.c
   ${CORE}/src/state.c
   ${CORE}/src/log.c
   ${CORE}/src/cli.c

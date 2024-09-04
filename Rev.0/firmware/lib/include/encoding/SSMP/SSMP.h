@@ -12,11 +12,17 @@ typedef enum {
 
 typedef enum {
     VALUE_UNKNOWN,
-    VALUE_UINT32
+    VALUE_UINT32,
+    VALUE_NULL,
 } VALUE;
 
-typedef struct datetime {
-} datetime;
+typedef struct value {
+    VALUE tag;
+
+    union {
+        int64_t integer;
+    };
+} value;
 
 typedef struct packet {
     PACKET tag;
@@ -35,12 +41,7 @@ typedef struct packet {
             int64_t error;
             int64_t error_index;
             char *OID;
-            struct {
-                VALUE tag;
-                union {
-                    int64_t integer;
-                };
-            } value;
+            value value;
         } get_response;
     };
 } packet;

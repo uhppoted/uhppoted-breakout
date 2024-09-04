@@ -6,6 +6,7 @@
 #include <pico/stdlib.h>
 #include <pico/time.h>
 
+#include <MIB.h>
 #include <breakout.h>
 #include <encoding/ASN.1/BER.h>
 #include <encoding/SSMP/SSMP.h>
@@ -133,7 +134,9 @@ void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, i
     struct packet *request = BER_decode(data, data_len);
 
     if (request != NULL && request->tag == PACKET_GET) {
-        const struct packet reply = {
+        value v = MIB_get(request->get.OID);
+
+        struct packet reply = {
             .tag = PACKET_GET_RESPONSE,
             .version = 0,
             .community = "public",
@@ -142,13 +145,11 @@ void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, i
                 .error = 0,
                 .error_index = 0,
                 .OID = "0.1.3.6.655136.1.1",
-                .value = {
-                    .tag = VALUE_UINT32,
-                    .integer = 405419896,
-                },
+                .value = v,
             },
         };
 
+        // ... encode
         slice packed = ssmp_encode(reply);
         slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 

@@ -74,10 +74,14 @@ slice packet_encode_get_response(packet p) {
     };
 
     field value = {
-        .tag = FIELD_INTEGER,
-        .integer = {
-            .value = p.get_response.value.integer,
-        },
+        .tag = FIELD_NULL,
+    };
+
+    switch (p.get_response.value.tag) {
+    case VALUE_UINT32:
+        value.tag = FIELD_INTEGER;
+        value.integer.value = p.get_response.value.integer;
+        break;
     };
 
     field item = {
@@ -134,7 +138,7 @@ packet *ssmp_get(int64_t version, char *community, int64_t request_id, int64_t e
     p->get.request_id = request_id;
     p->get.error = error;
     p->get.error_index = error_index;
-    p->get.OID = NULL;
+    p->get.OID = OID;
 
     return p;
 }
