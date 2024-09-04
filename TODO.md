@@ -1,7 +1,5 @@
 # TODO
 
-- [ ] debounce simulation
-      - (?) TinyML
 - [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 
 ### emulator
@@ -15,7 +13,6 @@
     - [ ] CRC
     - [ ] Fix hardcoded OID
     - [ ] Fix 'read' goroutine that never exits
-    - [ ] Fix initial connect that never connects
     - (?) decode - partial packets
     - [ ] prune handlers
     - [ ] idle poll
@@ -31,6 +28,7 @@
    - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
    - https://forums.raspberrypi.com/viewtopic.php?t=302960
 
+   - [x] Fix initial connect that never connects
    - [ ] MIB
    - [ ] GET
          - [ ] CRC

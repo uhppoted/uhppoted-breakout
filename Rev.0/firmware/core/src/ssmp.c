@@ -71,14 +71,16 @@ void ssmp_start() {
     // uart_set_irq_enables(uart0, true, false);
 }
 
+void ssmp_reset() {
+    debugf("SSMP", "reset");
+
+    SSMP.touched = get_absolute_time();
+}
+
 void ssmp_ping() {
     if (get_mode() == MODE_SSMP) {
         absolute_time_t now = get_absolute_time();
         int64_t delta = absolute_time_diff_us(SSMP.touched, now) / 1000;
-
-        // char s[64];
-        // snprintf(s, sizeof(s), "%lld   %lld   %lld %s", SSMP.touched, now / 1000, delta, llabs(delta) > SSMP_IDLE ? "idle" : " busy");
-        // printf(s);
 
         if (llabs(delta) > SSMP_IDLE) {
             set_mode(MODE_UNKNOWN);

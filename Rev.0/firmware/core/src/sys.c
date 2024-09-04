@@ -48,7 +48,13 @@ mode get_mode() {
 }
 
 void set_mode(mode mode) {
-    SYSTEM.mode = mode;
+    if (SYSTEM.mode != mode) {
+        SYSTEM.mode = mode;
+
+        if (mode == MODE_SSMP) {
+            ssmp_reset();
+        }
+    }
 
     // ... unblock queue
     if (mode == MODE_CLI) {
