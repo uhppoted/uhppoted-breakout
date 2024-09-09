@@ -13,4 +13,3 @@ typedef struct slice {
 extern slice slice_make(int size);
 extern void slice_free(slice *);
 extern int slice_append(slice *dest, const slice src);
-// uint8_t *slice_reverse(uint8_t *buffer, int N);

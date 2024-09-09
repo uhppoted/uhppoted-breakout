@@ -116,6 +116,16 @@ func (codec Bisync) Encode(header []uint8, packet []uint8) ([]byte, error) {
 		return nil, err
 	}
 
+	// ... append CRC
+
+	if err := b.WriteByte(0x12); err != nil {
+		return nil, err
+	}
+
+	if err := b.WriteByte(0x34); err != nil {
+		return nil, err
+	}
+
 	return b.Bytes(), nil
 }
 

@@ -9,13 +9,25 @@ typedef void (*bisync_enq)();
 typedef void (*bisync_msg)(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 
 typedef struct bisync {
-    char header[128];
-    char data[512];
-    int hx;
-    int ix;
+    struct {
+        int ix;
+        uint8_t data[128];
+    } header;
+
+    struct {
+        int ix;
+        uint8_t data[512];
+    } data;
+
+    struct {
+        int ix;
+        uint8_t data[2];
+    } crc;
+
     bool DLE;
     bool SOH;
     bool STX;
+    bool CRC;
 
     bisync_enq enq;
     bisync_msg received;

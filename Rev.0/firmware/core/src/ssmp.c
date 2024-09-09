@@ -32,13 +32,24 @@ struct {
     absolute_time_t touched;
 } SSMP = {
     .codec = {
-        .header = {0},
-        .data = {0},
-        .hx = 0,
-        .ix = 0,
+        .header = {
+            .ix = 0,
+            .data = {0},
+        },
+        .data = {
+            .ix = 0,
+            .data = {0},
+        },
+        .crc = {
+            .ix = 0,
+            .data = {0},
+        },
+
         .DLE = false,
         .SOH = false,
         .STX = false,
+        .CRC = false,
+
         .enq = ssmp_enq,
         .received = ssmp_received,
     },

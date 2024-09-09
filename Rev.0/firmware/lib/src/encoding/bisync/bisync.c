@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,101 +19,123 @@ const char SYN_SYN_ACK[] = {SYN, SYN, ACK};
 bool escape(uint8_t b);
 
 void bisync_reset(struct bisync *codec) {
-    memset(codec->header, 0, sizeof(codec->header));
-    memset(codec->data, 0, sizeof(codec->data));
-    codec->hx = 0;
-    codec->ix = 0;
+    memset(codec->header.data, 0, sizeof(codec->header.data));
+    memset(codec->data.data, 0, sizeof(codec->data.data));
+    memset(codec->crc.data, 0, sizeof(codec->crc.data));
+
+    codec->header.ix = 0;
+    codec->data.ix = 0;
+    codec->crc.ix = 0;
+
+    codec->DLE = false;
     codec->SOH = false;
     codec->STX = false;
+    codec->CRC = false;
 }
 
 void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
     for (int i = 0; i < N; i++) {
         uint8_t ch = buffer[i];
 
+        // ... expecting CRC?
+        if (codec->CRC) {
+            if (codec->crc.ix < sizeof(codec->crc.data)) {
+                codec->crc.data[codec->crc.ix++] = ch;
+
+                if (codec->crc.ix == sizeof(codec->crc.data)) {
+                    if (codec->received != NULL) {
+                        codec->received(codec->header.data, codec->header.ix, codec->data.data, codec->data.ix);
+                    }
+
+                    bisync_reset(codec);
+                }
+            } else {
+                bisync_reset(codec);
+            }
+
+            continue;
+        }
+
         // ... escaped?
         if (codec->DLE) {
             codec->DLE = false;
 
             if (codec->SOH) {
-                if (codec->hx < sizeof(codec->header)) {
-                    codec->header[codec->hx++] = ch;
+                if (codec->header.ix < sizeof(codec->header.data)) {
+                    codec->header.data[codec->header.ix++] = ch;
                 } else {
                     bisync_reset(codec);
                 }
             }
 
             if (codec->STX) {
-                if (codec->ix < sizeof(codec->data)) {
-                    codec->data[codec->ix++] = ch;
+                if (codec->data.ix < sizeof(codec->data.data)) {
+                    codec->data.data[codec->data.ix++] = ch;
                 } else {
                     bisync_reset(codec);
                 }
             }
-        } else {
-            // SYN?
-            if (ch == SYN) {
+            continue;
+        }
+
+        // ... normal'ish
+        // SYN?
+        if (ch == SYN) {
+            bisync_reset(codec);
+            continue;
+        }
+
+        // ENQ?
+        // if (ch == ENQ && codec->ix == 0) {
+        if (ch == ENQ) {
+            bisync_reset(codec);
+            if (codec->enq != NULL) {
+                codec->enq();
+            }
+            continue;
+        }
+
+        // SOH?
+        if (ch == SOH) {
+            bisync_reset(codec);
+            codec->SOH = true;
+            continue;
+        }
+
+        // STX?
+        if (ch == STX) {
+            codec->SOH = false;
+            codec->STX = true;
+            continue;
+        }
+
+        // ETX?
+        if (ch == ETX) {
+            codec->STX = false;
+            codec->CRC = true;
+            continue;
+        }
+
+        // DLE?
+        if (ch == DLE) {
+            codec->DLE = true;
+            continue;
+        }
+
+        // ... accumulate message
+        if (codec->SOH) {
+            if (codec->header.ix < sizeof(codec->header.data)) {
+                codec->header.data[codec->header.ix++] = ch;
+            } else {
                 bisync_reset(codec);
-                continue;
             }
+        }
 
-            // ENQ?
-            // if (ch == ENQ && codec->ix == 0) {
-            if (ch == ENQ) {
+        if (codec->STX) {
+            if (codec->data.ix < sizeof(codec->data.data)) {
+                codec->data.data[codec->data.ix++] = ch;
+            } else {
                 bisync_reset(codec);
-                if (codec->enq != NULL) {
-                    codec->enq();
-                }
-                continue;
-            }
-
-            // SOH?
-            if (ch == SOH) {
-                bisync_reset(codec);
-                codec->SOH = true;
-                continue;
-            }
-
-            // STX?
-            if (ch == STX) {
-                codec->SOH = false;
-                codec->STX = true;
-                continue;
-            }
-
-            // ETX?
-            if (ch == ETX) {
-                if (codec->ix < sizeof(codec->data)) {
-                    if (codec->received != NULL) {
-                        codec->received(codec->header, codec->hx, codec->data, codec->ix);
-                    }
-                }
-
-                bisync_reset(codec);
-                continue;
-            }
-
-            // DLE?
-            if (ch == DLE) {
-                codec->DLE = true;
-                continue;
-            }
-
-            // ... accumulate message
-            if (codec->SOH) {
-                if (codec->hx < sizeof(codec->header)) {
-                    codec->header[codec->hx++] = ch;
-                } else {
-                    bisync_reset(codec);
-                }
-            }
-
-            if (codec->STX) {
-                if (codec->ix < sizeof(codec->data)) {
-                    codec->data[codec->ix++] = ch;
-                } else {
-                    bisync_reset(codec);
-                }
             }
         }
     }

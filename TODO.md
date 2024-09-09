@@ -4,14 +4,12 @@
 
 ### emulator
     - [ ] get-controller
-          - [x] from MIB
+          - [ ] Fix hardcoded OID
           - [ ] errors pipe in request
     - [x] ENQ/ACK loop - use codec
-          - [x] Use callback to handle decoded messages
           - (?) use common rx codec??
           - (?) use callback funcs rather than interface
     - [ ] CRC
-    - [ ] Fix hardcoded OID
     - [ ] Fix 'read' goroutine that never exits
     - (?) decode - partial packets
     - [ ] prune handlers
@@ -30,23 +28,22 @@
 
    - [x] Fix initial connect that never connects
    - [ ] MIB
+   - [ ] CRC
+         - [ ] append to request
+         - [ ] append to response
+         - [ ] validate request CRC
+         - [ ] validate response CRC
+   - [ ] BER
+       - [x] free field list/fields
+       - [ ] check slice_free
+       - [ ] check field_free
+       - [ ] check vector_free
+       - [ ] check packet_free
    - [ ] GET
-         - [ ] CRC
-         - [x] BER
-               - [x] not unpacking multiple fields with different lengths correctly
-               - [x] commonalise decode length
-               - [x] free field list/fields
-               - [x] pack response
-               - [ ] check slice_free
-               - [ ] check field_free
-               - [ ] check vector_free
-               - [ ] check packet_free
-         - [ ] GET
-               - [x] free SSMP packet
-               - [x] get from MIB
-               - [ ] return error if unknown
+       - [x] free SSMP packet
+       - [x] get from MIB
+       - [ ] return error if unknown
 
-   - [x] SSMP idle - revert to MODE_UNKNOWN
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
 
@@ -71,9 +68,6 @@
    - https://groupgets.com/products/pureconnect
 
 ## R&D
-- [x] Relay pin voltages
-- [x] CPU board power consumption
-- [x] Breakout board power consumption
 - [ ] Pinout diagram
       - (?) [WireViz] https://github.com/formatc1702/WireViz
       - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator
