@@ -37,7 +37,7 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
     for (int i = 0; i < N; i++) {
         uint8_t ch = buffer[i];
 
-        // ... expecting CRC?
+        // ... CRC?
         if (codec->CRC) {
             if (codec->crc.ix < sizeof(codec->crc.data)) {
                 codec->crc.data[codec->crc.ix++] = ch;
@@ -143,7 +143,7 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
 
 slice bisync_encode(const uint8_t *header, int header_size, const uint8_t *data, int data_size) {
     // ... calculate message size
-    int N = 2;
+    int N = 2; // SYN-SYN
 
     if (header != NULL) {
         N += 1;
@@ -170,6 +170,8 @@ slice bisync_encode(const uint8_t *header, int header_size, const uint8_t *data,
             }
         }
     }
+
+    N += 2; // CRC
 
     // ... encode message
     slice m = {
@@ -203,6 +205,10 @@ slice bisync_encode(const uint8_t *header, int header_size, const uint8_t *data,
         }
     }
     m.bytes[m.length++] = ETX;
+
+    // ... CRC
+    m.bytes[m.length++] = 0xab;
+    m.bytes[m.length++] = 0xcd;
 
     return m;
 }

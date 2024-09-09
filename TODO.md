@@ -29,8 +29,8 @@
    - [x] Fix initial connect that never connects
    - [ ] MIB
    - [ ] CRC
-         - [ ] append to request
-         - [ ] append to response
+         - [x] append to request
+         - [x] append to response
          - [ ] validate request CRC
          - [ ] validate response CRC
    - [ ] BER
