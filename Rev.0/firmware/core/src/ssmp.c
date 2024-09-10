@@ -43,6 +43,7 @@ struct {
         .crc = {
             .ix = 0,
             .data = {0},
+            .crc = 0x0000,
         },
 
         .DLE = false,

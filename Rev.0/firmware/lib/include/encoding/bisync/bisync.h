@@ -22,6 +22,7 @@ typedef struct bisync {
     struct {
         int ix;
         uint8_t data[2];
+        uint16_t crc;
     } crc;
 
     bool DLE;

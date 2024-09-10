@@ -49,6 +49,7 @@ add_executable(breakout
 
   ${LIB}/src/types/slice.c
   ${LIB}/src/encoding/bisync/bisync.c
+  ${LIB}/src/encoding/bisync/crc.c
   ${LIB}/src/encoding/ASN.1/encode.c
   ${LIB}/src/encoding/ASN.1/decode.c
   ${LIB}/src/encoding/ASN.1/fields.c

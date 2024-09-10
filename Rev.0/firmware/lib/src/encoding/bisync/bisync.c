@@ -5,6 +5,8 @@
 #include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
 
+extern uint16_t crc16x(uint16_t iv, uint8_t data);
+
 const uint8_t SOH = 1;
 const uint8_t STX = 2;
 const uint8_t ETX = 3;
@@ -20,12 +22,14 @@ bool escape(uint8_t b);
 
 void bisync_reset(struct bisync *codec) {
     memset(codec->header.data, 0, sizeof(codec->header.data));
-    memset(codec->data.data, 0, sizeof(codec->data.data));
-    memset(codec->crc.data, 0, sizeof(codec->crc.data));
-
     codec->header.ix = 0;
+
+    memset(codec->data.data, 0, sizeof(codec->data.data));
     codec->data.ix = 0;
+
+    memset(codec->crc.data, 0, sizeof(codec->crc.data));
     codec->crc.ix = 0;
+    codec->crc.crc = 0x0000;
 
     codec->DLE = false;
     codec->SOH = false;
@@ -43,8 +47,17 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
                 codec->crc.data[codec->crc.ix++] = ch;
 
                 if (codec->crc.ix == sizeof(codec->crc.data)) {
-                    if (codec->received != NULL) {
-                        codec->received(codec->header.data, codec->header.ix, codec->data.data, codec->data.ix);
+                    uint16_t crc = 0x0000;
+
+                    crc <<= 8;
+                    crc |= codec->crc.data[0];
+                    crc <<= 8;
+                    crc |= codec->crc.data[1];
+
+                    if ((codec->crc.crc ^ crc) == 0x0000) {
+                        if (codec->received != NULL) {
+                            codec->received(codec->header.data, codec->header.ix, codec->data.data, codec->data.ix);
+                        }
                     }
 
                     bisync_reset(codec);
@@ -61,6 +74,8 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
             codec->DLE = false;
 
             if (codec->SOH) {
+                codec->crc.crc = crc16x(codec->crc.crc, ch);
+
                 if (codec->header.ix < sizeof(codec->header.data)) {
                     codec->header.data[codec->header.ix++] = ch;
                 } else {
@@ -69,12 +84,15 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
             }
 
             if (codec->STX) {
+                codec->crc.crc = crc16x(codec->crc.crc, ch);
+
                 if (codec->data.ix < sizeof(codec->data.data)) {
                     codec->data.data[codec->data.ix++] = ch;
                 } else {
                     bisync_reset(codec);
                 }
             }
+
             continue;
         }
 
@@ -106,6 +124,7 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
         if (ch == STX) {
             codec->SOH = false;
             codec->STX = true;
+            codec->crc.crc = crc16x(codec->crc.crc, ch);
             continue;
         }
 
@@ -113,6 +132,7 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
         if (ch == ETX) {
             codec->STX = false;
             codec->CRC = true;
+            codec->crc.crc = crc16x(codec->crc.crc, ch);
             continue;
         }
 
@@ -124,6 +144,8 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
 
         // ... accumulate message
         if (codec->SOH) {
+            codec->crc.crc = crc16x(codec->crc.crc, ch);
+
             if (codec->header.ix < sizeof(codec->header.data)) {
                 codec->header.data[codec->header.ix++] = ch;
             } else {
@@ -132,6 +154,8 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
         }
 
         if (codec->STX) {
+            codec->crc.crc = crc16x(codec->crc.crc, ch);
+
             if (codec->data.ix < sizeof(codec->data.data)) {
                 codec->data.data[codec->data.ix++] = ch;
             } else {

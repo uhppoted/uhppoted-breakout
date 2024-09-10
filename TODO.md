@@ -9,7 +9,6 @@
     - [x] ENQ/ACK loop - use codec
           - (?) use common rx codec??
           - (?) use callback funcs rather than interface
-    - [ ] CRC
     - [ ] Fix 'read' goroutine that never exits
     - (?) decode - partial packets
     - [ ] prune handlers
@@ -31,8 +30,9 @@
    - [ ] CRC
          - [x] append to request
          - [x] append to response
-         - [ ] validate request CRC
+         - [x] validate request CRC
          - [ ] validate response CRC
+         - [ ] inline CRCx
    - [ ] BER
        - [x] free field list/fields
        - [ ] check slice_free

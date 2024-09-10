@@ -51,25 +51,28 @@ func NewBisync() *Bisync {
 }
 
 func (codec Bisync) Encode(header []uint8, packet []uint8) ([]byte, error) {
-	var b bytes.Buffer
+	var buffer bytes.Buffer
+	crc := uint16(0x0000)
 
 	// ... preamble
-	if err := b.WriteByte(SYN); err != nil {
+	if err := buffer.WriteByte(SYN); err != nil {
 		return nil, err
 	}
 
-	if err := b.WriteByte(SYN); err != nil {
+	if err := buffer.WriteByte(SYN); err != nil {
 		return nil, err
 	}
 
 	// ... encode message header
 	if header != nil {
-		if err := b.WriteByte(SOH); err != nil {
+		if err := buffer.WriteByte(SOH); err != nil {
 			return nil, err
 		}
 
-		for _, byte := range header {
-			switch byte {
+		for _, b := range header {
+			crc = CRC16x(crc, b)
+
+			switch b {
 			case SYN,
 				ENQ,
 				ACK,
@@ -77,25 +80,27 @@ func (codec Bisync) Encode(header []uint8, packet []uint8) ([]byte, error) {
 				STX,
 				ETX,
 				DLE:
-				if err := b.WriteByte(DLE); err != nil {
+				if err := buffer.WriteByte(DLE); err != nil {
 					return nil, err
 				}
 			}
 
-			if err := b.WriteByte(byte); err != nil {
+			if err := buffer.WriteByte(b); err != nil {
 				return nil, err
 			}
 		}
 	}
 
 	// ... encode message
-	if err := b.WriteByte(STX); err != nil {
+	crc = CRC16x(crc, STX)
+	if err := buffer.WriteByte(STX); err != nil {
 		return nil, err
 	}
 
-	for ix := 0; ix < len(packet); ix++ {
-		byte := packet[ix]
-		switch byte {
+	for _, b := range packet {
+		crc = CRC16x(crc, b)
+
+		switch b {
 		case SYN,
 			ENQ,
 			ACK,
@@ -103,36 +108,36 @@ func (codec Bisync) Encode(header []uint8, packet []uint8) ([]byte, error) {
 			STX,
 			ETX,
 			DLE:
-			if err := b.WriteByte(DLE); err != nil {
+			if err := buffer.WriteByte(DLE); err != nil {
 				return nil, err
 			}
 
-			if err := b.WriteByte(byte); err != nil {
+			if err := buffer.WriteByte(b); err != nil {
 				return nil, err
 			}
 
 		default:
-			if err := b.WriteByte(byte); err != nil {
+			if err := buffer.WriteByte(b); err != nil {
 				return nil, err
 			}
 		}
 	}
 
-	if err := b.WriteByte(ETX); err != nil {
+	crc = CRC16x(crc, ETX)
+	if err := buffer.WriteByte(ETX); err != nil {
 		return nil, err
 	}
 
 	// ... append CRC
-
-	if err := b.WriteByte(0x12); err != nil {
+	if err := buffer.WriteByte(uint8((crc >> 8) & 0x00ff)); err != nil {
 		return nil, err
 	}
 
-	if err := b.WriteByte(0x34); err != nil {
+	if err := buffer.WriteByte(uint8((crc >> 0) & 0x00ff)); err != nil {
 		return nil, err
 	}
 
-	return b.Bytes(), nil
+	return buffer.Bytes(), nil
 }
 
 func (codec *Bisync) Decode(msg []uint8, f callback) error {

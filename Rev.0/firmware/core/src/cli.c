@@ -22,6 +22,9 @@
 #include <state.h>
 #include <sys.h>
 
+extern uint16_t crc16(uint16_t iv, void const *data, size_t N);
+extern uint16_t crc16x(uint16_t iv, uint8_t data);
+
 typedef struct CLI {
     int rows;
     int columns;
@@ -403,73 +406,56 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    packet p = {
-        .tag = PACKET_GET_RESPONSE,
-        .version = 0,
-        .community = "public",
-        .get_response = {
-            .request_id = 1,
-            .error = 0,
-            .error_index = 0,
-            .OID = "0.1.3.6.655136.1.1",
-            .value = {
-                .tag = VALUE_UINT32,
-                .integer = 405419896,
-            },
-        },
-    };
+    const uint8_t CCITT[] = "123456789";
+    uint16_t crc = crc16(0x0000, CCITT, 9);
 
-    slice packed = ssmp_encode(p);
-    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+    printf(">>> CRC   %04x\n", crc);
 
-    printf("--- %d\n", packed.length);
-    for (int i = 0; i < packed.length; i++) {
-        printf(" %02X", packed.bytes[i]);
-    };
-    printf("\n---\n");
-    printf("--- %d\n", encoded.length);
-    for (int i = 0; i < encoded.length; i++) {
-        printf(" %02X", encoded.bytes[i]);
-    };
-    printf("\n---\n");
+    uint16_t crcx = 0x0000;
+    crcx = crc16x(crcx, '1');
+    crcx = crc16x(crcx, '2');
+    crcx = crc16x(crcx, '3');
+    crcx = crc16x(crcx, '4');
+    crcx = crc16x(crcx, '5');
+    crcx = crc16x(crcx, '6');
+    crcx = crc16x(crcx, '7');
+    crcx = crc16x(crcx, '8');
+    crcx = crc16x(crcx, '9');
 
-    slice_free(&packed);
-    slice_free(&encoded);
+    printf(">>> CRC/X %04x\n", crcx);
 
-    // // clang-format off
-    // const uint8_t msg[] = {
-    //     48, 37, 2, 1, 0, 4, 6, 112, 117, 98, 108, 105, 99,
-    //     160, 24,
-    //          2, 1, 1,
-    //          2, 1, 0,
-    //          2, 1, 0,
-    //          48, 13, 48, 11, 6, 7, 43, 6, 167, 254, 32, 1, 1, 5, 0,
-    //
-    //     // 48, 38, 2, 2, 0, 13, 4, 6, 112, 117, 98, 108, 105, 99,
-    //     // 160, 24, 2, 1, 1, 2, 1, 0, 2,
-    //     // 1, 0, 48, 13, 48, 11, 6, 7, 43, 6, 167, 254, 32,
-    //     // 1, 1, 5, 0,
+    // packet p = {
+    //     .tag = PACKET_GET_RESPONSE,
+    //     .version = 0,
+    //     .community = "public",
+    //     .get_response = {
+    //         .request_id = 1,
+    //         .error = 0,
+    //         .error_index = 0,
+    //         .OID = "0.1.3.6.655136.1.1",
+    //         .value = {
+    //             .tag = VALUE_UINT32,
+    //             .integer = 405419896,
+    //         },
+    //     },
     // };
-    // // clang-format on
     //
-    // // printf("\n");
-    // // for (int i = 0; i < 39; i++) {
-    // //     printf("%02X", packet[i]);
-    // // }
-    // // printf("\n");
+    // slice packed = ssmp_encode(p);
+    // slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
     //
-    // packet *p = BER_decode(msg, sizeof(msg));
+    // printf("--- %d\n", packed.length);
+    // for (int i = 0; i < packed.length; i++) {
+    //     printf(" %02X", packed.bytes[i]);
+    // };
+    // printf("\n---\n");
+    // printf("--- %d\n", encoded.length);
+    // for (int i = 0; i < encoded.length; i++) {
+    //     printf(" %02X", encoded.bytes[i]);
+    // };
+    // printf("\n---\n");
     //
-    // debugf("CLI", ">>> PDU/GET");
-    // debugf("CLI", ">>> PDU/GET version     %lld", p->get.version);
-    // debugf("CLI", ">>> PDU/GET community   %s", p->get.community);
-    // debugf("CLI", ">>> PDU/GET request ID  %lld", p->get.request_id);
-    // debugf("CLI", ">>> PDU/GET error       %lld", p->get.error);
-    // debugf("CLI", ">>> PDU/GET error index %lld", p->get.error_index);
-    // debugf("CLI", ">>> PDU/GET OID         %s", p->get.OID);
-    // debugf("CLI", ">>> PDU/GET value       null");
-    //
-    // packet_free(p);
+    // slice_free(&packed);
+    // slice_free(&encoded);
 }
 
 void state() {
