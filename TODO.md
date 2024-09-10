@@ -31,8 +31,9 @@
          - [x] append to request
          - [x] append to response
          - [x] validate request CRC
-         - [ ] validate response CRC
-         - [ ] inline CRCx
+         - [x] validate response CRC
+         - [ ] inline CRC16x
+         - [ ] change to CRC/DNP
    - [ ] BER
        - [x] free field list/fields
        - [ ] check slice_free

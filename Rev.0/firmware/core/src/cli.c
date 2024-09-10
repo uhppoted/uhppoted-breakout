@@ -22,8 +22,8 @@
 #include <state.h>
 #include <sys.h>
 
-extern uint16_t crc16(uint16_t iv, void const *data, size_t N);
-extern uint16_t crc16x(uint16_t iv, uint8_t data);
+extern uint16_t CRC16(uint16_t iv, void const *data, size_t N);
+extern uint16_t CRC16x(uint16_t iv, uint8_t data);
 
 typedef struct CLI {
     int rows;
@@ -407,20 +407,20 @@ void exec(char *cmd) {
 
 void debug() {
     const uint8_t CCITT[] = "123456789";
-    uint16_t crc = crc16(0x0000, CCITT, 9);
+    uint16_t crc = CRC16(0x0000, CCITT, 9);
 
     printf(">>> CRC   %04x\n", crc);
 
     uint16_t crcx = 0x0000;
-    crcx = crc16x(crcx, '1');
-    crcx = crc16x(crcx, '2');
-    crcx = crc16x(crcx, '3');
-    crcx = crc16x(crcx, '4');
-    crcx = crc16x(crcx, '5');
-    crcx = crc16x(crcx, '6');
-    crcx = crc16x(crcx, '7');
-    crcx = crc16x(crcx, '8');
-    crcx = crc16x(crcx, '9');
+    crcx = CRC16x(crcx, '1');
+    crcx = CRC16x(crcx, '2');
+    crcx = CRC16x(crcx, '3');
+    crcx = CRC16x(crcx, '4');
+    crcx = CRC16x(crcx, '5');
+    crcx = CRC16x(crcx, '6');
+    crcx = CRC16x(crcx, '7');
+    crcx = CRC16x(crcx, '8');
+    crcx = CRC16x(crcx, '9');
 
     printf(">>> CRC/X %04x\n", crcx);
 

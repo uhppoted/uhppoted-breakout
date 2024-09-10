@@ -28,7 +28,10 @@ type Bisync struct {
 
 	header bytes.Buffer
 	packet bytes.Buffer
-	crc    bytes.Buffer
+	crc    struct {
+		data bytes.Buffer
+		CRC  uint16
+	}
 }
 
 type callback interface {
@@ -46,13 +49,19 @@ func NewBisync() *Bisync {
 
 		header: bytes.Buffer{},
 		packet: bytes.Buffer{},
-		crc:    bytes.Buffer{},
+		crc: struct {
+			data bytes.Buffer
+			CRC  uint16
+		}{
+			data: bytes.Buffer{},
+			CRC:  0x0000,
+		},
 	}
 }
 
 func (codec Bisync) Encode(header []uint8, packet []uint8) ([]byte, error) {
 	var buffer bytes.Buffer
-	crc := uint16(0x0000)
+	var crc = uint16(0x0000)
 
 	// ... preamble
 	if err := buffer.WriteByte(SYN); err != nil {
@@ -153,13 +162,22 @@ func (codec *Bisync) decode(msg []uint8, f callback) error {
 	for _, b := range msg {
 		// ... CRC?
 		if codec.CRC {
-			if err := codec.crc.WriteByte(b); err != nil {
+			if err := codec.crc.data.WriteByte(b); err != nil {
 				return err
 			}
 
-			if codec.crc.Len() >= 2 {
-				if f != nil {
-					f.OnMessage(codec.header.Bytes(), codec.packet.Bytes())
+			if codec.crc.data.Len() >= 2 {
+				crc := uint16(0x0000)
+
+				crc <<= 8
+				crc |= uint16(codec.crc.data.Bytes()[0])
+				crc <<= 8
+				crc |= uint16(codec.crc.data.Bytes()[1])
+
+				if (crc ^ codec.crc.CRC) == 0x0000 {
+					if f != nil {
+						f.OnMessage(codec.header.Bytes(), codec.packet.Bytes())
+					}
 				}
 
 				codec.reset()
@@ -171,12 +189,14 @@ func (codec *Bisync) decode(msg []uint8, f callback) error {
 		// ... escaped?
 		if codec.DLE {
 			if codec.SOH {
+				codec.crc.CRC = CRC16x(codec.crc.CRC, b)
 				if err := codec.header.WriteByte(b); err != nil {
 					return err
 				}
 			}
 
 			if codec.STX {
+				codec.crc.CRC = CRC16x(codec.crc.CRC, b)
 				if err := codec.packet.WriteByte(b); err != nil {
 					return err
 				}
@@ -216,10 +236,12 @@ func (codec *Bisync) decode(msg []uint8, f callback) error {
 		case STX:
 			codec.SOH = false
 			codec.STX = true
+			codec.crc.CRC = CRC16x(codec.crc.CRC, b)
 
 		case ETX:
 			codec.STX = false
 			codec.CRC = true
+			codec.crc.CRC = CRC16x(codec.crc.CRC, b)
 
 		case DLE:
 			codec.DLE = true
@@ -227,6 +249,7 @@ func (codec *Bisync) decode(msg []uint8, f callback) error {
 		default:
 			if codec.SOH {
 				if codec.header.Len() < HEADER_SIZE {
+					codec.crc.CRC = CRC16x(codec.crc.CRC, b)
 					if err := codec.header.WriteByte(b); err != nil {
 						return err
 					}
@@ -237,6 +260,7 @@ func (codec *Bisync) decode(msg []uint8, f callback) error {
 
 			if codec.STX {
 				if codec.packet.Len() < PACKET_SIZE {
+					codec.crc.CRC = CRC16x(codec.crc.CRC, b)
 					if err := codec.packet.WriteByte(b); err != nil {
 						return err
 					}
@@ -258,5 +282,6 @@ func (codec *Bisync) reset() {
 
 	codec.header.Reset()
 	codec.packet.Reset()
-	codec.crc.Reset()
+	codec.crc.data.Reset()
+	codec.crc.CRC = 0x0000
 }

@@ -29,11 +29,11 @@ static uint16_t const CCITT[] = {
     0xf78f, 0xe606, 0xd49d, 0xc514, 0xb1ab, 0xa022, 0x92b9, 0x8330, 0x7bc7, 0x6a4e,
     0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78};
 
-uint16_t crc16x(uint16_t crc, uint8_t b) {
+uint16_t CRC16x(uint16_t crc, uint8_t b) {
     return (crc >> 8) ^ CCITT[(crc ^ b) & 0xff];
 }
 
-uint16_t crc16(uint16_t crc, void const *mem, size_t len) {
+uint16_t CRC16(uint16_t crc, void const *mem, size_t len) {
     unsigned char const *data = mem;
 
     if (data == NULL) {
