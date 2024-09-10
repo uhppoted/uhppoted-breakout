@@ -22,8 +22,8 @@
 #include <state.h>
 #include <sys.h>
 
-extern uint16_t CRC16(uint16_t iv, void const *data, size_t N);
-extern uint16_t CRC16x(uint16_t iv, uint8_t data);
+uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
+uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
 
 typedef struct CLI {
     int rows;
@@ -406,23 +406,10 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    const uint8_t CCITT[] = "123456789";
-    uint16_t crc = CRC16(0x0000, CCITT, 9);
+    const uint8_t bytes[] = "123456789";
 
-    printf(">>> CRC   %04x\n", crc);
-
-    uint16_t crcx = 0x0000;
-    crcx = CRC16x(crcx, '1');
-    crcx = CRC16x(crcx, '2');
-    crcx = CRC16x(crcx, '3');
-    crcx = CRC16x(crcx, '4');
-    crcx = CRC16x(crcx, '5');
-    crcx = CRC16x(crcx, '6');
-    crcx = CRC16x(crcx, '7');
-    crcx = CRC16x(crcx, '8');
-    crcx = CRC16x(crcx, '9');
-
-    printf(">>> CRC/X %04x\n", crcx);
+    printf(">>> CRC/CCITT  %04x\n", CRC_CCITT(0x0000, bytes, 9));
+    printf(">>> CRC/DNP    %04x\n", CRC_DNP(0xffff, bytes, 9));
 
     // packet p = {
     //     .tag = PACKET_GET_RESPONSE,

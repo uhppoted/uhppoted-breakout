@@ -32,7 +32,7 @@
          - [x] append to response
          - [x] validate request CRC
          - [x] validate response CRC
-         - [ ] inline CRC16x
+         - [x] inline CRC16x
          - [ ] change to CRC/DNP
    - [ ] BER
        - [x] free field list/fields

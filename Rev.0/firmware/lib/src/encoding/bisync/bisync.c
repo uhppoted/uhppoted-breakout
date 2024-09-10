@@ -5,7 +5,11 @@
 #include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
 
-extern uint16_t CRC16x(uint16_t iv, uint8_t data);
+extern const uint16_t CCITT[];
+
+inline uint16_t CRC16x(uint16_t crc, uint8_t b) {
+    return (crc >> 8) ^ CCITT[(crc ^ b) & 0xff];
+}
 
 const uint8_t SOH = 1;
 const uint8_t STX = 2;
