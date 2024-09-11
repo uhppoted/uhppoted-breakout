@@ -13,6 +13,9 @@ format:
 build: format
 	go build -o ./bin/ ./...
 
+test: build
+	go test ./...
+
 run: build
 	./bin/emulator --usb /dev/tty.usbmodem14201
 

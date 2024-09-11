@@ -4,7 +4,7 @@
 
 ### emulator
     - [ ] get-controller
-          - [ ] Fix hardcoded OID
+          - [ ] **Fix hardcoded OID**
           - [ ] errors pipe in request
           - [ ] serialize requests
 
@@ -33,6 +33,7 @@
          - [x] generate request ID
          - [ ] validate request ID
          - [ ] set secret
+         - [ ] replace with custom OTP code
 
    - [ ] MIB
    - [ ] BER
@@ -44,10 +45,10 @@
        - [ ] check packet_free
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638
    - [ ] GET
-       - [ ] unpack packet
        - [x] free SSMP packet
        - [x] get from MIB
        - [ ] return error if unknown
+       - [ ] unpack packet
 
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict

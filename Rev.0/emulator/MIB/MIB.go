@@ -4,6 +4,7 @@ import (
 	"net"
 	"net/netip"
 
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/MIB/types"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
 )
 
@@ -22,6 +23,10 @@ const CONTROLLER_GATEWAY = "controller.gateway"
 const CONTROLLER_MAC = "controller.MAC"
 const CONTROLLER_VERSION = "controller.version"
 const CONTROLLER_RELEASED = "controller.released"
+
+var OIDs = map[string]types.OID{
+	CONTROLLER_ID: []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1},
+}
 
 var mib = map[string]field{
 	CONTROLLER_ID:       {get: getControllerID},

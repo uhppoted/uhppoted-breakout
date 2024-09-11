@@ -8,7 +8,7 @@ value MIB_get(const char *OID) {
         .tag = VALUE_UNKNOWN,
     };
 
-    if (strcmp(OID, "0.1.3.6.655136.1.1") == 0) {
+    if (strcmp(OID, "0.1.3.6.1.4.1.65536.1.1") == 0) {
         v.tag = VALUE_UINT32;
         v.integer = 405419896;
     }

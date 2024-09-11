@@ -8,6 +8,7 @@ import (
 	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/term"
 
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/MIB/types"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/BER"
 	ssmp "github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/SSMP"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/bisync"
@@ -27,14 +28,14 @@ type request struct {
 var write = make(chan request)
 var rqid = atomic.Uint32{}
 
-func Get(oid []uint32) (any, error) {
+func Get(oid types.OID) (any, error) {
 	if rqId, err := auth.NextID(); err != nil {
 		return nil, err
 	} else {
 		packet := ssmp.GetPacket{
 			Community: "public",
 			RequestID: rqId,
-			OID:       ".1.3.6.655136.1.1",
+			OID:       fmt.Sprintf("%v", oid),
 		}
 
 		rq := request{
@@ -49,19 +50,19 @@ func Get(oid []uint32) (any, error) {
 		case reply := <-rq.pipe:
 			debugf("reply to SSMP GET request (%v)", reply)
 
-			if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
-				return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+			if value, err := get(reply, oid); err != nil {
+				return 0, fmt.Errorf("invalid reply to SSMP GET %v request", oid)
 			} else if v, ok := value.(int); !ok {
-				return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+				return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", oid)
 			} else {
 				return uint32(v), nil
 			}
 
 		case <-timeout:
-			return 0, fmt.Errorf("no reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+			return 0, fmt.Errorf("no reply to SSMP GET %v request", oid)
 		}
 
-		return 0, fmt.Errorf("SSMP GET %v failed", ".1.3.6.655136.1.1")
+		return 0, fmt.Errorf("SSMP GET %v failed", oid)
 	}
 }
 
@@ -205,14 +206,16 @@ func received(msg []byte, codec *bisync.Bisync) []gosnmp.SnmpPacket {
 	return packets
 }
 
-func get(packet gosnmp.SnmpPacket, OID string) (any, error) {
+func get(packet gosnmp.SnmpPacket, oid types.OID) (any, error) {
+	name := fmt.Sprintf("%v", oid)
+
 	for _, pdu := range packet.Variables {
-		if pdu.Name == OID {
+		if pdu.Name == name {
 			return pdu.Value, nil
 		}
 	}
 
-	return nil, fmt.Errorf("OID %v not found", OID)
+	return nil, fmt.Errorf("OID %v not found", oid)
 }
 
 func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors chan error) error {
