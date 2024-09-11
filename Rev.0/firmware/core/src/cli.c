@@ -411,6 +411,13 @@ void debug() {
     printf(">>> CRC/CCITT  %04x\n", CRC_CCITT(0x0000, bytes, 9));
     printf(">>> CRC/DNP    %04x\n", CRC_DNP(0xffff, bytes, 9));
 
+    uint16_t crc = 0xffff;
+    for (int i = 0; i < 9; i++) {
+        crc = CRC_DNP(crc, &bytes[i], 1);
+    }
+
+    printf(">>> CRC/XXX    %04x\n", crc);
+
     // packet p = {
     //     .tag = PACKET_GET_RESPONSE,
     //     .version = 0,

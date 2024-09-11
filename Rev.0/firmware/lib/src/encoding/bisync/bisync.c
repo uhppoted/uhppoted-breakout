@@ -5,11 +5,7 @@
 #include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
 
-extern const uint16_t CCITT[];
-
-inline uint16_t CRC16x(uint16_t crc, uint8_t b) {
-    return (crc >> 8) ^ CCITT[(crc ^ b) & 0xff];
-}
+extern uint16_t CRC16(uint16_t crc, const uint8_t *bytes, size_t N);
 
 const uint8_t SOH = 1;
 const uint8_t STX = 2;
@@ -33,7 +29,6 @@ void bisync_reset(struct bisync *codec) {
 
     memset(codec->crc.data, 0, sizeof(codec->crc.data));
     codec->crc.ix = 0;
-    codec->crc.crc = 0x0000;
 
     codec->DLE = false;
     codec->SOH = false;
@@ -51,14 +46,19 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
                 codec->crc.data[codec->crc.ix++] = ch;
 
                 if (codec->crc.ix == sizeof(codec->crc.data)) {
-                    uint16_t crc = 0x0000;
+                    uint16_t CRC = 0xffff;
+                    CRC = CRC16(CRC, codec->header.data, codec->header.ix);
+                    CRC = CRC16(CRC, &STX, 1);
+                    CRC = CRC16(CRC, codec->data.data, codec->data.ix);
+                    CRC = CRC16(CRC, &ETX, 1);
 
+                    uint16_t crc = 0x0000;
                     crc <<= 8;
                     crc |= codec->crc.data[0];
                     crc <<= 8;
                     crc |= codec->crc.data[1];
 
-                    if ((codec->crc.crc ^ crc) == 0x0000) {
+                    if ((CRC ^ crc) == 0x0000) {
                         if (codec->received != NULL) {
                             codec->received(codec->header.data, codec->header.ix, codec->data.data, codec->data.ix);
                         }
@@ -78,8 +78,6 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
             codec->DLE = false;
 
             if (codec->SOH) {
-                codec->crc.crc = CRC16x(codec->crc.crc, ch);
-
                 if (codec->header.ix < sizeof(codec->header.data)) {
                     codec->header.data[codec->header.ix++] = ch;
                 } else {
@@ -88,8 +86,6 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
             }
 
             if (codec->STX) {
-                codec->crc.crc = CRC16x(codec->crc.crc, ch);
-
                 if (codec->data.ix < sizeof(codec->data.data)) {
                     codec->data.data[codec->data.ix++] = ch;
                 } else {
@@ -128,7 +124,6 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
         if (ch == STX) {
             codec->SOH = false;
             codec->STX = true;
-            codec->crc.crc = CRC16x(codec->crc.crc, ch);
             continue;
         }
 
@@ -136,7 +131,6 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
         if (ch == ETX) {
             codec->STX = false;
             codec->CRC = true;
-            codec->crc.crc = CRC16x(codec->crc.crc, ch);
             continue;
         }
 
@@ -148,8 +142,6 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
 
         // ... accumulate message
         if (codec->SOH) {
-            codec->crc.crc = CRC16x(codec->crc.crc, ch);
-
             if (codec->header.ix < sizeof(codec->header.data)) {
                 codec->header.data[codec->header.ix++] = ch;
             } else {
@@ -158,8 +150,6 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
         }
 
         if (codec->STX) {
-            codec->crc.crc = CRC16x(codec->crc.crc, ch);
-
             if (codec->data.ix < sizeof(codec->data.data)) {
                 codec->data.data[codec->data.ix++] = ch;
             } else {
@@ -202,7 +192,6 @@ slice bisync_encode(const uint8_t *header, int header_size, const uint8_t *data,
     N += 2; // CRC
 
     // ... encode message
-    uint16_t crc = 0x0000;
     slice m = {
         .capacity = N,
         .length = 0,
@@ -220,12 +209,10 @@ slice bisync_encode(const uint8_t *header, int header_size, const uint8_t *data,
             }
 
             m.bytes[m.length++] = header[i];
-            crc = CRC16x(crc, header[i]);
         }
     }
 
     m.bytes[m.length++] = STX;
-    crc = CRC16x(crc, STX);
 
     if (data != NULL) {
         for (int i = 0; i < data_size; i++) {
@@ -234,14 +221,18 @@ slice bisync_encode(const uint8_t *header, int header_size, const uint8_t *data,
             }
 
             m.bytes[m.length++] = data[i];
-            crc = CRC16x(crc, data[i]);
         }
     }
 
     m.bytes[m.length++] = ETX;
-    crc = CRC16x(crc, ETX);
 
     // ... CRC
+    uint16_t crc = 0xffff;
+    crc = CRC16(crc, header, header_size);
+    crc = CRC16(crc, &STX, 1);
+    crc = CRC16(crc, data, data_size);
+    crc = CRC16(crc, &ETX, 1);
+
     m.bytes[m.length++] = (uint8_t)((crc >> 8) & 0x00ff);
     m.bytes[m.length++] = (uint8_t)((crc >> 0) & 0x00ff);
 

@@ -6,6 +6,8 @@
     - [ ] get-controller
           - [ ] Fix hardcoded OID
           - [ ] errors pipe in request
+          - [ ] serialize requests
+
     - [x] ENQ/ACK loop - use codec
           - (?) use common rx codec??
           - (?) use callback funcs rather than interface
@@ -27,13 +29,13 @@
 
    - [x] Fix initial connect that never connects
    - [ ] MIB
-   - [ ] CRC
+   - [x] CRC
          - [x] append to request
          - [x] append to response
          - [x] validate request CRC
          - [x] validate response CRC
          - [x] inline CRC16x
-         - [ ] change to CRC/DNP
+         - [x] change to CRC/DNP
    - [ ] BER
        - [x] free field list/fields
        - [ ] check slice_free
@@ -111,5 +113,6 @@
 17. https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
 18. https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
 19. https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
+20. https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
 
 

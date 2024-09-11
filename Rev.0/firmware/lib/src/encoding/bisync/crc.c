@@ -29,7 +29,7 @@ const uint16_t CCITT[] = {
     0xf78f, 0xe606, 0xd49d, 0xc514, 0xb1ab, 0xa022, 0x92b9, 0x8330, 0x7bc7, 0x6a4e,
     0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78};
 
-static uint16_t const DNP[] = {
+const uint16_t DNP[] = {
     0xed35, 0xdb6b, 0x8189, 0xb7d7, 0x344d, 0x0213, 0x58f1, 0x6eaf, 0x12bc, 0x24e2,
     0x7e00, 0x485e, 0xcbc4, 0xfd9a, 0xa778, 0x9126, 0x5f5e, 0x6900, 0x33e2, 0x05bc,
     0x8626, 0xb078, 0xea9a, 0xdcc4, 0xa0d7, 0x9689, 0xcc6b, 0xfa35, 0x79af, 0x4ff1,
@@ -57,11 +57,9 @@ static uint16_t const DNP[] = {
     0x8313, 0xb54d, 0xefaf, 0xd9f1, 0x5a6b, 0x6c35, 0x36d7, 0x0089, 0x7c9a, 0x4ac4,
     0x1026, 0x2678, 0xa5e2, 0x93bc, 0xc95e, 0xff00};
 
-uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len) {
-    uint8_t const *data = mem;
-
+uint16_t CRC_CCITT(uint16_t crc, const uint8_t *data, size_t len) {
     if (data == NULL) {
-        return 0;
+        return crc;
     }
 
     for (size_t i = 0; i < len; i++) {
@@ -71,11 +69,9 @@ uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len) {
     return crc;
 }
 
-uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len) {
-    uint8_t const *data = mem;
-
+uint16_t CRC_DNP(uint16_t crc, const uint8_t *data, size_t len) {
     if (data == NULL) {
-        return 0xffff;
+        return crc;
     }
 
     for (size_t i = 0; i < len; i++) {
@@ -83,4 +79,8 @@ uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len) {
     }
 
     return crc;
+}
+
+uint16_t CRC16(uint16_t crc, uint8_t *bytes, size_t N) {
+    return CRC_DNP(crc, bytes, N);
 }

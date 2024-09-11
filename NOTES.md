@@ -51,9 +51,11 @@
    - https://blog.adafruit.com/2023/01/24/using-direct-memory-access-dma-on-the-rp2040-chip-raspberrypi-rp2040-dma
    - https://stackoverflow.com/questions/66388451/how-to-use-raspberry-pi-pico-with-dac-with-spi-to-generate-sine-wave-of-1-khz-wi
 
-# Debouncing
+## Debouncing
 - https://www.eejournal.com/article/ultimate-guide-to-switch-debounce-part-1
 
+## CRCs
+- https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
 
 ## BER
 - https://www.ranecommercial.com/legacy/note161.html
