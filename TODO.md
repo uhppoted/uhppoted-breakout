@@ -28,21 +28,23 @@
    - https://forums.raspberrypi.com/viewtopic.php?t=302960
 
    - [x] Fix initial connect that never connects
-   - [ ] MIB
    - [x] CRC
-         - [x] append to request
-         - [x] append to response
-         - [x] validate request CRC
-         - [x] validate response CRC
-         - [x] inline CRC16x
-         - [x] change to CRC/DNP
+   - [ ] HOTP
+         - [x] generate request ID
+         - [ ] validate request ID
+         - [ ] set secret
+
+   - [ ] MIB
    - [ ] BER
+       - [ ] Fix negative int encoding
        - [x] free field list/fields
        - [ ] check slice_free
        - [ ] check field_free
        - [ ] check vector_free
        - [ ] check packet_free
+       - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638
    - [ ] GET
+       - [ ] unpack packet
        - [x] free SSMP packet
        - [x] get from MIB
        - [ ] return error if unknown

@@ -12,6 +12,7 @@ import (
 	ssmp "github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/SSMP"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/bisync"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/ssmp/auth"
 )
 
 type SSMP struct {
@@ -27,37 +28,41 @@ var write = make(chan request)
 var rqid = atomic.Uint32{}
 
 func Get(oid []uint32) (any, error) {
-	packet := ssmp.GetPacket{
-		Community: "public",
-		RequestID: 1,
-		OID:       ".1.3.6.655136.1.1",
-	}
-
-	rq := request{
-		packet: packet,
-		pipe:   make(chan gosnmp.SnmpPacket),
-	}
-
-	timeout := time.After(500 * time.Millisecond)
-
-	write <- rq
-	select {
-	case reply := <-rq.pipe:
-		debugf("reply to SSMP GET request (%v)", reply)
-
-		if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
-			return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
-		} else if v, ok := value.(int); !ok {
-			return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
-		} else {
-			return uint32(v), nil
+	if rqId, err := auth.NextID(); err != nil {
+		return nil, err
+	} else {
+		packet := ssmp.GetPacket{
+			Community: "public",
+			RequestID: rqId,
+			OID:       ".1.3.6.655136.1.1",
 		}
 
-	case <-timeout:
-		return 0, fmt.Errorf("no reply to SSMP GET %v request", ".1.3.6.655136.1.1")
-	}
+		rq := request{
+			packet: packet,
+			pipe:   make(chan gosnmp.SnmpPacket),
+		}
 
-	return 0, fmt.Errorf("SSMP GET %v failed", ".1.3.6.655136.1.1")
+		timeout := time.After(500 * time.Millisecond)
+
+		write <- rq
+		select {
+		case reply := <-rq.pipe:
+			debugf("reply to SSMP GET request (%v)", reply)
+
+			if value, err := get(reply, ".1.3.6.655136.1.1"); err != nil {
+				return 0, fmt.Errorf("invalid reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+			} else if v, ok := value.(int); !ok {
+				return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+			} else {
+				return uint32(v), nil
+			}
+
+		case <-timeout:
+			return 0, fmt.Errorf("no reply to SSMP GET %v request", ".1.3.6.655136.1.1")
+		}
+
+		return 0, fmt.Errorf("SSMP GET %v failed", ".1.3.6.655136.1.1")
+	}
 }
 
 func (ssmp SSMP) Run() {
