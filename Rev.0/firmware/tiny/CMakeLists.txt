@@ -33,7 +33,7 @@ add_executable(breakout
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
-  ${CORE}/src/SSMP.c
+  ${CORE}/src/ssmpx.c
   ${CORE}/src/MIB.c
   ${CORE}/src/auth.c
   ${CORE}/src/state.c
