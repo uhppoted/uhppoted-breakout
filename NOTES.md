@@ -54,6 +54,10 @@
 ## Debouncing
 - https://www.eejournal.com/article/ultimate-guide-to-switch-debounce-part-1
 
+## USB
+   - https://forums.raspberrypi.com/viewtopic.php?t=302960
+   - https://stackoverflow.com/questions/29354228/is-stdout-required-to-be-a-text-stream
+
 ## CRCs
 - https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
 

@@ -33,8 +33,9 @@ add_executable(breakout
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
-  ${CORE}/src/ssmp.c
+  ${CORE}/src/SSMP.c
   ${CORE}/src/MIB.c
+  ${CORE}/src/auth.c
   ${CORE}/src/state.c
   ${CORE}/src/log.c
   ${CORE}/src/cli.c
@@ -53,7 +54,8 @@ add_executable(breakout
   ${LIB}/src/encoding/ASN.1/encode.c
   ${LIB}/src/encoding/ASN.1/decode.c
   ${LIB}/src/encoding/ASN.1/fields.c
-  ${LIB}/src/encoding/SSMP/SSMP.c
+  ${LIB}/src/encoding/ssmp/ssmp.c
+  ${LIB}/src/auth/hotp/hotp.c
 )
 
 target_include_directories(breakout 

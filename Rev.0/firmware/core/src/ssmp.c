@@ -7,6 +7,8 @@
 #include <pico/time.h>
 
 #include <MIB.h>
+#include <auth.h>
+#include <auth/hotp/hotp.h>
 #include <breakout.h>
 #include <encoding/ASN.1/BER.h>
 #include <encoding/SSMP/SSMP.h>
@@ -23,9 +25,11 @@
 
 const int64_t SSMP_IDLE = 5000; // ms
 
-void ssmp_enq();
-void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
-void on_ssmp();
+void SSMP_enq();
+void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
+void SSMP_touched();
+void SSMP_get(const packet *request);
+void on_SSMP();
 
 struct {
     struct bisync codec;
@@ -50,13 +54,13 @@ struct {
         .STX = false,
         .CRC = false,
 
-        .enq = ssmp_enq,
-        .received = ssmp_received,
+        .enq = SSMP_enq,
+        .received = SSMP_received,
     },
     .touched = 0,
 };
 
-void ssmp_init() {
+void SSMP_init() {
     debugf("SSMP", "init");
 
     // // ... UART
@@ -69,13 +73,13 @@ void ssmp_init() {
     // uart_set_hw_flow(uart0, false, false);
     // uart_set_fifo_enabled(uart0, false);
 
-    SSMP.touched = get_absolute_time();
+    SSMP_touched();
 
     infof("SSMP", "initialised");
 }
 
 // Enables interrupt handler.
-void ssmp_start() {
+void SSMP_start() {
     debugf("SSMP", "start");
 
     // irq_set_exclusive_handler(UART0_IRQ, on_smp);
@@ -83,13 +87,20 @@ void ssmp_start() {
     // uart_set_irq_enables(uart0, true, false);
 }
 
-void ssmp_reset() {
+void SSMP_reset() {
     debugf("SSMP", "reset");
 
+    SSMP_touched();
+}
+
+/** Updates the internal 'touched' timestamp.
+ *
+ */
+void SSMP_touched() {
     SSMP.touched = get_absolute_time();
 }
 
-void ssmp_ping() {
+void SSMP_ping() {
     if (get_mode() == MODE_SSMP) {
         absolute_time_t now = get_absolute_time();
         int64_t delta = absolute_time_diff_us(SSMP.touched, now) / 1000;
@@ -100,7 +111,7 @@ void ssmp_ping() {
     }
 }
 
-void on_ssmp() {
+void on_SSMP() {
     // char buffer[32];
     // int ix = 0;
     //
@@ -125,12 +136,12 @@ void on_ssmp() {
     // }
 }
 
-void ssmp_rx(const struct buffer *received) {
+void SSMP_rx(const struct buffer *received) {
     bisync_decode(&SSMP.codec, received->data, received->N);
 }
 
-void ssmp_enq() {
-    SSMP.touched = get_absolute_time();
+void SSMP_enq() {
+    SSMP_touched();
 
     const char *reply = SYN_SYN_ACK;
 
@@ -139,38 +150,54 @@ void ssmp_enq() {
     fflush(stdout);
 }
 
-void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
-    SSMP.touched = get_absolute_time();
-
+void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
     struct packet *request = BER_decode(data, data_len);
 
+    // ... GET request?
     if (request != NULL && request->tag == PACKET_GET) {
-        value v = MIB_get(request->get.OID);
+        const char *community = request->community;
+        const char *oid = request->get.OID;
+        uint32_t code = request->get.request_id;
 
-        struct packet reply = {
-            .tag = PACKET_GET_RESPONSE,
-            .version = 0,
-            .community = "public",
-            .get_response = {
-                .request_id = request->get.request_id,
-                .error = 0,
-                .error_index = 0,
-                .OID = request->get.OID,
-                .value = v,
-            },
-        };
+        if (authorised(community, oid)) {
+            if (hotp_validate(community, code)) {
+                SSMP_touched();
 
-        // ... encode
-        slice packed = ssmp_encode(reply);
-        slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
-
-        fwrite(encoded.bytes, sizeof(uint8_t), encoded.length, stdout);
-        fflush(stdout);
-
-        slice_free(&packed);
-        slice_free(&encoded);
+                SSMP_get(request);
+            }
+        }
     }
 
     packet_free(request);
     free(request);
+}
+
+/* SSMP GET response
+ *
+ */
+void SSMP_get(const packet *request) {
+    value v = MIB_get(request->get.OID);
+
+    struct packet reply = {
+        .tag = PACKET_GET_RESPONSE,
+        .version = 0,
+        .community = "public",
+        .get_response = {
+            .request_id = request->get.request_id,
+            .error = 0,
+            .error_index = 0,
+            .OID = request->get.OID,
+            .value = v,
+        },
+    };
+
+    // ... encode
+    slice packed = ssmp_encode(reply);
+    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+
+    fwrite(encoded.bytes, sizeof(uint8_t), encoded.length, stdout);
+    fflush(stdout);
+
+    slice_free(&packed);
+    slice_free(&encoded);
 }

@@ -7,12 +7,12 @@
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
+#include <SSMP.h>
 #include <U2.h>
 #include <U3.h>
 #include <breakout.h>
 #include <cli.h>
 #include <log.h>
-#include <ssmp.h>
 #include <sys.h>
 
 struct {
@@ -52,7 +52,7 @@ void set_mode(mode mode) {
         SYSTEM.mode = mode;
 
         if (mode == MODE_SSMP) {
-            ssmp_reset();
+            SSMP_reset();
         }
     }
 
@@ -77,7 +77,7 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_RX) {
         struct buffer *b = (struct buffer *)(SRAM_BASE | (v & 0x0fffffff));
-        ssmp_rx(b);
+        SSMP_rx(b);
         free(b);
     }
 
@@ -85,7 +85,7 @@ void dispatch(uint32_t v) {
         struct buffer *b = (struct buffer *)(SRAM_BASE | (v & 0x0fffffff));
 
         if (SYSTEM.mode == MODE_SSMP) {
-            ssmp_rx(b);
+            SSMP_rx(b);
         } else {
             cli_rx(b);
         }
@@ -102,7 +102,7 @@ void dispatch(uint32_t v) {
             break;
 
         case MODE_SSMP:
-            ssmp_ping();
+            SSMP_ping();
             break;
 
         case MODE_UNKNOWN:

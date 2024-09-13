@@ -11,9 +11,9 @@
 #include <I2C1.h>
 #include <IOX.h>
 #include <RTC.h>
+#include <SSMP.h>
 #include <breakout.h>
 #include <log.h>
-#include <ssmp.h>
 #include <sys.h>
 
 #define _VERSION "v0.0"
@@ -64,14 +64,14 @@ int main() {
     // ... initialise RTC, IO expanders and serial port
     RTC_init();
     IOX_init();
-    ssmp_init();
+    SSMP_init();
 
     sleep_ms(2500); // FIXME remove - delay to let USB initialise
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();
     IOX_start();
-    ssmp_start();
+    SSMP_start();
 
     // ... run loop
     while (true) {

@@ -21,12 +21,13 @@ clean: CMakeLists.txt
 
 format: clean
 	clang-format -i src/*.c
-	clang-format -i ../core/src/*.c ../core/include/*.h
-	clang-format -i ../lib/src/*.c  ../lib/include/*.h
+	clang-format -i ../core/src/*.c                ../core/include/*.h
+	clang-format -i ../lib/src/*.c                 ../lib/include/*.h
 	clang-format -i ../lib/src/types/*.c           ../lib/include/types/*.h
-	clang-format -i ../lib/src/encoding/bisync/*.c ../lib/include/encoding/bisync/*.h
 	clang-format -i ../lib/src/encoding/ASN.1/*.c  ../lib/include/encoding/ASN.1/*.h
-	clang-format -i ../lib/src/encoding/SSMP/*.c   ../lib/include/encoding/SSMP/*.h
+	clang-format -i ../lib/src/encoding/bisync/*.c ../lib/include/encoding/bisync/*.h
+	clang-format -i ../lib/src/encoding/ssmp/*.c   ../lib/include/encoding/ssmp/*.h
+	clang-format -i ../lib/src/auth/hotp/*.c       ../lib/include/auth/hotp/*.h
 
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make

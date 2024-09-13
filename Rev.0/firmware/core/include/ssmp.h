@@ -2,8 +2,8 @@
 
 struct buffer;
 
-extern void ssmp_init();
-extern void ssmp_start();
-extern void ssmp_reset();
-extern void ssmp_ping();
-extern void ssmp_rx(const struct buffer *);
+extern void SSMP_init();
+extern void SSMP_start();
+extern void SSMP_reset();
+extern void SSMP_ping();
+extern void SSMP_rx(const struct buffer *);
