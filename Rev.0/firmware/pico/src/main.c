@@ -43,7 +43,6 @@ int main() {
     bi_decl(bi_2pins_with_func(_I2C1SDA, _I2C1SCL, GPIO_FUNC_I2C));
 
     stdio_init_all();
-    stdio_set_translate_crlf(&stdio_usb, false);
 
     watchdog_enable(WATCHDOG_TIMEOUT, true);
     queue_init(&queue, sizeof(uint32_t), 64);
