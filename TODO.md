@@ -3,6 +3,7 @@
 - [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 
 ### emulator
+    - [ ] log CRC errors
     - [ ] get-controller
           - [ ] **Fix hardcoded OID**
           - [ ] errors pipe in request
@@ -27,8 +28,14 @@
    - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
    - https://forums.raspberrypi.com/viewtopic.php?t=302960
 
-   - [x] Fix initial connect that never connects
-   - [x] CRC
+   - [ ] Intermittently missing handler
+```
+2024-09-12 16:54:35 DEBUG  SSMP             write (67 bytes) [22 22 2 48 42 16 2 16 1 0 4 16 6 112 117 98 108 105 99 160 ...]
+2024-09-12 16:54:35 DEBUG  SSMP             read  (44 bytes) [22 22 2 48 45 16 2 16 1 0 4 16 6 112 117 98 108 105 99 162 ...]
+2024-09-12 16:54:35 DEBUG  SSMP             read  (25 bytes) [43 16 6 16 1 4 16 1 132 128 0 16 1 16 1 16 2 4 24 42 ...]
+2024-09-12 16:54:35 WARN   SSMP             reply 4294939880 (missing handler)
+```
+
    - [ ] HOTP
          - [x] generate request ID
          - [ ] validate request ID
@@ -117,5 +124,5 @@
 18. https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
 19. https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 20. https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
-
-
+21, https://github.com/raspberrypi/pico-sdk/issues/224
+22. https://github.com/raspberrypi/pico-sdk/issues/997

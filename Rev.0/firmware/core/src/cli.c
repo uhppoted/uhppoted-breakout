@@ -15,12 +15,12 @@
 #include <U3.h>
 #include <U4.h>
 #include <cli.h>
-#include <encoding/ASN.1/BER.h>
-#include <encoding/SSMP/SSMP.h>
-#include <encoding/bisync/bisync.h>
 #include <log.h>
 #include <state.h>
 #include <sys.h>
+
+#include <MIB.h>
+#include <encoding/bisync/bisync.h>
 
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
 uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
@@ -88,6 +88,9 @@ extern const char *TERMINAL_ECHO;
 extern const char *TERMINAL_CLEARLINE;
 extern const char *TERMINAL_DISPLAY;
 extern const char *TERMINAL_AT;
+
+extern const uint8_t SYN;
+extern const uint8_t ENQ;
 
 const char CR = '\n';
 const char LF = '\r';
@@ -406,50 +409,42 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    const uint8_t bytes[] = "123456789";
+    value v = MIB_get("0.1.3.6.1.4.1.65536.1.1");
 
-    printf(">>> CRC/CCITT  %04x\n", CRC_CCITT(0x0000, bytes, 9));
-    printf(">>> CRC/DNP    %04x\n", CRC_DNP(0xffff, bytes, 9));
+    struct packet reply = {
+        .tag = PACKET_GET_RESPONSE,
+        .version = 0,
+        .community = "public",
+        .get_response = {
+            .request_id = 817236,
+            .error = 0,
+            .error_index = 0,
+            .OID = "0.1.3.6.1.4.1.65536.1.1",
+            .value = v,
+        },
+    };
 
-    uint16_t crc = 0xffff;
-    for (int i = 0; i < 9; i++) {
-        crc = CRC_DNP(crc, &bytes[i], 1);
-    }
+    slice packed = ssmp_encode(reply);
+    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
-    printf(">>> CRC/XXX    %04x\n", crc);
+    printf("--- %d\n", packed.length);
+    for (int i = 0; i < packed.length; i++) {
+        printf(" %02X", packed.bytes[i]);
+    };
+    printf("\n---\n");
 
-    // packet p = {
-    //     .tag = PACKET_GET_RESPONSE,
-    //     .version = 0,
-    //     .community = "public",
-    //     .get_response = {
-    //         .request_id = 1,
-    //         .error = 0,
-    //         .error_index = 0,
-    //         .OID = "0.1.3.6.655136.1.1",
-    //         .value = {
-    //             .tag = VALUE_UINT32,
-    //             .integer = 405419896,
-    //         },
-    //     },
-    // };
-    //
-    // slice packed = ssmp_encode(p);
-    // slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
-    //
-    // printf("--- %d\n", packed.length);
-    // for (int i = 0; i < packed.length; i++) {
-    //     printf(" %02X", packed.bytes[i]);
-    // };
-    // printf("\n---\n");
-    // printf("--- %d\n", encoded.length);
-    // for (int i = 0; i < encoded.length; i++) {
-    //     printf(" %02X", encoded.bytes[i]);
-    // };
-    // printf("\n---\n");
-    //
-    // slice_free(&packed);
-    // slice_free(&encoded);
+    printf("--- %d\n", encoded.length);
+    for (int i = 0; i < 32; i++) {
+        printf(" %02X", encoded.bytes[i]);
+    };
+    printf("\n");
+    for (int i = 32; i < encoded.length; i++) {
+        printf(" %02X", encoded.bytes[i]);
+    };
+    printf("\n---\n");
+
+    slice_free(&packed);
+    slice_free(&encoded);
 }
 
 void state() {

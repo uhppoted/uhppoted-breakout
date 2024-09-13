@@ -155,7 +155,7 @@ void ssmp_received(const uint8_t *header, int header_len, const uint8_t *data, i
                 .request_id = request->get.request_id,
                 .error = 0,
                 .error_index = 0,
-                .OID = "0.1.3.6.1.4.1.65536.1.1",
+                .OID = request->get.OID,
                 .value = v,
             },
         };

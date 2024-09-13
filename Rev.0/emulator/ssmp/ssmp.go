@@ -306,7 +306,7 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 		for {
 			select {
 			case msg := <-pipe:
-				if msg[0] != 22 {
+				if len(msg) > 2 && msg[0] == '>' && msg[1] == '>' {
 					debugf("read  (%v bytes) %v", len(msg), string(msg))
 				} else if len(msg) > 20 {
 					debugf("read  (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
