@@ -55,6 +55,8 @@ add_executable(breakout
   ${LIB}/src/encoding/ASN.1/decode.c
   ${LIB}/src/encoding/ASN.1/fields.c
   ${LIB}/src/encoding/ssmp/ssmp.c
+  ${LIB}/src/encoding/ssmp/get.c
+  ${LIB}/src/encoding/ssmp/get_response.c
   ${LIB}/src/auth/hotp/hotp.c
 )
 

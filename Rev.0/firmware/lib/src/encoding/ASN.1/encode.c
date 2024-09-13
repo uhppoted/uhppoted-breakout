@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include <encoding/ASN.1/BER.h>
-#include <encoding/SSMP/SSMP.h>
+// #include <encoding/SSMP/SSMP.h>
 
 slice pack_integer(const field *f);
 slice pack_octets(const field *f);

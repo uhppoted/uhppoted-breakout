@@ -1,5 +1,5 @@
 #pragma once
 
-#include <encoding/SSMP/SSMP.h>
+#include <encoding/ssmp/ssmp.h>
 
 value MIB_get(const char *OID);

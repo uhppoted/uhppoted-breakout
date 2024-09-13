@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include <types/slice.h>
+#include <types/vector.h>
 
 typedef enum {
     PACKET_UNKNOWN,
@@ -48,5 +49,4 @@ typedef struct packet {
 
 void packet_free(packet *const);
 slice ssmp_encode(packet);
-
-packet *ssmp_get(int64_t version, char *community, int64_t request_id, int64_t error, int64_t error_index, char *OID);
+packet *ssmp_decode(const vector *fields);

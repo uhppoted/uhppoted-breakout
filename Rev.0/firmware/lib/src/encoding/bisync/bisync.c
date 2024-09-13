@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <encoding/SSMP/SSMP.h>
+// #include <encoding/ssmpx/SSMP.h>
 #include <encoding/bisync/bisync.h>
 
 extern uint16_t CRC16(uint16_t crc, const uint8_t *bytes, size_t N);

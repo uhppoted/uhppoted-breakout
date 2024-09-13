@@ -52,8 +52,8 @@ request error (TX queue blocked)
    - [ ] GET
        - [x] free SSMP packet
        - [x] get from MIB
-       - [ ] return error if unknown
-       - [ ] unpack packet
+       - [x] unpack packet in encoding/ssmp
+       - [ ] return error if unknown OID
 
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict

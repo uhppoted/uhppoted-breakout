@@ -4,13 +4,14 @@
 #include <stdint.h>
 
 #include <types/slice.h>
+#include <types/vector.h>
 
 struct packet;
 struct field;
 struct vector;
 
 struct slice BER_encode(const struct field f);
-struct packet *BER_decode(const uint8_t *message, int N);
+struct vector *BER_decode(const uint8_t *message, int N);
 
 extern void field_free(struct field *const);
 
@@ -34,12 +35,6 @@ typedef enum {
     // FIELD_PDU_SET: 0xA3,
     // FIELD_PDU_TRAP: 0xA4,
 } FIELD;
-
-typedef struct vector {
-    int capacity;
-    int size;
-    struct field *fields[4];
-} vector;
 
 typedef struct field {
     FIELD tag;

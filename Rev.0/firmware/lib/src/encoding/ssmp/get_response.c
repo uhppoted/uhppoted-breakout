@@ -2,34 +2,9 @@
 #include <string.h>
 
 #include <encoding/ASN.1/BER.h>
-#include <encoding/SSMP/SSMP.h>
+#include <encoding/ssmp/ssmp.h>
 
-slice packet_encode_get_response(packet);
-
-// NTS: expects 'p' to be free'd by caller
-void packet_free(packet *const p) {
-    free(p->community);
-
-    if (p != NULL && p->tag == PACKET_GET) {
-        free(p->get.OID);
-    }
-}
-
-slice ssmp_encode(packet p) {
-    if (p.tag == PACKET_GET_RESPONSE) {
-        return packet_encode_get_response(p);
-    }
-
-    slice s = {
-        .capacity = 0,
-        .length = 0,
-        .bytes = NULL,
-    };
-
-    return s;
-}
-
-slice packet_encode_get_response(packet p) {
+slice ssmp_encode_get_response(packet p) {
     field version = {
         .tag = FIELD_INTEGER,
         .integer = {
@@ -127,18 +102,4 @@ slice packet_encode_get_response(packet p) {
     response.sequence.fields = vector_add(response.sequence.fields, &pdu);
 
     return BER_encode(response);
-}
-
-packet *ssmp_get(int64_t version, char *community, int64_t request_id, int64_t error, int64_t error_index, char *OID) {
-    packet *p = (packet *)malloc(sizeof(packet));
-
-    p->tag = PACKET_GET;
-    p->version = version;
-    p->community = community;
-    p->get.request_id = request_id;
-    p->get.error = error;
-    p->get.error_index = error_index;
-    p->get.OID = OID;
-
-    return p;
 }

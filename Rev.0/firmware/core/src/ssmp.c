@@ -11,8 +11,8 @@
 #include <auth/hotp/hotp.h>
 #include <breakout.h>
 #include <encoding/ASN.1/BER.h>
-#include <encoding/SSMP/SSMP.h>
 #include <encoding/bisync/bisync.h>
+#include <encoding/ssmp/ssmp.h>
 #include <log.h>
 #include <ssmp.h>
 #include <state.h>
@@ -151,7 +151,12 @@ void SSMP_enq() {
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
-    struct packet *request = BER_decode(data, data_len);
+    // ... decode packet
+    vector *fields = BER_decode(data, data_len);
+    packet *request = ssmp_decode(fields);
+
+    vector_free(fields);
+    free(fields);
 
     // ... GET request?
     if (request != NULL && request->tag == PACKET_GET) {
@@ -162,7 +167,6 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         if (authorised(community, oid)) {
             if (hotp_validate(community, code)) {
                 SSMP_touched();
-
                 SSMP_get(request);
             }
         }
