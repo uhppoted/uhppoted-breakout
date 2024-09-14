@@ -7,7 +7,7 @@
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
-#include <SSMPx.h>
+#include <SSMP.h>
 #include <U2.h>
 #include <U3.h>
 #include <breakout.h>

@@ -7,7 +7,7 @@
 #include <pico/time.h>
 
 #include <MIB.h>
-#include <SSMPx.h>
+#include <SSMP.h>
 #include <auth.h>
 #include <auth/hotp/hotp.h>
 #include <breakout.h>
