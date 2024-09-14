@@ -11,7 +11,7 @@
 #include <I2C1.h>
 #include <IOX.h>
 #include <RTC.h>
-#include <SSMP.h>
+#include <SSMPx.h>
 #include <breakout.h>
 #include <log.h>
 #include <sys.h>
