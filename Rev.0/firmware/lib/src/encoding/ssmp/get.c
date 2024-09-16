@@ -54,8 +54,9 @@ packet *ssmp_decode_get(const vector *fields) {
         }
     }
 
-    packet *p = (packet *)malloc(sizeof(packet));
+    packet *p = (packet *)calloc(1, sizeof(packet));
 
+    p->dynamic = true;
     p->tag = PACKET_GET;
     p->version = version;
     p->community = community;

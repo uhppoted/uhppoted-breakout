@@ -7,15 +7,6 @@
 extern slice ssmp_encode_get_response(packet);
 extern packet *ssmp_decode_get(const vector *fields);
 
-// NTS: expects 'p' to be free'd by caller
-void packet_free(packet *const p) {
-    free(p->community);
-
-    if (p != NULL && p->tag == PACKET_GET) {
-        free(p->get.OID);
-    }
-}
-
 slice ssmp_encode(packet p) {
     if (p.tag == PACKET_GET_RESPONSE) {
         return ssmp_encode_get_response(p);
@@ -45,4 +36,24 @@ struct packet *ssmp_decode(const vector *fields) {
     }
 
     return NULL;
+}
+
+void free_packet(packet *p) {
+    if (p == NULL) {
+        return;
+    }
+
+    free(p->community);
+
+    if (p->tag == PACKET_GET) {
+        free(p->get.OID);
+    }
+
+    if (p->tag == PACKET_GET_RESPONSE) {
+        free(p->get_response.OID);
+    }
+
+    if (p->dynamic) {
+        free(p);
+    }
 }

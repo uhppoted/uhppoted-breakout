@@ -28,7 +28,7 @@ const int64_t SSMP_IDLE = 5000; // ms
 void SSMP_enq();
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 void SSMP_touched();
-void SSMP_get(const packet *request);
+void SSMP_get(const char *community, int64_t rqid, const char *OID);
 void on_SSMP();
 
 struct {
@@ -167,30 +167,29 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         if (authorised(community, oid)) {
             if (hotp_validate(community, code)) {
                 SSMP_touched();
-                SSMP_get(request);
+                SSMP_get(request->community, request->get.request_id, request->get.OID);
             }
         }
     }
 
-    packet_free(request);
-    free(request);
+    free_packet(request);
 }
 
 /* SSMP GET response
  *
  */
-void SSMP_get(const packet *request) {
-    value v = MIB_get(request->get.OID);
+void SSMP_get(const char *community, int64_t rqid, const char *OID) {
+    value v = MIB_get(OID);
 
     struct packet reply = {
         .tag = PACKET_GET_RESPONSE,
         .version = 0,
-        .community = "public",
+        .community = strdup(community),
         .get_response = {
-            .request_id = request->get.request_id,
+            .request_id = rqid,
             .error = 0,
             .error_index = 0,
-            .OID = request->get.OID,
+            .OID = strdup(OID),
             .value = v,
         },
     };
@@ -204,4 +203,5 @@ void SSMP_get(const packet *request) {
 
     slice_free(&packed);
     slice_free(&encoded);
+    free_packet(&reply);
 }

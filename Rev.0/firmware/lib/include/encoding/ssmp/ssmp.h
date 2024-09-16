@@ -45,8 +45,11 @@ typedef struct packet {
             value value;
         } get_response;
     };
+
+    bool dynamic;
 } packet;
 
-void packet_free(packet *const);
 slice ssmp_encode(packet);
 packet *ssmp_decode(const vector *fields);
+
+void free_packet(packet *);

@@ -5,7 +5,7 @@
 ### emulator
     - [ ] log CRC errors
     - [ ] get-controller
-          - [ ] **Fix hardcoded OID**
+          - [x] **Fix hardcoded OID**
           - [ ] errors pipe in request
           - [ ] serialize requests
 
@@ -43,11 +43,11 @@ request error (TX queue blocked)
    - [ ] MIB
    - [ ] BER
        - [ ] Fix negative int encoding
+       - [x] free_packet
        - [x] free field list/fields
        - [ ] check slice_free
        - [ ] check field_free
        - [ ] check vector_free
-       - [ ] check packet_free
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638
    - [ ] GET
        - [x] free SSMP packet
