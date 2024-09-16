@@ -61,6 +61,10 @@
 ## CRCs
 - https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
 
+## SSMP
+- https://stackoverflow.com/questions/29354228/is-stdout-required-to-be-a-text-stream
+- https://forums.raspberrypi.com/viewtopic.php?t=302960
+
 ## BER
 - https://www.ranecommercial.com/legacy/note161.html
 - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html

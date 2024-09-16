@@ -35,6 +35,7 @@ bool sys_init() {
     uint offset = pio_add_program(pio, &ws2812_program);
 
     ws2812_program_init(pio, sm, offset, 16, 800000, true);
+    put_rgb(128, 0, 0);
 
     if (!add_repeating_timer_ms(1000, on_tick, &sys, &sys.timer)) {
         return false;

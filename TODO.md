@@ -26,8 +26,6 @@
    - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
    - https://www.ranecommercial.com/legacy/note161.html
    - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
-   - https://forums.raspberrypi.com/viewtopic.php?t=302960
-   - https://stackoverflow.com/questions/29354228/is-stdout-required-to-be-a-text-stream
    - [ ] ENQ/ACK loop
 ```
 request error (RX queue blocked)
