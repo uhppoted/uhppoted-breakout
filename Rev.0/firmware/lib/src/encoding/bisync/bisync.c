@@ -26,8 +26,8 @@ void bisync_reset(struct bisync *codec) {
     memset(codec->data.data, 0, sizeof(codec->data.data));
     codec->data.ix = 0;
 
-    memset(codec->crc.data, 0, sizeof(codec->crc.data));
     codec->crc.ix = 0;
+    codec->crc.CRC = 0;
 
     codec->DLE = false;
     codec->SOH = false;
@@ -41,31 +41,23 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
 
         // ... CRC?
         if (codec->CRC) {
-            if (codec->crc.ix < sizeof(codec->crc.data)) {
-                codec->crc.data[codec->crc.ix++] = ch;
+            codec->crc.CRC <<= 8;
+            codec->crc.CRC |= (uint16_t)(ch)&0x00ff;
+            codec->crc.ix++;
 
-                if (codec->crc.ix == sizeof(codec->crc.data)) {
-                    uint16_t CRC = 0xffff;
-                    CRC = CRC16(CRC, codec->header.data, codec->header.ix);
-                    CRC = CRC16(CRC, &STX, 1);
-                    CRC = CRC16(CRC, codec->data.data, codec->data.ix);
-                    CRC = CRC16(CRC, &ETX, 1);
+            if (codec->crc.ix >= 2) {
+                uint16_t CRC = 0xffff;
+                CRC = CRC16(CRC, codec->header.data, codec->header.ix);
+                CRC = CRC16(CRC, &STX, 1);
+                CRC = CRC16(CRC, codec->data.data, codec->data.ix);
+                CRC = CRC16(CRC, &ETX, 1);
 
-                    uint16_t crc = 0x0000;
-                    crc <<= 8;
-                    crc |= codec->crc.data[0];
-                    crc <<= 8;
-                    crc |= codec->crc.data[1];
-
-                    if ((CRC ^ crc) == 0x0000) {
-                        if (codec->received != NULL) {
-                            codec->received(codec->header.data, codec->header.ix, codec->data.data, codec->data.ix);
-                        }
+                if ((CRC ^ codec->crc.CRC) == 0x0000) {
+                    if (codec->received != NULL) {
+                        codec->received(codec->header.data, codec->header.ix, codec->data.data, codec->data.ix);
                     }
-
-                    bisync_reset(codec);
                 }
-            } else {
+
                 bisync_reset(codec);
             }
 

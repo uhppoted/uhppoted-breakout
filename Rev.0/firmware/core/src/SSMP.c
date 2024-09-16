@@ -46,7 +46,7 @@ struct {
         },
         .crc = {
             .ix = 0,
-            .data = {0},
+            .CRC = 0,
         },
 
         .DLE = false,
