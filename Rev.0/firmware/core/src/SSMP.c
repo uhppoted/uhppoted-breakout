@@ -24,6 +24,7 @@
 #define PARITY UART_PARITY_NONE
 
 const int64_t SSMP_IDLE = 5000; // ms
+const int64_t SSMP_ERROR_NO_SUCH_OBJECT = 0x02;
 
 void SSMP_enq();
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
@@ -193,6 +194,11 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
             .value = v,
         },
     };
+
+    if (v.tag == VALUE_UNKNOWN) {
+        reply.get_response.error = SSMP_ERROR_NO_SUCH_OBJECT;
+        reply.get_response.error_index = 1;
+    }
 
     // ... encode
     slice packed = ssmp_encode(reply);

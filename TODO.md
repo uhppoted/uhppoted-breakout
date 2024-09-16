@@ -49,11 +49,11 @@ request error (TX queue blocked)
        - [ ] check field_free
        - [ ] check vector_free
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638
-   - [ ] GET
+   - [x] GET
        - [x] free SSMP packet
        - [x] get from MIB
        - [x] unpack packet in encoding/ssmp
-       - [ ] return error if unknown OID
+       - [x] return error if unknown OID
 
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
