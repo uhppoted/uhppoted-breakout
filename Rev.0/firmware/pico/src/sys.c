@@ -106,5 +106,4 @@ void sys_reboot() {
  *
  */
 void sys_translate_crlf(bool enabled) {
-    stdio_set_translate_crlf(&stdio_usb, enabled);
 }
