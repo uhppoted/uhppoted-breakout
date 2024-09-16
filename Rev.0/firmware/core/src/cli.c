@@ -20,6 +20,7 @@
 #include <sys.h>
 
 #include <MIB.h>
+#include <crypt/crypt.h>
 #include <encoding/bisync/bisync.h>
 
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
@@ -409,42 +410,53 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    value v = MIB_get("0.1.3.6.1.4.1.65536.1.1");
-
-    struct packet reply = {
-        .tag = PACKET_GET_RESPONSE,
-        .version = 0,
-        .community = "public",
-        .get_response = {
-            .request_id = 817236,
-            .error = 0,
-            .error_index = 0,
-            .OID = "0.1.3.6.1.4.1.65536.1.1",
-            .value = v,
-        },
+    uint8_t hash[64];
+    uint8_t plaintext[] = {
+        0x8c,
+        0xcb,
+        0x08,
+        0xd2,
+        0xa1,
+        0xa2,
+        0x82,
+        0xaa,
+        0x8c,
+        0xc9,
+        0x99,
+        0x02,
+        0xec,
+        0xaf,
+        0x0f,
+        0x67,
+        0xa9,
+        0xf2,
+        0x1c,
+        0xff,
+        0xe2,
+        0x80,
+        0x05,
+        0xcb,
+        0x27,
+        0xfc,
+        0xf1,
+        0x29,
+        0xe9,
+        0x63,
+        0xf9,
+        0x9d,
     };
+    int ix = 0;
 
-    slice packed = ssmp_encode(reply);
-    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+    crypto_hash(hash, plaintext, sizeof(plaintext));
 
-    printf("--- %d\n", packed.length);
-    for (int i = 0; i < packed.length; i++) {
-        printf(" %02X", packed.bytes[i]);
-    };
-    printf("\n---\n");
-
-    printf("--- %d\n", encoded.length);
-    for (int i = 0; i < 32; i++) {
-        printf(" %02X", encoded.bytes[i]);
-    };
+    printf(">> DEBUG SHA-512\n");
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 32; j++) {
+            printf("%02x", hash[ix++]);
+        }
+        printf("\n");
+    }
     printf("\n");
-    for (int i = 32; i < encoded.length; i++) {
-        printf(" %02X", encoded.bytes[i]);
-    };
-    printf("\n---\n");
-
-    slice_free(&packed);
-    slice_free(&encoded);
 }
 
 void state() {

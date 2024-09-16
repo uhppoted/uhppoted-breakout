@@ -32,13 +32,17 @@ request error (RX queue blocked)
 request error (TX queue blocked)
 ```
 
+   - [x] set output translation in USB mode only
    - [ ] HOTP
          - [x] generate request ID
          - [ ] validate request ID
+               - https://www.oryx-embedded.com/doc/dir_a9aab978e0be629e504b25df915d67e8.html
+               - https://www.ti.com/lit/an/slaa547c/slaa547c.pdf?ts=1726528827036&ref_url=https%253A%252F%252Fduckduckgo.com%252F
+               - https://www.ti.com/tool/SHA-256
+               - https://opensource.apple.com/source/clamav/clamav-158/clamav.Bin/clamav-0.98/libclamav/sha256.c.auto.html
          - [ ] set secret
          - [ ] replace with custom OTP code
 
-   - [ ] MIB
    - [ ] BER
        - [ ] Fix negative int encoding
        - [x] free_packet

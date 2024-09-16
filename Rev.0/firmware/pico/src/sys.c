@@ -101,3 +101,10 @@ void sys_tick() {
 void sys_reboot() {
     sys.reboot = true;
 }
+
+/* Enables/disables LF to CRLF translation on USB.
+ *
+ */
+void sys_translate_crlf(bool enabled) {
+    stdio_set_translate_crlf(&stdio_usb, enabled);
+}

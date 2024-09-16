@@ -29,6 +29,8 @@ void _push(char *);
 void _flush();
 void _print(const char *);
 
+extern void sys_translate_crlf(bool);
+
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
     mutex_init(&SYSTEM.guard);
@@ -52,7 +54,10 @@ void set_mode(mode mode) {
         SYSTEM.mode = mode;
 
         if (mode == MODE_SSMP) {
+            sys_translate_crlf(false);
             SSMP_reset();
+        } else {
+            sys_translate_crlf(true);
         }
     }
 

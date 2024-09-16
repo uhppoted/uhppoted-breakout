@@ -104,6 +104,13 @@ void sys_reboot() {
     sys.reboot = true;
 }
 
+/* Enables/disables LF to CRLF translation on USB.
+ *
+ */
+void sys_translate_crlf(bool enabled) {
+    stdio_set_translate_crlf(&stdio_usb, enabled);
+}
+
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {
     uint32_t rgb = (red << 16u) | (green << 8u) | (blue / 16 << 0u);
 
