@@ -13,6 +13,7 @@ clean:
 
 format: 
 	clang-format -i src/*.c
+	clang-format -i src/crypt/hash/*.c             include/crypt/hash/*.h
 	clang-format -i ../core/src/*.c                ../core/include/*.h
 	clang-format -i ../lib/src/*.c                 ../lib/include/*.h
 	clang-format -i ../lib/src/types/*.c           ../lib/include/types/*.h
@@ -20,6 +21,7 @@ format:
 	clang-format -i ../lib/src/encoding/bisync/*.c ../lib/include/encoding/bisync/*.h
 	clang-format -i ../lib/src/encoding/ssmp/*.c   ../lib/include/encoding/ssmp/*.h
 	clang-format -i ../lib/src/auth/hotp/*.c       ../lib/include/auth/hotp/*.h
+	clang-format -i ../lib/src/crypt/hash/*.c      ../lib/include/crypt/hash/*.h
 
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make

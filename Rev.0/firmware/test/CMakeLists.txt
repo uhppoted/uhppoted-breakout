@@ -18,6 +18,10 @@ add_executable(breakout
   src/main.c
   src/sys.c
   src/hwconfig.c
+
+  src/crypt/hash/sha256_test.c
+
+  ${LIB}/src/crypt/hash/sha256.c
 )
 
 target_include_directories(breakout 
