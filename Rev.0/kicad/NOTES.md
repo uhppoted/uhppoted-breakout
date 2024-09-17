@@ -15,6 +15,7 @@
 10. Connect NC    pins on J12 to J12
 11. Tie RX8900SA NC pins to GND
 12. Fix PiZero2W mounting holes
+    - https://www.tomshardware.com/news/waveshares-rp2040-pi-zero-morphs-raspberry-pi-pico-into-zero
 13. PiZero2W header (surface mount)
 14. Debug/state LEDs
 15. BOM: 1.6mm x dia. 6.5mm washer for standoffs

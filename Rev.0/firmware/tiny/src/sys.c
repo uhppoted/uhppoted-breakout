@@ -75,7 +75,7 @@ void sys_tick() {
     if (sys.LED) {
         switch (get_mode()) {
         case MODE_CLI:
-            put_rgb(6, 4, 0); // yellow'ish
+            put_rgb(8, 4, 0); // yellow'ish
             break;
 
         case MODE_SSMP:

@@ -1,10 +1,6 @@
 SDK ?=$(HOME)/Development/tools/pico/pico-sdk
 PORT=/dev/tty.usbmodem14201
 
-RX8900SA_VDET ?= disabled
-RX8900SA_SWOFF ?= switch
-RX8900SA_BKSMP ?= 2ms
-
 .PHONY: format
 .PHONY: telnet
 
@@ -13,9 +9,7 @@ clean:
 	mkdir -p build
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
-	       cmake -DI2C0_CLOCK="100kHz" -DI2C1_CLOCK="400kHz" \
-	             -DRX8900SA_VDET="$(RX8900SA_VDET)" -DRX8900SA_SWOFF="$(RX8900SA_SWOFF)" -DRX8900SA_BKSMP="$(RX8900SA_BKSMP)" \
-	             ..
+	       cmake ..
 
 format: 
 	clang-format -i src/*.c
