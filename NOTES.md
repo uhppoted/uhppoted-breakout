@@ -61,11 +61,14 @@
 ## CRCs
 - https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
 
+## ASN.1
+- https://learn.microsoft.com/en-gb/windows/win32/seccertenroll/about-integer?redirectedfrom=MSDN
+- https://www.ranecommercial.com/legacy/note161.html
+- https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
+
 ## SSMP
 - https://stackoverflow.com/questions/29354228/is-stdout-required-to-be-a-text-stream
 - https://forums.raspberrypi.com/viewtopic.php?t=302960
-- https://www.ranecommercial.com/legacy/note161.html
-- https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
 - https://www.baeldung.com/cs/bisync
 
 ## Crypto

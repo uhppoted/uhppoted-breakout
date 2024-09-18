@@ -50,14 +50,23 @@ slice BER_encode(const struct field f) {
 }
 
 slice pack_integer(const field *f) {
-    uint8_t buffer[8] = {0};
+    uint8_t buffer[9] = {0};
     int ix = 0;
     int64_t v = f->integer.value;
+    uint8_t u8 = 0x00;
 
     do {
-        buffer[ix++] = v & 0x00ff;
+        u8 = (uint8_t)(v & 0x00ff);
+        buffer[ix++] = u8;
         v >>= 8;
-    } while (v != 0 && ix < sizeof(buffer));
+    } while (v != 0 && v != -1 && ix < sizeof(buffer));
+
+    // ... pad if +ve and most-significant bit is set OR -ve and most-significant bit is not set
+    if ((f->integer.value > 0) && (u8 > 0x007f)) {
+        buffer[ix++] = 0x00;
+    } else if ((f->integer.value < 0) && (u8 < 0x80)) {
+        buffer[ix++] = 0xff;
+    }
 
     slice s = {
         .capacity = 64,

@@ -14,6 +14,7 @@ clean:
 format: 
 	clang-format -i src/*.c
 	clang-format -i src/crypt/hash/*.c             include/crypt/hash/*.h
+	clang-format -i src/encoding/ASN.1/*.c         include/encoding/ASN.1/*.h
 	clang-format -i ../core/src/*.c                ../core/include/*.h
 	clang-format -i ../lib/src/*.c                 ../lib/include/*.h
 	clang-format -i ../lib/src/types/*.c           ../lib/include/types/*.h

@@ -9,7 +9,9 @@
 #include <crypt/hash/sha256.h>
 
 bool test_SHA256() {
-    printf("-- SHA-256  FIPS 180-2 B.1\n");
+    bool ok = false;
+
+    printf("-- SHA-256\n");
 
     // ... calculate hash
     char *expected = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
@@ -21,7 +23,6 @@ bool test_SHA256() {
 
     // ... convert to hex
     char hash[65];
-    bool ok = false;
     int ix = 0;
 
     for (int i = 0; i < 32; i++) {
@@ -33,9 +34,9 @@ bool test_SHA256() {
         ok = true;
     }
 
-    printf("expected %s\n", expected);
-    printf("got      %s\n", hash);
-    printf("%s\n", ok ? "ok" : "** error **");
+    // printf("expected %s\n", expected);
+    // printf("got      %s\n", hash);
+    printf("%-5s  %s\n", ok ? "ok" : "error", "FIPS 180-2 B.1");
     printf("\n");
 
     return ok;

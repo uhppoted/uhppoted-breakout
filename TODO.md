@@ -38,8 +38,8 @@ request error (TX queue blocked)
          - [ ] set secret
          - [ ] replace with custom OTP code
 
-   - [ ] BER
-       - [ ] Fix negative int encoding
+   - [ ] ASN.1
+       - [x] Fix negative int encoding
        - [x] free_packet
        - [x] free field list/fields
        - [ ] check slice_free

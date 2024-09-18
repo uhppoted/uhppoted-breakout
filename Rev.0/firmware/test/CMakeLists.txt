@@ -20,8 +20,11 @@ add_executable(breakout
   src/hwconfig.c
 
   src/crypt/hash/sha256_test.c
+  src/encoding/ASN.1/BER_encode_test.c
 
   ${LIB}/src/crypt/hash/sha256.c
+  ${LIB}/src/encoding/ASN.1/encode.c
+  ${LIB}/src/types/slice.c
 )
 
 target_include_directories(breakout 

@@ -6,6 +6,7 @@
 #include <pico/stdlib.h>
 
 #include "../include/crypt/hash/hash.h"
+#include "../include/encoding/ASN.1/ASN1.h"
 
 #define _VERSION "v0.0"
 
@@ -28,17 +29,25 @@ int main() {
         return -1;
     }
 
-    // ... run tests
-    bool ok = true;
-
-    if (!test_SHA256()) {
-        ok = false;
-    }
-
     // ... done
     while (true) {
-        sleep_ms(1000);
+        bool ok = true;
         sys_blink();
-        test_SHA256();
+
+        if (!test_SHA256()) {
+            ok = false;
+        }
+
+        if (!test_ASN1_encode_integer()) {
+            ok = false;
+        }
+
+        if (ok) {
+            printf("\nOK\n\n");
+        } else {
+            printf("\n** FAILED **\n\n");
+        }
+
+        sleep_ms(2500);
     }
 }
