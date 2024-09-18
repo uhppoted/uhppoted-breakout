@@ -64,8 +64,11 @@
 ## SSMP
 - https://stackoverflow.com/questions/29354228/is-stdout-required-to-be-a-text-stream
 - https://forums.raspberrypi.com/viewtopic.php?t=302960
-
-## BER
 - https://www.ranecommercial.com/legacy/note161.html
 - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
+- https://www.baeldung.com/cs/bisync
 
+## Crypto
+- https://www.jstage.jst.go.jp/article/transinf/E99.D/8/E99.D_2015INP0013/_article
+- https://github.com/ubirch/ubirch-mbed-nacl-cm0
+- https://www.semanticscholar.org/paper/True-random-number-generation-on-an-Atmel-AVR-Hlav%C3%A1c-L%C3%B3rencz/3948b47a9fb7a6b3632a1b631035bec3972932bc

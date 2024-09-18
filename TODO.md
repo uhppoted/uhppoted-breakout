@@ -22,9 +22,6 @@
 
 
 ### SSMP
-   - https://www.baeldung.com/cs/bisync
-   - https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/basic-encoding-rules.html
-   - https://www.ranecommercial.com/legacy/note161.html
    - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
    - [ ] ENQ/ACK loop
 ```
@@ -33,13 +30,11 @@ request error (TX queue blocked)
 ```
 
    - [x] set output translation in USB mode only
+   - [x] GET
    - [ ] HOTP
          - [x] generate request ID
          - [ ] validate request ID
-               - https://www.oryx-embedded.com/doc/dir_a9aab978e0be629e504b25df915d67e8.html
-               - https://www.ti.com/lit/an/slaa547c/slaa547c.pdf?ts=1726528827036&ref_url=https%253A%252F%252Fduckduckgo.com%252F
-               - https://www.ti.com/tool/SHA-256
-               - https://opensource.apple.com/source/clamav/clamav-158/clamav.Bin/clamav-0.98/libclamav/sha256.c.auto.html
+               - https://github.com/ubirch/ubirch-mbed-nacl-cm0
          - [ ] set secret
          - [ ] replace with custom OTP code
 
@@ -51,20 +46,14 @@ request error (TX queue blocked)
        - [ ] check field_free
        - [ ] check vector_free
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638
-   - [x] GET
-       - [x] free SSMP packet
-       - [x] get from MIB
-       - [x] unpack packet in encoding/ssmp
-       - [x] return error if unknown OID
-
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
 
 
 ### MIB
     - [ ] controller ID
+          - [x] compile time constant
           - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
-          - compile time constant
 
 ### CLI
     - [ ] parse commands using strtok
