@@ -26,6 +26,7 @@ add_executable(breakout
   ${LIB}/src/crypt/hash/sha256.c
   ${LIB}/src/encoding/ASN.1/encode.c
   ${LIB}/src/encoding/ASN.1/decode.c
+  ${LIB}/src/encoding/ASN.1/fields.c
   ${LIB}/src/types/slice.c
 )
 

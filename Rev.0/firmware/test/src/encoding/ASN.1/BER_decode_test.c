@@ -4,6 +4,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <encoding/ASN.1/BER.h>
 
@@ -169,6 +170,9 @@ bool test_decode_integer(uint8_t *bytes, int length, int64_t expected, const cha
             printf("       - got:      ix:%d\n", ix);
         }
     }
+
+    field_free(f);
+    free(f); // FIXME - add 'dynamic' to field struct
 
     return ok;
 }
