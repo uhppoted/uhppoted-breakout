@@ -23,6 +23,8 @@
 #include <crypt/crypt.h>
 #include <encoding/bisync/bisync.h>
 
+extern uint32_t hotp_generate(const uint8_t *secret, int len, uint64_t counter);
+
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
 uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
 
@@ -410,62 +412,20 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    uint8_t hash[64];
-    uint8_t plaintext[] = {
-        0x8c,
-        0xcb,
-        0x08,
-        0xd2,
-        0xa1,
-        0xa2,
-        0x82,
-        0xaa,
-        0x8c,
-        0xc9,
-        0x99,
-        0x02,
-        0xec,
-        0xaf,
-        0x0f,
-        0x67,
-        0xa9,
-        0xf2,
-        0x1c,
-        0xff,
-        0xe2,
-        0x80,
-        0x05,
-        0xcb,
-        0x27,
-        0xfc,
-        0xf1,
-        0x29,
-        0xe9,
-        0x63,
-        0xf9,
-        0x9d,
-    };
-    int ix = 0;
+    const uint8_t key[] = {0x06, 0xed, 0x87, 0xd7, 0x95, 0xb4, 0x16, 0xbf, 0x54, 0xb9};
+    const uint64_t counter = 405419896;
+    const uint32_t HOTP = hotp_generate(key, sizeof(key), counter);
 
-    crypto_hash(hash, plaintext, sizeof(plaintext));
-
-    printf(">> DEBUG SHA-512\n");
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 32; j++) {
-            printf("%02x", hash[ix++]);
-        }
-        printf("\n");
-    }
-    printf("\n");
+    debugf("CLI", ">>> HOTP %u", HOTP);
 }
 
 void state() {
-    debugf("CLI", ">>> I2C   %s\n", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
-    debugf("CLI", ">>> queue %s\n", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
-    debugf("CLI", ">>> RTC   %s\n", get_error(ERR_RX8900SA) ? "error" : "ok");
-    debugf("CLI", ">>> U3    %s\n", get_error(ERR_U3) ? "error" : "ok");
-    debugf("CLI", ">>> U4    %s\n", get_error(ERR_U4) ? "error" : "ok");
-    debugf("CLI", ">>> other %s\n", get_error(ERR_UNKNOWN) ? "error" : "ok");
+    debugf("CLI", ">>> I2C   %s", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
+    debugf("CLI", ">>> queue %s", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
+    debugf("CLI", ">>> RTC   %s", get_error(ERR_RX8900SA) ? "error" : "ok");
+    debugf("CLI", ">>> U3    %s", get_error(ERR_U3) ? "error" : "ok");
+    debugf("CLI", ">>> U4    %s", get_error(ERR_U4) ? "error" : "ok");
+    debugf("CLI", ">>> other %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
 }
 
 void get_datetime() {

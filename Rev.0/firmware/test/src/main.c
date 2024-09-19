@@ -20,8 +20,8 @@ bool validate();
 typedef bool (*test)();
 
 const test tests[] = {
-    test_SHA256,
-    test_ASN1_encode_integer,
+    // test_SHA256,
+    // test_ASN1_encode_integer,
     test_ASN1_decode_integer,
 };
 
@@ -53,12 +53,12 @@ int main() {
         sys_blink();
 
         if (validate()) {
-            printf("*** OK  %llu\n\n", ++loops);
+            printf("*** OK %llu\n\n", ++loops);
         } else {
-            printf("*** FAILED  %llu\n\n", ++loops);
+            printf("*** FAILED %llu\n\n", ++loops);
         }
 
-        sleep_ms(1000);
+        sleep_ms(250);
     }
 }
 

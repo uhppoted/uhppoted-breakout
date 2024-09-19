@@ -22,5 +22,5 @@ typedef struct sha256 {
 } sha256;
 
 void sha256_init(sha256 *ctx);
-void sha256_update(sha256 *ctx, uint8_t *block, size_t length);
+void sha256_update(sha256 *ctx, const uint8_t *block, size_t length);
 void sha256_finalize(sha256 *ctx);

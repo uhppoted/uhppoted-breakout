@@ -42,7 +42,7 @@ void sha256_init(sha256 *ctx) {
     ctx->bufferOffset = 0;
 }
 
-void sha256_update(sha256 *ctx, uint8_t *data, size_t length) {
+void sha256_update(sha256 *ctx, const uint8_t *data, size_t length) {
     for (size_t i = 0; i < length; i++) {
         ctx->byteCount++;
 

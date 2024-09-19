@@ -181,5 +181,7 @@ bool test_encode_integer(int64_t value, uint8_t *expected, int length, const cha
         printf("       - got:      %s\n", q);
     }
 
+    slice_free(&encoded);
+
     return ok;
 }
