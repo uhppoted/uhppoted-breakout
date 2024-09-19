@@ -84,6 +84,14 @@ field *unpack_integer(const uint8_t *message, int N, int *ix) {
 
     if (length <= 8) {
         for (int i = 0; i < length; i++) {
+            uint8_t u8 = message[*ix + i];
+            value = ((u8 & 0x80) == 0x80) ? -1 : 0;
+            value <<= 8;
+            value |= message[*ix + i] & 0x00ff;
+            break;
+        }
+
+        for (int i = 1; i < length; i++) {
             value <<= 8;
             value |= message[*ix + i] & 0x00ff;
         }

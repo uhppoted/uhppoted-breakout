@@ -34,10 +34,11 @@ bool test_SHA256() {
         ok = true;
     }
 
-    // printf("expected %s\n", expected);
-    // printf("got      %s\n", hash);
     printf("%-5s  %s\n", ok ? "ok" : "error", "FIPS 180-2 B.1");
-    printf("\n");
+    if (!ok) {
+        printf("       - expected: %s\n", expected);
+        printf("       - got:      %s\n", hash);
+    }
 
     return ok;
 }

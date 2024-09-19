@@ -21,9 +21,11 @@ add_executable(breakout
 
   src/crypt/hash/sha256_test.c
   src/encoding/ASN.1/BER_encode_test.c
+  src/encoding/ASN.1/BER_decode_test.c
 
   ${LIB}/src/crypt/hash/sha256.c
   ${LIB}/src/encoding/ASN.1/encode.c
+  ${LIB}/src/encoding/ASN.1/decode.c
   ${LIB}/src/types/slice.c
 )
 

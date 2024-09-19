@@ -7,7 +7,6 @@ RX8900SA_BKSMP ?= 2ms
 CONTROLLER ?= 405419896
 
 .PHONY: format
-.PHONY: telnet
 
 clean: 
 	rm -rf build

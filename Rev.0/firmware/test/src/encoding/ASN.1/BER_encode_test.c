@@ -161,24 +161,25 @@ bool test_encode_integer(int64_t value, uint8_t *expected, int length, const cha
         }
     }
 
-    // ... print
-    // char p[65];
-    // char q[65];
-    // int ix;
-
-    // ix = 0;
-    // for (int i = 0; i < length && ix < sizeof(p); i++) {
-    //     ix += snprintf(&p[ix], sizeof(p) - ix, "%02x ", expected[i]);
-    // }
-
-    // ix = 0;
-    // for (int i = 0; i < encoded.length && ix < sizeof(q); i++) {
-    //     ix += snprintf(&q[ix], sizeof(q) - ix, "%02x ", encoded.bytes[i]);
-    // }
-
-    // printf("expected %s\n", p);
-    // printf("got      %s\n", q);
     printf("%-5s  %s\n", ok ? "ok" : "error", message);
+    if (!ok) {
+        char p[65];
+        char q[65];
+        int ix;
+
+        ix = 0;
+        for (int i = 0; i < length && ix < sizeof(p); i++) {
+            ix += snprintf(&p[ix], sizeof(p) - ix, "%02x ", expected[i]);
+        }
+
+        ix = 0;
+        for (int i = 0; i < encoded.length && ix < sizeof(q); i++) {
+            ix += snprintf(&q[ix], sizeof(q) - ix, "%02x ", encoded.bytes[i]);
+        }
+
+        printf("       - expected: %s\n", p);
+        printf("       - got:      %s\n", q);
+    }
 
     return ok;
 }

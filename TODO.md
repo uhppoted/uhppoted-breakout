@@ -1,6 +1,13 @@
 # TODO
 
 - [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
+- [ ] tests: out of memory
+```
+*** PANIC ***
+
+Out of memory
+```
+
 
 ### emulator
     - [ ] log CRC errors
@@ -40,7 +47,7 @@ request error (TX queue blocked)
 
    - [ ] ASN.1
        - [x] Fix negative int encoding
-       - [ ] Test integer decoding
+       - [x] Fix integer decoding
        - [x] free_packet
        - [x] free field list/fields
        - [ ] check slice_free

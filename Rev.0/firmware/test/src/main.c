@@ -15,6 +15,15 @@ const uint32_t WATCHDOG_TIMEOUT = 5000; // ms
 
 extern bool sys_init();
 extern bool sys_blink();
+bool validate();
+
+typedef bool (*test)();
+
+const test tests[] = {
+    test_SHA256,
+    test_ASN1_encode_integer,
+    test_ASN1_decode_integer,
+};
 
 int main() {
     bi_decl(bi_program_description("uhppoted-breakout::test"));
@@ -29,25 +38,41 @@ int main() {
         return -1;
     }
 
-    // ... done
+    // ... validate
+    if (validate()) {
+        printf("*** OK\n\n");
+    } else {
+        printf("*** FAILED\n\n");
+    }
+
+    sleep_ms(5000);
+
+    // ... loop 'n validate (out of memory)
+    uint64_t loops = 0;
     while (true) {
-        bool ok = true;
         sys_blink();
 
-        if (!test_SHA256()) {
-            ok = false;
-        }
-
-        if (!test_ASN1_encode_integer()) {
-            ok = false;
-        }
-
-        if (ok) {
-            printf("\nOK\n\n");
+        if (validate()) {
+            printf("*** OK  %llu\n\n", ++loops);
         } else {
-            printf("\n** FAILED **\n\n");
+            printf("*** FAILED  %llu\n\n", ++loops);
         }
 
-        sleep_ms(2500);
+        sleep_ms(1000);
     }
+}
+
+bool validate() {
+    bool ok = true;
+    int N = sizeof(tests) / sizeof(test);
+
+    for (int i = 0; i < N; i++) {
+        if (!tests[i]()) {
+            ok = false;
+        }
+
+        printf("\n");
+    }
+
+    return ok;
 }
