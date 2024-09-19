@@ -40,6 +40,7 @@ request error (TX queue blocked)
 
    - [ ] ASN.1
        - [x] Fix negative int encoding
+       - [ ] Test integer decoding
        - [x] free_packet
        - [x] free field list/fields
        - [ ] check slice_free
