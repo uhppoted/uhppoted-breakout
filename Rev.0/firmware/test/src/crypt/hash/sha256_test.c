@@ -22,7 +22,7 @@ bool test_SHA256() {
     sha256_finalize(&ctx);
 
     // ... convert to hex
-    char hash[65];
+    char hash[65] = "???";
     int ix = 0;
 
     for (int i = 0; i < 32; i++) {

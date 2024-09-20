@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #define SHA1_HASH_LENGTH 20
 #define SHA1_BLOCKSIZE 64

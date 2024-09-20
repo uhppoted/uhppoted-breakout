@@ -22,7 +22,7 @@ bool test_SHA1() {
     sha1_finalize(&ctx);
 
     // ... convert to hex
-    char hash[65];
+    char hash[41] = "???";
     int ix = 0;
 
     for (int i = 0; i < 20; i++) {
