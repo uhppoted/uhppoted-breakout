@@ -2,18 +2,18 @@
 
 #include <stdint.h>
 
-#define HASH_LENGTH 32
-#define BLOCK_LENGTH 64
+#define SHA256_HASH_LENGTH 32
+#define SHA256_BLOCKSIZE 64
 
 typedef struct sha256 {
     union {
-        uint8_t b[HASH_LENGTH];
-        uint32_t w[HASH_LENGTH / 4];
+        uint8_t b[SHA256_HASH_LENGTH];
+        uint32_t w[SHA256_HASH_LENGTH / 4];
     } hash;
 
     union {
-        uint8_t b[BLOCK_LENGTH];
-        uint32_t w[BLOCK_LENGTH / 4];
+        uint8_t b[SHA256_BLOCKSIZE];
+        uint32_t w[SHA256_BLOCKSIZE / 4];
     } buffer;
 
     uint32_t byteCount;

@@ -31,12 +31,12 @@ void sha256_hashblock(sha256 *ctx);
 void sha256_pad(sha256 *ctx);
 void sha256_padWithByte(sha256 *ctx, uint8_t data);
 
-inline uint32_t sha256_ror32(uint32_t number, uint8_t bits) {
+inline uint32_t ror32(uint32_t number, uint8_t bits) {
     return ((number << (32 - bits)) | (number >> bits));
 }
 
 void sha256_init(sha256 *ctx) {
-    memmove(ctx->hash.b, SHA256_INITIAL_STATE, sizeof(ctx->hash.b));
+    memmove(ctx->hash.b, SHA256_INITIAL_STATE, SHA256_HASH_LENGTH);
 
     ctx->byteCount = 0;
     ctx->bufferOffset = 0;
@@ -48,7 +48,7 @@ void sha256_update(sha256 *ctx, const uint8_t *data, size_t length) {
 
         ctx->buffer.b[ctx->bufferOffset ^ 3] = data[i];
         ctx->bufferOffset++;
-        if (ctx->bufferOffset == BUFFER_SIZE) {
+        if (ctx->bufferOffset == SHA256_BLOCKSIZE) {
             sha256_hashblock(ctx);
             ctx->bufferOffset = 0;
         }
@@ -89,20 +89,20 @@ void sha256_hashblock(sha256 *ctx) {
         if (i >= 16) {
             t1 = ctx->buffer.w[i & 15] + ctx->buffer.w[(i - 7) & 15];
             t2 = ctx->buffer.w[(i - 2) & 15];
-            t1 += sha256_ror32(t2, 17) ^ sha256_ror32(t2, 19) ^ (t2 >> 10);
+            t1 += ror32(t2, 17) ^ ror32(t2, 19) ^ (t2 >> 10);
             t2 = ctx->buffer.w[(i - 15) & 15];
-            t1 += sha256_ror32(t2, 7) ^ sha256_ror32(t2, 18) ^ (t2 >> 3);
+            t1 += ror32(t2, 7) ^ ror32(t2, 18) ^ (t2 >> 3);
 
             ctx->buffer.w[i & 15] = t1;
         }
 
         t1 = h;
-        t1 += sha256_ror32(e, 6) ^ sha256_ror32(e, 11) ^ sha256_ror32(e, 25); // ∑1(e)
-        t1 += g ^ (e & (g ^ f));                                              // Ch(e,f,g)
-        t1 += SHA256K[i];                                                     // Ki
-        t1 += ctx->buffer.w[i & 15];                                          // Wi
-        t2 = sha256_ror32(a, 2) ^ sha256_ror32(a, 13) ^ sha256_ror32(a, 22);  // ∑0(a)
-        t2 += ((b & c) | (a & (b | c)));                                      // Maj(a,b,c)
+        t1 += ror32(e, 6) ^ ror32(e, 11) ^ ror32(e, 25); // ∑1(e)
+        t1 += g ^ (e & (g ^ f));                         // Ch(e,f,g)
+        t1 += SHA256K[i];                                // Ki
+        t1 += ctx->buffer.w[i & 15];                     // Wi
+        t2 = ror32(a, 2) ^ ror32(a, 13) ^ ror32(a, 22);  // ∑0(a)
+        t2 += ((b & c) | (a & (b | c)));                 // Maj(a,b,c)
 
         h = g;
         g = f;
@@ -134,7 +134,7 @@ void sha256_pad(sha256 *ctx) {
 
     // ... append length in the last 8 bytes
     sha256_padWithByte(ctx, 0);                    // We're only using 32 bit lengths
-    sha256_padWithByte(ctx, 0);                    // But SHA-1 supports 64 bit lengths
+    sha256_padWithByte(ctx, 0);                    // But SHA-256 supports 64 bit lengths
     sha256_padWithByte(ctx, 0);                    // So zero pad the top bits
     sha256_padWithByte(ctx, ctx->byteCount >> 29); // Shifting to multiply by 8
     sha256_padWithByte(ctx, ctx->byteCount >> 21); // as SHA-1 supports bitstreams as well as

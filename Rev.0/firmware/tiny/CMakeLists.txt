@@ -59,7 +59,7 @@ add_executable(breakout
   ${LIB}/src/encoding/ssmp/get.c
   ${LIB}/src/encoding/ssmp/get_response.c
   ${LIB}/src/auth/hotp/hotp.c
-  ${LIB}/src/crypt/hash/sha256.c
+  ${LIB}/src/crypt/hash/sha1.c
 )
 
 target_include_directories(breakout 

@@ -45,12 +45,6 @@ uint32_t hotp_generate(const uint8_t *secret, int length, uint64_t counter) {
 }
 
 void hmac(const uint8_t *key, size_t keylen, const uint8_t *in, size_t inlen, uint8_t hash[32]) {
-    // sha256 ctx;
-
-    // sha256_init(&ctx);
-    // sha256_update(&ctx, "abc", 3);
-    // sha256_finalize(&ctx);
-
     struct sha256 inner;
     struct sha256 outer;
     //   char optkeybuf[32];

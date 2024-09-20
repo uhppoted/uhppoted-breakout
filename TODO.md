@@ -1,12 +1,7 @@
 # TODO
 
 - [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
-- [ ] tests: out of memory
-```
-*** PANIC ***
-
-Out of memory
-```
+- [x] tests: out of memory
 
 
 ### emulator
@@ -26,6 +21,12 @@ Out of memory
     - [ ] walk MIB to initialise/refresh cache
     - [ ] // TODO: exponential backoff
     - [ ] tinygo
+
+### MIB
+    - [x] controller ID
+    - [ ] controller address
+    - [ ] RP2040 ID
+          - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
 
 
 ### SSMP
@@ -57,11 +58,6 @@ request error (TX queue blocked)
    - [ ] Enable FIFO
    - [ ] pico: txrx/uart conflict
 
-
-### MIB
-    - [ ] controller ID
-          - [x] compile time constant
-          - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
 
 ### CLI
     - [ ] parse commands using strtok

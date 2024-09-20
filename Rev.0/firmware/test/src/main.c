@@ -20,6 +20,7 @@ bool validate();
 typedef bool (*test)();
 
 const test tests[] = {
+    test_SHA1,
     test_SHA256,
     test_ASN1_encode_integer,
     test_ASN1_decode_integer,
