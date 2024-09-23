@@ -9,7 +9,6 @@
 #include <MIB.h>
 #include <SSMP.h>
 #include <auth.h>
-#include <auth/hotp/hotp.h>
 #include <breakout.h>
 #include <encoding/ASN.1/BER.h>
 #include <encoding/bisync/bisync.h>
@@ -166,7 +165,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         uint32_t code = request->get.request_id;
 
         if (authorised(community, oid)) {
-            if (hotp_validate(community, code)) {
+            if (validate(community, code)) {
                 SSMP_touched();
                 SSMP_get(request->community, request->get.request_id, request->get.OID);
             }

@@ -42,7 +42,6 @@ request error (TX queue blocked)
    - [ ] HOTP
          - [x] generate request ID
          - [ ] validate request ID
-               - https://github.com/ubirch/ubirch-mbed-nacl-cm0
          - [ ] set secret
          - [ ] replace with custom OTP code
 

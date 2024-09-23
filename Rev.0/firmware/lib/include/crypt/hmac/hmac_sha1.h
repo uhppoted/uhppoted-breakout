@@ -12,4 +12,4 @@ typedef struct hmac_sha1 {
 
 void hmac_sha1_init(hmac_sha1 *ctx, const uint8_t key[], size_t length);
 void hmac_sha1_update(hmac_sha1 *ctx, const uint8_t *block, size_t length);
-void hmac_sha1_finalize(hmac_sha1 *ctx);
+void hmac_sha1_finalize(hmac_sha1 *ctx, uint8_t hmac[20]);

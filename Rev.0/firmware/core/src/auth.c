@@ -20,3 +20,11 @@ bool authorised(const char *community, const char *oid) {
 
     return false;
 }
+
+bool validate(const char *community, uint32_t code) {
+    if (strcmp(community, "public") == 0) {
+        return true;
+    }
+
+    return false;
+}

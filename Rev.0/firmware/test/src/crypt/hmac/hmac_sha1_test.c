@@ -22,28 +22,29 @@ bool test_HMAC_SHA1() {
 
     char *expected = "4f4ca3d5d68ba7cc0a1208c9c61e9c5da0403c0a";
     hmac_sha1 ctx;
+    uint8_t hmac[20];
 
     hmac_sha1_init(&ctx, key, sizeof(key));
     hmac_sha1_update(&ctx, "Sample #1", 9);
-    hmac_sha1_finalize(&ctx);
+    hmac_sha1_finalize(&ctx, hmac);
 
     // ... convert to hex
-    char hmac[41] = "???";
     int ix = 0;
+    char hex[41];
 
     for (int i = 0; i < 20; i++) {
-        ix += snprintf(&hmac[ix], sizeof(hmac) - ix, "%02x", ctx.sha1.hash.b[i]);
+        ix += snprintf(&hex[ix], sizeof(hex) - ix, "%02x", hmac[i]);
     }
 
     // ... print result
-    if (strcmp(hmac, expected) == 0) {
+    if (strcmp(hex, expected) == 0) {
         ok = true;
     }
 
     printf("%-5s  %s\n", ok ? "ok" : "error", "FIPS 198a A.1");
     if (!ok) {
         printf("       - expected: %s\n", expected);
-        printf("       - got:      %s\n", hmac);
+        printf("       - got:      %s\n", hex);
     }
 
     return ok;

@@ -21,9 +21,8 @@
 
 #include <MIB.h>
 #include <crypt/crypt.h>
+#include <crypt/otp/hotp.h>
 #include <encoding/bisync/bisync.h>
-
-extern uint32_t hotp_generate(const uint8_t *secret, int len, uint64_t counter);
 
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
 uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
@@ -413,10 +412,9 @@ void exec(char *cmd) {
 
 void debug() {
     const uint8_t key[] = {0x06, 0xed, 0x87, 0xd7, 0x95, 0xb4, 0x16, 0xbf, 0x54, 0xb9};
-    const uint64_t counter = 405419896;
-    const uint32_t HOTP = hotp_generate(key, sizeof(key), counter);
+    const uint64_t counter = 1;
 
-    debugf("CLI", ">>> HOTP %u", HOTP);
+    debugf("CLI", ">>> HOTP %06u", hotp_validate(key, sizeof(key), counter, 848788) ? "ok" : "invalid");
 }
 
 void state() {

@@ -22,9 +22,9 @@ format:
 	clang-format -i ../lib/src/encoding/ASN.1/*.c  ../lib/include/encoding/ASN.1/*.h
 	clang-format -i ../lib/src/encoding/bisync/*.c ../lib/include/encoding/bisync/*.h
 	clang-format -i ../lib/src/encoding/ssmp/*.c   ../lib/include/encoding/ssmp/*.h
-	clang-format -i ../lib/src/auth/hotp/*.c       ../lib/include/auth/hotp/*.h
 	clang-format -i ../lib/src/crypt/hash/*.c      ../lib/include/crypt/hash/*.h
 	clang-format -i ../lib/src/crypt/hmac/*.c      ../lib/include/crypt/hmac/*.h
+	clang-format -i ../lib/src/crypt/otp/*.c       ../lib/include/crypt/otp/*.h
 
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make

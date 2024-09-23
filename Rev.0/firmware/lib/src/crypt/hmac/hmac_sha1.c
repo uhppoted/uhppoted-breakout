@@ -34,7 +34,7 @@ void hmac_sha1_update(hmac_sha1 *ctx, const uint8_t *block, size_t length) {
     sha1_update(&ctx->sha1, block, length);
 }
 
-void hmac_sha1_finalize(hmac_sha1 *ctx) {
+void hmac_sha1_finalize(hmac_sha1 *ctx, uint8_t hmac[20]) {
     // ... complete inner hash
 
     uint8_t inner[SHA1_HASH_LENGTH];
@@ -54,4 +54,7 @@ void hmac_sha1_finalize(hmac_sha1 *ctx) {
     sha1_update(&ctx->sha1, fv, SHA1_BLOCKSIZE);
     sha1_update(&ctx->sha1, inner, SHA1_HASH_LENGTH);
     sha1_finalize(&ctx->sha1);
+
+    // ... copy to HMAC
+    memmove(hmac, ctx->sha1.hash.b, SHA1_HASH_LENGTH);
 }
