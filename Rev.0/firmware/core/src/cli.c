@@ -20,9 +20,10 @@
 #include <sys.h>
 
 #include <MIB.h>
-#include <crypt/crypt.h>
-#include <crypt/otp/hotp.h>
-#include <encoding/bisync/bisync.h>
+#include <auth.h>
+// #include <crypt/crypt.h>
+// #include <crypt/otp/hotp.h>
+// #include <encoding/bisync/bisync.h>
 
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
 uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
@@ -411,10 +412,28 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    const uint8_t key[] = {0x06, 0xed, 0x87, 0xd7, 0x95, 0xb4, 0x16, 0xbf, 0x54, 0xb9};
-    const uint64_t counter = 1;
+    // const uint8_t key[] = {0x06, 0xed, 0x87, 0xd7, 0x95, 0xb4, 0x16, 0xbf, 0x54, 0xb9};
+    // const uint64_t counter = 1;
+    //
+    // debugf("CLI", ">>> HOTP %06u", hotp_validate(key, sizeof(key), counter, 848788) ? "ok" : "invalid");
 
-    debugf("CLI", ">>> HOTP %06u", hotp_validate(key, sizeof(key), counter, 848788) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 0, auth_validate("private", 363589) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 1, auth_validate("private", 848788) ? "ok" : "invalid");
+
+    debugf("CLI", ">>> validate %u  %s", 0, auth_validate("private", 363589) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 1, auth_validate("private", 848788) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 2, auth_validate("private", 931192) ? "ok" : "invalid");
+
+    debugf("CLI", ">>> validate %u  %s", 0, auth_validate("private", 363589) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 1, auth_validate("private", 848788) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 2, auth_validate("private", 931192) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 3, auth_validate("private", 38120) ? "ok" : "invalid");
+
+    // debugf("CLI", ">>> validate %u  %s", 0, auth_validate("private", 363589) ? "ok" : "invalid");
+    // debugf("CLI", ">>> validate %u  %s", 1, auth_validate("private", 848788) ? "ok" : "invalid");
+    // debugf("CLI", ">>> validate %u  %s", 2, auth_validate("private", 931192) ? "ok" : "invalid");
+    // debugf("CLI", ">>> validate %u  %s", 3, auth_validate("private", 038120) ? "ok" : "invalid");
+    // debugf("CLI", ">>> validate %u  %s", 8, auth_validate("private", 38120) ? "ok" : "invalid");
 }
 
 void state() {

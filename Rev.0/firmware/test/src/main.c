@@ -7,6 +7,7 @@
 
 #include "../include/crypt/hash/hash.h"
 #include "../include/crypt/hmac/hmac.h"
+#include "../include/crypt/otp/hotp.h"
 #include "../include/encoding/ASN.1/ASN1.h"
 
 #define _VERSION "v0.0"
@@ -24,6 +25,7 @@ const test tests[] = {
     test_SHA1,
     test_SHA256,
     test_HMAC_SHA1,
+    test_HOTP,
     test_ASN1_encode_integer,
     test_ASN1_decode_integer,
 };

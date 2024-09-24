@@ -164,8 +164,8 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         const char *oid = request->get.OID;
         uint32_t code = request->get.request_id;
 
-        if (authorised(community, oid)) {
-            if (validate(community, code)) {
+        if (auth_authorised(community, oid)) {
+            if (auth_validate(community, code)) {
                 SSMP_touched();
                 SSMP_get(request->community, request->get.request_id, request->get.OID);
             }

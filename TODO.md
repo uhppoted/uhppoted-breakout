@@ -7,6 +7,7 @@
          - [x] generate request ID
          - [x] replace with custom OTP code
          - [ ] validate request ID
+               - tests
          - [ ] set secret
     - [ ] ENQ/ACK loop
     ```
