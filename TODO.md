@@ -1,8 +1,33 @@
 # TODO
 
-- [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
-- [x] tests: out of memory
-
+### SSMP
+    - [x] set USB output translation
+    - [x] GET
+    - [ ] HOTP
+         - [x] generate request ID
+         - [x] replace with custom OTP code
+         - [ ] validate request ID
+         - [ ] set secret
+    - [ ] ENQ/ACK loop
+    ```
+    request error (RX queue blocked)
+    request error (TX queue blocked)
+     ```
+    - [ ] ASN.1
+       - [x] Fix negative int encoding
+       - [x] Fix integer decoding
+       - [ ] free_packet: dynamic
+       - [ ] check slice_free
+       - [ ] check field_free
+       - [ ] check vector_free
+       - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
+    
+    - [ ] UART
+        - [ ] set UART output translation (`uart_set_translate_crlf`)
+        - [ ] Enable FIFO
+        - [ ] pico: txrx/uart conflict
+ 
+       - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
 
 ### emulator
     - [ ] log CRC errors
@@ -29,64 +54,35 @@
           - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
 
 
-### SSMP
-   - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
-   - [ ] ENQ/ACK loop
-```
-request error (RX queue blocked)
-request error (TX queue blocked)
-```
-
-   - [x] set output translation in USB mode only
-   - [x] GET
-   - [ ] HOTP
-         - [x] generate request ID
-         - [ ] validate request ID
-         - [ ] set secret
-         - [ ] replace with custom OTP code
-
-   - [ ] ASN.1
-       - [x] Fix negative int encoding
-       - [x] Fix integer decoding
-       - [x] free_packet
-       - [x] free field list/fields
-       - [ ] check slice_free
-       - [ ] check field_free
-       - [ ] check vector_free
-       - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638
-   - [ ] Enable FIFO
-   - [ ] pico: txrx/uart conflict
-
-
 ### CLI
-    - [ ] parse commands using strtok
+     - [ ] parse commands using strtok
 
 ## PiZeroW
-   - [ ] Reduce power consumption
-   - [ ] NB: 24/7 operation - Cam said to ask him
-   - (?) Use Nerves
+    - [ ] Reduce power consumption
+    - [ ] NB: 24/7 operation - Cam said to ask him
+    - (?) Use Nerves
 
 ### OTA
-   - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
-   - https://www.youtube.com/watch?v=4-dle5L9REs
-   - https://monocypher.org
-   - https://groupgets.com/products/pureconnect
+    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
+    - https://www.youtube.com/watch?v=4-dle5L9REs
+    - https://monocypher.org
+    - https://groupgets.com/products/pureconnect
 
 ## R&D
+- [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 - [ ] Pinout diagram
-      - (?) [WireViz] https://github.com/formatc1702/WireViz
-      - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator
-      - (?) https://pinouts.vercel.app/board/nodemcu-v2
-      - (?) https://electronics.stackexchange.com/questions/73780/program-to-draw-pinouts-and-easily-visualize-pins-multiplexed-functions
-      - (?) https://www.youtube.com/watch?v=ndVs1UvK6AE
-      - (?) TeX
-      - (?) https://www.sparkfun.com/news/1947
-      - (?) https://www.flickr.com/photos/28521811@N04/
-      - (?) https://github.com/stevenj/GenPinoutSVG
-      - (?) https://yaqwsx.github.io/Pinion/
+     - (?) [WireViz] https://github.com/formatc1702/WireViz
+     - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator
+     - (?) https://pinouts.vercel.app/board/nodemcu-v2
+     - (?) https://electronics.stackexchange.com/questions/73780/program-to-draw-pinouts-and-easily-visualize-pins-multiplexed-functions
+     - (?) https://www.youtube.com/watch?v=ndVs1UvK6AE
+     - (?) TeX
+     - (?) https://www.sparkfun.com/news/1947
+     - (?) https://www.flickr.com/photos/28521811@N04/
+     - (?) https://github.com/stevenj/GenPinoutSVG
+     - (?) https://yaqwsx.github.io/Pinion/
 
 ## Notes
-
 1. https://github.com/yaqwsx/PcbDraw
 2. https://yaqwsx.github.io/Pinion/
 3. https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol
@@ -97,7 +93,6 @@ request error (TX queue blocked)
       - https://electronics.stackexchange.com/questions/1849/is-there-a-correct-resistance-value-for-i2c-pull-up-resistors
       - https://www.ti.com/lit/an/slva689/slva689.pdf
       - https://www.edn.com/design-calculations-for-robust-i2c-communications/
-
 8. https://www.cnx-software.com/2021/12/09/raspberry-pi-zero-2-w-power-consumption
 9. https://raspi.tv/2017/how-much-power-does-pi-zero-w-use
 10. DC-DC converter modules:

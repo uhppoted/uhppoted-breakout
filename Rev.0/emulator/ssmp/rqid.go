@@ -1,18 +1,18 @@
-package auth
+package ssmp
 
 import (
 	"strconv"
 	"sync/atomic"
 
-	"github.com/pquerna/otp/hotp"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/crypt/otp"
 )
 
 var id = atomic.Uint64{}
 
-func NextID() (uint32, error) {
+func nextID() (uint32, error) {
 	next := id.Add(1)
 
-	if code, err := hotp.GenerateCode("A3WYPV4VWQLL6VFZ", next); err != nil {
+	if code, err := otp.GenerateHOTP("A3WYPV4VWQLL6VFZ", next); err != nil {
 		return 0, err
 	} else if v, err := strconv.ParseUint(code, 10, 32); err != nil {
 		return 0, err

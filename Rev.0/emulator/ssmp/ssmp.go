@@ -13,7 +13,6 @@ import (
 	ssmp "github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/SSMP"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/bisync"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/ssmp/auth"
 )
 
 type SSMP struct {
@@ -29,7 +28,7 @@ var write = make(chan request)
 var rqid = atomic.Uint32{}
 
 func Get(oid types.OID) (any, error) {
-	if rqId, err := auth.NextID(); err != nil {
+	if rqId, err := nextID(); err != nil {
 		return nil, err
 	} else {
 		packet := ssmp.GetPacket{
