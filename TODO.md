@@ -3,12 +3,12 @@
 ### SSMP
     - [x] set USB output translation
     - [x] GET
-    - [ ] HOTP
+    - [x] HOTP
          - [x] generate request ID
          - [x] replace with custom OTP code
-         - [ ] validate request ID
-               - tests
-         - [ ] set secret
+         - [x] validate request ID
+         - [x] set secret
+         - [x] tests
     - [ ] ENQ/ACK loop
     ```
     request error (RX queue blocked)

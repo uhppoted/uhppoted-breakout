@@ -5,6 +5,7 @@
 #include <pico/multicore.h>
 #include <pico/stdlib.h>
 
+#include "../include/auth/auth.h"
 #include "../include/crypt/hash/hash.h"
 #include "../include/crypt/hmac/hmac.h"
 #include "../include/crypt/otp/hotp.h"
@@ -22,12 +23,18 @@ bool validate();
 typedef bool (*test)();
 
 const test tests[] = {
+    // ... BER
+    test_ASN1_encode_integer,
+    test_ASN1_decode_integer,
+
+    // ... crypt
     test_SHA1,
     test_SHA256,
     test_HMAC_SHA1,
     test_HOTP,
-    test_ASN1_encode_integer,
-    test_ASN1_decode_integer,
+
+    // ... auth
+    test_auth_validate,
 };
 
 int main() {

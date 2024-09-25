@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <auth.h>
@@ -7,7 +7,7 @@
 typedef struct community {
     uint64_t counter;
     size_t keysize;
-    uint8_t key[];
+    uint8_t *key;
 } community;
 
 const char *PUBLIC[] = {
@@ -17,13 +17,13 @@ const char *PUBLIC[] = {
 community public = {
     .counter = 0,
     .keysize = 0,
-    .key = {},
+    .key = NULL,
 };
 
 community private = {
     .counter = 0,
-    .keysize = 10,
-    .key = {0x06, 0xed, 0x87, 0xd7, 0x95, 0xb4, 0x16, 0xbf, 0x54, 0xb9},
+    .keysize = 0,
+    .key = NULL,
 };
 
 bool auth_authorised(const char *community, const char *oid) {
@@ -49,7 +49,7 @@ bool auth_validate(const char *community, uint32_t code) {
         return true;
     }
 
-    if (strcmp(community, "private") == 0) {
+    if (strcmp(community, "private") == 0 && private.key != NULL && private.keysize > 0) {
         uint64_t counter = private.counter;
         for (int i = 0; i < 5; i++) {
             counter++;
@@ -64,4 +64,24 @@ bool auth_validate(const char *community, uint32_t code) {
     }
 
     return false;
+}
+
+void auth_setkey(const char *community, const uint8_t *key, size_t length) {
+    if (strcmp(community, "private") == 0) {
+        uint8_t *oldkey = private.key;
+        uint8_t *newkey = NULL;
+        size_t N = length > 0 && key != NULL ? length : 0;
+
+        if (key != NULL && N > 0) {
+            newkey = (uint8_t *)calloc(sizeof(uint8_t), N);
+
+            memmove(newkey, key, length);
+        }
+
+        private.counter = 0;
+        private.key = newkey;
+        private.keysize = N;
+
+        free(oldkey);
+    }
 }

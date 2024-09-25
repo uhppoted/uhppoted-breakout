@@ -412,10 +412,9 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    // const uint8_t key[] = {0x06, 0xed, 0x87, 0xd7, 0x95, 0xb4, 0x16, 0xbf, 0x54, 0xb9};
-    // const uint64_t counter = 1;
-    //
-    // debugf("CLI", ">>> HOTP %06u", hotp_validate(key, sizeof(key), counter, 848788) ? "ok" : "invalid");
+    const uint8_t key[] = {0x06, 0xed, 0x87, 0xd7, 0x95, 0xb4, 0x16, 0xbf, 0x54, 0xb9};
+
+    auth_setkey("private", key, sizeof(key));
 
     debugf("CLI", ">>> validate %u  %s", 0, auth_validate("private", 363589) ? "ok" : "invalid");
     debugf("CLI", ">>> validate %u  %s", 1, auth_validate("private", 848788) ? "ok" : "invalid");
@@ -429,11 +428,11 @@ void debug() {
     debugf("CLI", ">>> validate %u  %s", 2, auth_validate("private", 931192) ? "ok" : "invalid");
     debugf("CLI", ">>> validate %u  %s", 3, auth_validate("private", 38120) ? "ok" : "invalid");
 
-    // debugf("CLI", ">>> validate %u  %s", 0, auth_validate("private", 363589) ? "ok" : "invalid");
-    // debugf("CLI", ">>> validate %u  %s", 1, auth_validate("private", 848788) ? "ok" : "invalid");
-    // debugf("CLI", ">>> validate %u  %s", 2, auth_validate("private", 931192) ? "ok" : "invalid");
-    // debugf("CLI", ">>> validate %u  %s", 3, auth_validate("private", 038120) ? "ok" : "invalid");
-    // debugf("CLI", ">>> validate %u  %s", 8, auth_validate("private", 38120) ? "ok" : "invalid");
+    auth_setkey("private", key, sizeof(key));
+    debugf("CLI", ">>> validate %u  %s", 0, auth_validate("private", 363589) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 6, auth_validate("private", 280652) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 5, auth_validate("private", 797611) ? "ok" : "invalid");
+    debugf("CLI", ">>> validate %u  %s", 6, auth_validate("private", 280652) ? "ok" : "invalid");
 }
 
 void state() {

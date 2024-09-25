@@ -19,12 +19,15 @@ add_executable(breakout
   src/sys.c
   src/hwconfig.c
 
+  src/encoding/ASN.1/BER_encode_test.c
+  src/encoding/ASN.1/BER_decode_test.c
   src/crypt/hash/sha1_test.c
   src/crypt/hash/sha256_test.c
   src/crypt/hmac/hmac_sha1_test.c
   src/crypt/otp/hotp_test.c
-  src/encoding/ASN.1/BER_encode_test.c
-  src/encoding/ASN.1/BER_decode_test.c
+  src/auth/auth_test.c
+
+  ${CORE}/src/auth.c
 
   ${LIB}/src/crypt/hash/sha1.c
   ${LIB}/src/crypt/hash/sha256.c
