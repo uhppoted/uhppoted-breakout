@@ -17,7 +17,7 @@
     - [ ] ASN.1
        - [x] Fix negative int encoding
        - [x] Fix integer decoding
-       - [ ] free_packet: dynamic
+       - [x] free_packet: dynamic
        - [ ] check slice_free
        - [ ] check field_free
        - [ ] check vector_free

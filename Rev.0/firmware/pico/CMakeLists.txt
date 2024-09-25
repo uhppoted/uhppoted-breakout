@@ -50,6 +50,7 @@ add_executable(breakout
   ${LIB}/src/PCAL6416A.c
 
   ${LIB}/src/types/slice.c
+  ${LIB}/src/types/packet.c
   ${LIB}/src/encoding/bisync/bisync.c
   ${LIB}/src/encoding/bisync/crc.c
   ${LIB}/src/encoding/ASN.1/encode.c
