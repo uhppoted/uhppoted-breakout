@@ -4,11 +4,6 @@
     - [x] set USB output translation
     - [x] GET
     - [x] HOTP
-         - [x] generate request ID
-         - [x] replace with custom OTP code
-         - [x] validate request ID
-         - [x] set secret
-         - [x] tests
     - [ ] ENQ/ACK loop
     ```
     request error (RX queue blocked)
@@ -27,10 +22,10 @@
         - [ ] set UART output translation (`uart_set_translate_crlf`)
         - [ ] Enable FIFO
         - [ ] pico: txrx/uart conflict
- 
-       - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
+        - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
 
 ### emulator
+    - [ ] ASN.1
     - [ ] log CRC errors
     - [ ] get-controller
           - [x] **Fix hardcoded OID**
@@ -47,6 +42,7 @@
     - [ ] walk MIB to initialise/refresh cache
     - [ ] // TODO: exponential backoff
     - [ ] tinygo
+    - [ ] python
 
 ### MIB
     - [x] controller ID

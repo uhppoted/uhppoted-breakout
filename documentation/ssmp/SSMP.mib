@@ -17,9 +17,20 @@ uhppotedSSMP MODULE-IDENTITY
         DESCRIPTION "First draft"
     ::= { enterprises 65536 }
 
-system OBJECT IDENTIFIER ::= { uhppotedSSMP 1 }
-controller OBJECT IDENTIFIER ::= { system 1 }
+internal   OBJECT IDENTIFIER ::= { uhppotedSSMP 0 }
+system     OBJECT IDENTIFIER ::= { uhppotedSSMP 1 }
+controller OBJECT IDENTIFIER ::= { uhppotedSSMP 2 }
 
+-- system
+serialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer object representing the RP2040 serial number."
+    ::= { system 1 }
+
+-- controller
 controllerId OBJECT-TYPE
     SYNTAX      Integer32 (0..2147483647)
     MAX-ACCESS  read-only
@@ -28,19 +39,36 @@ controllerId OBJECT-TYPE
         "An integer object representing the controller ID."
     ::= { controller 1 }
 
+controllerAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 4 byte octet string representing the controller IPv4 address."
+    ::= { controller 2 }
+
+-- groups
+systemGroup OBJECT-GROUP
+    OBJECTS { serialNumber }
+    STATUS  current
+    DESCRIPTION
+        "System information."
+    ::= { internal 1 }
+
 controllerGroup OBJECT-GROUP
-    OBJECTS { controllerId }
+    OBJECTS { controllerId, controllerAddress }
     STATUS  current
     DESCRIPTION
         "Controller configuration information."
-    ::= { system 2 }
+    ::= { internal 2 }
 
+-- compliance
 compliance MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
-        "The compliance statement for the controllerId object."
+        "The compliance statement for the system and controller groups."
     MODULE  -- this module
-    MANDATORY-GROUPS { controllerGroup }
-    ::= { system 3 }
+    MANDATORY-GROUPS { systemGroup, controllerGroup }
+    ::= { internal 0 }
 
 END

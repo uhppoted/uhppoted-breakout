@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <MIB.h>
 #include <auth.h>
 #include <crypt/otp/hotp.h>
 
@@ -11,8 +12,7 @@ typedef struct community {
 } community;
 
 const char *PUBLIC[] = {
-    "0.1.3.6.1.4.1.65536.1.1",
-};
+    MIB_CONTROLLER_ID};
 
 community public = {
     .counter = 0,

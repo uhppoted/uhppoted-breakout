@@ -16,6 +16,8 @@ type field struct {
 	get func() (any, error)
 }
 
+const SYSTEM_SERIALNO = "system.serialno"
+
 const CONTROLLER_ID = "controller.id"
 const CONTROLLER_ADDRESS = "controller.address"
 const CONTROLLER_NETMASK = "controller.netmask"
@@ -25,10 +27,14 @@ const CONTROLLER_VERSION = "controller.version"
 const CONTROLLER_RELEASED = "controller.released"
 
 var OIDs = map[string]types.OID{
-	CONTROLLER_ID: []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1},
+	SYSTEM_SERIALNO:    []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1},
+	CONTROLLER_ID:      []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 1},
+	CONTROLLER_ADDRESS: []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 2},
 }
 
 var mib = map[string]field{
+	SYSTEM_SERIALNO: {get: getSystemSerialNo},
+
 	CONTROLLER_ID:       {get: getControllerID},
 	CONTROLLER_ADDRESS:  {get: getControllerAddress},
 	CONTROLLER_NETMASK:  {get: getControllerNetmask},
