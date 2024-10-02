@@ -28,7 +28,8 @@
     - [ ] ASN.1
     - [ ] log CRC errors
     - [ ] get-controller
-          - [x] **Fix hardcoded OID**
+          - [ ] IPv4 address/netmask/gateway
+          - [ ] MAC
           - [ ] errors pipe in request
           - [ ] serialize requests
 
@@ -47,12 +48,9 @@
 ### MIB
     - [x] controller ID
     - [ ] controller address
+          - https://github.com/jackpal/gateway
     - [ ] RP2040 ID
           - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
-
-
-### CLI
-     - [ ] parse commands using strtok
 
 ## PiZeroW
     - [ ] Reduce power consumption

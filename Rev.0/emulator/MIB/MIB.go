@@ -44,6 +44,12 @@ var mib = map[string]field{
 	CONTROLLER_RELEASED: {get: getControllerReleased},
 }
 
+func Init(addr netip.Addr, netmask netip.Addr, gateway netip.Addr) {
+	controller.address = addr
+	controller.netmask = netmask
+	controller.gateway = gateway
+}
+
 func Get[T V](tag string, defval T) T {
 	if f, ok := mib[tag]; ok && f.get != nil {
 		if u, err := f.get(); err != nil {

@@ -18,9 +18,9 @@ var controller = struct {
 	released string
 }{
 	id:       405419896,
-	address:  netip.AddrFrom4([4]byte{192, 168, 1, 100}),
+	address:  netip.AddrFrom4([4]byte{0, 0, 0, 0}),
 	netmask:  netip.AddrFrom4([4]byte{255, 255, 255, 0}),
-	gateway:  netip.AddrFrom4([4]byte{192, 168, 1, 1}),
+	gateway:  netip.AddrFrom4([4]byte{0, 0, 0, 0}),
 	MAC:      net.HardwareAddr([]byte{0x00, 0x66, 0x19, 0x39, 0x55, 0x2d}),
 	version:  0x2407,
 	released: "2024-07-30",

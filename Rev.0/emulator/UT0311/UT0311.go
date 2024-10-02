@@ -9,6 +9,7 @@ import (
 	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
 	"github.com/uhppoted/uhppote-core/messages"
 
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/MIB"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
 )
 
@@ -16,6 +17,12 @@ type UT0311 struct {
 }
 
 func (ut0311 UT0311) Run() {
+	if addr, netmask, gateway, err := resolveNetAddr("en3"); err != nil {
+		warnf("%v", err)
+	} else {
+		MIB.Init(addr, netmask, gateway)
+	}
+
 	for {
 		if err := ut0311.listen(); err != nil {
 			warnf("%v", err)
@@ -65,7 +72,7 @@ func (ut0311 UT0311) listen() error {
 }
 
 func (ut0311 UT0311) received(request any) (any, error) {
-	infof("UDP  request %v", request)
+	infof("UDP  request %T", request)
 
 	switch rq := request.(type) {
 	case *messages.GetDeviceRequest:
