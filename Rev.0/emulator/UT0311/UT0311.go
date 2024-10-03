@@ -1,8 +1,10 @@
 package UT0311
 
 import (
+	"encoding/json"
 	"net"
 	"net/netip"
+	"os"
 	"reflect"
 	"time"
 
@@ -16,11 +18,29 @@ import (
 type UT0311 struct {
 }
 
-func (ut0311 UT0311) Run() {
-	if addr, netmask, gateway, err := resolveNetAddr("en3"); err != nil {
-		warnf("%v", err)
+func Load(filepath string) (Config, error) {
+	var config Config
+
+	if bytes, err := os.ReadFile(filepath); err != nil {
+		return Config{}, err
+	} else if err := json.Unmarshal(bytes, &config); err != nil {
+		return Config{}, err
 	} else {
-		MIB.Init(addr, netmask, gateway)
+		return config, nil
+	}
+}
+
+func (ut0311 UT0311) Run(config Config) {
+	if v := config.Network.Interface; v != "" {
+		if addr, netmask, gateway, err := resolveNetAddr(v); err != nil {
+			warnf("%v", err)
+		} else if err := MIB.Init(addr, netmask, gateway); err != nil {
+			warnf("%v", err)
+		}
+	} else if v := config.Network.IPv4; v != nil {
+		if err := MIB.Init(v.Address, v.Netmask, v.Gateway); err != nil {
+			warnf("%v", err)
+		}
 	}
 
 	for {

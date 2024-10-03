@@ -1,5 +1,10 @@
 # TODO
 
+- [ ] IPv4 address/netmask/gateway
+      - [ ] configure interface
+      - [ ] configure from .config
+      - (?) store on breakout
+
 ### SSMP
     - [x] set USB output translation
     - [x] GET
@@ -28,7 +33,6 @@
     - [ ] ASN.1
     - [ ] log CRC errors
     - [ ] get-controller
-          - [ ] IPv4 address/netmask/gateway
           - [ ] MAC
           - [ ] errors pipe in request
           - [ ] serialize requests
@@ -54,6 +58,8 @@
 
 ## PiZeroW
     - [ ] Reduce power consumption
+          - https://hackaday.com/2024/10/03/pi-zero-power-optimization-leaves-no-stone-unturned
+          - https://kittenlabs.de/blog/2024/09/01/extreme-pi-boot-optimization
     - [ ] NB: 24/7 operation - Cam said to ask him
     - (?) Use Nerves
 

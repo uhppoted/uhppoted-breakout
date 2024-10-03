@@ -15,38 +15,44 @@ import (
 const VERSION = "v0.0"
 
 var options = struct {
-	USB string
+	config string
+	USB    string
 }{
-	USB: "",
+	config: ".config",
+	USB:    "",
 }
 
 func main() {
 	infof("uhppoted-breakout::emulator %v", VERSION)
 
+	flag.StringVar(&options.config, "config", options.config, ".config file")
 	flag.StringVar(&options.USB, "usb", options.USB, "USB TTY device")
 	flag.Parse()
 
-	if options.USB == "" {
+	if cfg, err := UT0311.Load(options.config); err != nil {
+		errorf("%v", err)
+		os.Exit(1)
+	} else if options.USB == "" {
 		errorf("invalid USB TTY device")
 		os.Exit(1)
+	} else {
+		go func() {
+			ssmp.SSMP{
+				USB: options.USB,
+			}.Run()
+		}()
+
+		go func() {
+			UT0311.UT0311{}.Run(cfg)
+		}()
+
+		interrupt := make(chan os.Signal, 1)
+
+		signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+		<-interrupt
+		fmt.Printf("  ... interrupted\n")
 	}
-
-	go func() {
-		ssmp.SSMP{
-			USB: options.USB,
-		}.Run()
-	}()
-
-	go func() {
-		UT0311.UT0311{}.Run()
-	}()
-
-	interrupt := make(chan os.Signal, 1)
-
-	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-	<-interrupt
-	fmt.Printf("  ... interrupted\n")
 }
 
 func infof(format string, args ...any) {

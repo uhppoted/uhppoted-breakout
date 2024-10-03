@@ -1,6 +1,7 @@
 package MIB
 
 import (
+	"fmt"
 	"net"
 	"net/netip"
 
@@ -44,10 +45,24 @@ var mib = map[string]field{
 	CONTROLLER_RELEASED: {get: getControllerReleased},
 }
 
-func Init(addr netip.Addr, netmask netip.Addr, gateway netip.Addr) {
-	controller.address = addr
+func Init(address netip.Addr, netmask net.IPMask, gateway netip.Addr) error {
+	if !address.IsValid() {
+		return fmt.Errorf("invalid controller IPv4 address (%v)", address)
+	}
+
+	if netmask == nil {
+		return fmt.Errorf("invalid controller IPv4 netmask (%v)", netmask)
+	}
+
+	if !gateway.IsValid() {
+		return fmt.Errorf("invalid controller IPv4 gateway (%v)", gateway)
+	}
+
+	controller.address = address
 	controller.netmask = netmask
 	controller.gateway = gateway
+
+	return nil
 }
 
 func Get[T V](tag string, defval T) T {

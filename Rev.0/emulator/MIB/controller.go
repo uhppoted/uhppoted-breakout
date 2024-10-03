@@ -11,7 +11,7 @@ import (
 var controller = struct {
 	id       uint32
 	address  netip.Addr
-	netmask  netip.Addr
+	netmask  net.IPMask
 	gateway  netip.Addr
 	MAC      net.HardwareAddr
 	version  uint16
@@ -19,7 +19,7 @@ var controller = struct {
 }{
 	id:       405419896,
 	address:  netip.AddrFrom4([4]byte{0, 0, 0, 0}),
-	netmask:  netip.AddrFrom4([4]byte{255, 255, 255, 0}),
+	netmask:  net.IPv4Mask(255, 255, 255, 0),
 	gateway:  netip.AddrFrom4([4]byte{0, 0, 0, 0}),
 	MAC:      net.HardwareAddr([]byte{0x00, 0x66, 0x19, 0x39, 0x55, 0x2d}),
 	version:  0x2407,
