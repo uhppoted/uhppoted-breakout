@@ -1,8 +1,9 @@
 # TODO
 
 - [ ] IPv4 address/netmask/gateway
-      - [ ] configure interface
-      - [ ] configure from .config
+      - [x] configure interface
+      - [x] configure from .config
+      - [x] update if .config changes
       - (?) store on breakout
 
 ### SSMP

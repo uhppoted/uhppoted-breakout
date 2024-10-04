@@ -1,11 +1,14 @@
 package main
 
 import (
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"os"
 	"os/signal"
+	"slices"
 	"syscall"
+	"time"
 
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/UT0311"
 	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
@@ -29,13 +32,15 @@ func main() {
 	flag.StringVar(&options.USB, "usb", options.USB, "USB TTY device")
 	flag.Parse()
 
-	if cfg, err := UT0311.Load(options.config); err != nil {
+	if cfg, hash, err := UT0311.Load(options.config); err != nil {
 		errorf("%v", err)
 		os.Exit(1)
 	} else if options.USB == "" {
 		errorf("invalid USB TTY device")
 		os.Exit(1)
 	} else {
+		ut0311 := UT0311.UT0311{}
+
 		go func() {
 			ssmp.SSMP{
 				USB: options.USB,
@@ -43,7 +48,11 @@ func main() {
 		}()
 
 		go func() {
-			UT0311.UT0311{}.Run(cfg)
+			ut0311.Run(cfg)
+		}()
+
+		go func() {
+			watch(&ut0311, options.config, hash)
 		}()
 
 		interrupt := make(chan os.Signal, 1)
@@ -55,8 +64,41 @@ func main() {
 	}
 }
 
+func watch(ut0311 *UT0311.UT0311, filepath string, hash []byte) {
+	signature := hash
+
+	f := func() {
+		if bytes, err := os.ReadFile(filepath); err == nil {
+			sha224 := sha256.Sum224(bytes)
+
+			if !slices.Equal(signature, sha224[:]) {
+				warnf("reloading config from %v", filepath)
+
+				if cfg, _, err := UT0311.Load(filepath); err != nil {
+					warnf("%v", err)
+				} else {
+					ut0311.SetConfig(cfg)
+				}
+
+				signature = sha224[:]
+			}
+		}
+	}
+
+	tick := time.Tick(15 * time.Second)
+
+	for {
+		<-tick
+		f()
+	}
+}
+
 func infof(format string, args ...any) {
 	log.Infof("emulator", format, args...)
+}
+
+func warnf(format string, args ...any) {
+	log.Warnf("emulator", format, args...)
 }
 
 func errorf(format string, args ...any) {

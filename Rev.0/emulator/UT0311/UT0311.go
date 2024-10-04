@@ -1,6 +1,7 @@
 package UT0311
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"net"
 	"net/netip"
@@ -18,30 +19,26 @@ import (
 type UT0311 struct {
 }
 
-func Load(filepath string) (Config, error) {
+func Load(filepath string) (Config, []byte, error) {
 	var config Config
 
 	if bytes, err := os.ReadFile(filepath); err != nil {
-		return Config{}, err
+		return Config{}, nil, err
 	} else if err := json.Unmarshal(bytes, &config); err != nil {
-		return Config{}, err
+		return Config{}, nil, err
 	} else {
-		return config, nil
+		hash := sha256.Sum224(bytes)
+
+		return config, hash[:], nil
 	}
 }
 
-func (ut0311 UT0311) Run(config Config) {
-	if v := config.Network.Interface; v != "" {
-		if addr, netmask, gateway, err := resolveNetAddr(v); err != nil {
-			warnf("%v", err)
-		} else if err := MIB.Init(addr, netmask, gateway); err != nil {
-			warnf("%v", err)
-		}
-	} else if v := config.Network.IPv4; v != nil {
-		if err := MIB.Init(v.Address, v.Netmask, v.Gateway); err != nil {
-			warnf("%v", err)
-		}
-	}
+func (ut0311 *UT0311) SetConfig(config Config) {
+	ut0311.initialise(config)
+}
+
+func (ut0311 *UT0311) Run(config Config) {
+	ut0311.initialise(config)
 
 	for {
 		if err := ut0311.listen(); err != nil {
@@ -50,6 +47,27 @@ func (ut0311 UT0311) Run(config Config) {
 
 		// TODO: exponential backoff
 		time.Sleep(5 * time.Second)
+	}
+}
+
+func (ut0311 *UT0311) initialise(config Config) {
+	if v := config.Network.Interface; v != "" {
+		if addr, netmask, gateway, err := resolveNetAddr(v); err != nil {
+			warnf("%v", err)
+		} else if err := MIB.Init(addr, netmask, gateway); err != nil {
+			warnf("%v", err)
+		} else {
+			infof("initialised MIB IPv4 information from interface '%v'", v)
+			return
+		}
+	}
+
+	if v := config.Network.IPv4; v != nil {
+		if err := MIB.Init(v.Address, v.Netmask, v.Gateway); err != nil {
+			warnf("%v", err)
+		} else {
+			infof("initialised MIB IPv4 information from config.IPv4")
+		}
 	}
 }
 
