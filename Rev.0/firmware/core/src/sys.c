@@ -38,7 +38,7 @@ void sysinit() {
     mutex_init(&SYSTEM.guard);
 }
 
-void sys_id(char *ID, int N) {
+int sys_id(char *ID, int N) {
     pico_unique_board_id_t board_id;
 
     pico_get_unique_board_id(&board_id);
@@ -52,6 +52,8 @@ void sys_id(char *ID, int N) {
              board_id.id[5],
              board_id.id[6],
              board_id.id[7]);
+
+    return N < 16 ? N : 16;
 }
 
 mode get_mode() {

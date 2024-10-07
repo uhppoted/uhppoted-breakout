@@ -24,6 +24,7 @@
        - [ ] check slice_free
        - [ ] check field_free
        - [ ] check vector_free
+       - (?) free_value
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
     
     - [ ] UART

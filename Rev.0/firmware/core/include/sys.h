@@ -9,7 +9,7 @@ typedef enum {
 extern bool sys_init();
 extern void sys_tick();
 extern void sys_reboot();
-extern void sys_id(char *ID, int N);
+extern int sys_id(char *ID, int N);
 extern void dispatch(uint32_t);
 
 extern void print(const char *);

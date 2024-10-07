@@ -14,6 +14,7 @@ typedef enum {
 typedef enum {
     VALUE_UNKNOWN,
     VALUE_UINT32,
+    VALUE_OCTET_STRING,
     VALUE_NULL,
 } VALUE;
 
@@ -22,6 +23,7 @@ typedef struct value {
 
     union {
         int64_t integer;
+        slice octets;
     };
 } value;
 

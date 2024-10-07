@@ -57,6 +57,12 @@ slice ssmp_encode_get_response(packet p) {
         value.tag = FIELD_INTEGER;
         value.integer.value = p.get_response.value.integer;
         break;
+
+    case VALUE_OCTET_STRING:
+        value.tag = FIELD_OCTET_STRING;
+        value.octets.length = p.get_response.value.octets.length;
+        value.octets.octets = p.get_response.value.octets.bytes;
+        break;
     };
 
     field item = {
