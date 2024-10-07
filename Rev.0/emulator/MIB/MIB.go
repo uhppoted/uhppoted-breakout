@@ -45,7 +45,7 @@ var mib = map[string]field{
 	CONTROLLER_RELEASED: {get: getControllerReleased},
 }
 
-func Init(address netip.Addr, netmask net.IPMask, gateway netip.Addr) error {
+func Init(address netip.Addr, netmask net.IPMask, gateway netip.Addr, MAC net.HardwareAddr) error {
 	if !address.IsValid() {
 		return fmt.Errorf("invalid controller IPv4 address (%v)", address)
 	}
@@ -58,9 +58,14 @@ func Init(address netip.Addr, netmask net.IPMask, gateway netip.Addr) error {
 		return fmt.Errorf("invalid controller IPv4 gateway (%v)", gateway)
 	}
 
+	if len(MAC) != 6 {
+		return fmt.Errorf("invalid controller MAC address (%v)", MAC)
+	}
+
 	controller.address = address
 	controller.netmask = netmask
 	controller.gateway = gateway
+	controller.MAC = MAC
 
 	return nil
 }

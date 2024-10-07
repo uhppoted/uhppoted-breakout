@@ -1,16 +1,16 @@
 # TODO
 
-- [ ] IPv4 address/netmask/gateway
+- [x] IPv4 address/netmask/gateway/MAC
       - [x] configure interface
       - [x] configure from .config
       - [x] update if .config changes
-      - (?) store on breakout
+      - [x] MAC
 
 ### SSMP
-    - [x] set USB output translation
-    - [x] GET
-    - [x] HOTP
-    - [ ] ENQ/ACK loop
+    - get-controller
+      - [ ] version
+      - [ ] released
+      - [ ] ENQ/ACK loop
     ```
     request error (RX queue blocked)
     request error (TX queue blocked)
