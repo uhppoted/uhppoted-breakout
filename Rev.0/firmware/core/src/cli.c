@@ -51,6 +51,7 @@ void cpr(char *cmd);
 void display(const char *fmt, ...);
 void exec(char *cmd);
 
+void get_ID();
 void get_datetime();
 void set_datetime(const char *cmd);
 void get_date();
@@ -104,6 +105,7 @@ const char *HELP[] = {
     "BREAKOUT Rev.0",
     "",
     "Commands:",
+    "  get id",
     "  get date",
     "  set date <YYYY-MM-DD>",
     "  get time",
@@ -366,7 +368,9 @@ void display(const char *fmt, ...) {
 void exec(char *cmd) {
     char s[128];
 
-    if (strncasecmp(cmd, "get datetime", 12) == 0) {
+    if (strncasecmp(cmd, "get id", 6) == 0) {
+        get_ID();
+    } else if (strncasecmp(cmd, "get datetime", 12) == 0) {
         get_datetime();
     } else if (strncasecmp(cmd, "set datetime ", 13) == 0) {
         set_datetime(&cmd[13]);
@@ -442,6 +446,15 @@ void state() {
     debugf("CLI", ">>> U3    %s", get_error(ERR_U3) ? "error" : "ok");
     debugf("CLI", ">>> U4    %s", get_error(ERR_U4) ? "error" : "ok");
     debugf("CLI", ">>> other %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
+}
+
+void get_ID() {
+    char ID[32] = {0};
+    int N = sizeof(ID);
+
+    sys_id(ID, N);
+
+    display("get-ID: %s\n", ID);
 }
 
 void get_datetime() {

@@ -75,3 +75,8 @@
 - https://www.jstage.jst.go.jp/article/transinf/E99.D/8/E99.D_2015INP0013/_article
 - https://github.com/ubirch/ubirch-mbed-nacl-cm0
 - https://www.semanticscholar.org/paper/True-random-number-generation-on-an-Atmel-AVR-Hlav%C3%A1c-L%C3%B3rencz/3948b47a9fb7a6b3632a1b631035bec3972932bc
+
+## Flash ID
+1. https://forums.raspberrypi.com/viewtopic.php?t=331351
+2. https://forums.raspberrypi.com/viewtopic.php?t=316853
+3. https://forums.raspberrypi.com/viewtopic.php?t=316853

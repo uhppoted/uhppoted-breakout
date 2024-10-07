@@ -1,10 +1,12 @@
 # TODO
 
-- [x] IPv4 address/netmask/gateway/MAC
+- [ ] IPv4 address/netmask/gateway/MAC
       - [x] configure interface
       - [x] configure from .config
       - [x] update if .config changes
       - [x] MAC
+      - [ ] gateway
+            - https://github.com/jackpal/gateway
 
 ### SSMP
     - get-controller
@@ -52,8 +54,6 @@
 
 ### MIB
     - [x] controller ID
-    - [ ] controller address
-          - https://github.com/jackpal/gateway
     - [ ] RP2040 ID
           - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
 

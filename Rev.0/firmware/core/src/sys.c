@@ -3,9 +3,11 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <hardware/flash.h>
 #include <hardware/watchdog.h>
 #include <pico/stdlib.h>
 #include <pico/sync.h>
+#include <pico/unique_id.h>
 
 #include <SSMP.h>
 #include <U2.h>
@@ -34,6 +36,22 @@ extern void sys_translate_crlf(bool);
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
     mutex_init(&SYSTEM.guard);
+}
+
+void sys_id(char *ID, int N) {
+    pico_unique_board_id_t board_id;
+
+    pico_get_unique_board_id(&board_id);
+
+    snprintf(ID, N, "%02x%02x%02x%02x%02x%02x%02x%02x",
+             board_id.id[0],
+             board_id.id[1],
+             board_id.id[2],
+             board_id.id[3],
+             board_id.id[4],
+             board_id.id[5],
+             board_id.id[6],
+             board_id.id[7]);
 }
 
 mode get_mode() {

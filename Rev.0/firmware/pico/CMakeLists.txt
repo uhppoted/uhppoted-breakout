@@ -82,6 +82,7 @@ target_link_libraries(
     pico_stdlib
     pico_multicore
     pico_sync
+    pico_unique_id
 
     hardware_i2c
     hardware_watchdog
