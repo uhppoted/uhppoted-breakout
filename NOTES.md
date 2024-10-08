@@ -27,6 +27,10 @@
 18. https://nats.io
 19. https://store.particle.io/collections/all-products/products/photon-2
 20. https://youtu.be/RrUyS-gixWk?si=QhU_jPk8qZ5NfyuA
+21. Gateway discovery
+    - https://github.com/jackpal/gateway
+    - https://gist.github.com/jftuga/18409ced62f9a59ecbc047800ab8e810
+    - https://forum.golangbridge.org/t/get-set-network-interface-in-pure-go-code/9075/3
 
 ## RX8900SA
 1. https://github.com/citriena/RX8900RTC/blob/master/src/RX8900RTC.cpp

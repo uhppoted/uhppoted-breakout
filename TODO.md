@@ -5,10 +5,11 @@
       - [x] configure from .config
       - [x] update if .config changes
       - [x] MAC
-      - [ ] gateway
-            - https://github.com/jackpal/gateway
+      - [x] gateway
 
 ### SSMP
+    - get-board
+
     - get-controller
       - [ ] version
       - [ ] released

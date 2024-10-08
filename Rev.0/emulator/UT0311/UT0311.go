@@ -51,23 +51,31 @@ func (ut0311 *UT0311) Run(config Config) {
 }
 
 func (ut0311 *UT0311) initialise(config Config) {
+	var address netip.Addr
+	var netmask net.IPMask
+	var gateway netip.Addr
+	var MAC net.HardwareAddr
+
+	if v := config.Network.IPv4; v != nil {
+		address = v.Address
+		netmask = v.Netmask
+		gateway = v.Gateway
+		MAC = v.MAC
+	}
+
 	if v := config.Network.Interface; v != "" {
-		if addr, netmask, gateway, MAC, err := resolveNetAddr(v); err != nil {
-			warnf("%v", err)
-		} else if err := MIB.Init(addr, netmask, gateway, MAC); err != nil {
+		if addr, subnet, gw, mac, err := discover(v); err != nil {
 			warnf("%v", err)
 		} else {
-			infof("initialised MIB IPv4 information from interface '%v'", v)
-			return
+			address = addr
+			netmask = subnet
+			gateway = gw
+			MAC = mac
 		}
 	}
 
-	if v := config.Network.IPv4; v != nil {
-		if err := MIB.Init(v.Address, v.Netmask, v.Gateway, v.MAC); err != nil {
-			warnf("%v", err)
-		} else {
-			infof("initialised MIB IPv4 information from config.IPv4")
-		}
+	if err := MIB.Init(address, netmask, gateway, MAC); err != nil {
+		warnf("%v", err)
 	}
 }
 
