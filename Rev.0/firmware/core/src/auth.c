@@ -12,7 +12,9 @@ typedef struct community {
 } community;
 
 const char *PUBLIC[] = {
-    MIB_CONTROLLER_ID};
+    MIB_CONTROLLER_ID,
+    MIB_CONTROLLER_VERSION,
+};
 
 community public = {
     .counter = 0,

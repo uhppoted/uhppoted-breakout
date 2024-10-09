@@ -28,9 +28,13 @@ const CONTROLLER_VERSION = "controller.version"
 const CONTROLLER_RELEASED = "controller.released"
 
 var OIDs = map[string]types.OID{
-	SYSTEM_SERIALNO:    []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1},
-	CONTROLLER_ID:      []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 1},
-	CONTROLLER_ADDRESS: []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 2},
+	SYSTEM_SERIALNO:     []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1},
+	CONTROLLER_ID:       []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 1},
+	CONTROLLER_VERSION:  []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 2},
+	CONTROLLER_RELEASED: []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 3},
+	CONTROLLER_ADDRESS:  []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 4},
+	CONTROLLER_NETMASK:  []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 5},
+	CONTROLLER_GATEWAY:  []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 6},
 }
 
 var mib = map[string]field{

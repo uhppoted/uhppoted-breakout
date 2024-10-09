@@ -51,10 +51,12 @@ func Get(oid types.OID) (any, error) {
 
 			if value, err := get(reply, oid); err != nil {
 				return 0, fmt.Errorf("invalid reply to SSMP GET %v request", oid)
-			} else if v, ok := value.(int); !ok {
-				return 0, fmt.Errorf("invalid value in reply to SSMP GET %v request", oid)
-			} else {
+			} else if v, ok := value.(int); ok {
 				return uint32(v), nil
+			} else if v, ok := value.([]uint8); ok {
+				return []uint8(v), nil
+			} else {
+				return 0, fmt.Errorf("invalid value (%T) in reply to SSMP GET %v request", v, oid)
 			}
 
 		case <-timeout:

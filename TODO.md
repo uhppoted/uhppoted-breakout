@@ -1,17 +1,10 @@
 # TODO
 
-- [ ] IPv4 address/netmask/gateway/MAC
-      - [x] configure interface
-      - [x] configure from .config
-      - [x] update if .config changes
-      - [x] MAC
-      - [x] gateway
-
 ### SSMP
     - get-board
 
     - get-controller
-      - [ ] version
+      - [x] version
       - [ ] released
       - [ ] ENQ/ACK loop
     ```

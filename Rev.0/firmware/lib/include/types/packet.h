@@ -13,6 +13,7 @@ typedef enum {
 
 typedef enum {
     VALUE_UNKNOWN,
+    VALUE_UINT16,
     VALUE_UINT32,
     VALUE_OCTET_STRING,
     VALUE_NULL,

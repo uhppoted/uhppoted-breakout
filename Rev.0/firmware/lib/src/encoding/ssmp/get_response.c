@@ -53,6 +53,11 @@ slice ssmp_encode_get_response(packet p) {
     };
 
     switch (p.get_response.value.tag) {
+    case VALUE_UINT16:
+        value.tag = FIELD_INTEGER;
+        value.integer.value = p.get_response.value.integer;
+        break;
+
     case VALUE_UINT32:
         value.tag = FIELD_INTEGER;
         value.integer.value = p.get_response.value.integer;
