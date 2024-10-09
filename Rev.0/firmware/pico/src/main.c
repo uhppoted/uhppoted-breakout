@@ -22,7 +22,6 @@
 #define _I2C1SDA 2
 #define _I2C1SCL 3
 
-const char *VERSION = _VERSION;
 const uint32_t WATCHDOG_TIMEOUT = 5000; // ms
 
 const uint32_t MSG = 0xf0000000;

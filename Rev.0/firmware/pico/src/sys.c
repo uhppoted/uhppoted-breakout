@@ -14,7 +14,6 @@
 #define STOP_BITS 1
 #define PARITY UART_PARITY_NONE
 
-extern const char *VERSION;
 extern void sysinit();
 
 bool on_tick(repeating_timer_t *);
@@ -58,7 +57,7 @@ bool sys_init() {
     // ... system stuff
     char s[64];
 
-    snprintf(s, sizeof(s), "-----  BREAKOUT   %s", VERSION);
+    snprintf(s, sizeof(s), "-----  BREAKOUT   %02x.02x", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
 
     sysinit();
     cli_init();
