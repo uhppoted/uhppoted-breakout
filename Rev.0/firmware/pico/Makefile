@@ -9,6 +9,7 @@ I2C1_CLOCK ?= 400kHz
 
 CONTROLLER ?= 405419896
 VERSION ?= 0x0001
+RELEASED ?= "2024-10-01"
 
 .PHONY: format
 
@@ -20,7 +21,8 @@ clean: CMakeLists.txt
 	       cmake -DI2C0_CLOCK="100kHz" -DI2C1_CLOCK="400kHz" \
 	             -DRX8900SA_VDET="$(RX8900SA_VDET)" -DRX8900SA_SWOFF="$(RX8900SA_SWOFF)" -DRX8900SA_BKSMP="$(RX8900SA_BKSMP)" \
 	             -DCONTROLLER=$(CONTROLLER) \
-	             -DVERSION=$(VERSION) \
+	             -DVERSION=$(VERSION)       \
+	             -DRELEASED=$(RELEASED)     \
 	             ..
 
 format: clean
