@@ -72,5 +72,13 @@ func getControllerVersion() (any, error) {
 }
 
 func getControllerReleased() (any, error) {
-	return controller.released, nil
+	if oid, ok := OIDs[CONTROLLER_RELEASED]; !ok {
+		return nil, fmt.Errorf("missing %v OID", CONTROLLER_RELEASED)
+	} else if v, err := ssmp.Get(oid); err != nil {
+		return nil, err
+	} else if bytes, ok := v.([]byte); !ok {
+		return nil, fmt.Errorf("invalid %v value (%T)", CONTROLLER_RELEASED, v)
+	} else {
+		return string(bytes), nil
+	}
 }

@@ -68,7 +68,7 @@ func Get(oid types.OID) (any, error) {
 }
 
 func (ssmp SSMP) Run() {
-	rx := make(chan []byte)
+	rx := make(chan []byte, 16)
 	tx := make(chan []byte)
 	pipe := make(chan []byte)
 	errors := make(chan error)
@@ -178,6 +178,7 @@ func (h handler) OnMessage(header []uint8, content []uint8) {
 }
 
 func received(msg []byte, codec *bisync.Bisync) []gosnmp.SnmpPacket {
+	println(">>>>>>>>> received ", len(msg))
 	var packets []gosnmp.SnmpPacket
 
 	h := handler{
@@ -196,6 +197,7 @@ func received(msg []byte, codec *bisync.Bisync) []gosnmp.SnmpPacket {
 				warnf("invalid packet (%v)", packet)
 			} else {
 				packets = append(packets, *packet)
+				println(">>>>>>>>> received/gotcha", len(packets))
 			}
 		},
 	}
@@ -309,7 +311,7 @@ func listen(USB string, tx chan []byte, rx chan []byte, pipe chan []byte, errors
 			case msg := <-pipe:
 				if len(msg) > 2 && msg[0] == '>' && msg[1] == '>' {
 					debugf("read  (%v bytes) %v", len(msg), string(msg))
-				} else if len(msg) > 20 {
+				} else if len(msg) > 50 {
 					debugf("read  (%v bytes) [%v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v %v ...]",
 						len(msg),
 						msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9],

@@ -44,5 +44,21 @@ value MIB_get(const char *OID) {
         v.octets = octets;
     }
 
+    if (strcmp(OID, MIB_CONTROLLER_RELEASED) == 0) {
+        slice octets = {
+            .capacity = 32,
+            .length = 0,
+            .bytes = (char *)calloc(32, sizeof(uint8_t)),
+        };
+
+        int N = snprintf(octets.bytes, octets.capacity, "%s", RELEASED);
+        if (N > 0) {
+            octets.length = N < strlen(RELEASED) ? N : strlen(RELEASED);
+        }
+
+        v.tag = VALUE_OCTET_STRING;
+        v.octets = octets;
+    }
+
     return v;
 }

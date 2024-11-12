@@ -20,12 +20,12 @@ type field struct {
 const SYSTEM_SERIALNO = "system.serialno"
 
 const CONTROLLER_ID = "controller.id"
+const CONTROLLER_VERSION = "controller.version"
+const CONTROLLER_RELEASED = "controller.released"
 const CONTROLLER_ADDRESS = "controller.address"
 const CONTROLLER_NETMASK = "controller.netmask"
 const CONTROLLER_GATEWAY = "controller.gateway"
 const CONTROLLER_MAC = "controller.MAC"
-const CONTROLLER_VERSION = "controller.version"
-const CONTROLLER_RELEASED = "controller.released"
 
 var OIDs = map[string]types.OID{
 	SYSTEM_SERIALNO:     []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1},

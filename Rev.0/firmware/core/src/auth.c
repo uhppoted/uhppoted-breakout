@@ -14,6 +14,7 @@ typedef struct community {
 const char *PUBLIC[] = {
     MIB_CONTROLLER_ID,
     MIB_CONTROLLER_VERSION,
+    MIB_CONTROLLER_RELEASED,
 };
 
 community public = {

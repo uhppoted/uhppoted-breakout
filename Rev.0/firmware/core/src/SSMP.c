@@ -63,15 +63,15 @@ struct {
 void SSMP_init() {
     debugf("SSMP", "init");
 
-    // // ... UART
-    // gpio_set_function(UART0_TX, GPIO_FUNC_UART);
-    // gpio_set_function(UART0_RX, GPIO_FUNC_UART);
-    //
-    // uart_init(uart0, BAUD_RATE);
-    // uart_set_baudrate(uart0, BAUD_RATE);
-    // uart_set_format(uart0, DATA_BITS, STOP_BITS, PARITY);
-    // uart_set_hw_flow(uart0, false, false);
-    // uart_set_fifo_enabled(uart0, false);
+    // ... UART
+    gpio_set_function(UART0_TX, GPIO_FUNC_UART);
+    gpio_set_function(UART0_RX, GPIO_FUNC_UART);
+
+    uart_init(uart0, BAUD_RATE);
+    uart_set_baudrate(uart0, BAUD_RATE);
+    uart_set_format(uart0, DATA_BITS, STOP_BITS, PARITY);
+    uart_set_hw_flow(uart0, false, false);
+    uart_set_fifo_enabled(uart0, true);
 
     SSMP_touched();
 
@@ -82,9 +82,9 @@ void SSMP_init() {
 void SSMP_start() {
     debugf("SSMP", "start");
 
-    // irq_set_exclusive_handler(UART0_IRQ, on_smp);
-    // irq_set_enabled(UART0_IRQ, true);
-    // uart_set_irq_enables(uart0, true, false);
+    irq_set_exclusive_handler(UART0_IRQ, on_SSMP);
+    irq_set_enabled(UART0_IRQ, true);
+    uart_set_irq_enables(uart0, true, false);
 }
 
 void SSMP_reset() {
@@ -101,39 +101,42 @@ void SSMP_touched() {
 }
 
 void SSMP_ping() {
-    if (get_mode() == MODE_SSMP) {
-        absolute_time_t now = get_absolute_time();
-        int64_t delta = absolute_time_diff_us(SSMP.touched, now) / 1000;
+    debugf("SSMP", "ping");
 
-        if (llabs(delta) > SSMP_IDLE) {
-            set_mode(MODE_UNKNOWN);
-        }
-    }
+    // if (get_mode() == MODE_SSMP) {
+    //     absolute_time_t now = get_absolute_time();
+    //     int64_t delta = absolute_time_diff_us(SSMP.touched, now) / 1000;
+    //
+    //     if (llabs(delta) > SSMP_IDLE) {
+    //         set_mode(MODE_UNKNOWN);
+    //     }
+    // }
 }
 
 void on_SSMP() {
-    // char buffer[32];
-    // int ix = 0;
-    //
-    // while (uart_is_readable(uart0) && ix < sizeof(buffer)) {
-    //     buffer[ix++] = uart_getc(uart0);
-    // }
-    //
-    // if (ix > 0) {
-    //     char *b;
-    //
-    //     // FIXME use struct with length
-    //     if ((b = calloc(ix + 1, 1)) != NULL) {
-    //         memmove(b, buffer, ix);
-    //         uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
-    //         if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-    //             set_error(ERR_QUEUE_FULL, "SMP", "rx: queue full");
-    //             free(b);
-    //         }
-    //     }
-    //
-    //     ix = 0;
-    // }
+    char buffer[32];
+    int ix = 0;
+
+    while (uart_is_readable(uart0) && ix < sizeof(buffer)) {
+        buffer[ix++] = uart_getc(uart0);
+    }
+
+    if (ix > 0) {
+        struct buffer *b;
+
+        if ((b = (struct buffer *)malloc(sizeof(struct buffer))) != NULL) {
+            b->N = ix;
+            memmove(b->data, buffer, ix);
+
+            uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
+            if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+                set_error(ERR_QUEUE_FULL, "SSMP", "rx: queue full");
+                free(b);
+            }
+        }
+
+        ix = 0;
+    }
 }
 
 void SSMP_rx(const struct buffer *received) {
@@ -142,12 +145,7 @@ void SSMP_rx(const struct buffer *received) {
 
 void SSMP_enq() {
     SSMP_touched();
-
-    const char *reply = SYN_SYN_ACK;
-
-    fflush(stdout);
-    fwrite(reply, 1, 3, stdout);
-    fflush(stdout);
+    uart_write_blocking(uart0, SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
