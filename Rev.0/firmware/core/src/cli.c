@@ -134,7 +134,7 @@ const char *HELP[] = {
  *
  */
 void cli_init() {
-    //FIXME reinstate: print(TERMINAL_CLEAR);
+    // FIXME reinstate: print(TERMINAL_CLEAR);
     print(TERMINAL_QUERY_CODE);
     print(TERMINAL_QUERY_SIZE);
     printf(TERMINAL_QUERY_STATUS);
@@ -295,7 +295,7 @@ int64_t cli_ping_timeout(alarm_id_t id, void *data) {
  *
  */
 void clear() {
-    //FIXME reinstate: print(TERMINAL_CLEAR);
+    // FIXME reinstate: print(TERMINAL_CLEAR);
     print(TERMINAL_QUERY_SIZE);
 }
 
