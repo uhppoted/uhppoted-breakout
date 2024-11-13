@@ -1,4 +1,4 @@
-module github.com/uhppoted/uhppoted-breakout/Rev.0/emulator
+module github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go
 
 go 1.23
 

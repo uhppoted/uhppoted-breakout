@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/UT0311"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/ssmp"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/UT0311"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/log"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/ssmp"
 )
 
 const VERSION = "v0.0"

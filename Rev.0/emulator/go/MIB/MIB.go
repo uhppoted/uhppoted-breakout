@@ -5,8 +5,8 @@ import (
 	"net"
 	"net/netip"
 
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/MIB/types"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/log"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/MIB/types"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/log"
 )
 
 type V interface {

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/SSMP"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/encoding/bisync"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/encoding/SSMP"
+	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/encoding/bisync"
 )
 
 func main() {
