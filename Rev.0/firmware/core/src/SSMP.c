@@ -114,7 +114,7 @@ void SSMP_ping() {
 }
 
 void on_SSMP() {
-    char buffer[32];
+    char buffer[64];
     int ix = 0;
 
     while (uart_is_readable(uart0) && ix < sizeof(buffer)) {
@@ -140,15 +140,19 @@ void on_SSMP() {
 }
 
 void SSMP_rx(const struct buffer *received) {
+    debugf("SSMP", "RX %d", received->N);
     bisync_decode(&SSMP.codec, received->data, received->N);
 }
 
 void SSMP_enq() {
+    debugf("SSMP", "ENQ");
     SSMP_touched();
     uart_write_blocking(uart0, SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
+    debugf("SSMP", "received");
+
     // ... decode packet
     vector *fields = BER_decode(data, data_len);
     packet *request = ssmp_decode(fields);
@@ -177,9 +181,10 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
  *
  */
 void SSMP_get(const char *community, int64_t rqid, const char *OID) {
+    debugf("SSMP", "GET");
     value v = MIB_get(OID);
 
-    struct packet reply = {
+    packet reply = {
         .tag = PACKET_GET_RESPONSE,
         .version = 0,
         .community = strdup(community),
@@ -201,10 +206,10 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     slice packed = ssmp_encode(reply);
     slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
-    fwrite(encoded.bytes, sizeof(uint8_t), encoded.length, stdout);
-    fflush(stdout);
+    debugf("SSMP", "GET/response %u", encoded.length);
+    uart_write_blocking(uart0, encoded.bytes, encoded.length);
 
-    slice_free(&packed);
     slice_free(&encoded);
+    slice_free(&packed);
     free_packet(&reply);
 }

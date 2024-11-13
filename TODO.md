@@ -3,12 +3,14 @@
 ### SSMP
     - [ ] Migrate SSMP handler to UART1
           - [x] ENQ
-          - [ ] GET
+          - [x] GET
+          - [ ] weird intermittent reset - expects ping maybe??
           - [ ] Remove SSMP stuff from CLI
           - [ ] Remove MODE
           - [ ] Remove Pico variant
                 - Remove uart.c
           - [ ] aioconsole
+          - (?) maybe move bisync decoding to on_SSMP
 
     - monitor
       - get-board

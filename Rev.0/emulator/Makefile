@@ -24,3 +24,6 @@ get-controller:
 
 tty:
 	 minicom -b 115200 -o -D $(PORT)
+
+encode: build
+	./bin/ssmp 
