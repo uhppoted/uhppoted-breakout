@@ -1,6 +1,7 @@
 #pragma once
 
 #include <I2C.h>
+#include <hardware/uart.h>
 #include <pico/util/queue.h>
 
 extern const uint32_t MSG;
@@ -27,8 +28,10 @@ extern const uint SPI_TX;
 extern const uint SPI_CSn;
 extern const uint SPI_CLK;
 
-extern const uint UART0_TX;
-extern const uint UART0_RX;
+extern uart_inst_t *UART;
+extern const uint UART_IRQ;
+extern const uint UART_TX;
+extern const uint UART_RX;
 
 extern const struct I2C U2;
 extern const struct I2C U3;

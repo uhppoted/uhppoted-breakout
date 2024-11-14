@@ -28,6 +28,7 @@ add_executable(breakout
   src/main.c
   src/sys.c
   src/hwconfig.c
+  src/uart.c
 
   ${CORE}/src/sys.c
   ${CORE}/src/I2C0.c
@@ -44,8 +45,6 @@ add_executable(breakout
   ${CORE}/src/log.c
   ${CORE}/src/cli.c
   ${CORE}/src/ANSI.c
-
-  ${CORE}/src/uart.c
 
   ${LIB}/src/I2C.c
   ${LIB}/src/RX8900SA.c

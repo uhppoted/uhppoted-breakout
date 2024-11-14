@@ -7,7 +7,6 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
-#include <uart.h>
 
 #define BAUD_RATE 115200
 #define DATA_BITS 8
@@ -15,6 +14,10 @@
 #define PARITY UART_PARITY_NONE
 
 extern void sysinit();
+extern void on_uart_rx();
+
+const uint UART0_TX = 0;
+const uint UART0_RX = 1;
 
 bool on_tick(repeating_timer_t *);
 
@@ -39,7 +42,7 @@ bool sys_init() {
 #endif
 
     // ... UART
-    uart_init(uart0, 2400);
+    uart_init(uart0, 115200);
 
     gpio_set_function(UART0_TX, GPIO_FUNC_UART);
     gpio_set_function(UART0_RX, GPIO_FUNC_UART);

@@ -1,4 +1,5 @@
 #include <I2C.h>
+#include <hardware/uart.h>
 #include <pico/types.h>
 
 // GPIO
@@ -29,8 +30,10 @@ const uint GPIO_26 = 26;
 const uint GPIO_27 = 27;
 const uint GPIO_28 = 28;
 
-const uint UART0_TX = GPIO_0;
-const uint UART0_RX = GPIO_1;
+const uart_inst_t *UART = uart1;
+const uint UART_IRQ = UART1_IRQ;
+const uint UART_TX = GPIO_8;
+const uint UART_RX = GPIO_9;
 
 const uint IOX_RESET = GPIO_16;
 

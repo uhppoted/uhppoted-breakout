@@ -4,11 +4,10 @@
     - [ ] Migrate SSMP handler to UART1
           - [x] ENQ
           - [x] GET
+          - [x] pico: txrx/uart conflict
+          - [ ] Remove MODE
           - [ ] weird intermittent reset - expects ping maybe??
           - [ ] Remove SSMP stuff from CLI
-          - [ ] Remove MODE
-          - [ ] Remove Pico variant
-                - Remove uart.c
           - [ ] aioconsole
           - (?) maybe move bisync decoding to on_SSMP
 
@@ -41,7 +40,6 @@
     - [ ] UART
         - [ ] set UART output translation (`uart_set_translate_crlf`)
         - [ ] Enable FIFO
-        - [ ] pico: txrx/uart conflict
         - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
 
 ### emulator

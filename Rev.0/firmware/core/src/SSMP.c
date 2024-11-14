@@ -64,14 +64,14 @@ void SSMP_init() {
     debugf("SSMP", "init");
 
     // ... UART
-    gpio_set_function(UART0_TX, GPIO_FUNC_UART);
-    gpio_set_function(UART0_RX, GPIO_FUNC_UART);
+    gpio_set_function(UART_TX, GPIO_FUNC_UART);
+    gpio_set_function(UART_RX, GPIO_FUNC_UART);
 
-    uart_init(uart0, BAUD_RATE);
-    uart_set_baudrate(uart0, BAUD_RATE);
-    uart_set_format(uart0, DATA_BITS, STOP_BITS, PARITY);
-    uart_set_hw_flow(uart0, false, false);
-    uart_set_fifo_enabled(uart0, true);
+    uart_init(UART, BAUD_RATE);
+    uart_set_baudrate(UART, BAUD_RATE);
+    uart_set_format(UART, DATA_BITS, STOP_BITS, PARITY);
+    uart_set_hw_flow(UART, false, false);
+    uart_set_fifo_enabled(UART, true);
 
     SSMP_touched();
 
@@ -82,9 +82,9 @@ void SSMP_init() {
 void SSMP_start() {
     debugf("SSMP", "start");
 
-    irq_set_exclusive_handler(UART0_IRQ, on_SSMP);
-    irq_set_enabled(UART0_IRQ, true);
-    uart_set_irq_enables(uart0, true, false);
+    irq_set_exclusive_handler(UART_IRQ, on_SSMP);
+    irq_set_enabled(UART_IRQ, true);
+    uart_set_irq_enables(UART, true, false);
 }
 
 void SSMP_reset() {
@@ -117,8 +117,8 @@ void on_SSMP() {
     char buffer[64];
     int ix = 0;
 
-    while (uart_is_readable(uart0) && ix < sizeof(buffer)) {
-        buffer[ix++] = uart_getc(uart0);
+    while (uart_is_readable(UART) && ix < sizeof(buffer)) {
+        buffer[ix++] = uart_getc(UART);
     }
 
     if (ix > 0) {
@@ -147,7 +147,7 @@ void SSMP_rx(const struct buffer *received) {
 void SSMP_enq() {
     debugf("SSMP", "ENQ");
     SSMP_touched();
-    uart_write_blocking(uart0, SYN_SYN_ACK, 3);
+    uart_write_blocking(UART, SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
@@ -207,7 +207,7 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
     debugf("SSMP", "GET/response %u", encoded.length);
-    uart_write_blocking(uart0, encoded.bytes, encoded.length);
+    uart_write_blocking(UART, encoded.bytes, encoded.length);
 
     slice_free(&encoded);
     slice_free(&packed);
