@@ -83,7 +83,6 @@ int main() {
             if (connected) {
                 infof("SYS", "USB connected");
             } else {
-                // set_mode(MODE_UNKNOWN);
                 infof("SYS", "USB disconnected");
             }
         }

@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include <stdio.h>
 
 #include <pico/stdlib.h>
@@ -17,6 +18,8 @@ extern void sysinit();
 
 bool on_tick(repeating_timer_t *);
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
+uint32_t get_total_heap();
+uint32_t get_free_heap();
 
 struct {
     bool LED;
@@ -71,19 +74,10 @@ bool on_tick(repeating_timer_t *t) {
 void sys_tick() {
     sys.LED = !sys.LED;
 
-    if (sys.LED) {
-        switch (get_mode()) {
-        case MODE_CLI:
-            put_rgb(8, 4, 0); // yellow'ish
-            break;
-
-        case MODE_SSMP:
-            put_rgb(0, 0, 96); // blue
-            break;
-
-        default:
-            put_rgb(0, 0, 0); // off
-        }
+    if (sys.LED && get_mode() == MODE_CLI) {
+        put_rgb(8, 4, 0); // yellow'ish
+    } else if (sys.LED) {
+        put_rgb(0, 0, 0); // off
     } else {
         put_rgb(0, 8, 0);
     }
@@ -94,6 +88,8 @@ void sys_tick() {
             set_error(ERR_QUEUE_FULL, "SYS", "watchdog: queue full");
         }
     }
+
+    debugf("SYS", "queue:%u  total heap:%u  free heap:%u", queue_get_level(&queue), get_total_heap(), get_free_heap());
 }
 
 /* Sets sys.reboot flag to inhibit watchdog reset.
@@ -103,15 +99,23 @@ void sys_reboot() {
     sys.reboot = true;
 }
 
-/* Enables/disables LF to CRLF translation on USB.
- *
- */
-void sys_translate_crlf(bool enabled) {
-    stdio_set_translate_crlf(&stdio_usb, enabled);
-}
-
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {
     uint32_t rgb = (red << 16u) | (green << 8u) | (blue / 16 << 0u);
 
     pio_sm_put_blocking(pio0, 0, rgb << 8u);
+}
+
+uint32_t get_total_heap() {
+    extern char __StackLimit, __bss_end__;
+
+    return &__StackLimit - &__bss_end__;
+}
+
+uint32_t get_free_heap() {
+    extern char __StackLimit, __bss_end__;
+
+    uint32_t total = &__StackLimit - &__bss_end__;
+    struct mallinfo m = mallinfo();
+
+    return total - m.uordblks;
 }

@@ -103,14 +103,11 @@ void SSMP_touched() {
 void SSMP_ping() {
     debugf("SSMP", "ping");
 
-    // if (get_mode() == MODE_SSMP) {
     //     absolute_time_t now = get_absolute_time();
     //     int64_t delta = absolute_time_diff_us(SSMP.touched, now) / 1000;
     //
     //     if (llabs(delta) > SSMP_IDLE) {
-    //         set_mode(MODE_UNKNOWN);
     //     }
-    // }
 }
 
 void on_SSMP() {

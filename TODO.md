@@ -5,27 +5,24 @@
           - [x] ENQ
           - [x] GET
           - [x] pico: txrx/uart conflict
-          - [ ] Remove MODE
-          - [ ] weird intermittent reset - expects ping maybe??
-          - [ ] Remove SSMP stuff from CLI
+          - [x] Remove MODE
+          - [x] Remove SSMP stuff from CLI
+          - [ ] Move bisync decoding to on_SSMP
+          - [ ] weird intermittent reset
+                - associated with too many get requests maybe
+                - ~~full queue ?~~
+                - something in the bisync decoder ?
           - [ ] aioconsole
-          - (?) maybe move bisync decoding to on_SSMP
 
     - monitor
       - get-board
+
+    - [ ] memory leak
 
     - get-controller
       - [x] version
       - [ ] released
       - [ ] cache
-```
-2024-10-10 11:40:46 DEBUG  SSMP             write (68 bytes) [22 22 2 48 42 16 2 16 1 0 4 16 6 112 117 98 108 105 99 160 ...]
-2024-10-10 11:40:46 DEBUG  SSMP             read  (46 bytes) [43 16 6 16 1 4 16 1 132 128 0 16 2 16 3 4 10 50 48 50 52 45 49 48 45 48 49 3 138 146 2 16 1 0 16 2 16 1 0 48 26 48 24 16 6 10]
-2024-10-10 11:40:46 DEBUG  SSMP             read  (30 bytes) [43 16 6 16 1 4 16 1 132 128 0 16 2 16 3 4 10 50 48 50 52 45 49 48 45 48 49 3 138 146]
->>>>>>>>> received  46
->>>>>>>>> received  30
-2024-10-10 11:40:46 WARN   MIB              GET controller.released (no reply to SSMP GET .1.3.6.1.4.1.65536.2.3 request)
-```
 
     - [ ] ASN.1
        - [x] Fix negative int encoding

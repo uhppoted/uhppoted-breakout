@@ -3,7 +3,6 @@
 typedef enum {
     MODE_UNKNOWN,
     MODE_CLI,
-    MODE_SSMP,
 } mode;
 
 extern bool sys_init();

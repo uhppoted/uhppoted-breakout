@@ -21,9 +21,6 @@
 
 #include <MIB.h>
 #include <auth.h>
-// #include <crypt/crypt.h>
-// #include <crypt/otp/hotp.h>
-// #include <encoding/bisync/bisync.h>
 
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
 uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
@@ -92,9 +89,6 @@ extern const char *TERMINAL_ECHO;
 extern const char *TERMINAL_CLEARLINE;
 extern const char *TERMINAL_DISPLAY;
 extern const char *TERMINAL_AT;
-
-extern const uint8_t SYN;
-extern const uint8_t ENQ;
 
 const char CR = '\n';
 const char LF = '\r';
@@ -182,21 +176,6 @@ void cli_rx(const struct buffer *received) {
 
     for (int i = 0; i < N; i++) {
         char ch = received->data[i];
-
-        // SYN?
-        if (ch == SYN) {
-            memset(cli.buffer, 0, sizeof(cli.buffer));
-            cli.ix = 0;
-            continue;
-        }
-
-        // ENQ?
-        if (ch == ENQ && cli.ix == 0) {
-            memset(cli.buffer, 0, sizeof(cli.buffer));
-            cli.ix = 0;
-            set_mode(MODE_SSMP);
-            break;
-        }
 
         // ESC?
         if (ch == 27) {

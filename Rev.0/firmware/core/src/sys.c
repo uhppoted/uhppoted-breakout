@@ -31,8 +31,6 @@ void _push(char *);
 void _flush();
 void _print(const char *);
 
-extern void sys_translate_crlf(bool);
-
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
     mutex_init(&SYSTEM.guard);
@@ -61,9 +59,6 @@ mode get_mode() {
     case MODE_CLI:
         return MODE_CLI;
 
-    case MODE_SSMP:
-        return MODE_SSMP;
-
     default:
         return MODE_UNKNOWN;
     }
@@ -72,13 +67,6 @@ mode get_mode() {
 void set_mode(mode mode) {
     if (SYSTEM.mode != mode) {
         SYSTEM.mode = mode;
-
-        if (mode == MODE_SSMP) {
-            sys_translate_crlf(false);
-            SSMP_reset();
-        } else {
-            sys_translate_crlf(true);
-        }
     }
 
     // ... unblock queue
@@ -109,31 +97,13 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_TTY) {
         struct buffer *b = (struct buffer *)(SRAM_BASE | (v & 0x0fffffff));
 
-        if (SYSTEM.mode == MODE_SSMP) {
-            SSMP_rx(b);
-        } else {
-            cli_rx(b);
-        }
-
+        cli_rx(b);
         free(b);
     }
 
     if ((v & MSG) == MSG_TICK) {
         sys_tick();
-
-        switch (SYSTEM.mode) {
-        case MODE_CLI:
-            cli_ping();
-            break;
-
-        case MODE_SSMP:
-            SSMP_ping();
-            break;
-
-        case MODE_UNKNOWN:
-            cli_ping();
-            break;
-        }
+        cli_ping();
     }
 
     if ((v & MSG) == MSG_WATCHDOG) {
