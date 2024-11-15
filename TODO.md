@@ -11,8 +11,8 @@
           - [ ] weird intermittent reset
                 - associated with too many get requests maybe
                 - ~~full queue ?~~
-                - something in the bisync decoder ?
-          - [ ] aioconsole
+                - ~~something in the bisync decoder ?~~
+                - something in the interrupt handler ?
 
     - monitor
       - get-board
@@ -40,6 +40,9 @@
         - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
 
 ### emulator
+    - [ ] python
+          - [ ] aioconsole
+
     - [ ] tinygo
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
 

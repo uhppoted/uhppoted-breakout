@@ -72,6 +72,7 @@ void SSMP_init() {
     uart_set_format(UART, DATA_BITS, STOP_BITS, PARITY);
     uart_set_hw_flow(UART, false, false);
     uart_set_fifo_enabled(UART, true);
+    uart_set_translate_crlf(UART, false);
 
     SSMP_touched();
 
@@ -111,11 +112,12 @@ void SSMP_ping() {
 }
 
 void on_SSMP() {
-    char buffer[64];
+    char buf[32];
     int ix = 0;
 
-    while (uart_is_readable(UART) && ix < sizeof(buffer)) {
-        buffer[ix++] = uart_getc(UART);
+    // FIXME bool uart_is_readable_within_us (uart_inst_t * uart, uint32_t us)
+    while (uart_is_readable(UART) && ix < sizeof(buf)) {
+        buf[ix++] = uart_getc(UART);
     }
 
     if (ix > 0) {
@@ -123,7 +125,7 @@ void on_SSMP() {
 
         if ((b = (struct buffer *)malloc(sizeof(struct buffer))) != NULL) {
             b->N = ix;
-            memmove(b->data, buffer, ix);
+            memmove(b->data, buf, ix);
 
             uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
             if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
@@ -137,7 +139,7 @@ void on_SSMP() {
 }
 
 void SSMP_rx(const struct buffer *received) {
-    debugf("SSMP", "RX %d", received->N);
+    debugf("SSMP", ">> RX %d", received->N);
     bisync_decode(&SSMP.codec, received->data, received->N);
 }
 
