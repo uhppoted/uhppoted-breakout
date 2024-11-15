@@ -20,6 +20,7 @@ bool on_tick(repeating_timer_t *);
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
 uint32_t get_total_heap();
 uint32_t get_free_heap();
+uint32_t counter = 0;
 
 struct {
     bool LED;
@@ -89,7 +90,7 @@ void sys_tick() {
         }
     }
 
-    debugf("SYS", "queue:%u  total heap:%u  free heap:%u", queue_get_level(&queue), get_total_heap(), get_free_heap());
+    debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u", counter++, queue_get_level(&queue), get_total_heap(), get_free_heap());
 }
 
 /* Sets sys.reboot flag to inhibit watchdog reset.

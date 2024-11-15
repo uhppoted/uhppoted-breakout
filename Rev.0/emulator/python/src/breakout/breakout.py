@@ -36,10 +36,33 @@ async def ping(transport):
       print('... ping    ', ' '.join('{:02x}'.format(x) for x in ping))
       transport.write(ping)
 
+async def pingx(transport):
+      while True:
+          ping = b'\x16\x16\x05'
+          print('... ping    ', ' '.join('{:02x}'.format(x) for x in ping))
+          transport.write(ping)
+          await asyncio.sleep(5)
+
 async def get(transport):
       request = bytes(GET)
       print('... get     ', f'length:{len(request)}', f"\n                bytes: {' '.join('{:02x}'.format(x) for x in request)}")
       transport.write(request)
+
+async def getx(transport):
+      while True:
+          request = bytes(GET)
+          print('... get     ', f'length:{len(request)}', f"\n                bytes: {' '.join('{:02x}'.format(x) for x in request)}")
+          transport.write(request)
+          await asyncio.sleep(5)
+
+async def yadda(transport):
+      counter = 0
+      while True:
+          msg = b'\x16\x16'
+          counter = counter + 1
+          print('... yadda    ',counter, ' '.join('{:02x}'.format(x) for x in msg))
+          transport.write(msg)
+          await asyncio.sleep(5)
 
 async def readln(transport):
     while True:
@@ -48,8 +71,14 @@ async def readln(transport):
            break
         elif cmd == 'ping':
            asyncio.create_task(ping(transport))
+        elif cmd == 'pingx':
+           asyncio.create_task(pingx(transport))
         elif cmd == 'get':
            asyncio.create_task(get(transport))
+        elif cmd == 'getx':
+           asyncio.create_task(getx(transport))
+        elif cmd == 'yadda':
+           asyncio.create_task(yadda(transport))
 
 async def main():
     loop = asyncio.get_running_loop()

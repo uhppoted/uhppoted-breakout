@@ -41,5 +41,8 @@ build: format
 run: build
 	picotool load -v build/breakout.uf2 -f
 
+reboot: 
+	picotool reboot -f
+
 tty:
 	 minicom -b 115200 -o -D $(PORT)

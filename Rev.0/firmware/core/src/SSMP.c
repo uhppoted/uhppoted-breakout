@@ -84,8 +84,9 @@ void SSMP_start() {
     debugf("SSMP", "start");
 
     irq_set_exclusive_handler(UART_IRQ, on_SSMP);
-    irq_set_enabled(UART_IRQ, true);
     uart_set_irq_enables(UART, true, false);
+    // irq_set_enabled(UART_IRQ, true);
+    irq_set_enabled(UART_IRQ, false);
 }
 
 void SSMP_reset() {
@@ -113,29 +114,31 @@ void SSMP_ping() {
 
 void on_SSMP() {
     char buf[32];
-    int ix = 0;
+    size_t ix = 0;
 
     // FIXME bool uart_is_readable_within_us (uart_inst_t * uart, uint32_t us)
     while (uart_is_readable(UART) && ix < sizeof(buf)) {
         buf[ix++] = uart_getc(UART);
     }
 
-    if (ix > 0) {
-        struct buffer *b;
-
-        if ((b = (struct buffer *)malloc(sizeof(struct buffer))) != NULL) {
-            b->N = ix;
-            memmove(b->data, buf, ix);
-
-            uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
-            if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-                set_error(ERR_QUEUE_FULL, "SSMP", "rx: queue full");
-                free(b);
-            }
-        }
-
-        ix = 0;
-    }
+    // debugf("SSMP", "RX %d", ix);
+    //
+    // if (ix > 0) {
+    // struct buffer *b;
+    //
+    // if ((b = (struct buffer *)malloc(sizeof(struct buffer))) != NULL) {
+    //     b->N = ix;
+    //     memmove(b->data, buf, ix);
+    //
+    //     uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
+    //     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+    //         set_error(ERR_QUEUE_FULL, "SSMP", "rx: queue full");
+    //         free(b);
+    //     }
+    // }
+    //
+    // ix = 0;
+    // }
 }
 
 void SSMP_rx(const struct buffer *received) {
