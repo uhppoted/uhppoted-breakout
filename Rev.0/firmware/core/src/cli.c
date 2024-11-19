@@ -131,15 +131,18 @@ void cli_init() {
     print(TERMINAL_CLEAR);
     print(TERMINAL_QUERY_CODE);
     print(TERMINAL_QUERY_SIZE);
-    printf(TERMINAL_QUERY_STATUS);
+    // FIXME printf(TERMINAL_QUERY_STATUS);
 }
 
 /** Queries the terminal ID 'out of band'.
  *
  */
 void cli_ping() {
-    cli.ping = add_alarm_in_ms(CLI_PING_TIMEOUT, cli_ping_timeout, (CLI *)&cli, true);
-    printf(TERMINAL_QUERY_STATUS);
+    // FIXME cli.ping = add_alarm_in_ms(CLI_PING_TIMEOUT, cli_ping_timeout, (CLI *)&cli, true);
+    // FIXME printf(TERMINAL_QUERY_STATUS);
+
+    // FIXME
+    set_mode(MODE_CLI);
 }
 
 /** Processes received characters.
@@ -263,9 +266,9 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
  *
  */
 int64_t cli_ping_timeout(alarm_id_t id, void *data) {
-    if (get_mode() == MODE_CLI) {
-        set_mode(MODE_UNKNOWN);
-    }
+    // FIXME if (get_mode() == MODE_CLI) {
+    // FIXME     set_mode(MODE_UNKNOWN);
+    // FIXME }
 
     return 0;
 }

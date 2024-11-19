@@ -184,8 +184,7 @@ void U3_read(void *data) {
     int err;
 
     if ((err = PCAL6408A_read(U3, &inputs)) != ERR_OK) {
-        warnf("U3", "error reading PCAL6408A inputs (%d)", err);
-        set_error(ERR_U3, "U3", "get-inputs error %d", err);
+        set_error(ERR_U3, "U3", "error reading PCAL6408A inputs (%d)", err);
     } else {
         uint32_t v = inputs;
         uint32_t msg = MSG_U3 | (v & 0x0fffffff);

@@ -58,14 +58,14 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
         break;
     }
 
-    char msg[64];
-
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(msg, sizeof(msg), fmt, args);
-    va_end(args);
-
-    errorf(tag, "%s", msg);
+    // char msg[64];
+    //
+    // va_list args;
+    // va_start(args, fmt);
+    // vsnprintf(msg, sizeof(msg), fmt, args);
+    // va_end(args);
+    //
+    // errorf(tag, "%s", msg);
 }
 
 bool get_error(err error) {
@@ -93,4 +93,24 @@ bool get_error(err error) {
     }
 
     return false;
+}
+
+uint16_t get_errors() {
+    uint16_t bits = 0x0000;
+
+    bits |= STATE.errors.I2C ? 0x0001 : 0x0000;
+    bits |= STATE.errors.queue ? 0x0002 : 0x0000;
+    bits |= STATE.errors.RX8900SA ? 0x0004 : 0x0000;
+    bits |= STATE.errors.U3 ? 0x0008 : 0x0000;
+    bits |= STATE.errors.U4 ? 0x0010 : 0x0000;
+    bits |= STATE.errors.unknown ? 0x8000 : 0x0000;
+
+    STATE.errors.I2C = false;
+    STATE.errors.queue = false;
+    STATE.errors.RX8900SA = false;
+    STATE.errors.U3 = false;
+    STATE.errors.U4 = false;
+    STATE.errors.unknown = false;
+
+    return bits;
 }

@@ -1,5 +1,6 @@
 #include <malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <pico/stdlib.h>
 
@@ -17,6 +18,7 @@
 extern void sysinit();
 
 bool on_tick(repeating_timer_t *);
+bool on_monitor(repeating_timer_t *);
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
 uint32_t get_total_heap();
 uint32_t get_free_heap();
@@ -25,10 +27,17 @@ uint32_t counter = 0;
 struct {
     bool LED;
     bool reboot;
-    struct repeating_timer timer;
+    repeating_timer_t timer;
+
+    alarm_pool_t *pool;
+    repeating_timer_t monitor;
+    absolute_time_t touched;
+    bool triggered;
 } sys = {
     .LED = false,
     .reboot = false,
+    .touched = 0,
+    .triggered = false,
 };
 
 bool sys_init() {
@@ -57,6 +66,16 @@ bool sys_init() {
     usb_init();
     log_init();
 
+    // ... set up health watchdog
+    uint t0 = TIMER_ALARM_NUM_FROM_IRQ(TIMER_IRQ_0);
+
+    if (!hardware_alarm_is_claimed(t0)) {
+        sys.pool = alarm_pool_create(t0, 1);
+        sys.touched = get_absolute_time();
+
+        alarm_pool_add_repeating_timer_ms(sys.pool, 500, on_monitor, &sys, &sys.monitor);
+    }
+
     return true;
 }
 
@@ -69,18 +88,43 @@ bool on_tick(repeating_timer_t *t) {
     return true;
 }
 
+/* Internal system monitor, hooked to TIMER 0 IRQ
+ *
+ */
+bool on_monitor(repeating_timer_t *t) {
+    absolute_time_t now = get_absolute_time();
+    int64_t delta = absolute_time_diff_us(sys.touched, now) / 1000;
+
+    if (llabs(delta) > 5000) {
+        if (!sys.triggered) {
+            sys.triggered = true;
+            put_rgb(128, 0, 128);
+            debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  errors:%04x",
+                   counter++,
+                   queue_get_level(&queue),
+                   get_total_heap(),
+                   get_free_heap(),
+                   get_errors());
+        }
+    } else {
+        sys.triggered = false;
+    }
+}
+
 /* Blinks SYSLED and resets watchdog.
  *
  */
 void sys_tick() {
     sys.LED = !sys.LED;
 
-    if (sys.LED && get_mode() == MODE_CLI) {
-        put_rgb(8, 4, 0); // yellow'ish
-    } else if (sys.LED) {
-        put_rgb(0, 0, 0); // off
-    } else {
-        put_rgb(0, 8, 0);
+    if (!sys.triggered) {
+        if (sys.LED && get_mode() == MODE_CLI) {
+            put_rgb(8, 4, 0); // yellow'ish
+        } else if (sys.LED) {
+            put_rgb(0, 0, 0); // off
+        } else {
+            put_rgb(0, 8, 0);
+        }
     }
 
     if (!sys.reboot) {
@@ -90,7 +134,12 @@ void sys_tick() {
         }
     }
 
-    debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u", counter++, queue_get_level(&queue), get_total_heap(), get_free_heap());
+    debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u  errors:%04x",
+           counter++,
+           queue_get_level(&queue),
+           get_total_heap(),
+           get_free_heap(),
+           get_errors());
 }
 
 /* Sets sys.reboot flag to inhibit watchdog reset.
@@ -98,6 +147,26 @@ void sys_tick() {
  */
 void sys_reboot() {
     sys.reboot = true;
+}
+
+/* Resets the internal soft watchdog.
+ *
+ */
+void sys_watchdog_update() {
+    sys.touched = get_absolute_time();
+}
+
+void sys_debug() {
+    absolute_time_t now = get_absolute_time();
+    int64_t delta = absolute_time_diff_us(sys.touched, now) / 1000;
+
+    debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  errors:%04x  dt:%ld",
+           counter++,
+           queue_get_level(&queue),
+           get_total_heap(),
+           get_free_heap(),
+           get_errors(),
+           delta);
 }
 
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {

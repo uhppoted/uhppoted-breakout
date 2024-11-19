@@ -89,9 +89,7 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_RX) {
-        struct buffer *b = (struct buffer *)(SRAM_BASE | (v & 0x0fffffff));
-        SSMP_rx(b);
-        free(b);
+        SSMP_rx(v & 0x0fffffff);
     }
 
     if ((v & MSG) == MSG_TTY) {
@@ -108,6 +106,7 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_WATCHDOG) {
         watchdog_update();
+        sys_watchdog_update();
     }
 }
 

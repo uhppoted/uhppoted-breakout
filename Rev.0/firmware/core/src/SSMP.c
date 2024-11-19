@@ -31,10 +31,18 @@ void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
 void on_SSMP();
 
+extern void sys_debug();
+
 struct {
+    uint8_t buffer[512];
+    int head;
+    int tail;
     struct bisync codec;
     absolute_time_t touched;
 } SSMP = {
+    .head = 0,
+    .tail = 0,
+
     .codec = {
         .header = {
             .ix = 0,
@@ -57,6 +65,7 @@ struct {
         .enq = SSMP_enq,
         .received = SSMP_received,
     },
+
     .touched = 0,
 };
 
@@ -64,6 +73,9 @@ void SSMP_init() {
     debugf("SSMP", "init");
 
     // ... UART
+    gpio_pull_up(UART_TX);
+    gpio_pull_up(UART_RX);
+
     gpio_set_function(UART_TX, GPIO_FUNC_UART);
     gpio_set_function(UART_RX, GPIO_FUNC_UART);
 
@@ -72,7 +84,7 @@ void SSMP_init() {
     uart_set_format(UART, DATA_BITS, STOP_BITS, PARITY);
     uart_set_hw_flow(UART, false, false);
     uart_set_fifo_enabled(UART, true);
-    uart_set_translate_crlf(UART, false);
+    uart_set_translate_crlf(UART, true);
 
     SSMP_touched();
 
@@ -85,8 +97,7 @@ void SSMP_start() {
 
     irq_set_exclusive_handler(UART_IRQ, on_SSMP);
     uart_set_irq_enables(UART, true, false);
-    // irq_set_enabled(UART_IRQ, true);
-    irq_set_enabled(UART_IRQ, false);
+    irq_set_enabled(UART_IRQ, true);
 }
 
 void SSMP_reset() {
@@ -113,37 +124,50 @@ void SSMP_ping() {
 }
 
 void on_SSMP() {
-    char buf[32];
-    size_t ix = 0;
+    int next = (SSMP.head + 1) % sizeof(SSMP.buffer);
+    int poke = 0;
 
-    // FIXME bool uart_is_readable_within_us (uart_inst_t * uart, uint32_t us)
-    while (uart_is_readable(UART) && ix < sizeof(buf)) {
-        buf[ix++] = uart_getc(UART);
+    while (uart_is_readable(UART)) {
+        uint8_t ch = uart_getc(UART);
+
+        // FIXME remove (debugging)
+        if (ch == '*') {
+            poke++;
+        }
+
+        if (next != SSMP.tail) {
+            SSMP.buffer[SSMP.head] = ch;
+            SSMP.head = next;
+
+            next = (SSMP.head + 1) % sizeof(SSMP.buffer);
+        }
     }
 
-    // debugf("SSMP", "RX %d", ix);
-    //
-    // if (ix > 0) {
-    // struct buffer *b;
-    //
-    // if ((b = (struct buffer *)malloc(sizeof(struct buffer))) != NULL) {
-    //     b->N = ix;
-    //     memmove(b->data, buf, ix);
-    //
-    //     uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
-    //     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-    //         set_error(ERR_QUEUE_FULL, "SSMP", "rx: queue full");
-    //         free(b);
-    //     }
-    // }
-    //
-    // ix = 0;
-    // }
+    // FIXME remove (debugging)
+    if (poke > 2) {
+        sys_debug(); // FIXME remove
+    }
+
+    int N = (SSMP.head - SSMP.tail + sizeof(SSMP.buffer)) % sizeof(SSMP.buffer);
+    uint32_t msg = MSG_RX | ((uint32_t)N & 0x0fffffff);
+    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+        set_error(ERR_QUEUE_FULL, "SSMP", "rx: queue full");
+    }
 }
 
-void SSMP_rx(const struct buffer *received) {
-    debugf("SSMP", ">> RX %d", received->N);
-    bisync_decode(&SSMP.codec, received->data, received->N);
+void SSMP_rx(uint32_t N) {
+    int pending = (SSMP.head - SSMP.tail + sizeof(SSMP.buffer)) % sizeof(SSMP.buffer);
+
+    debugf("SSMP", ">> RX  head:%d  tail:%d  N:%u  pending:%d", SSMP.head, SSMP.tail, N, pending);
+
+    while (SSMP.tail != SSMP.head) {
+        uint8_t ch = SSMP.buffer[SSMP.tail];
+
+        SSMP.tail = (SSMP.tail + 1) % sizeof(SSMP.buffer);
+        uart_putc(UART, ch);
+    }
+
+    // bisync_decode(&SSMP.codec, received->data, received->N);
 }
 
 void SSMP_enq() {

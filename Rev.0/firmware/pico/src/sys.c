@@ -104,8 +104,17 @@ void sys_reboot() {
     sys.reboot = true;
 }
 
+/* Resets any internal soft watchdog.
+ *
+ */
+void sys_watchdog_update() {
+}
+
 /* Enables/disables LF to CRLF translation on USB.
  *
  */
 void sys_translate_crlf(bool enabled) {
+}
+
+void sys_debug() {
 }

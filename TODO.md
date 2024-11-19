@@ -1,5 +1,8 @@
 # TODO
 
+- [ ] set I2C GPIO slew rates and drive for 100kHz
+- [ ] CLI: trace on/off
+
 ### SSMP
     - [ ] Migrate SSMP handler to UART1
           - [x] ENQ
@@ -9,10 +12,23 @@
           - [x] Remove SSMP stuff from CLI
           - [ ] Move bisync decoding to on_SSMP
           - [ ] weird intermittent reset
-                - associated with too many get requests maybe
-                - ~~full queue ?~~
-                - ~~something in the bisync decoder ?~~
-                - something in the interrupt handler ?
+                - ~~too many get requests~~
+                - ~~full queue~~
+                - ~~bisync decoder~~
+                - ~~UART interrupt handler~~
+                - ~~IOX or RTC~~
+                - ~~USB~~
+                - U3_read ?
+                - alarm timers disabled ?
+                - stray printf ?
+```
+/Users/tonyseebregts/Development/uhppote/uhppoted/uhppoted-breakout/Rev.0/firmware/core/src/cli.c:
+  134:     printf(TERMINAL_QUERY_STATUS);
+  142:     printf(TERMINAL_QUERY_STATUS);
+```
+          - [ ] Reinstate watchdog reset
+          - [ ] Reinstate CLI query status, ping, etc
+          - [ ] Check all FIXMEs
 
     - monitor
       - get-board
