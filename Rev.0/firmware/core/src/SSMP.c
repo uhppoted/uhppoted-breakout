@@ -174,8 +174,9 @@ void SSMP_rx(uint32_t N) {
 
 void SSMP_enq() {
     debugf("SSMP", "ENQ");
-    // SSMP_touched();
-    // uart_write_blocking(UART, SYN_SYN_ACK, 3);
+
+    SSMP_touched();
+    uart_write_blocking(UART, SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {

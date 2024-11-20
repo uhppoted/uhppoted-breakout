@@ -23,57 +23,57 @@ vector *BER_decode(const uint8_t *message, int N) {
 vector *unpack(const uint8_t *bytes, int N) {
     vector *v = vector_new();
 
-    if (v != NULL) {
-        int ix = 0;
-        int count = 0;
-        field *f;
-
-        while (ix < N && ++count < 16) {
-            uint8_t tag = bytes[ix++];
-
-            switch (tag) {
-            case FIELD_INTEGER:
-                if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
-                    v = vector_add(v, f);
-                }
-                break;
-
-            case FIELD_OCTET_STRING:
-                if ((f = unpack_octets(bytes, N, &ix)) != NULL) {
-                    v = vector_add(v, f);
-                }
-                break;
-
-            case FIELD_NULL:
-                if ((f = unpack_null(bytes, N, &ix)) != NULL) {
-                    v = vector_add(v, f);
-                }
-                break;
-
-            case FIELD_OID:
-                if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
-                    v = vector_add(v, f);
-                }
-                break;
-
-            case FIELD_SEQUENCE:
-                if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
-                    v = vector_add(v, f);
-                }
-                break;
-
-            case FIELD_PDU_GET:
-                if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
-                    v = vector_add(v, f);
-                }
-                break;
-
-            default:
-                // printf("::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
-                ix = N;
-            }
-        }
-    }
+    // if (v != NULL) {
+    //     int ix = 0;
+    //     int count = 0;
+    //     field *f;
+    //
+    //     while (ix < N && ++count < 16) {
+    //         uint8_t tag = bytes[ix++];
+    //
+    //         switch (tag) {
+    //         case FIELD_INTEGER:
+    //             if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
+    //                 v = vector_add(v, f);
+    //             }
+    //             break;
+    //
+    //         case FIELD_OCTET_STRING:
+    //             if ((f = unpack_octets(bytes, N, &ix)) != NULL) {
+    //                 v = vector_add(v, f);
+    //             }
+    //             break;
+    //
+    //         case FIELD_NULL:
+    //             if ((f = unpack_null(bytes, N, &ix)) != NULL) {
+    //                 v = vector_add(v, f);
+    //             }
+    //             break;
+    //
+    //         case FIELD_OID:
+    //             if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
+    //                 v = vector_add(v, f);
+    //             }
+    //             break;
+    //
+    //         case FIELD_SEQUENCE:
+    //             if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
+    //                 v = vector_add(v, f);
+    //             }
+    //             break;
+    //
+    //         case FIELD_PDU_GET:
+    //             if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
+    //                 v = vector_add(v, f);
+    //             }
+    //             break;
+    //
+    //         default:
+    //             // printf("::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
+    //             ix = N;
+    //         }
+    //     }
+    // }
 
     return v;
 }
