@@ -29,7 +29,6 @@ const uint32_t MSG_WIO = 0x10000000;
 const uint32_t MSG_U3 = 0x20000000;
 const uint32_t MSG_RX = 0x30000000;
 const uint32_t MSG_TTY = 0xc0000000;
-const uint32_t MSG_USB = 0xd0000000;
 const uint32_t MSG_WATCHDOG = 0xe0000000;
 const uint32_t MSG_TICK = 0xf0000000;
 
@@ -76,14 +75,5 @@ int main() {
         uint32_t v;
         queue_remove_blocking(&queue, &v);
         dispatch(v);
-
-        if ((v & MSG) == MSG_USB) {
-            bool connected = (v & 0x0fffffff) == 1;
-            if (connected) {
-                infof("SYS", "USB connected");
-            } else {
-                infof("SYS", "USB disconnected");
-            }
-        }
     }
 }

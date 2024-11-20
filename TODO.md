@@ -29,6 +29,12 @@
           - [ ] Reinstate watchdog reset
           - [ ] Reinstate CLI query status, ping, etc
           - [ ] Check all FIXMEs
+          - [ ] Move query-status + mode to sys
+          - [ ] Trace interval (compile time option)
+          - [ ] Rework println to use circular buffer
+          - [ ] Invoke sys.flush from main loop
+          - [ ] Check that system doesn't freeze when print queue is full 
+                (i.e. why did it freeze when the CLI used a printf?)
 
     - monitor
       - get-board

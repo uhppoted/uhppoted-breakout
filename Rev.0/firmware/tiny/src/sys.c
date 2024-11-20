@@ -160,6 +160,8 @@ void sys_debug() {
     absolute_time_t now = get_absolute_time();
     int64_t delta = absolute_time_diff_us(sys.touched, now) / 1000;
 
+    put_rgb(0, 64, 255);
+
     debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  errors:%04x  dt:%ld",
            counter++,
            queue_get_level(&queue),

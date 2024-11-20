@@ -28,18 +28,11 @@ bool on_usb_rx(repeating_timer_t *rt) {
     if (tud_cdc_connected() && !USB.connected) {
         USB.connected = true;
 
-        uint32_t msg = MSG_USB | 0x00000001;
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            set_error(ERR_QUEUE_FULL, "USB", "rx: queue full");
-        }
-
+        infof("USB", "connected");
     } else if (!tud_cdc_connected() && USB.connected) {
         USB.connected = false;
 
-        uint32_t msg = MSG_USB | 0x00000000;
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            set_error(ERR_QUEUE_FULL, "USB", "rx: queue full");
-        }
+        infof("USB", "disconnected");
     }
 
     if (tud_cdc_connected()) {
