@@ -145,7 +145,7 @@ void on_SSMP() {
 
     // FIXME remove (debugging)
     if (poke > 2) {
-        sys_debug(); // FIXME remove
+        sys_debug();
     }
 
     int N = (SSMP.head - SSMP.tail + sizeof(SSMP.buffer)) % sizeof(SSMP.buffer);
@@ -156,51 +156,53 @@ void on_SSMP() {
 }
 
 void SSMP_rx(uint32_t N) {
-    int pending = (SSMP.head - SSMP.tail + sizeof(SSMP.buffer)) % sizeof(SSMP.buffer);
+    // int pending = (SSMP.head - SSMP.tail + sizeof(SSMP.buffer)) % sizeof(SSMP.buffer);
+    // debugf("SSMP", ">> RX  head:%d  tail:%d  N:%u  pending:%d", SSMP.head, SSMP.tail, N, pending);
 
-    debugf("SSMP", ">> RX  head:%d  tail:%d  N:%u  pending:%d", SSMP.head, SSMP.tail, N, pending);
+    int tail = SSMP.tail;
+    uint8_t ch;
 
-    while (SSMP.tail != SSMP.head) {
-        uint8_t ch = SSMP.buffer[SSMP.tail];
+    while (tail != SSMP.head) {
+        ch = SSMP.buffer[tail++];
+        tail %= sizeof(SSMP.buffer);
 
-        SSMP.tail = (SSMP.tail + 1) % sizeof(SSMP.buffer);
-        uart_putc(UART, ch);
+        bisync_decode(&SSMP.codec, ch);
     }
 
-    // bisync_decode(&SSMP.codec, received->data, received->N);
+    SSMP.tail = tail;
 }
 
 void SSMP_enq() {
     debugf("SSMP", "ENQ");
-    SSMP_touched();
-    uart_write_blocking(UART, SYN_SYN_ACK, 3);
+    // SSMP_touched();
+    // uart_write_blocking(UART, SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
     debugf("SSMP", "received");
 
-    // ... decode packet
-    vector *fields = BER_decode(data, data_len);
-    packet *request = ssmp_decode(fields);
-
-    vector_free(fields);
-    free(fields);
-
-    // ... GET request?
-    if (request != NULL && request->tag == PACKET_GET) {
-        const char *community = request->community;
-        const char *oid = request->get.OID;
-        uint32_t code = request->get.request_id;
-
-        if (auth_authorised(community, oid)) {
-            if (auth_validate(community, code)) {
-                SSMP_touched();
-                SSMP_get(request->community, request->get.request_id, request->get.OID);
-            }
-        }
-    }
-
-    free_packet(request);
+    // // ... decode packet
+    // vector *fields = BER_decode(data, data_len);
+    // packet *request = ssmp_decode(fields);
+    //
+    // vector_free(fields);
+    // free(fields);
+    //
+    // // ... GET request?
+    // if (request != NULL && request->tag == PACKET_GET) {
+    //     const char *community = request->community;
+    //     const char *oid = request->get.OID;
+    //     uint32_t code = request->get.request_id;
+    //
+    //     if (auth_authorised(community, oid)) {
+    //         if (auth_validate(community, code)) {
+    //             SSMP_touched();
+    //             SSMP_get(request->community, request->get.request_id, request->get.OID);
+    //         }
+    //     }
+    // }
+    //
+    // free_packet(request);
 }
 
 /* SSMP GET response

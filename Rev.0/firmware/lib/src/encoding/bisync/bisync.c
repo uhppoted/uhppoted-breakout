@@ -34,103 +34,36 @@ void bisync_reset(struct bisync *codec) {
     codec->CRC = false;
 }
 
-void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
-    for (int i = 0; i < N; i++) {
-        uint8_t ch = buffer[i];
+void bisync_decode(struct bisync *codec, const uint8_t ch) {
+    // ... CRC?
+    if (codec->CRC) {
+        codec->crc.CRC <<= 8;
+        codec->crc.CRC |= (uint16_t)(ch)&0x00ff;
+        codec->crc.ix++;
 
-        // ... CRC?
-        if (codec->CRC) {
-            codec->crc.CRC <<= 8;
-            codec->crc.CRC |= (uint16_t)(ch)&0x00ff;
-            codec->crc.ix++;
+        if (codec->crc.ix >= 2) {
+            uint16_t CRC = 0xffff;
+            CRC = CRC16(CRC, codec->header.data, codec->header.ix);
+            CRC = CRC16(CRC, &STX, 1);
+            CRC = CRC16(CRC, codec->data.data, codec->data.ix);
+            CRC = CRC16(CRC, &ETX, 1);
 
-            if (codec->crc.ix >= 2) {
-                uint16_t CRC = 0xffff;
-                CRC = CRC16(CRC, codec->header.data, codec->header.ix);
-                CRC = CRC16(CRC, &STX, 1);
-                CRC = CRC16(CRC, codec->data.data, codec->data.ix);
-                CRC = CRC16(CRC, &ETX, 1);
-
-                if ((CRC ^ codec->crc.CRC) == 0x0000) {
-                    if (codec->received != NULL) {
-                        codec->received(codec->header.data, codec->header.ix, codec->data.data, codec->data.ix);
-                    }
-                }
-
-                bisync_reset(codec);
-            }
-
-            continue;
-        }
-
-        // ... escaped?
-        if (codec->DLE) {
-            codec->DLE = false;
-
-            if (codec->SOH) {
-                if (codec->header.ix < sizeof(codec->header.data)) {
-                    codec->header.data[codec->header.ix++] = ch;
-                } else {
-                    bisync_reset(codec);
+            if ((CRC ^ codec->crc.CRC) == 0x0000) {
+                if (codec->received != NULL) {
+                    codec->received(codec->header.data, codec->header.ix, codec->data.data, codec->data.ix);
                 }
             }
 
-            if (codec->STX) {
-                if (codec->data.ix < sizeof(codec->data.data)) {
-                    codec->data.data[codec->data.ix++] = ch;
-                } else {
-                    bisync_reset(codec);
-                }
-            }
-
-            continue;
-        }
-
-        // ... normal'ish
-        // SYN?
-        if (ch == SYN) {
             bisync_reset(codec);
-            continue;
         }
 
-        // ENQ?
-        // if (ch == ENQ && codec->ix == 0) {
-        if (ch == ENQ) {
-            bisync_reset(codec);
-            if (codec->enq != NULL) {
-                codec->enq();
-            }
-            continue;
-        }
+        return;
+    }
 
-        // SOH?
-        if (ch == SOH) {
-            bisync_reset(codec);
-            codec->SOH = true;
-            continue;
-        }
+    // ... escaped?
+    if (codec->DLE) {
+        codec->DLE = false;
 
-        // STX?
-        if (ch == STX) {
-            codec->SOH = false;
-            codec->STX = true;
-            continue;
-        }
-
-        // ETX?
-        if (ch == ETX) {
-            codec->STX = false;
-            codec->CRC = true;
-            continue;
-        }
-
-        // DLE?
-        if (ch == DLE) {
-            codec->DLE = true;
-            continue;
-        }
-
-        // ... accumulate message
         if (codec->SOH) {
             if (codec->header.ix < sizeof(codec->header.data)) {
                 codec->header.data[codec->header.ix++] = ch;
@@ -145,6 +78,69 @@ void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N) {
             } else {
                 bisync_reset(codec);
             }
+        }
+
+        return;
+    }
+
+    // ... normal'ish
+    // SYN?
+    if (ch == SYN) {
+        bisync_reset(codec);
+        return;
+    }
+
+    // ENQ?
+    // if (ch == ENQ && codec->ix == 0) {
+    if (ch == ENQ) {
+        bisync_reset(codec);
+        if (codec->enq != NULL) {
+            codec->enq();
+        }
+        return;
+    }
+
+    // SOH?
+    if (ch == SOH) {
+        bisync_reset(codec);
+        codec->SOH = true;
+        return;
+    }
+
+    // STX?
+    if (ch == STX) {
+        codec->SOH = false;
+        codec->STX = true;
+        return;
+    }
+
+    // ETX?
+    if (ch == ETX) {
+        codec->STX = false;
+        codec->CRC = true;
+        return;
+    }
+
+    // DLE?
+    if (ch == DLE) {
+        codec->DLE = true;
+        return;
+    }
+
+    // ... accumulate message
+    if (codec->SOH) {
+        if (codec->header.ix < sizeof(codec->header.data)) {
+            codec->header.data[codec->header.ix++] = ch;
+        } else {
+            bisync_reset(codec);
+        }
+    }
+
+    if (codec->STX) {
+        if (codec->data.ix < sizeof(codec->data.data)) {
+            codec->data.data[codec->data.ix++] = ch;
+        } else {
+            bisync_reset(codec);
         }
     }
 }

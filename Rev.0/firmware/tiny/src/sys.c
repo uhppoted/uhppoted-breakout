@@ -134,11 +134,16 @@ void sys_tick() {
         }
     }
 
-    debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u  errors:%04x",
+    uint32_t heap = get_total_heap();
+    uint32_t available = get_free_heap();
+    float used = 1.0 - ((float)available / (float)heap);
+
+    debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x",
            counter++,
            queue_get_level(&queue),
-           get_total_heap(),
-           get_free_heap(),
+           heap,
+           available,
+           100.0 * used,
            get_errors());
 }
 
@@ -162,11 +167,16 @@ void sys_debug() {
 
     put_rgb(0, 64, 255);
 
-    debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  errors:%04x  dt:%ld",
+    uint32_t heap = get_total_heap();
+    uint32_t available = get_free_heap();
+    float used = 1.0 - ((float)available / (float)heap);
+
+    debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  dt:%ld",
            counter++,
            queue_get_level(&queue),
-           get_total_heap(),
-           get_free_heap(),
+           heap,
+           available,
+           100.0 * used,
            get_errors(),
            delta);
 }

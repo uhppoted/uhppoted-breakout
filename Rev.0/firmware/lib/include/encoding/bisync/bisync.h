@@ -44,5 +44,5 @@ extern const uint8_t SYN;
 
 extern const char SYN_SYN_ACK[];
 
-extern void bisync_decode(struct bisync *codec, const uint8_t *buffer, int N);
+extern void bisync_decode(struct bisync *codec, const uint8_t ch);
 extern slice bisync_encode(const uint8_t *header, int header_len, const uint8_t *data, int data_len);

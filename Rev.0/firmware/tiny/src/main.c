@@ -73,6 +73,7 @@ int main() {
     // ... run loop
     while (true) {
         uint32_t v;
+
         queue_remove_blocking(&queue, &v);
         dispatch(v);
     }
