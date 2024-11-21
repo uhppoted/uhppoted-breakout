@@ -50,8 +50,3 @@ typedef enum {
     ERR_VLF,
     ERR_UNKNOWN,
 } err;
-
-typedef struct buffer {
-    int N;
-    uint8_t data[256];
-} buffer;

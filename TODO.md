@@ -2,8 +2,17 @@
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] CLI: trace on/off
+- [ ] USB circular buffer
+- [ ] UART circular buffer
+- (?) Remove SPI
 
 ### SSMP
+    - [ ] circular-buffer
+          - [ ] push
+          - [ ] pop
+          - [ ] flush
+          - [ ] empty
+
     - [ ] Migrate SSMP handler to UART1
           - [x] ENQ
           - [x] GET
@@ -11,7 +20,7 @@
           - [x] Remove MODE
           - [x] Remove SSMP stuff from CLI
           - [x] Move USB connected/disconnected to USB driver
-          - [ ] Move bisync decoding to on_SSMP
+          - [x] pass buffer address in MSG
           - [ ] weird intermittent reset
                 - ~~too many get requests~~
                 - ~~full queue~~
@@ -69,6 +78,13 @@
         - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
 
 ### emulator
+    - [ ] split architecture
+          - SSMP driver
+          - UHPPOTE emulator
+          - RPC
+            - unix domain sockets
+            - TCP/IP
+
     - [ ] python
           - [ ] aioconsole
 
@@ -95,7 +111,6 @@
     - [ ] idle poll
     - [ ] walk MIB to initialise/refresh cache
     - [ ] // TODO: exponential backoff
-    - [ ] python
 
 ### MIB
     - [x] controller ID

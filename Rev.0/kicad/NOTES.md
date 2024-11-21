@@ -38,8 +38,9 @@
 32. DO and DI are actual D0 and D1, etc
 33. Protection resistors (560 ohms?) on UART1 pins
 34. Add RTS and CTS to UART header
-35. Connect RX8900SA INT (or 1s output) to GPIO for use as external watchdog
-36. Seriously considier an external hardware watchdog
+35. Connect RX8900SA 1s output to GPIO
+36. Connect RX8900SA ALARM output to reset (jumper)
+37. Seriously consider an external hardware watchdog
 
 (?) Maybe put GND on pin 1 of UART/SPI header
 (?) https://www.olimex.com/Products/Components/IC/SY6280

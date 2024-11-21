@@ -16,6 +16,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
+#include <types/buffer.h>
 
 #define BAUD_RATE 115200
 #define DATA_BITS 8
@@ -34,14 +35,14 @@ void on_SSMP();
 extern void sys_debug();
 
 struct {
-    uint8_t buffer[512];
-    int head;
-    int tail;
-    struct bisync codec;
+    circular_buffer buffer;
+    bisync codec;
     absolute_time_t touched;
 } SSMP = {
-    .head = 0,
-    .tail = 0,
+    .buffer = {
+        .head = 0,
+        .tail = 0,
+    },
 
     .codec = {
         .header = {
@@ -98,6 +99,8 @@ void SSMP_start() {
     irq_set_exclusive_handler(UART_IRQ, on_SSMP);
     uart_set_irq_enables(UART, true, false);
     irq_set_enabled(UART_IRQ, true);
+
+    debugf("SSMP", ">>>>>>>>>> start %p", &SSMP.buffer);
 }
 
 void SSMP_reset() {
@@ -124,7 +127,7 @@ void SSMP_ping() {
 }
 
 void on_SSMP() {
-    int next = (SSMP.head + 1) % sizeof(SSMP.buffer);
+    int next = (SSMP.buffer.head + 1) % sizeof(SSMP.buffer.bytes);
     int poke = 0;
 
     while (uart_is_readable(UART)) {
@@ -135,11 +138,11 @@ void on_SSMP() {
             poke++;
         }
 
-        if (next != SSMP.tail) {
-            SSMP.buffer[SSMP.head] = ch;
-            SSMP.head = next;
+        if (next != SSMP.buffer.tail) {
+            SSMP.buffer.bytes[SSMP.buffer.head] = ch;
+            SSMP.buffer.head = next;
 
-            next = (SSMP.head + 1) % sizeof(SSMP.buffer);
+            next = (SSMP.buffer.head + 1) % sizeof(SSMP.buffer.bytes);
         }
     }
 
@@ -148,28 +151,26 @@ void on_SSMP() {
         sys_debug();
     }
 
-    int N = (SSMP.head - SSMP.tail + sizeof(SSMP.buffer)) % sizeof(SSMP.buffer);
-    uint32_t msg = MSG_RX | ((uint32_t)N & 0x0fffffff);
+    circular_buffer *b = &SSMP.buffer;
+    uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
+
     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
         set_error(ERR_QUEUE_FULL, "SSMP", "rx: queue full");
     }
 }
 
-void SSMP_rx(uint32_t N) {
-    // int pending = (SSMP.head - SSMP.tail + sizeof(SSMP.buffer)) % sizeof(SSMP.buffer);
-    // debugf("SSMP", ">> RX  head:%d  tail:%d  N:%u  pending:%d", SSMP.head, SSMP.tail, N, pending);
-
-    int tail = SSMP.tail;
+void SSMP_rx(const circular_buffer *buffer) {
+    int tail = SSMP.buffer.tail;
     uint8_t ch;
 
-    while (tail != SSMP.head) {
-        ch = SSMP.buffer[tail++];
-        tail %= sizeof(SSMP.buffer);
+    while (tail != SSMP.buffer.head) {
+        ch = SSMP.buffer.bytes[tail++];
+        tail %= sizeof(SSMP.buffer.bytes);
 
         bisync_decode(&SSMP.codec, ch);
     }
 
-    SSMP.tail = tail;
+    SSMP.buffer.tail = tail;
 }
 
 void SSMP_enq() {

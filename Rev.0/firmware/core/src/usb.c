@@ -6,6 +6,7 @@
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
+#include <types/buffer.h>
 
 repeating_timer_t usb_timer;
 

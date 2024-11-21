@@ -18,6 +18,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
+#include <types/buffer.h>
 
 #include <MIB.h>
 #include <auth.h>

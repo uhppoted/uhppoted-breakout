@@ -5,6 +5,7 @@
 
 #include <breakout.h>
 #include <state.h>
+#include <types/buffer.h>
 
 void on_uart_rx() {
     char buffer[32];

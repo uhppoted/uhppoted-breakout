@@ -89,7 +89,9 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_RX) {
-        SSMP_rx(v & 0x0fffffff);
+        struct circular_buffer *b = (struct circular_buffer *)(SRAM_BASE | (v & 0x0fffffff));
+
+        SSMP_rx(b);
     }
 
     if ((v & MSG) == MSG_TTY) {
