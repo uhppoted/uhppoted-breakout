@@ -10,6 +10,7 @@
           - [x] pico: txrx/uart conflict
           - [x] Remove MODE
           - [x] Remove SSMP stuff from CLI
+          - [x] Move USB connected/disconnected to USB driver
           - [ ] Move bisync decoding to on_SSMP
           - [ ] weird intermittent reset
                 - ~~too many get requests~~
@@ -35,6 +36,9 @@
           - [ ] Invoke sys.flush from main loop
           - [ ] Check that system doesn't freeze when print queue is full 
                 (i.e. why did it freeze when the CLI used a printf?)
+          - [ ] Maybe only enable SSMP interrupt after a delay? 
+          - [ ] bisync timeout
+          - [ ] bisync max message size
 
     - monitor
       - get-board

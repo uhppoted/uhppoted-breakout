@@ -54,11 +54,13 @@ add_executable(breakout
 
   ${LIB}/src/types/slice.c
   ${LIB}/src/types/packet.c
+  ${LIB}/src/types/vector.c
+  ${LIB}/src/types/fields.c
+
   ${LIB}/src/encoding/bisync/bisync.c
   ${LIB}/src/encoding/bisync/crc.c
   ${LIB}/src/encoding/ASN.1/encode.c
   ${LIB}/src/encoding/ASN.1/decode.c
-  ${LIB}/src/encoding/ASN.1/fields.c
   ${LIB}/src/encoding/ssmp/ssmp.c
   ${LIB}/src/encoding/ssmp/get.c
   ${LIB}/src/encoding/ssmp/get_response.c

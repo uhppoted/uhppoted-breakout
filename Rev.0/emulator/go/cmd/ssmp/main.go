@@ -24,6 +24,27 @@ func main() {
 	} else if encoded, err := codec.Encode(nil, bytes); err != nil {
 		fmt.Printf("  *** ERROR %v\n", err)
 	} else {
-		fmt.Printf("%v\n", encoded)
+		fmt.Printf("GET     %v\n", encoded)
+	}
+
+	integer := []uint8{2, 1, 13}
+	if encoded, err := codec.Encode(nil, integer); err != nil {
+		fmt.Printf("  *** ERROR %v\n", err)
+	} else {
+		fmt.Printf("INTEGER %v\n", encoded)
+	}
+
+	null := []uint8{5, 0}
+	if encoded, err := codec.Encode(nil, null); err != nil {
+		fmt.Printf("  *** ERROR %v\n", err)
+	} else {
+		fmt.Printf("NULL    %v\n", encoded)
+	}
+
+	octets := []uint8{4, 6, 'p', 'u', 'b', 'l', 'i', 'c'}
+	if encoded, err := codec.Encode(nil, octets); err != nil {
+		fmt.Printf("  *** ERROR %v\n", err)
+	} else {
+		fmt.Printf("OCTETS  %v\n", encoded)
 	}
 }

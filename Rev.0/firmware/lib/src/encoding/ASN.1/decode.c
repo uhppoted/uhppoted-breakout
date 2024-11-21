@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <encoding/ASN.1/BER.h>
+#include <log.h>
 
 // clang-format off
 field *unpack_integer    (const uint8_t *, int, int *);
@@ -12,6 +13,8 @@ field *unpack_OID        (const uint8_t *, int, int *);
 field *unpack_sequence   (const uint8_t *, int, int *);
 field *unpack_get_request(const uint8_t *, int, int *);
 // clang-format on
+
+const int MAX_FIELDS = 16;
 
 vector *unpack(const uint8_t *bytes, int N);
 uint32_t unpack_length(const uint8_t *message, int N, int *ix);
@@ -23,57 +26,60 @@ vector *BER_decode(const uint8_t *message, int N) {
 vector *unpack(const uint8_t *bytes, int N) {
     vector *v = vector_new();
 
-    // if (v != NULL) {
-    //     int ix = 0;
-    //     int count = 0;
-    //     field *f;
-    //
-    //     while (ix < N && ++count < 16) {
-    //         uint8_t tag = bytes[ix++];
-    //
-    //         switch (tag) {
-    //         case FIELD_INTEGER:
-    //             if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
-    //                 v = vector_add(v, f);
-    //             }
-    //             break;
-    //
-    //         case FIELD_OCTET_STRING:
-    //             if ((f = unpack_octets(bytes, N, &ix)) != NULL) {
-    //                 v = vector_add(v, f);
-    //             }
-    //             break;
-    //
-    //         case FIELD_NULL:
-    //             if ((f = unpack_null(bytes, N, &ix)) != NULL) {
-    //                 v = vector_add(v, f);
-    //             }
-    //             break;
-    //
-    //         case FIELD_OID:
-    //             if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
-    //                 v = vector_add(v, f);
-    //             }
-    //             break;
-    //
-    //         case FIELD_SEQUENCE:
-    //             if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
-    //                 v = vector_add(v, f);
-    //             }
-    //             break;
-    //
-    //         case FIELD_PDU_GET:
-    //             if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
-    //                 v = vector_add(v, f);
-    //             }
-    //             break;
-    //
-    //         default:
-    //             // printf("::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
-    //             ix = N;
-    //         }
-    //     }
-    // }
+    if (v != NULL) {
+        int ix = 0;
+        int count = 0;
+        field *f;
+
+        while (ix < N && ++count < MAX_FIELDS) {
+            uint8_t tag = bytes[ix++];
+
+            switch (tag) {
+            case FIELD_INTEGER:
+                if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+            case FIELD_OCTET_STRING:
+                if ((f = unpack_octets(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+            case FIELD_NULL:
+                if ((f = unpack_null(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
+                //         case FIELD_OID:
+                //             if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
+                //                 // v = vector_add(v, f);
+                //                 // field_free(f);
+                //             }
+                //             break;
+
+                //         case FIELD_SEQUENCE:
+                //             if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
+                //                 // v = vector_add(v, f);
+                //                 // field_free(f);
+                //             }
+                //             break;
+
+                //         case FIELD_PDU_GET:
+                //             if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
+                //                 // v = vector_add(v, f);
+                //                 // field_free(f);
+                //             }
+                //             break;
+
+            default:
+                debugf("ASN.1", "decode::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
+                ix = N;
+            }
+        }
+    }
 
     return v;
 }
@@ -97,10 +103,10 @@ field *unpack_integer(const uint8_t *message, int N, int *ix) {
         }
     }
 
-    // printf("::integer     N:%d  ix:%-3d length:%lu  value:%lld\n", N, *ix, length, value);
-
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
+
+    f->dynamic = true;
     f->tag = FIELD_INTEGER;
     f->integer.value = value;
 
@@ -115,10 +121,10 @@ field *unpack_octets(const uint8_t *message, int N, int *ix) {
 
     memmove(octets, &message[*ix], length);
 
-    // printf("::octets      N:%d  ix:%-3d length:%lu  octets:%s\n", N, *ix, length, strndup(octets, length));
-
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
+
+    f->dynamic = true;
     f->tag = FIELD_OCTET_STRING;
     f->octets.length = length;
     f->octets.octets = octets;
@@ -131,11 +137,11 @@ field *unpack_octets(const uint8_t *message, int N, int *ix) {
 field *unpack_null(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
 
-    // printf("::null        N:%d  ix:%-3d length:%lu\n", N, *ix, length);
-
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
+
     f->tag = FIELD_NULL;
+    f->dynamic = true;
 
     *ix += length;
 

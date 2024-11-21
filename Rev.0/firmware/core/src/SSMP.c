@@ -183,12 +183,11 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
     debugf("SSMP", "received");
 
     // // ... decode packet
-    // vector *fields = BER_decode(data, data_len);
+    vector *fields = BER_decode(data, data_len);
     // packet *request = ssmp_decode(fields);
-    //
-    // vector_free(fields);
-    // free(fields);
-    //
+
+    vector_free(fields);
+
     // // ... GET request?
     // if (request != NULL && request->tag == PACKET_GET) {
     //     const char *community = request->community;

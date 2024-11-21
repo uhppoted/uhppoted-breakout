@@ -1,40 +1,22 @@
+#include <log.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <encoding/ASN.1/BER.h>
-
-void vector_free(vector *);
+#include <types/vector.h>
 
 const int CAPACITY = 16;
 
-void field_free(field *const f) {
-    switch (f->tag) {
-    case FIELD_OCTET_STRING:
-        free(f->octets.octets);
-        break;
+struct field;
 
-    case FIELD_OID:
-        free(f->OID.OID);
-        break;
-
-    case FIELD_SEQUENCE:
-        vector_free(f->sequence.fields);
-        free(f->sequence.fields);
-        break;
-
-    case FIELD_PDU_GET:
-        vector_free(f->pdu.fields);
-        free(f->pdu.fields);
-        break;
-    }
-}
+extern void field_free(struct field *const);
 
 vector *vector_new() {
     int capacity = CAPACITY;
-    size_t size = sizeof(int) + sizeof(int) + capacity * sizeof(field *);
+    size_t size = 12 + capacity * sizeof(struct field *);
     vector *v = (vector *)malloc(size);
 
     if (v != NULL) {
+        v->dynamic = true;
         v->capacity = capacity;
         v->size = 0;
 
@@ -46,28 +28,36 @@ vector *vector_new() {
     return v;
 }
 
-void vector_free(vector *const v) {
+void vector_free(vector *v) {
+    struct field *f;
+
     if (v != NULL) {
         for (int i = 0; i < v->size; i++) {
-            field_free(v->fields[i]);
+            if ((f = v->fields[i]) != NULL) {
+                field_free(v->fields[i]);
+            }
+        }
+
+        if (v->dynamic) {
+            free(v);
         }
     }
 }
 
-vector *vector_add(vector *v, field *f) {
+vector *vector_add(vector *v, struct field *f) {
     if (v->size < v->capacity) {
-        v->fields[v->size] = f;
-        v->size++;
+        v->fields[v->size++] = f;
 
         return v;
     }
 
     // .. reallocate and copy
     int capacity = v->capacity + CAPACITY;
-    size_t size = sizeof(int) + sizeof(int) + capacity * sizeof(field *);
+    size_t size = 12 + capacity * sizeof(struct field *);
     vector *u = (vector *)malloc(size);
 
     if (u != NULL) {
+        u->dynamic = true;
         u->capacity = capacity;
         u->size = v->size;
 

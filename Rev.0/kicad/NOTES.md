@@ -39,6 +39,7 @@
 33. Protection resistors (560 ohms?) on UART1 pins
 34. Add RTS and CTS to UART header
 35. Connect RX8900SA INT (or 1s output) to GPIO for use as external watchdog
+36. Seriously considier an external hardware watchdog
 
 (?) Maybe put GND on pin 1 of UART/SPI header
 (?) https://www.olimex.com/Products/Components/IC/SY6280

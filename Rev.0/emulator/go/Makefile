@@ -27,3 +27,4 @@ tty:
 
 encode: build
 	./bin/ssmp 
+
