@@ -19,6 +19,7 @@
                 - ~~UART interrupt handler~~
                 - ~~IOX or RTC~~
                 - ~~USB~~
+   
                 - U3_read ?
                 - alarm timers disabled ?
                 - stray printf ?
@@ -27,10 +28,11 @@
   134:     printf(TERMINAL_QUERY_STATUS);
   142:     printf(TERMINAL_QUERY_STATUS);
 ```
-          - [ ] Reinstate watchdog reset
           - [ ] Reinstate CLI query status, ping, etc
-          - [ ] Check all FIXMEs
           - [ ] Move query-status + mode to sys
+          - [ ] MODE_UNKNOWN on startup and then wait for query status response
+
+          - [ ] Check all FIXMEs
           - [ ] Trace interval (compile time option)
           - [ ] Rework println to use circular buffer
           - [ ] Invoke sys.flush from main loop
@@ -39,6 +41,7 @@
           - [ ] Maybe only enable SSMP interrupt after a delay? 
           - [ ] bisync timeout
           - [ ] bisync max message size
+          - [ ] Reinstate watchdog reset
 
     - monitor
       - get-board

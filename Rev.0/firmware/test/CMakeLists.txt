@@ -35,7 +35,9 @@ add_executable(breakout
   ${LIB}/src/crypt/otp/hotp.c
   ${LIB}/src/encoding/ASN.1/encode.c
   ${LIB}/src/encoding/ASN.1/decode.c
-  ${LIB}/src/encoding/ASN.1/fields.c
+
+  ${LIB}/src/types/fields.c
+  ${LIB}/src/types/vector.c
   ${LIB}/src/types/slice.c
 )
 

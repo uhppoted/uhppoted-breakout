@@ -182,11 +182,9 @@ void SSMP_enq() {
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
     debugf("SSMP", "received");
 
-    // // ... decode packet
+    // ... decode packet
     vector *fields = BER_decode(data, data_len);
     // packet *request = ssmp_decode(fields);
-
-    vector_free(fields);
 
     // // ... GET request?
     // if (request != NULL && request->tag == PACKET_GET) {
@@ -201,8 +199,9 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
     //         }
     //     }
     // }
-    //
+
     // free_packet(request);
+    vector_free(fields);
 }
 
 /* SSMP GET response

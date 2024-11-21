@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include <encoding/ASN.1/BER.h>
+#include <types/slice.h>
 
 extern slice pack_integer(const field *f);
 
