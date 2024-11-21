@@ -99,8 +99,6 @@ void SSMP_start() {
     irq_set_exclusive_handler(UART_IRQ, on_SSMP);
     uart_set_irq_enables(UART, true, false);
     irq_set_enabled(UART_IRQ, true);
-
-    debugf("SSMP", ">>>>>>>>>> start %p", &SSMP.buffer);
 }
 
 void SSMP_reset() {

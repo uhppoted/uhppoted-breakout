@@ -17,15 +17,23 @@
 #include <log.h>
 #include <sys.h>
 
+extern const char *TERMINAL_QUERY_STATUS;
+
 struct {
     mode mode;
     queue_t queue;
     mutex_t guard;
+    struct {
+        absolute_time_t mode;
+    } touched;
 } SYSTEM = {
     .mode = MODE_UNKNOWN,
-};
+    .touched = {
+        .mode = 0,
+    }};
 
-const int32_t FLUSH = 1000; // ms
+const int32_t FLUSH = 1000;              // ms
+const uint32_t MODE_CLI_TIMEOUT = 15000; // ms
 
 void _push(char *);
 void _flush();
@@ -34,6 +42,8 @@ void _print(const char *);
 void sysinit() {
     queue_init(&SYSTEM.queue, sizeof(char *), 64);
     mutex_init(&SYSTEM.guard);
+
+    set_mode(MODE_UNKNOWN);
 }
 
 int sys_id(char *ID, int N) {
@@ -71,6 +81,7 @@ void set_mode(mode mode) {
 
     // ... unblock queue
     if (mode == MODE_CLI) {
+        SYSTEM.touched.mode = get_absolute_time();
         print("");
     }
 }
@@ -103,7 +114,20 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_TICK) {
         sys_tick();
-        cli_ping();
+
+        // ... MODE_CLI timeout?
+        absolute_time_t now = get_absolute_time();
+        int64_t delta = absolute_time_diff_us(SYSTEM.touched.mode, now) / 1000;
+
+        if (llabs(delta) > MODE_CLI_TIMEOUT) {
+            set_mode(MODE_UNKNOWN);
+        }
+
+        // ... ping terminal
+        if (mutex_try_enter(&SYSTEM.guard, NULL)) {
+            _print(TERMINAL_QUERY_STATUS);
+            mutex_exit(&SYSTEM.guard);
+        }
     }
 
     if ((v & MSG) == MSG_WATCHDOG) {

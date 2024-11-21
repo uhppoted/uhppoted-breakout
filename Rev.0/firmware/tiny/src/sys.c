@@ -82,7 +82,7 @@ bool sys_init() {
 bool on_tick(repeating_timer_t *t) {
     uint32_t msg = MSG_TICK;
     if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-        set_error(ERR_QUEUE_FULL, "SYS", "blink: queue full");
+        set_error(ERR_QUEUE_FULL, "SYS", "tick: queue full");
     }
 
     return true;

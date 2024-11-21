@@ -4,6 +4,7 @@
 - [ ] CLI: trace on/off
 - [ ] USB circular buffer
 - [ ] UART circular buffer
+- [ ] Rework log queue as circular buffer
 - (?) Remove SPI
 
 ### SSMP
@@ -21,6 +22,9 @@
           - [x] Remove SSMP stuff from CLI
           - [x] Move USB connected/disconnected to USB driver
           - [x] pass buffer address in MSG
+          - [x] Move query-status + mode to sys
+          - [x] MODE_UNKNOWN on startup and then wait for query status response
+          - [x] MODE_CLI timeout
           - [ ] weird intermittent reset
                 - ~~too many get requests~~
                 - ~~full queue~~
@@ -28,19 +32,11 @@
                 - ~~UART interrupt handler~~
                 - ~~IOX or RTC~~
                 - ~~USB~~
-   
+                - **CLI TERMINAL_QUERY_STATUS printf**
                 - U3_read ?
                 - alarm timers disabled ?
-                - stray printf ?
-```
-/Users/tonyseebregts/Development/uhppote/uhppoted/uhppoted-breakout/Rev.0/firmware/core/src/cli.c:
-  134:     printf(TERMINAL_QUERY_STATUS);
-  142:     printf(TERMINAL_QUERY_STATUS);
-```
-          - [ ] Reinstate CLI query status, ping, etc
-          - [ ] Move query-status + mode to sys
-          - [ ] MODE_UNKNOWN on startup and then wait for query status response
 
+          - [ ] health-check on TTY off ?????
           - [ ] Check all FIXMEs
           - [ ] Trace interval (compile time option)
           - [ ] Rework println to use circular buffer

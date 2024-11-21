@@ -32,15 +32,12 @@ typedef struct CLI {
     char buffer[64];
     int ix;
     int32_t timer;
-    int32_t ping;
 } CLI;
 
-const uint32_t CLI_TIMEOUT = 5000;     // ms
-const uint32_t CLI_PING_TIMEOUT = 250; // ms
+const uint32_t CLI_TIMEOUT = 5000; // ms
 const uint8_t height = 25;
 
 int64_t cli_timeout(alarm_id_t id, void *data);
-int64_t cli_ping_timeout(alarm_id_t id, void *data);
 void cli_on_terminal_report(const char *buffer, int N);
 
 void echo(const char *line);
@@ -132,18 +129,6 @@ void cli_init() {
     print(TERMINAL_CLEAR);
     print(TERMINAL_QUERY_CODE);
     print(TERMINAL_QUERY_SIZE);
-    // FIXME printf(TERMINAL_QUERY_STATUS);
-}
-
-/** Queries the terminal ID 'out of band'.
- *
- */
-void cli_ping() {
-    // FIXME cli.ping = add_alarm_in_ms(CLI_PING_TIMEOUT, cli_ping_timeout, (CLI *)&cli, true);
-    // FIXME printf(TERMINAL_QUERY_STATUS);
-
-    // FIXME
-    set_mode(MODE_CLI);
 }
 
 /** Processes received characters.
@@ -236,7 +221,6 @@ void cli_on_terminal_report(const char *data, int N) {
     // ... report device status?
     if (N >= 4 && data[0] == 27 && data[1] == '[' && data[2] == '0' && data[3] == 'n') {
         set_mode(MODE_CLI);
-        cancel_alarm(cli.ping);
     }
 
     // ... report cursor position (ESC[#;#R)
@@ -259,17 +243,6 @@ int64_t cli_timeout(alarm_id_t id, void *data) {
     cli->timer = 0;
 
     clearline();
-
-    return 0;
-}
-
-/* 'ping' timeout handler. Sets the system 'mode' to 'unknown'.
- *
- */
-int64_t cli_ping_timeout(alarm_id_t id, void *data) {
-    // FIXME if (get_mode() == MODE_CLI) {
-    // FIXME     set_mode(MODE_UNKNOWN);
-    // FIXME }
 
     return 0;
 }
