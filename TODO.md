@@ -6,6 +6,8 @@
 - [ ] UART circular buffer
 - [ ] Rework log queue as circular buffer
 - [ ] Remove SPI
+- [ ] Make Rev.0 emulator a 'local only' package
+- [x] Remove CLI timer
 
 ### SSMP
     - [ ] circular-buffer

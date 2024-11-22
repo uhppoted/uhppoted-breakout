@@ -26,19 +26,11 @@
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
 uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
 
-typedef struct CLI {
-    int rows;
-    int columns;
-    char buffer[64];
-    int ix;
-    int32_t timer;
-} CLI;
-
 const uint32_t CLI_TIMEOUT = 5000; // ms
 const uint8_t height = 25;
 
-int64_t cli_timeout(alarm_id_t id, void *data);
 void cli_on_terminal_report(const char *buffer, int N);
+void cli_rxchar(const char ch);
 
 void echo(const char *line);
 void clearline();
@@ -70,12 +62,16 @@ void clear();
 void help();
 void debug();
 
-CLI cli = {
+struct CLI {
+    int rows;
+    int columns;
+    char buffer[64];
+    int ix;
+} cli = {
     .rows = 40,
     .columns = 120,
     .buffer = {0},
     .ix = 0,
-    .timer = -1,
 };
 
 extern const char *TERMINAL_CLEAR;
@@ -158,54 +154,44 @@ void cli_rx(const struct buffer *received) {
     }
 
     // ... typed characters presumably
-    if (cli.timer > 0) {
-        cancel_alarm(cli.timer);
-        cli.timer = 0;
-    }
-
     for (int i = 0; i < N; i++) {
         char ch = received->data[i];
 
-        // ESC?
-        if (ch == 27) {
-            memset(cli.buffer, 0, sizeof(cli.buffer));
-            cli.ix = 0;
-            break; // NTS: really not expecting and ESC character
+        cli_rxchar(ch);
+    }
+}
+
+void cli_rxchar(const char ch) {
+    switch (ch) {
+    case 27: // ESC?
+        memset(cli.buffer, 0, sizeof(cli.buffer));
+        cli.ix = 0;
+        break; // NTS: really not expecting an ESC character
+
+    case 8: // backspace?
+        if (cli.ix > 0) {
+            cli.buffer[--cli.ix] = 0;
+            echo(cli.buffer);
+        }
+        break;
+
+    case CR:
+    case LF: // CRLF ?
+        if (cli.ix > 0) {
+            exec(cli.buffer);
         }
 
-        // CRLF ?
-        if (ch == CR || ch == LF) {
-            if (cli.ix > 0) {
-                exec(cli.buffer);
-            }
+        memset(cli.buffer, 0, sizeof(cli.buffer));
+        cli.ix = 0;
+        break;
 
-            memset(cli.buffer, 0, sizeof(cli.buffer));
-            cli.ix = 0;
-            continue;
-        }
-
-        // backspace?
-        if (ch == 8) {
-            if (cli.ix > 0) {
-                cli.buffer[--cli.ix] = 0;
-                echo(cli.buffer);
-            }
-
-            continue;
-        }
-
-        // append character to buffer
+    default: // append character to buffer
         if (cli.ix < (sizeof(cli.buffer) - 1)) {
             cli.buffer[cli.ix++] = ch;
             cli.buffer[cli.ix] = 0;
 
             echo(cli.buffer);
-            continue;
         }
-    }
-
-    if (cli.ix > 0) {
-        cli.timer = add_alarm_in_ms(CLI_TIMEOUT, cli_timeout, (CLI *)&cli, true);
     }
 }
 
@@ -231,20 +217,6 @@ void cli_on_terminal_report(const char *data, int N) {
         cpr(code);
         free(code);
     }
-}
-
-/* Timeout handler. Clears the current command and command line.
- *
- */
-int64_t cli_timeout(alarm_id_t id, void *data) {
-    CLI *cli = (CLI *)data;
-    memset(cli->buffer, 0, sizeof(cli->buffer));
-    cli->ix = 0;
-    cli->timer = 0;
-
-    clearline();
-
-    return 0;
 }
 
 /* Clears the terminal and queries window size
