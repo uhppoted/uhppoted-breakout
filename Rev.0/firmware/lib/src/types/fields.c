@@ -17,12 +17,11 @@ void field_free(field *f) {
 
         case FIELD_SEQUENCE:
             vector_free(f->sequence.fields);
-            free(f->sequence.fields);
             break;
 
         case FIELD_PDU_GET:
-            vector_free(f->pdu.fields);
-            free(f->pdu.fields);
+            // vector_free(f->pdu.fields);
+            // free(f->pdu.fields);
             break;
         }
 

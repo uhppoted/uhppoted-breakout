@@ -8,7 +8,13 @@ PORT = '/dev/serial0'
 BAUDRATE = 115200
 
 GET = [22,22,2,48,40,16,2,16,1,0,4,16,6,112,117,98,108,105,99,160,27,16,2,16,1,13,16,2,16,1,0,16,2,16,1,0,48,16,16,48,14,16,6,10,43,16,6,16,1,4,16,1,132,128,0,16,2,16,1,16,5,0,3,33,189]
-
+INTEGER = [22,22,2,16,2,16,1,13,3,193,16]
+NULL = [22,22,2,16,5,0,3,18,236]
+OCTETS = [22,22,2,4,16,6,112,117,98,108,105,99,3,170,217]
+OID = [22,22,2,16,6,10,43,16,6,16,1,4,16,1,132,128,0,16,2,16,1,3,162,165]
+SEQUENCE = [22,22,2,48,14,16,6,10,43,16,6,16,1,4,16,1,132,128,0,16,2,16,1,16,5,0,3,211,137]
+SEQUENCES = [22,22,2,48,16,16,48,14,16,6,10,43,16,6,16,1,4,16,1,132,128,0,16,2,16,1,16,5,0,3,236,207]
+PDU = [22,22,2,160,27,16,2,16,1,13,16,2,16,1,0,16,2,16,1,0,48,16,16,48,14,16,6,10,43,16,6,16,1,4,16,1,132,128,0,16,2,16,1,16,5,0,3,152,19]
 
 class OutputProtocol(asyncio.Protocol):
     def connection_made(self, transport):
@@ -41,7 +47,7 @@ async def pingx(transport):
           ping = b'\x16\x16\x05'
           print('... ping    ', ' '.join('{:02x}'.format(x) for x in ping))
           transport.write(ping)
-          await asyncio.sleep(1)
+          await asyncio.sleep(1.1)
 
 async def get(transport):
       request = bytes(GET)
@@ -53,7 +59,7 @@ async def getx(transport):
           request = bytes(GET)
           print('... get     ', f'length:{len(request)}', f"\n                bytes: {' '.join('{:02x}'.format(x) for x in request)}")
           transport.write(request)
-          await asyncio.sleep(1)
+          await asyncio.sleep(1.3)
 
 async def poke(transport):
       msg = bytes(b'***')
@@ -61,10 +67,15 @@ async def poke(transport):
       transport.write(msg)
 
 async def debug(transport):
+      msg = bytes(SEQUENCE)
+      print('... debug    ',' '.join('{:02x}'.format(x) for x in msg[0:10]),'....')
+      transport.write(msg)
+
+async def debugx(transport):
       counter = 0
+      msg = bytes(SEQUENCE)
       while True:
-          msg = bytes(GET)
-          counter = counter + 1
+          counter += 1
           print('... debug    ',counter, ' '.join('{:02x}'.format(x) for x in msg[0:10]),'....')
           transport.write(msg)
           await asyncio.sleep(1)
@@ -86,6 +97,8 @@ async def readln(transport):
            asyncio.create_task(poke(transport))
         elif cmd == 'debug':
            asyncio.create_task(debug(transport))
+        elif cmd == 'debugx':
+           asyncio.create_task(debugx(transport))
 
 async def main():
     loop = asyncio.get_running_loop()

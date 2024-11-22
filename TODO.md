@@ -5,7 +5,7 @@
 - [ ] USB circular buffer
 - [ ] UART circular buffer
 - [ ] Rework log queue as circular buffer
-- (?) Remove SPI
+- [ ] Remove SPI
 
 ### SSMP
     - [ ] circular-buffer
@@ -33,14 +33,20 @@
                 - ~~IOX or RTC~~
                 - ~~USB~~
                 - **CLI TERMINAL_QUERY_STATUS printf**
+                - something in sequence ? 
+                  - MSG_TICK seemed to stop working
+                  - SSMP received was still being printed though
+                  - looks like MSG_TICK is not being generated
+                  - timer(s) cancelled ???
+                  - terminal ping ???
+                  >>>> try printing last health-check in 'poke'
+                  >>>> try printing last tick in 'poke'
                 - U3_read ?
-                - alarm timers disabled ?
+                - alarms/timers disabled ?
 
-          - [ ] health-check on TTY off ?????
           - [ ] Check all FIXMEs
           - [ ] Trace interval (compile time option)
-          - [ ] Rework println to use circular buffer
-          - [ ] Invoke sys.flush from main loop
+          - [ ] Invoke sys.flush from main loop rather than timer handler
           - [ ] Check that system doesn't freeze when print queue is full 
                 (i.e. why did it freeze when the CLI used a printf?)
           - [ ] Maybe only enable SSMP interrupt after a delay? 

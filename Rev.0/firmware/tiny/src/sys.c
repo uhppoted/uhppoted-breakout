@@ -49,6 +49,7 @@ bool sys_init() {
     ws2812_program_init(pio, sm, offset, 16, 800000, true);
     put_rgb(128, 0, 0);
 
+    // ... system tick
     if (!add_repeating_timer_ms(1000, on_tick, &sys, &sys.timer)) {
         return false;
     }
@@ -105,12 +106,18 @@ bool on_monitor(repeating_timer_t *t) {
             float used = 1.0 - ((float)available / (float)heap);
 
             debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x",
-                   counter++,
+                   counter,
                    queue_get_level(&queue),
                    heap,
                    available,
                    100.0f * used,
                    get_errors());
+
+            debugf("*****", "%-5u now:%ld  touched:%ld  delta:%ld",
+                   counter,
+                   now,
+                   sys.touched,
+                   delta);
         }
     } else {
         sys.triggered = false;
@@ -145,12 +152,14 @@ void sys_tick() {
     float used = 1.0 - ((float)available / (float)heap);
 
     debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x",
-           counter++,
+           counter,
            queue_get_level(&queue),
            heap,
            available,
            100.0f * used,
            get_errors());
+
+    counter++;
 }
 
 /* Sets sys.reboot flag to inhibit watchdog reset.
@@ -177,13 +186,18 @@ void sys_debug() {
     uint32_t available = get_free_heap();
     float used = 1.0 - ((float)available / (float)heap);
 
-    debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  dt:%ld",
-           counter++,
+    debugf("POKE", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x",
+           counter,
            queue_get_level(&queue),
            heap,
            available,
            100.0f * used,
-           get_errors(),
+           get_errors());
+
+    debugf("POKE", "%-5u now:%ld  touched:%ld  delta:%ld",
+           counter,
+           now,
+           sys.touched,
            delta);
 }
 

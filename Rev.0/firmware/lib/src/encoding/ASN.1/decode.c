@@ -53,19 +53,17 @@ vector *unpack(const uint8_t *bytes, int N) {
                 }
                 break;
 
-                //         case FIELD_OID:
-                //             if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
-                //                 // v = vector_add(v, f);
-                //                 // field_free(f);
-                //             }
-                //             break;
+            case FIELD_OID:
+                if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
 
-                //         case FIELD_SEQUENCE:
-                //             if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
-                //                 // v = vector_add(v, f);
-                //                 // field_free(f);
-                //             }
-                //             break;
+            case FIELD_SEQUENCE:
+                if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
 
                 //         case FIELD_PDU_GET:
                 //             if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
@@ -140,8 +138,8 @@ field *unpack_null(const uint8_t *message, int N, int *ix) {
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
-    f->tag = FIELD_NULL;
     f->dynamic = true;
+    f->tag = FIELD_NULL;
 
     *ix += length;
 
@@ -181,10 +179,9 @@ field *unpack_OID(const uint8_t *message, int N, int *ix) {
         }
     }
 
-    // printf("::OID         N:%d  ix:%-3d length:%lu  OID:%s\n", N, *ix, length, OID);
-
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
+    f->dynamic = true;
     f->tag = FIELD_OID;
     f->OID.OID = OID;
 
@@ -197,10 +194,10 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
     vector *fields = unpack(&message[*ix], length);
 
-    // printf("::sequence    N:%d  ix:%-3d length:%lu  fields:%d\n", N, *ix, length, fields->size);
-
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
+
+    f->dynamic = true;
     f->tag = FIELD_SEQUENCE;
     f->sequence.fields = fields;
 
@@ -212,8 +209,6 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
 field *unpack_get_request(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
     vector *fields = unpack(&message[*ix], length);
-
-    // printf("::PDU         N:%d  ix:%-3d length:%lu  fields:%d\n", N, *ix, length, fields->size);
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
