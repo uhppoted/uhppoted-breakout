@@ -7,28 +7,35 @@
 #include <state.h>
 #include <types/buffer.h>
 
-void on_uart_rx() {
-    char buffer[32];
-    int ix = 0;
+struct {
+    circular_buffer buffer;
+} SERIAL = {
+    .buffer = {
+        .head = 0,
+        .tail = 0,
+    },
+};
 
-    while (uart_is_readable(uart0) && ix < sizeof(buffer)) {
-        buffer[ix++] = uart_getc(uart0);
+// NTS: Pico only - not tested
+void on_uart_rx() {
+    int next = (SERIAL.buffer.head + 1) % sizeof(SERIAL.buffer.bytes);
+    int poke = 0;
+
+    while (uart_is_readable(uart0)) {
+        uint8_t ch = uart_getc(uart0);
+
+        if (next != SERIAL.buffer.tail) {
+            SERIAL.buffer.bytes[SERIAL.buffer.head] = ch;
+            SERIAL.buffer.head = next;
+
+            next = (SERIAL.buffer.head + 1) % sizeof(SERIAL.buffer.bytes);
+        }
     }
 
-    if (ix > 0) {
-        struct buffer *b;
+    circular_buffer *b = &SERIAL.buffer;
+    uint32_t msg = MSG_TTY | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
 
-        if ((b = (struct buffer *)malloc(sizeof(struct buffer))) != NULL) {
-            b->N = ix;
-            memmove(b->data, buffer, ix);
-
-            uint32_t msg = MSG_TTY | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
-            if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-                set_error(ERR_QUEUE_FULL, "TTY", "rx: queue full");
-                free(b);
-            }
-        }
-
-        ix = 0;
+    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+        set_error(ERR_QUEUE_FULL, "SSMP", "rx: queue full");
     }
 }

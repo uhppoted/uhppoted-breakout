@@ -106,10 +106,9 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_TTY) {
-        struct buffer *b = (struct buffer *)(SRAM_BASE | (v & 0x0fffffff));
+        struct circular_buffer *b = (struct circular_buffer *)(SRAM_BASE | (v & 0x0fffffff));
 
         cli_rx(b);
-        free(b);
     }
 
     if ((v & MSG) == MSG_TICK) {

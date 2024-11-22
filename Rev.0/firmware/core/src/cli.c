@@ -130,20 +130,23 @@ void cli_init() {
 /** Processes received characters.
  *
  */
-void cli_rx(const struct buffer *received) {
-    int N = received->N;
-    int ix = 0;
+void cli_rx(circular_buffer *buffer) {
+    int tail = buffer->tail;
+    uint8_t ch;
 
-    while (ix < N) {
-        char ch = received->data[ix++];
+    while (tail != buffer->head) {
+        ch = buffer->bytes[tail++];
+        tail %= sizeof(buffer->bytes);
 
         // terminal message?
+        // NTS: flushes buffer after processing as the simplest way of handling ANSI escape sequences
         if (ch == 27) {
             char message[64] = {27};
             int jx = 1;
 
-            while (ix < N) {
-                char ch = received->data[ix++];
+            while (tail != buffer->head) {
+                ch = buffer->bytes[tail++];
+                tail %= sizeof(buffer->bytes);
                 if (ch == 27) {
                     cli_on_terminal_report(message, jx);
                     jx = 1;
@@ -152,6 +155,7 @@ void cli_rx(const struct buffer *received) {
                 }
             }
 
+            buffer->tail = tail;
             cli_on_terminal_report(message, jx);
             return;
         }
@@ -159,6 +163,8 @@ void cli_rx(const struct buffer *received) {
         // ... typed characters presumably
         cli_rxchar(ch);
     }
+
+    buffer->tail = tail;
 }
 
 void cli_rxchar(const char ch) {
