@@ -132,42 +132,37 @@ void cli_init() {
  */
 void cli_rx(const struct buffer *received) {
     int N = received->N;
+    int ix = 0;
 
-    // terminal message?
-    if (N > 0 && received->data[0] == 27) {
-        const char *data = received->data;
-        int ix = 0;
+    while (ix < N) {
+        char ch = received->data[ix++];
 
-        while (ix < N) {
-            if (data[ix] == 27) {
-                int jx = ix;
-                while (++jx < N && data[jx] != 27) {
+        // terminal message?
+        if (ch == 27) {
+            char message[64] = {27};
+            int jx = 1;
+
+            while (ix < N) {
+                char ch = received->data[ix++];
+                if (ch == 27) {
+                    cli_on_terminal_report(message, jx);
+                    jx = 1;
+                } else if (jx < sizeof(message)) {
+                    message[jx++] = ch;
                 }
-
-                cli_on_terminal_report(&data[ix], jx - ix);
             }
 
-            ix++;
+            cli_on_terminal_report(message, jx);
+            return;
         }
 
-        return;
-    }
-
-    // ... typed characters presumably
-    for (int i = 0; i < N; i++) {
-        char ch = received->data[i];
-
+        // ... typed characters presumably
         cli_rxchar(ch);
     }
 }
 
 void cli_rxchar(const char ch) {
     switch (ch) {
-    case 27: // ESC?
-        memset(cli.buffer, 0, sizeof(cli.buffer));
-        cli.ix = 0;
-        break; // NTS: really not expecting an ESC character
-
     case 8: // backspace?
         if (cli.ix > 0) {
             cli.buffer[--cli.ix] = 0;
