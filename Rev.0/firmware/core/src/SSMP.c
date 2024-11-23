@@ -26,6 +26,7 @@
 const int64_t SSMP_IDLE = 5000; // ms
 const int64_t SSMP_ERROR_NO_SUCH_OBJECT = 0x02;
 
+void SSMP_rxchar(uint8_t ch);
 void SSMP_enq();
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 void SSMP_touched();
@@ -125,22 +126,16 @@ void SSMP_ping() {
 }
 
 void on_SSMP() {
-    int next = (SSMP.buffer.head + 1) % sizeof(SSMP.buffer.bytes);
     int poke = 0;
 
     while (uart_is_readable(UART)) {
         uint8_t ch = uart_getc(UART);
 
+        buffer_push(&SSMP.buffer, ch);
+
         // FIXME remove (debugging)
         if (ch == '*') {
             poke++;
-        }
-
-        if (next != SSMP.buffer.tail) {
-            SSMP.buffer.bytes[SSMP.buffer.head] = ch;
-            SSMP.buffer.head = next;
-
-            next = (SSMP.buffer.head + 1) % sizeof(SSMP.buffer.bytes);
         }
     }
 
@@ -157,18 +152,12 @@ void on_SSMP() {
     }
 }
 
-void SSMP_rx(const circular_buffer *buffer) {
-    int tail = SSMP.buffer.tail;
-    uint8_t ch;
+void SSMP_rx(circular_buffer *buffer) {
+    buffer_flush(buffer, SSMP_rxchar);
+}
 
-    while (tail != SSMP.buffer.head) {
-        ch = SSMP.buffer.bytes[tail++];
-        tail %= sizeof(SSMP.buffer.bytes);
-
-        bisync_decode(&SSMP.codec, ch);
-    }
-
-    SSMP.buffer.tail = tail;
+void SSMP_rxchar(uint8_t ch) {
+    bisync_decode(&SSMP.codec, ch);
 }
 
 void SSMP_enq() {

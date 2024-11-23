@@ -43,7 +43,6 @@ bool on_usb_rx(repeating_timer_t *rt) {
     }
 
     if (tud_cdc_connected()) {
-        int next = (USB.buffer.head + 1) % sizeof(USB.buffer.bytes);
         int count = 0;
 
         while (tud_cdc_available()) {
@@ -52,13 +51,7 @@ bool on_usb_rx(repeating_timer_t *rt) {
 
             if (N > 0) {
                 count++;
-
-                if (next != USB.buffer.tail) {
-                    USB.buffer.bytes[USB.buffer.head] = ch;
-                    USB.buffer.head = next;
-
-                    next = (USB.buffer.head + 1) % sizeof(USB.buffer.bytes);
-                }
+                buffer_push(&USB.buffer, ch);
             }
         }
 

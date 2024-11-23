@@ -16,20 +16,12 @@ struct {
     },
 };
 
-// NTS: Pico only - not tested
+// NTS: **NOT TESTED** (Pico only)
 void on_uart_rx() {
-    int next = (SERIAL.buffer.head + 1) % sizeof(SERIAL.buffer.bytes);
-    int poke = 0;
-
     while (uart_is_readable(uart0)) {
         uint8_t ch = uart_getc(uart0);
 
-        if (next != SERIAL.buffer.tail) {
-            SERIAL.buffer.bytes[SERIAL.buffer.head] = ch;
-            SERIAL.buffer.head = next;
-
-            next = (SERIAL.buffer.head + 1) % sizeof(SERIAL.buffer.bytes);
-        }
+        buffer_push(&SERIAL.buffer, ch);
     }
 
     circular_buffer *b = &SERIAL.buffer;

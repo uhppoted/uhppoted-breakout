@@ -29,8 +29,8 @@ uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
 const uint32_t CLI_TIMEOUT = 5000; // ms
 const uint8_t height = 25;
 
+void cli_rxchar(uint8_t ch);
 void cli_on_terminal_report(const char *buffer, int N);
-void cli_rxchar(const char ch);
 
 void echo(const char *line);
 void clearline();
@@ -65,13 +65,29 @@ void debug();
 struct CLI {
     int rows;
     int columns;
-    char buffer[64];
-    int ix;
+    bool escaped;
+
+    struct {
+        char bytes[64];
+        int ix;
+    } buffer;
+
+    struct {
+        char bytes[64];
+        int ix;
+    } escape;
 } cli = {
     .rows = 40,
     .columns = 120,
-    .buffer = {0},
-    .ix = 0,
+    .escaped = false,
+    .buffer = {
+        .bytes = {0},
+        .ix = 0,
+    },
+    .escape = {
+        .bytes = {0},
+        .ix = 0,
+    },
 };
 
 extern const char *TERMINAL_CLEAR;
@@ -86,6 +102,8 @@ extern const char *TERMINAL_AT;
 
 const char CR = '\n';
 const char LF = '\r';
+const char ESC = 27;
+const char BACKSPACE = 8;
 
 const char *HELP[] = {
     "",
@@ -129,69 +147,65 @@ void cli_init() {
 
 /** Processes received characters.
  *
+ * Flushes buffer after processing any terminal ESC sequence as the simplest way
+ * of handling ANSI escape sequences.
  */
 void cli_rx(circular_buffer *buffer) {
-    int tail = buffer->tail;
-    uint8_t ch;
+    buffer_flush(buffer, cli_rxchar);
 
-    while (tail != buffer->head) {
-        ch = buffer->bytes[tail++];
-        tail %= sizeof(buffer->bytes);
-
-        // terminal message?
-        // NTS: flushes buffer after processing as the simplest way of handling ANSI escape sequences
-        if (ch == 27) {
-            char message[64] = {27};
-            int jx = 1;
-
-            while (tail != buffer->head) {
-                ch = buffer->bytes[tail++];
-                tail %= sizeof(buffer->bytes);
-                if (ch == 27) {
-                    cli_on_terminal_report(message, jx);
-                    jx = 1;
-                } else if (jx < sizeof(message)) {
-                    message[jx++] = ch;
-                }
-            }
-
-            buffer->tail = tail;
-            cli_on_terminal_report(message, jx);
-            return;
-        }
-
-        // ... typed characters presumably
-        cli_rxchar(ch);
+    if (cli.escaped) {
+        cli_on_terminal_report(cli.escape.bytes, cli.escape.ix);
+        cli.escape.ix = 0;
+        cli.escaped = false;
     }
-
-    buffer->tail = tail;
 }
 
-void cli_rxchar(const char ch) {
+void cli_rxchar(uint8_t ch) {
+    // ... terminal ESC sequence ?
+    if (cli.escaped) {
+        if (ch == ESC) {
+            cli_on_terminal_report(cli.escape.bytes, cli.escape.ix);
+
+            cli.escaped = true;
+            cli.escape.bytes[0] = ESC;
+            cli.escape.ix = 1;
+        } else if (cli.escape.ix < sizeof(cli.escape.bytes)) {
+            cli.escape.bytes[cli.escape.ix++] = ch;
+        }
+
+        return;
+    }
+
     switch (ch) {
-    case 8: // backspace?
-        if (cli.ix > 0) {
-            cli.buffer[--cli.ix] = 0;
-            echo(cli.buffer);
+    case ESC:
+        cli.escaped = true;
+        cli.escape.bytes[0] = ESC;
+        cli.escape.ix = 1;
+        break;
+
+    case BACKSPACE:
+        if (cli.buffer.ix > 0) {
+            cli.buffer.bytes[--cli.buffer.ix] = 0;
+            echo(cli.buffer.bytes);
         }
         break;
 
     case CR:
-    case LF: // CRLF ?
-        if (cli.ix > 0) {
-            exec(cli.buffer);
+    case LF:
+        if (cli.buffer.ix > 0) {
+            exec(cli.buffer.bytes);
         }
 
-        memset(cli.buffer, 0, sizeof(cli.buffer));
-        cli.ix = 0;
+        memset(cli.buffer.bytes, 0, sizeof(cli.buffer.bytes));
+        cli.buffer.ix = 0;
         break;
 
-    default: // append character to buffer
-        if (cli.ix < (sizeof(cli.buffer) - 1)) {
-            cli.buffer[cli.ix++] = ch;
-            cli.buffer[cli.ix] = 0;
+    default:
+        if (cli.buffer.ix < (sizeof(cli.buffer.bytes) - 1)) {
+            cli.buffer.bytes[cli.buffer.ix++] = ch;
+            cli.buffer.bytes[cli.buffer.ix] = 0;
 
-            echo(cli.buffer);
+            echo(cli.buffer.bytes);
         }
     }
 }

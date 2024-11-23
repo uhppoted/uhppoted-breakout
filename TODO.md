@@ -10,11 +10,11 @@
 - [x] Remove CLI timer
 
 ### SSMP
-    - [ ] circular-buffer
-          - [ ] push
-          - [ ] pop
-          - [ ] flush
-          - [ ] empty
+    - [x] circular-buffer
+          - [x] push
+          - [x] pop
+          - [x] empty
+          - [x] flush
 
     - [ ] Migrate SSMP handler to UART1
           - [x] ENQ
@@ -45,6 +45,16 @@
                   >>>> try printing last tick in 'poke'
                 - U3_read ?
                 - alarms/timers disabled ?
+                - weird SSMP response but message processing is commented out????? And approximately when board did its weird thing
+```
+... debug     264 16 16 02 30 0e 10 06 0a 2b 10 ....
+... received 16 16 02 30 0e 10 06 0a
+... received 2b 10 06 10 01 04 10 01
+... received 84 80 00 10 02 10 01 10
+... received 05 00 03 d3 89
+... debug     265 16 16 02 30 0e 10 06 0a 2b 10 ....
+... received 16 16 02 30 0e 10 06 0a
+```
 
           - [ ] Check all FIXMEs
           - [ ] Trace interval (compile time option)
