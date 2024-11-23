@@ -22,15 +22,15 @@ extern const uint IOX_RESET;
 extern const uint IOX_INT0;
 extern const uint IOX_INT1;
 
-extern const uint SPI_RX;
-extern const uint SPI_TX;
-extern const uint SPI_CSn;
-extern const uint SPI_CLK;
+extern uart_inst_t *CLI_UART;
+extern const uint CLI_IRQ;
+extern const uint CLI_TX;
+extern const uint CLI_RX;
 
-extern uart_inst_t *UART;
-extern const uint UART_IRQ;
-extern const uint UART_TX;
-extern const uint UART_RX;
+extern uart_inst_t *SSMP_UART;
+extern const uint SSMP_IRQ;
+extern const uint SSMP_TX;
+extern const uint SSMP_RX;
 
 extern const struct I2C U2;
 extern const struct I2C U3;

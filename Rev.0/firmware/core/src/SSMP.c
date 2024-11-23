@@ -75,18 +75,18 @@ void SSMP_init() {
     debugf("SSMP", "init");
 
     // ... UART
-    gpio_pull_up(UART_TX);
-    gpio_pull_up(UART_RX);
+    gpio_pull_up(SSMP_TX);
+    gpio_pull_up(SSMP_RX);
 
-    gpio_set_function(UART_TX, GPIO_FUNC_UART);
-    gpio_set_function(UART_RX, GPIO_FUNC_UART);
+    gpio_set_function(SSMP_TX, GPIO_FUNC_UART);
+    gpio_set_function(SSMP_RX, GPIO_FUNC_UART);
 
-    uart_init(UART, BAUD_RATE);
-    uart_set_baudrate(UART, BAUD_RATE);
-    uart_set_format(UART, DATA_BITS, STOP_BITS, PARITY);
-    uart_set_hw_flow(UART, false, false);
-    uart_set_fifo_enabled(UART, true);
-    uart_set_translate_crlf(UART, true);
+    uart_init(SSMP_UART, BAUD_RATE);
+    uart_set_baudrate(SSMP_UART, BAUD_RATE);
+    uart_set_format(SSMP_UART, DATA_BITS, STOP_BITS, PARITY);
+    uart_set_hw_flow(SSMP_UART, false, false);
+    uart_set_fifo_enabled(SSMP_UART, true);
+    uart_set_translate_crlf(SSMP_UART, false);
 
     SSMP_touched();
 
@@ -97,9 +97,9 @@ void SSMP_init() {
 void SSMP_start() {
     debugf("SSMP", "start");
 
-    irq_set_exclusive_handler(UART_IRQ, on_SSMP);
-    uart_set_irq_enables(UART, true, false);
-    irq_set_enabled(UART_IRQ, true);
+    irq_set_exclusive_handler(SSMP_IRQ, on_SSMP);
+    uart_set_irq_enables(SSMP_UART, true, false);
+    irq_set_enabled(SSMP_IRQ, true);
 }
 
 void SSMP_reset() {
@@ -128,8 +128,8 @@ void SSMP_ping() {
 void on_SSMP() {
     int poke = 0;
 
-    while (uart_is_readable(UART)) {
-        uint8_t ch = uart_getc(UART);
+    while (uart_is_readable(SSMP_UART)) {
+        uint8_t ch = uart_getc(SSMP_UART);
 
         buffer_push(&SSMP.buffer, ch);
 
@@ -164,7 +164,7 @@ void SSMP_enq() {
     debugf("SSMP", "ENQ");
 
     SSMP_touched();
-    uart_write_blocking(UART, SYN_SYN_ACK, 3);
+    uart_write_blocking(SSMP_UART, SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
@@ -222,7 +222,7 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
     debugf("SSMP", "GET/response %u", encoded.length);
-    uart_write_blocking(UART, encoded.bytes, encoded.length);
+    uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
 
     slice_free(&encoded);
     slice_free(&packed);

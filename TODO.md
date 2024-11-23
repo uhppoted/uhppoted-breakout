@@ -1,13 +1,16 @@
 # TODO
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
-- [ ] CLI: trace on/off
+- [ ] CLI: trace interval
 - [ ] Rework log queue as circular buffer
 - [ ] Make Rev.0 emulator a 'local only' package
 - [x] USB circular buffer
 - [x] UART circular buffer
 - [x] Remove CLI timer
 - [x] Remove SPI
+- [x] Move SSMP to UART1
+- [ ] WATCHDOGGED syserror
+- [ ] WATCHDOG_ENABLED build flag
 
 ### SSMP
     - [x] circular-buffer
@@ -35,16 +38,11 @@
                 - ~~IOX or RTC~~
                 - ~~USB~~
                 - **CLI TERMINAL_QUERY_STATUS printf**
+                - CLI echo ??
+                - CLI clear/clearline
                 - something in sequence ? 
-                  - MSG_TICK seemed to stop working
-                  - SSMP received was still being printed though
-                  - looks like MSG_TICK is not being generated
-                  - timer(s) cancelled ???
-                  - terminal ping ???
-                  >>>> try printing last health-check in 'poke'
-                  >>>> try printing last tick in 'poke'
                 - U3_read ?
-                - alarms/timers disabled ?
+                - alarms/timers disabled !!!!
                 - weird SSMP response but message processing is commented out????? And approximately when board did its weird thing
 ```
 ... debug     264 16 16 02 30 0e 10 06 0a 2b 10 ....
