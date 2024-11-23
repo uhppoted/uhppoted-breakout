@@ -3,11 +3,11 @@
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] CLI: trace on/off
 - [ ] Rework log queue as circular buffer
-- [ ] Remove SPI
 - [ ] Make Rev.0 emulator a 'local only' package
 - [x] USB circular buffer
 - [x] UART circular buffer
 - [x] Remove CLI timer
+- [x] Remove SPI
 
 ### SSMP
     - [x] circular-buffer
