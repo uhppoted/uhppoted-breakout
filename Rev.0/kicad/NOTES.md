@@ -44,6 +44,7 @@
 37. Connect RX8900SA ALARM output to reset (jumper)
 38. Seriously consider an external hardware watchdog
 39. Rev.1-Pico (with pico footprint on back)
+40. Protect UART pins against overvoltage
 
 (?) Maybe put GND on pin 1 of UART/SPI header
 (?) https://www.olimex.com/Products/Components/IC/SY6280

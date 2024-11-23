@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <pico/binary_info.h>
 #include <pico/multicore.h>
@@ -14,6 +15,7 @@
 #include <SSMP.h>
 #include <breakout.h>
 #include <log.h>
+#include <state.h>
 #include <sys.h>
 
 #define _VERSION "v0.0"
@@ -42,7 +44,14 @@ int main() {
 
     stdio_init_all();
 
-    // FIXME reinstate: watchdog_enable(WATCHDOG_TIMEOUT, true);
+    if (watchdog_caused_reboot()) {
+        set_error(ERR_WATCHDOG, "SYS", "watchdog reboot");
+    }
+
+    if (strcmp(WATCHDOG, "disabled") != 0) {
+        watchdog_enable(WATCHDOG_TIMEOUT, true);
+    }
+
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
 

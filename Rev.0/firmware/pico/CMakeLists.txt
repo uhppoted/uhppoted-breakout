@@ -14,6 +14,7 @@ add_compile_definitions(RX8900SA_SWOFF="${RX8900SA_SWOFF}")
 add_compile_definitions(RX8900SA_BKSMP="${RX8900SA_BKSMP}")
 add_compile_definitions(I2C0_CLOCK="${I2C0_CLOCK}")
 add_compile_definitions(I2C1_CLOCK="${I2C1_CLOCK}")
+add_compile_definitions(WATCHDOG="${WATCHDOG}")
 
 add_compile_definitions(CONTROLLER=${CONTROLLER})
 add_compile_definitions(VERSION=${VERSION})

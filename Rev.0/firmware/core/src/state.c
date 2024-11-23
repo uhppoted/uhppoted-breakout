@@ -12,6 +12,7 @@ struct {
         bool RX8900SA;
         bool U3;
         bool U4;
+        bool watchdog;
         bool unknown;
     } errors;
 } STATE = {
@@ -21,6 +22,7 @@ struct {
         .RX8900SA = false,
         .U3 = false,
         .U4 = false,
+        .watchdog = false,
         .unknown = false,
     },
 };
@@ -52,6 +54,10 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
 
     case ERR_U4:
         STATE.errors.U4 = true;
+        break;
+
+    case ERR_WATCHDOG:
+        STATE.errors.watchdog = true;
         break;
 
     case ERR_UNKNOWN:
@@ -88,6 +94,9 @@ bool get_error(err error) {
     case ERR_U4:
         return STATE.errors.U4;
 
+    case ERR_WATCHDOG:
+        return STATE.errors.watchdog;
+
     case ERR_UNKNOWN:
         return STATE.errors.unknown;
     }
@@ -103,6 +112,7 @@ uint16_t get_errors() {
     bits |= STATE.errors.RX8900SA ? 0x0004 : 0x0000;
     bits |= STATE.errors.U3 ? 0x0008 : 0x0000;
     bits |= STATE.errors.U4 ? 0x0010 : 0x0000;
+    bits |= STATE.errors.watchdog ? 0x0020 : 0x0000;
     bits |= STATE.errors.unknown ? 0x8000 : 0x0000;
 
     STATE.errors.I2C = false;
@@ -110,6 +120,7 @@ uint16_t get_errors() {
     STATE.errors.RX8900SA = false;
     STATE.errors.U3 = false;
     STATE.errors.U4 = false;
+    //  STATE.errors.watchdog = false;
     STATE.errors.unknown = false;
 
     return bits;

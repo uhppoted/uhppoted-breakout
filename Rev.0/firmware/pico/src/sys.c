@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <pico/stdlib.h>
 
@@ -59,6 +60,12 @@ bool sys_init() {
 
     // ... system stuff
     char s[64];
+
+    if (!strcmp(WATCHDOG, "disabled") != 0) {
+        snprintf(s, sizeof(s), "-----  BREAKOUT-PICO   v%02x.%02x   <<< NO WATCHDOG >>>", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+    } else {
+        snprintf(s, sizeof(s), "-----  BREAKOUT-PICO   v%02x.%02x", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+    }
 
     snprintf(s, sizeof(s), "-----  BREAKOUT   %02x.02x", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
 

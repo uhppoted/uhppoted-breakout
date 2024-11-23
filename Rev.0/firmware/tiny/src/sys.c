@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <pico/stdlib.h>
 
@@ -57,7 +58,11 @@ bool sys_init() {
     // ... system stuff
     char s[64];
 
-    snprintf(s, sizeof(s), "-----  BREAKOUT   v%02x.%02x", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+    if (!strcmp(WATCHDOG, "disabled") != 0) {
+        snprintf(s, sizeof(s), "-----  BREAKOUT   v%02x.%02x   <<< NO WATCHDOG >>>", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+    } else {
+        snprintf(s, sizeof(s), "-----  BREAKOUT   v%02x.%02x", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+    }
 
     sysinit();
     cli_init();
@@ -118,6 +123,10 @@ bool on_monitor(repeating_timer_t *t) {
                    now,
                    sys.touched,
                    delta);
+
+            if (get_error(ERR_WATCHDOG)) {
+                debugf("*****", "**** WATCHDOGGED");
+            }
         }
     } else {
         sys.triggered = false;
@@ -159,6 +168,10 @@ void sys_tick() {
            100.0f * used,
            get_errors());
 
+    if (get_error(ERR_WATCHDOG)) {
+        debugf("SYS", "**** WATCHDOGGED");
+    }
+
     counter++;
 }
 
@@ -199,6 +212,10 @@ void sys_debug() {
            now,
            sys.touched,
            delta);
+
+    if (get_error(ERR_WATCHDOG)) {
+        debugf("POKE", "**** WATCHDOGGED");
+    }
 }
 
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {

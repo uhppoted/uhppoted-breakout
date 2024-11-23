@@ -9,8 +9,12 @@
 - [x] Remove CLI timer
 - [x] Remove SPI
 - [x] Move SSMP to UART1
-- [ ] WATCHDOGGED syserror
-- [ ] WATCHDOG_ENABLED build flag
+- [x] WATCHDOG mode build flag
+- [x] WATCHDOG syserror
+      - check for SDK reboot ?
+      - https://forums.raspberrypi.com/viewtopic.php?t=354617
+      - https://forums.raspberrypi.com/viewtopic.php?t=348830
+      - maybe just a CLI acknowledge ?
 
 ### SSMP
     - [x] circular-buffer
@@ -63,6 +67,10 @@
           - [ ] bisync timeout
           - [ ] bisync max message size
           - [ ] Reinstate watchdog reset
+          - [ ] Second Zero2W UART
+                - https://www.raspberrypi.com/documentation/computers/configuration.html#secondary-uart
+                - config.txt: `dtparam=krnbt=off`
+                - https://forums.raspberrypi.com/viewtopic.php?p=2262551&hilit=serial1#p2262551
 
     - monitor
       - get-board
