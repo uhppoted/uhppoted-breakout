@@ -1,6 +1,8 @@
 # TODO
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
+- [ ] Commonalise sys implementation into core::sys
+
 - [ ] CLI: trace interval
 - [ ] CLI: poke
       - system errors
@@ -28,11 +30,6 @@
 - [x] Move SSMP to UART1
 - [x] WATCHDOG mode build flag
 - [x] WATCHDOG syserror
-
-- (?) getch() for CLI
-      - https://www.raspberrypi.com/documentation/pico-sdk/runtime.html#group_pico_stdio_1ga26d27f1b58f1385798f93a9799c40b73
-      - https://forums.raspberrypi.com/viewtopic.php?t=177157
-      - `stdio_set_chars_available_callback`
 
 ### SSMP
     - [ ] Migrate SSMP handler to UART1

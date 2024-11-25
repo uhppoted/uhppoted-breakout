@@ -11,8 +11,6 @@
 
 extern void sysinit();
 
-bool on_tick(repeating_timer_t *);
-
 struct {
     bool reboot;
     struct repeating_timer timer;
@@ -28,10 +26,10 @@ bool sys_init() {
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
-    if (!add_repeating_timer_ms(1000, on_tick, NULL, &sys.timer)) {
+#endif
+    if (!add_repeating_timer_ms(1000, sys_on_tick, NULL, &sys.timer)) {
         return false;
     }
-#endif
 
     // ... system stuff
     char s[64];
@@ -52,22 +50,15 @@ bool sys_init() {
     return true;
 }
 
-bool on_tick(repeating_timer_t *t) {
-    uint32_t msg = MSG_TICK;
-    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-        set_error(ERR_QUEUE_FULL, "SYS", "tick: queue full");
-    }
-
-    return true;
-}
-
 /* Blinks SYSLED and resets watchdog.
  *
  */
 void sys_tick() {
+#ifdef PICO_DEFAULT_LED_PIN
     bool on = gpio_get(PICO_DEFAULT_LED_PIN);
 
     gpio_put(PICO_DEFAULT_LED_PIN, !on);
+#endif
 
     if (!sys.reboot) {
         uint32_t msg = MSG_WATCHDOG;

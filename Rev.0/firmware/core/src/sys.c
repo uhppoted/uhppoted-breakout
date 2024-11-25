@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,6 +46,15 @@ void sysinit() {
     mutex_init(&SYSTEM.guard);
 
     set_mode(MODE_UNKNOWN);
+}
+
+bool sys_on_tick(repeating_timer_t *t) {
+    uint32_t msg = MSG_TICK;
+    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+        set_error(ERR_QUEUE_FULL, "SYS", "tick: queue full");
+    }
+
+    return true;
 }
 
 int sys_id(char *ID, int N) {
@@ -233,4 +243,19 @@ void _print(const char *msg) {
     }
 
     fflush(stdout);
+}
+
+uint32_t get_total_heap() {
+    extern char __StackLimit, __bss_end__;
+
+    return &__StackLimit - &__bss_end__;
+}
+
+uint32_t get_free_heap() {
+    extern char __StackLimit, __bss_end__;
+
+    uint32_t total = &__StackLimit - &__bss_end__;
+    struct mallinfo m = mallinfo();
+
+    return total - m.uordblks;
 }
