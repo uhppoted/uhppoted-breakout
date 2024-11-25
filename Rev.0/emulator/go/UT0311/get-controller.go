@@ -7,7 +7,7 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 	"github.com/uhppoted/uhppote-core/types"
 
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/MIB"
+	"emulator/MIB"
 )
 
 func (ut0311 *UT0311) GetController(rq *messages.GetDeviceRequest) (*messages.GetDeviceResponse, error) {

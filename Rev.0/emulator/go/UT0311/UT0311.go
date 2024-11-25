@@ -12,8 +12,8 @@ import (
 	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
 	"github.com/uhppoted/uhppote-core/messages"
 
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/MIB"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/log"
+	"emulator/MIB"
+	"emulator/log"
 )
 
 type UT0311 struct {

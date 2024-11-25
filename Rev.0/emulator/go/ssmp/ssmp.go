@@ -8,11 +8,11 @@ import (
 	"github.com/gosnmp/gosnmp"
 	"github.com/pkg/term"
 
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/MIB/types"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/encoding/BER"
-	ssmp "github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/encoding/SSMP"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/encoding/bisync"
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/log"
+	"emulator/MIB/types"
+	"emulator/encoding/BER"
+	ssmp "emulator/encoding/SSMP"
+	"emulator/encoding/bisync"
+	"emulator/log"
 )
 
 type SSMP struct {

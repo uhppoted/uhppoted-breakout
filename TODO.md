@@ -2,6 +2,7 @@
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
+- [ ] Zero2W pigpio UART
 
 - [ ] CLI: trace interval
 - [ ] CLI: poke
@@ -15,7 +16,7 @@
       - (?) log once on occurrence
       - (?) display in 'poke'
 
-- [ ] Make Rev.0 emulator a 'local only' package
+- [x] Make Rev.0 emulator a 'local only' package
 - [ ] Use Pico optimized libraries
       - pico_mem_ops
       - pico_printf
@@ -66,9 +67,6 @@
           - [ ] bisync max message size
           - (?) bisync timeout
           - [ ] Reinstate watchdog reset
-          - [ ] Second Zero2W UART
-                - https://www.raspberrypi.com/documentation/computers/configuration.html#secondary-uart
-                - config.txt: `dtparam=krnbt=off`
 
     - monitor
       - get-board

@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"github.com/uhppoted/uhppoted-breakout/Rev.0/emulator/go/crypt/otp"
+	"emulator/crypt/otp"
 )
 
 var id = atomic.Uint64{}
