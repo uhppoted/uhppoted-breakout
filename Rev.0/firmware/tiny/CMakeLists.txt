@@ -46,8 +46,6 @@ add_executable(breakout
   ${CORE}/src/cli.c
   ${CORE}/src/ANSI.c
 
-  ${CORE}/src/usb.c
-
   ${LIB}/src/I2C.c
   ${LIB}/src/RX8900SA.c
   ${LIB}/src/PCAL6408A.c

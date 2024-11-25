@@ -15,6 +15,7 @@
 #include <breakout.h>
 #include <cli.h>
 #include <log.h>
+#include <state.h>
 #include <sys.h>
 
 extern const char *TERMINAL_QUERY_STATUS;
@@ -205,6 +206,13 @@ void _flush() {
  *
  */
 void _print(const char *msg) {
+    // int len = strlen(msg);
+    // int N;
+    //
+    // if ((N = fwrite(msg, 1, len, stdout)) != len) {
+    //     set_error(ERR_STDOUT, "SYS", "print error len:%d  rc:%d", len, N);
+    // }
+
     int remaining = strlen(msg);
     int ix = 0;
     int N;
@@ -213,6 +221,12 @@ void _print(const char *msg) {
         if ((N = fwrite(&msg[ix], 1, remaining, stdout)) <= 0) {
             break;
         } else {
+            if (N < remaining) {
+                set_error(ERR_STDOUT, "SYS", "print error len:%d  rc:%d", remaining, N);
+                printf("...\n");
+                break;
+            }
+
             remaining -= N;
             ix += N;
         }

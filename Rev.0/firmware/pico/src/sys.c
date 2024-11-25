@@ -9,16 +9,7 @@
 #include <state.h>
 #include <sys.h>
 
-#define BAUD_RATE 115200
-#define DATA_BITS 8
-#define STOP_BITS 1
-#define PARITY UART_PARITY_NONE
-
 extern void sysinit();
-extern void on_uart_rx();
-
-const uint UART0_TX = 0;
-const uint UART0_RX = 1;
 
 bool on_tick(repeating_timer_t *);
 
@@ -42,22 +33,6 @@ bool sys_init() {
     }
 #endif
 
-    // ... UART
-    uart_init(uart0, 115200);
-
-    gpio_set_function(UART0_TX, GPIO_FUNC_UART);
-    gpio_set_function(UART0_RX, GPIO_FUNC_UART);
-
-    uart_set_baudrate(uart0, BAUD_RATE);
-    uart_set_hw_flow(uart0, false, false);
-    uart_set_format(uart0, DATA_BITS, STOP_BITS, PARITY);
-    uart_set_fifo_enabled(uart0, false);
-
-    irq_set_exclusive_handler(UART0_IRQ, on_uart_rx);
-    irq_set_enabled(UART0_IRQ, true);
-
-    uart_set_irq_enables(uart0, true, false);
-
     // ... system stuff
     char s[64];
 
@@ -71,10 +46,8 @@ bool sys_init() {
 
     sysinit();
     cli_init();
-    println(s);
-
-    // ... other stuff
     log_init();
+    println(s);
 
     return true;
 }
@@ -115,12 +88,6 @@ void sys_reboot() {
  *
  */
 void sys_watchdog_update() {
-}
-
-/* Enables/disables LF to CRLF translation on USB.
- *
- */
-void sys_translate_crlf(bool enabled) {
 }
 
 void sys_debug() {

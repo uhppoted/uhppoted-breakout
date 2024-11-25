@@ -2,8 +2,25 @@
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] CLI: trace interval
-- [ ] Rework log queue as circular buffer
+- [ ] CLI: poke
+      - system errors
+      - system error messages
+- [ ] Rework print queue as circular buffer of char[128]
+- [ ] Rework print queue to use timer + MSG
+- [ ] syserror
+      - (?) count up/down to auto-clear
+      - (?) orange LED on any system error 
+      - (?) log once on occurrence
+      - (?) display in 'poke'
+
 - [ ] Make Rev.0 emulator a 'local only' package
+- [ ] Use Pico optimized libraries
+      - pico_memo_ops
+      - pico_printf
+      - pico_malloc
+      - pico_stdio
+
+- [x] circular-buffer
 - [x] USB circular buffer
 - [x] UART circular buffer
 - [x] Remove CLI timer
@@ -11,18 +28,13 @@
 - [x] Move SSMP to UART1
 - [x] WATCHDOG mode build flag
 - [x] WATCHDOG syserror
-      - check for SDK reboot ?
-      - https://forums.raspberrypi.com/viewtopic.php?t=354617
-      - https://forums.raspberrypi.com/viewtopic.php?t=348830
-      - maybe just a CLI acknowledge ?
+
+- (?) getch() for CLI
+      - https://www.raspberrypi.com/documentation/pico-sdk/runtime.html#group_pico_stdio_1ga26d27f1b58f1385798f93a9799c40b73
+      - https://forums.raspberrypi.com/viewtopic.php?t=177157
+      - `stdio_set_chars_available_callback`
 
 ### SSMP
-    - [x] circular-buffer
-          - [x] push
-          - [x] pop
-          - [x] empty
-          - [x] flush
-
     - [ ] Migrate SSMP handler to UART1
           - [x] ENQ
           - [x] GET
@@ -41,12 +53,12 @@
                 - ~~UART interrupt handler~~
                 - ~~IOX or RTC~~
                 - ~~USB~~
+                - ~~loop in _print~~
                 - **CLI TERMINAL_QUERY_STATUS printf**
-                - CLI echo ??
-                - CLI clear/clearline
                 - something in sequence ? 
                 - U3_read ?
                 - alarms/timers disabled !!!!
+                - check all mutexes are try-lock (avoid priority inversion) 
                 - weird SSMP response but message processing is commented out????? And approximately when board did its weird thing
 ```
 ... debug     264 16 16 02 30 0e 10 06 0a 2b 10 ....
@@ -59,13 +71,12 @@
 ```
 
           - [ ] Check all FIXMEs
-          - [ ] Trace interval (compile time option)
           - [ ] Invoke sys.flush from main loop rather than timer handler
           - [ ] Check that system doesn't freeze when print queue is full 
                 (i.e. why did it freeze when the CLI used a printf?)
           - [ ] Maybe only enable SSMP interrupt after a delay? 
-          - [ ] bisync timeout
           - [ ] bisync max message size
+          - (?) bisync timeout
           - [ ] Reinstate watchdog reset
           - [ ] Second Zero2W UART
                 - https://www.raspberrypi.com/documentation/computers/configuration.html#secondary-uart
@@ -93,9 +104,8 @@
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
     
     - [ ] UART
-        - [ ] set UART output translation (`uart_set_translate_crlf`)
-        - [ ] Enable FIFO
-        - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
+        - [x] set UART output translation (`uart_set_translate_crlf`)
+        - [x] Enable FIFO
 
 ### emulator
     - [ ] split architecture
@@ -136,6 +146,8 @@
     - [x] controller ID
     - [ ] RP2040 ID
           - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
+    - [ ] system errors
+    - [ ] system error messages
 
 ## PiZeroW
     - [ ] Reduce power consumption
@@ -186,12 +198,6 @@
 12. External flash
     - https://mcuoneclipse.com/2022/12/04/add-extra-storage-to-the-raspberry-pi-pico-with-w25q128-and-littlefs
 13. https://forums.raspberrypi.com/viewtopic.php?t=327189
-14. https://stackoverflow.com/questions/76367736/uart-tx-produce-endless-interrupts-how-to-acknowlage-the-interrupt
-15. https://www.baeldung.com/cs/bisync
-16. https://stackoverflow.com/questions/51609813/serial-communication-in-c-for-raspberry-pi
-17. https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
-18. https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
-19. https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
-20. https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
-21, https://github.com/raspberrypi/pico-sdk/issues/224
-22. https://github.com/raspberrypi/pico-sdk/issues/997
+14. https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
+15, https://github.com/raspberrypi/pico-sdk/issues/224
+16. https://github.com/raspberrypi/pico-sdk/issues/997

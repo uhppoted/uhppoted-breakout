@@ -49,5 +49,6 @@ typedef enum {
     ERR_U4,
     ERR_VLF,
     ERR_WATCHDOG,
+    ERR_STDOUT,
     ERR_UNKNOWN,
 } err;

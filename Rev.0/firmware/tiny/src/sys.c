@@ -66,11 +66,10 @@ bool sys_init() {
 
     sysinit();
     cli_init();
-    println(s);
-
-    // ... other stuff
-    usb_init();
+    // usb_init();
     log_init();
+
+    println(s);
 
     // ... set up health watchdog
     uint t0 = TIMER_ALARM_NUM_FROM_IRQ(TIMER_IRQ_0);
@@ -109,14 +108,16 @@ bool on_monitor(repeating_timer_t *t) {
             uint32_t heap = get_total_heap();
             uint32_t available = get_free_heap();
             float used = 1.0 - ((float)available / (float)heap);
+            char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
 
-            debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x",
+            debugf("*****", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x %s",
                    counter,
                    queue_get_level(&queue),
                    heap,
                    available,
                    100.0f * used,
-                   get_errors());
+                   get_errors(),
+                   watchdogged);
 
             debugf("*****", "%-5u now:%ld  touched:%ld  delta:%ld",
                    counter,
@@ -124,8 +125,8 @@ bool on_monitor(repeating_timer_t *t) {
                    sys.touched,
                    delta);
 
-            if (get_error(ERR_WATCHDOG)) {
-                debugf("*****", "**** WATCHDOGGED");
+            if (get_error(ERR_STDOUT)) {
+                debugf("*****", "**** STDOUT");
             }
         }
     } else {
@@ -159,17 +160,19 @@ void sys_tick() {
     uint32_t heap = get_total_heap();
     uint32_t available = get_free_heap();
     float used = 1.0 - ((float)available / (float)heap);
+    char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
 
-    debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x",
+    debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
            counter,
            queue_get_level(&queue),
            heap,
            available,
            100.0f * used,
-           get_errors());
+           get_errors(),
+           watchdogged);
 
-    if (get_error(ERR_WATCHDOG)) {
-        debugf("SYS", "**** WATCHDOGGED");
+    if (get_error(ERR_STDOUT)) {
+        debugf("SYS", "**** STDOUT");
     }
 
     counter++;
@@ -198,14 +201,16 @@ void sys_debug() {
     uint32_t heap = get_total_heap();
     uint32_t available = get_free_heap();
     float used = 1.0 - ((float)available / (float)heap);
+    char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
 
-    debugf("POKE", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x",
+    debugf("POKE", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
            counter,
            queue_get_level(&queue),
            heap,
            available,
            100.0f * used,
-           get_errors());
+           get_errors(),
+           watchdogged);
 
     debugf("POKE", "%-5u now:%ld  touched:%ld  delta:%ld",
            counter,
@@ -213,8 +218,8 @@ void sys_debug() {
            sys.touched,
            delta);
 
-    if (get_error(ERR_WATCHDOG)) {
-        debugf("POKE", "**** WATCHDOGGED");
+    if (get_error(ERR_STDOUT)) {
+        debugf("POKE", "**** STDOUT");
     }
 }
 

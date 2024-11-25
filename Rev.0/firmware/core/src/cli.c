@@ -62,10 +62,12 @@ void clear();
 void help();
 void debug();
 
-struct CLI {
+struct {
     int rows;
     int columns;
     bool escaped;
+
+    circular_buffer rx;
 
     struct {
         char bytes[64];
@@ -80,6 +82,10 @@ struct CLI {
     .rows = 40,
     .columns = 120,
     .escaped = false,
+    .rx = {
+        .head = 0,
+        .tail = 0,
+    },
     .buffer = {
         .bytes = {0},
         .ix = 0,
@@ -136,10 +142,34 @@ const char *HELP[] = {
     "  help",
     ""};
 
+/** Unified stdin for CLI.
+ *
+ */
+void cli_callback(void *data) {
+    int count = 0;
+    int ch;
+
+    while ((ch = getchar_timeout_us(0)) != PICO_ERROR_TIMEOUT) {
+        buffer_push(&cli.rx, ch);
+        count++;
+    }
+
+    if (count > 0) {
+        circular_buffer *b = &cli.rx;
+        uint32_t msg = MSG_TTY | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
+
+        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+            set_error(ERR_QUEUE_FULL, "CLI", "rx: queue full");
+        }
+    }
+}
+
 /** Sets the scroll area.
  *
  */
 void cli_init() {
+    stdio_set_chars_available_callback(cli_callback, &cli);
+
     print(TERMINAL_CLEAR);
     print(TERMINAL_QUERY_CODE);
     print(TERMINAL_QUERY_SIZE);

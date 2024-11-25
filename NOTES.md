@@ -74,6 +74,14 @@
 - https://stackoverflow.com/questions/29354228/is-stdout-required-to-be-a-text-stream
 - https://forums.raspberrypi.com/viewtopic.php?t=302960
 - https://www.baeldung.com/cs/bisync
+- [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
+
+### Serial I/O
+- https://stackoverflow.com/questions/51609813/serial-communication-in-c-for-raspberry-pi
+- https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
+- https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
+- https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
+- https://stackoverflow.com/questions/76367736/uart-tx-produce-endless-interrupts-how-to-acknowlage-the-interrupt
 
 ## Crypto
 - https://www.jstage.jst.go.jp/article/transinf/E99.D/8/E99.D_2015INP0013/_article
