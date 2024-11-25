@@ -17,19 +17,10 @@
 
 - [ ] Make Rev.0 emulator a 'local only' package
 - [ ] Use Pico optimized libraries
-      - pico_memo_ops
+      - pico_mem_ops
       - pico_printf
       - pico_malloc
       - pico_stdio
-
-- [x] circular-buffer
-- [x] USB circular buffer
-- [x] UART circular buffer
-- [x] Remove CLI timer
-- [x] Remove SPI
-- [x] Move SSMP to UART1
-- [x] WATCHDOG mode build flag
-- [x] WATCHDOG syserror
 
 ### SSMP
     - [ ] Migrate SSMP handler to UART1
@@ -78,7 +69,6 @@
           - [ ] Second Zero2W UART
                 - https://www.raspberrypi.com/documentation/computers/configuration.html#secondary-uart
                 - config.txt: `dtparam=krnbt=off`
-                - https://forums.raspberrypi.com/viewtopic.php?p=2262551&hilit=serial1#p2262551
 
     - monitor
       - get-board

@@ -12,7 +12,7 @@ extern void field_free(struct field *const);
 
 vector *vector_new() {
     int capacity = CAPACITY;
-    size_t size = 12 + capacity * sizeof(struct field *);
+    size_t size = sizeof(vector) + capacity * sizeof(struct field *);
     vector *v = (vector *)malloc(size);
 
     if (v != NULL) {
@@ -53,7 +53,7 @@ vector *vector_add(vector *v, struct field *f) {
 
     // .. reallocate and copy
     int capacity = v->capacity + CAPACITY;
-    size_t size = 12 + capacity * sizeof(struct field *);
+    size_t size = sizeof(vector) + capacity * sizeof(struct field *);
     vector *u = (vector *)malloc(size);
 
     if (u != NULL) {

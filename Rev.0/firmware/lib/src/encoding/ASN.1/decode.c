@@ -192,7 +192,8 @@ field *unpack_OID(const uint8_t *message, int N, int *ix) {
 
 field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
-    vector *fields = unpack(&message[*ix], length);
+    // vector *fields = unpack(&message[*ix], length);
+    vector *fields = vector_new();
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
