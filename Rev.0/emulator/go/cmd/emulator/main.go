@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"emulator/UT0311"
+	"emulator/driver/stub"
 	"emulator/log"
-	"emulator/ssmp"
 )
 
 const VERSION = "v0.0"
@@ -39,13 +39,9 @@ func main() {
 		errorf("invalid USB TTY device")
 		os.Exit(1)
 	} else {
-		ut0311 := UT0311.UT0311{}
-
-		go func() {
-			ssmp.SSMP{
-				USB: options.USB,
-			}.Run()
-		}()
+		ut0311 := UT0311.UT0311{
+			Driver: stub.Stub{},
+		}
 
 		go func() {
 			ut0311.Run(cfg)

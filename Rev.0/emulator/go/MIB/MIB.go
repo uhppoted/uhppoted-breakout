@@ -17,6 +17,8 @@ type field struct {
 	get func() (any, error)
 }
 
+var OID_CONTROLLER_ID = []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 1}
+
 const SYSTEM_SERIALNO = "system.serialno"
 
 const CONTROLLER_ID = "controller.id"

@@ -13,10 +13,12 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 
 	"emulator/MIB"
+	"emulator/driver"
 	"emulator/log"
 )
 
 type UT0311 struct {
+	Driver driver.Driver
 }
 
 func Load(filepath string) (Config, []byte, error) {
