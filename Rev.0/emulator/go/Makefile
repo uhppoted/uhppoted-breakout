@@ -17,7 +17,7 @@ test: build
 	go test ./...
 
 run: build
-	./bin/emulator --usb /dev/tty.usbmodem14201
+	./bin/emulator
 
 get-controller:
 	../../../../uhppote-cli/bin/uhppote-cli get-device 405419896

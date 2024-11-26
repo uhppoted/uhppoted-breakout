@@ -1,7 +1,6 @@
 package MIB
 
 import (
-	"fmt"
 	"net"
 	"net/netip"
 
@@ -18,6 +17,7 @@ type field struct {
 }
 
 var OID_CONTROLLER_ID = []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 1}
+var OID_CONTROLLER_ADDRESS = []uint32{1, 3, 6, 1, 4, 1, 65536, 2, 4}
 
 const SYSTEM_SERIALNO = "system.serialno"
 
@@ -51,30 +51,30 @@ var mib = map[string]field{
 	CONTROLLER_RELEASED: {get: getControllerReleased},
 }
 
-func Init(address netip.Addr, netmask net.IPMask, gateway netip.Addr, MAC net.HardwareAddr) error {
-	if !address.IsValid() {
-		return fmt.Errorf("invalid controller IPv4 address (%v)", address)
-	}
-
-	if netmask == nil {
-		return fmt.Errorf("invalid controller IPv4 netmask (%v)", netmask)
-	}
-
-	if !gateway.IsValid() {
-		return fmt.Errorf("invalid controller IPv4 gateway (%v)", gateway)
-	}
-
-	if len(MAC) != 6 {
-		return fmt.Errorf("invalid controller MAC address (%v)", MAC)
-	}
-
-	controller.address = address
-	controller.netmask = netmask
-	controller.gateway = gateway
-	controller.MAC = MAC
-
-	return nil
-}
+// func Init(address netip.Addr, netmask net.IPMask, gateway netip.Addr, MAC net.HardwareAddr) error {
+// 	if !address.IsValid() {
+// 		return fmt.Errorf("invalid controller IPv4 address (%v)", address)
+// 	}
+//
+// 	if netmask == nil {
+// 		return fmt.Errorf("invalid controller IPv4 netmask (%v)", netmask)
+// 	}
+//
+// 	if !gateway.IsValid() {
+// 		return fmt.Errorf("invalid controller IPv4 gateway (%v)", gateway)
+// 	}
+//
+// 	if len(MAC) != 6 {
+// 		return fmt.Errorf("invalid controller MAC address (%v)", MAC)
+// 	}
+//
+// 	controller.address = address
+// 	controller.netmask = netmask
+// 	controller.gateway = gateway
+// 	controller.MAC = MAC
+//
+// 	return nil
+// }
 
 func Get[T V](tag string, defval T) T {
 	if f, ok := mib[tag]; ok && f.get != nil {

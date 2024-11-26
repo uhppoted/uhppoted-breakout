@@ -1,7 +1,9 @@
 # TODO
 
 - [x] Make Rev.0 emulator a 'local only' package
-- [ ] Zero2W pigpio UART
+- [ ] Zero2W serial logging (pigpio ?)
+- [ ] Zero2W USB UART
+
 - [ ] Rework print queue
       - [x] use circular buffer of char[128]
       - [x] remove free(msg) in _push

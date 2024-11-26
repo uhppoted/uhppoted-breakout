@@ -1,12 +1,17 @@
-package UT0311
+package config
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"net"
 	"net/netip"
+	"os"
 	"regexp"
 	"strconv"
+
+	"emulator/MIB"
+	"emulator/MIB/types"
 )
 
 type Config struct {
@@ -23,6 +28,28 @@ type IPv4 struct {
 	Netmask net.IPMask       `json:"netmask"`
 	Gateway netip.Addr       `json:"gateway"`
 	MAC     net.HardwareAddr `json:"MAC"`
+}
+
+func Load(filepath string) (Config, []byte, error) {
+	var config Config
+
+	if bytes, err := os.ReadFile(filepath); err != nil {
+		return Config{}, nil, err
+	} else if err := json.Unmarshal(bytes, &config); err != nil {
+		return Config{}, nil, err
+	} else {
+		hash := sha256.Sum224(bytes)
+
+		return config, hash[:], nil
+	}
+}
+
+func (c Config) Get(oid types.OID) (netip.Addr, error) {
+	if types.OID.Equal(oid, MIB.OID_CONTROLLER_ADDRESS) {
+		return c.Network.IPv4.Address, nil
+	}
+
+	return netip.Addr{}, fmt.Errorf("invalid OID (%v)", oid)
 }
 
 func (v *IPv4) UnmarshalJSON(bytes []byte) error {

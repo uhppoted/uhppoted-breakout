@@ -118,11 +118,11 @@ vector *unpack_xxx(const uint8_t *bytes, int N) {
                 }
                 break;
 
-                // case FIELD_SEQUENCE:
-                //     if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
-                //         v = vector_add(v, f);
-                //     }
-                //     break;
+            case FIELD_SEQUENCE:
+                if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
 
                 // case FIELD_PDU_GET:
                 //     if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {

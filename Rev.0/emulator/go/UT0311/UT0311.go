@@ -1,47 +1,36 @@
 package UT0311
 
 import (
-	"crypto/sha256"
-	"encoding/json"
 	"net"
 	"net/netip"
-	"os"
 	"reflect"
 	"time"
 
 	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
 	"github.com/uhppoted/uhppote-core/messages"
 
-	"emulator/MIB"
+	"emulator/config"
 	"emulator/driver"
 	"emulator/log"
 )
 
 type UT0311 struct {
-	Driver driver.Driver
+	config config.Config
+	driver driver.Driver
 }
 
-func Load(filepath string) (Config, []byte, error) {
-	var config Config
+func (ut0311 *UT0311) SetConfig(c config.Config) {
+	ut0311.config = c
+}
 
-	if bytes, err := os.ReadFile(filepath); err != nil {
-		return Config{}, nil, err
-	} else if err := json.Unmarshal(bytes, &config); err != nil {
-		return Config{}, nil, err
-	} else {
-		hash := sha256.Sum224(bytes)
-
-		return config, hash[:], nil
+func NewUT0311(c config.Config, d driver.Driver) UT0311 {
+	return UT0311{
+		config: c,
+		driver: d,
 	}
 }
 
-func (ut0311 *UT0311) SetConfig(config Config) {
-	ut0311.initialise(config)
-}
-
-func (ut0311 *UT0311) Run(config Config) {
-	ut0311.initialise(config)
-
+func (ut0311 *UT0311) Run() {
 	for {
 		if err := ut0311.listen(); err != nil {
 			warnf("%v", err)
@@ -52,34 +41,34 @@ func (ut0311 *UT0311) Run(config Config) {
 	}
 }
 
-func (ut0311 *UT0311) initialise(config Config) {
-	var address netip.Addr
-	var netmask net.IPMask
-	var gateway netip.Addr
-	var MAC net.HardwareAddr
-
-	if v := config.Network.IPv4; v != nil {
-		address = v.Address
-		netmask = v.Netmask
-		gateway = v.Gateway
-		MAC = v.MAC
-	}
-
-	if v := config.Network.Interface; v != "" {
-		if addr, subnet, gw, mac, err := discover(v); err != nil {
-			warnf("%v", err)
-		} else {
-			address = addr
-			netmask = subnet
-			gateway = gw
-			MAC = mac
-		}
-	}
-
-	if err := MIB.Init(address, netmask, gateway, MAC); err != nil {
-		warnf("%v", err)
-	}
-}
+// func (ut0311 *UT0311) initialise(config Config) {
+// 	var address netip.Addr
+// 	var netmask net.IPMask
+// 	var gateway netip.Addr
+// 	var MAC net.HardwareAddr
+//
+// 	if v := config.Network.IPv4; v != nil {
+// 		address = v.Address
+// 		netmask = v.Netmask
+// 		gateway = v.Gateway
+// 		MAC = v.MAC
+// 	}
+//
+// 	if v := config.Network.Interface; v != "" {
+// 		if addr, subnet, gw, mac, err := discover(v); err != nil {
+// 			warnf("%v", err)
+// 		} else {
+// 			address = addr
+// 			netmask = subnet
+// 			gateway = gw
+// 			MAC = mac
+// 		}
+// 	}
+//
+// 	if err := MIB.Init(address, netmask, gateway, MAC); err != nil {
+// 		warnf("%v", err)
+// 	}
+// }
 
 func (ut0311 UT0311) listen() error {
 	bind := netip.MustParseAddrPort("0.0.0.0:60000")

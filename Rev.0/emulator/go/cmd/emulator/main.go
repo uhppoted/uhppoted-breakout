@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"emulator/UT0311"
+	"emulator/config"
 	"emulator/driver/stub"
 	"emulator/log"
 )
@@ -19,32 +20,25 @@ const VERSION = "v0.0"
 
 var options = struct {
 	config string
-	USB    string
 }{
 	config: ".config",
-	USB:    "",
 }
 
 func main() {
 	infof("uhppoted-breakout::emulator %v", VERSION)
 
 	flag.StringVar(&options.config, "config", options.config, ".config file")
-	flag.StringVar(&options.USB, "usb", options.USB, "USB TTY device")
 	flag.Parse()
 
-	if cfg, hash, err := UT0311.Load(options.config); err != nil {
+	if cfg, hash, err := config.Load(options.config); err != nil {
 		errorf("%v", err)
 		os.Exit(1)
-	} else if options.USB == "" {
-		errorf("invalid USB TTY device")
-		os.Exit(1)
 	} else {
-		ut0311 := UT0311.UT0311{
-			Driver: stub.Stub{},
-		}
+		driver := stub.Stub{}
+		ut0311 := UT0311.NewUT0311(cfg, driver)
 
 		go func() {
-			ut0311.Run(cfg)
+			ut0311.Run()
 		}()
 
 		go func() {
@@ -70,7 +64,7 @@ func watch(ut0311 *UT0311.UT0311, filepath string, hash []byte) {
 			if !slices.Equal(signature, sha224[:]) {
 				warnf("reloading config from %v", filepath)
 
-				if cfg, _, err := UT0311.Load(filepath); err != nil {
+				if cfg, _, err := config.Load(filepath); err != nil {
 					warnf("%v", err)
 				} else {
 					ut0311.SetConfig(cfg)
