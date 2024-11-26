@@ -4,7 +4,7 @@
 - [ ] Zero2W pigpio UART
 - [ ] Rework print queue
       - [x] use circular buffer of char[128]
-      - [ ] remove free(msg) from _push
+      - [x] remove free(msg) in _push
       - [ ] overflow "..."
       - [ ] use timer + MSG_LOG
 

@@ -49,7 +49,7 @@ struct {
         .mode = 0,
     }};
 
-void _push(char *);
+void _push(const char *);
 void _flush();
 void _print(const char *);
 
@@ -158,28 +158,19 @@ void dispatch(uint32_t v) {
 }
 
 void print(const char *msg) {
-    int N = 256;
-    char *s;
-
-    if ((s = (char *)calloc(N, sizeof(char))) != NULL) {
-        snprintf(s, N, "%s", msg);
-        _push(s);
-        _flush();
-    }
+    _push(msg);
+    _flush();
 }
 
 void println(const char *msg) {
-    int N = 256;
-    char *s;
+    char s[128];
 
-    if ((s = (char *)calloc(N, sizeof(char))) != NULL) {
-        snprintf(s, N, "%s\n", msg);
-        _push(s);
-        _flush();
-    }
+    snprintf(s, sizeof(s), "%s\n", msg);
+    _push(s);
+    _flush();
 }
 
-void _push(char *msg) {
+void _push(const char *msg) {
     int head = SYSTEM.queue.head;
     int tail = SYSTEM.queue.tail;
     int next = (head + 1) % PRINT_QUEUE_SIZE;
@@ -197,8 +188,6 @@ void _push(char *msg) {
         snprintf(SYSTEM.queue.list[head], 128, "%s", msg);
         SYSTEM.queue.head = next;
     }
-
-    free(msg);
 }
 
 /* Flushes all pending messages to stdout.
