@@ -124,12 +124,12 @@ vector *unpack_xxx(const uint8_t *bytes, int N) {
                 //     }
                 //     break;
 
-                //         case FIELD_PDU_GET:
-                //             if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
-                //                 // v = vector_add(v, f);
-                //                 // field_free(f);
-                //             }
-                //             break;
+                // case FIELD_PDU_GET:
+                //     if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
+                //         // v = vector_add(v, f);
+                //         // field_free(f);
+                //     }
+                //     break;
 
             default:
                 debugf("ASN.1", "unpack/XXX unknown:%2d  N:%d  ix:%d\n", tag, N, ix);

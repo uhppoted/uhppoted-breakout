@@ -19,30 +19,41 @@
 #include <state.h>
 #include <sys.h>
 
+#define PRINT_QUEUE_SIZE 64
+
 extern const char *TERMINAL_QUERY_STATUS;
+const int32_t FLUSH = 1000;              // ms
+const uint32_t MODE_CLI_TIMEOUT = 15000; // ms
 
 struct {
     mode mode;
-    queue_t queue;
-    mutex_t guard;
+
+    struct {
+        int head;
+        int tail;
+        char list[PRINT_QUEUE_SIZE][128];
+    } queue;
+
     struct {
         absolute_time_t mode;
     } touched;
+
+    mutex_t guard;
 } SYSTEM = {
     .mode = MODE_UNKNOWN,
+    .queue = {
+        .head = 0,
+        .tail = 0,
+    },
     .touched = {
         .mode = 0,
     }};
-
-const int32_t FLUSH = 1000;              // ms
-const uint32_t MODE_CLI_TIMEOUT = 15000; // ms
 
 void _push(char *);
 void _flush();
 void _print(const char *);
 
 void sysinit() {
-    queue_init(&SYSTEM.queue, sizeof(char *), 64);
     mutex_init(&SYSTEM.guard);
 
     set_mode(MODE_UNKNOWN);
@@ -169,27 +180,25 @@ void println(const char *msg) {
 }
 
 void _push(char *msg) {
-    if (queue_is_full(&SYSTEM.queue)) {
-        for (int i = 0; i < 16; i++) {
-            char *pending = NULL;
-            if (queue_try_remove(&SYSTEM.queue, &pending)) {
-                free(pending);
-            }
-        }
+    int head = SYSTEM.queue.head;
+    int tail = SYSTEM.queue.tail;
+    int next = (head + 1) % PRINT_QUEUE_SIZE;
 
-        char *dots;
-
-        if ((dots = (char *)calloc(8, sizeof(char))) != NULL) {
-            snprintf(dots, 8, "...\n", msg);
-            if (!queue_try_add(&SYSTEM.queue, &dots)) {
-                free(dots);
-            }
+    if (next == SYSTEM.queue.tail) {
+        if (tail == head) {
+            // TODO replace tail entry with "..."
+        } else {
+            tail++;
+            SYSTEM.queue.tail = tail % PRINT_QUEUE_SIZE;
         }
     }
 
-    if (!queue_try_add(&SYSTEM.queue, &msg)) {
-        free(msg);
+    if (next != SYSTEM.queue.tail) {
+        snprintf(SYSTEM.queue.list[head], 128, "%s", msg);
+        SYSTEM.queue.head = next;
     }
+
+    free(msg);
 }
 
 /* Flushes all pending messages to stdout.
@@ -201,12 +210,15 @@ void _flush() {
     }
 
     if (mutex_try_enter(&SYSTEM.guard, NULL)) {
-        char *pending = NULL;
+        int head = SYSTEM.queue.head;
+        int tail = SYSTEM.queue.tail;
 
-        while (queue_try_remove(&SYSTEM.queue, &pending)) {
-            _print(pending);
-            free(pending);
+        while (tail != head) {
+            _print(SYSTEM.queue.list[tail++]);
+            tail %= PRINT_QUEUE_SIZE;
         }
+
+        SYSTEM.queue.tail = tail;
 
         mutex_exit(&SYSTEM.guard);
     }
@@ -216,13 +228,6 @@ void _flush() {
  *
  */
 void _print(const char *msg) {
-    // int len = strlen(msg);
-    // int N;
-    //
-    // if ((N = fwrite(msg, 1, len, stdout)) != len) {
-    //     set_error(ERR_STDOUT, "SYS", "print error len:%d  rc:%d", len, N);
-    // }
-
     int remaining = strlen(msg);
     int ix = 0;
     int N;
@@ -230,13 +235,11 @@ void _print(const char *msg) {
     while (remaining > 0) {
         if ((N = fwrite(&msg[ix], 1, remaining, stdout)) <= 0) {
             break;
+        } else if (N < remaining) {
+            set_error(ERR_STDOUT, "SYS", "print error len:%d  rc:%d", remaining, N);
+            printf("...\n");
+            break;
         } else {
-            if (N < remaining) {
-                set_error(ERR_STDOUT, "SYS", "print error len:%d  rc:%d", remaining, N);
-                printf("...\n");
-                break;
-            }
-
             remaining -= N;
             ix += N;
         }

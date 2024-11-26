@@ -1,22 +1,27 @@
 # TODO
 
+- [x] Make Rev.0 emulator a 'local only' package
+- [ ] Zero2W pigpio UART
+- [ ] Rework print queue
+      - [x] use circular buffer of char[128]
+      - [ ] remove free(msg) from _push
+      - [ ] overflow "..."
+      - [ ] use timer + MSG_LOG
+
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
-- [ ] Zero2W pigpio UART
 
 - [ ] CLI: trace interval
 - [ ] CLI: poke
       - system errors
       - system error messages
-- [ ] Rework print queue as circular buffer of char[128]
-- [ ] Rework print queue to use timer + MSG
+
 - [ ] syserror
       - (?) count up/down to auto-clear
       - (?) orange LED on any system error 
       - (?) log once on occurrence
       - (?) display in 'poke'
 
-- [x] Make Rev.0 emulator a 'local only' package
 - [ ] Use Pico optimized libraries
       - pico_mem_ops
       - pico_printf
