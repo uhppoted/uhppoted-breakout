@@ -26,6 +26,9 @@
       - (?) log once on occurrence
       - (?) display in 'poke'
 
+- [ ] system monitor
+      - error on e.g. 50% usage
+
 - [ ] Use Pico optimized libraries
       - pico_mem_ops
       - pico_printf
@@ -57,7 +60,7 @@
                 - U3_read ?
                 - alarms/timers disabled !!!!
                 - check all mutexes are try-lock (avoid priority inversion) 
-                - weird SSMP response but message processing is commented out????? And approximately when board did its weird thing
+                - weird SSMP response but message processing is commented out?????
 ```
 ... debug     264 16 16 02 30 0e 10 06 0a 2b 10 ....
 ... received 16 16 02 30 0e 10 06 0a
@@ -69,7 +72,6 @@
 ```
 
           - [ ] Check all FIXMEs
-          - [ ] Invoke sys.flush from main loop rather than timer handler
           - [ ] Check that system doesn't freeze when print queue is full 
                 (i.e. why did it freeze when the CLI used a printf?)
           - [ ] Maybe only enable SSMP interrupt after a delay? 
@@ -79,8 +81,6 @@
 
     - monitor
       - get-board
-
-    - [ ] memory leak
 
     - get-controller
       - [x] version
