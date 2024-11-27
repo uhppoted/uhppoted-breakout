@@ -25,6 +25,16 @@ extern const char *TERMINAL_QUERY_STATUS;
 const int32_t FLUSH = 1000;              // ms
 const uint32_t MODE_CLI_TIMEOUT = 15000; // ms
 
+const uint32_t MSG = 0xf0000000;
+const uint32_t MSG_DEBUG = 0x00000000;
+const uint32_t MSG_WIO = 0x10000000;
+const uint32_t MSG_U3 = 0x20000000;
+const uint32_t MSG_RX = 0x30000000;
+const uint32_t MSG_TTY = 0xc0000000;
+const uint32_t MSG_LOG = 0xd0000000;
+const uint32_t MSG_WATCHDOG = 0xe0000000;
+const uint32_t MSG_TICK = 0xf0000000;
+
 struct {
     mode mode;
 
@@ -149,6 +159,16 @@ void dispatch(uint32_t v) {
             _print(TERMINAL_QUERY_STATUS);
             mutex_exit(&SYSTEM.guard);
         }
+
+        // ... bump log queue
+        uint32_t m = MSG_LOG;
+        if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
+            set_error(ERR_QUEUE_FULL, "SYS", "log: queue full");
+        }
+    }
+
+    if ((v & MSG) == MSG_LOG) {
+        _flush();
     }
 
     if ((v & MSG) == MSG_WATCHDOG) {
@@ -159,7 +179,7 @@ void dispatch(uint32_t v) {
 
 void print(const char *msg) {
     _push(msg);
-    _flush();
+    // _flush();
 }
 
 void println(const char *msg) {
@@ -167,7 +187,7 @@ void println(const char *msg) {
 
     snprintf(s, sizeof(s), "%s\n", msg);
     _push(s);
-    _flush();
+    // _flush();
 }
 
 void _push(const char *msg) {
@@ -187,6 +207,11 @@ void _push(const char *msg) {
     if (next != SYSTEM.queue.tail) {
         snprintf(SYSTEM.queue.list[head], 128, "%s", msg);
         SYSTEM.queue.head = next;
+    }
+
+    uint32_t m = MSG_LOG;
+    if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
+        set_error(ERR_QUEUE_FULL, "SYS", "log: queue full");
     }
 }
 
@@ -223,10 +248,6 @@ void _print(const char *msg) {
 
     while (remaining > 0) {
         if ((N = fwrite(&msg[ix], 1, remaining, stdout)) <= 0) {
-            break;
-        } else if (N < remaining) {
-            set_error(ERR_STDOUT, "SYS", "print error len:%d  rc:%d", remaining, N);
-            printf("...\n");
             break;
         } else {
             remaining -= N;

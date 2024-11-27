@@ -11,6 +11,7 @@ extern const uint32_t MSG_TTY;
 extern const uint32_t MSG_WIO;
 extern const uint32_t MSG_U3;
 extern const uint32_t MSG_TICK;
+extern const uint32_t MSG_LOG;
 extern const uint32_t MSG_WATCHDOG;
 
 extern const uint I2C0_SDA;
@@ -49,6 +50,5 @@ typedef enum {
     ERR_U4,
     ERR_VLF,
     ERR_WATCHDOG,
-    ERR_STDOUT,
     ERR_UNKNOWN,
 } err;

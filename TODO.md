@@ -7,8 +7,10 @@
 - [ ] Rework print queue
       - [x] use circular buffer of char[128]
       - [x] remove free(msg) in _push
+      - [x] use timer + MSG_LOG
       - [ ] overflow "..."
-      - [ ] use timer + MSG_LOG
+      - [ ] MODE_LOG
+            - build flag
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys

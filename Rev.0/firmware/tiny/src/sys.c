@@ -100,10 +100,6 @@ void sys_tick() {
            get_errors(),
            watchdogged);
 
-    if (get_error(ERR_STDOUT)) {
-        debugf("SYS", "**** STDOUT");
-    }
-
     counter++;
 }
 
@@ -146,10 +142,6 @@ void sys_debug() {
            now,
            sys.touched,
            delta);
-
-    if (get_error(ERR_STDOUT)) {
-        debugf("POKE", "**** STDOUT");
-    }
 }
 
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {
