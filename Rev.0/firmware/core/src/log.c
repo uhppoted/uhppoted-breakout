@@ -15,7 +15,7 @@ void debugf(const char *tag, const char *fmt, ...) {
     char format[N + 32];
     char msg[128];
 
-    snprintf(format, sizeof(format), "%-5s  %-10s %s", "DEBUG", tag, fmt);
+    snprintf(format, sizeof(format), "%-5s  %-10s %s\n", "DEBUG", tag, fmt);
 
     va_list args;
 
@@ -23,7 +23,7 @@ void debugf(const char *tag, const char *fmt, ...) {
     vsnprintf(msg, sizeof(msg), format, args);
     va_end(args);
 
-    println(msg);
+    print(msg);
 }
 
 void infof(const char *tag, const char *fmt, ...) {
@@ -31,7 +31,7 @@ void infof(const char *tag, const char *fmt, ...) {
     char format[N + 32];
     char msg[128];
 
-    snprintf(format, sizeof(format), "%-5s  %-10s %s", "INFO", tag, fmt);
+    snprintf(format, sizeof(format), "%-5s  %-10s %s\n", "INFO", tag, fmt);
 
     va_list args;
 
@@ -39,7 +39,7 @@ void infof(const char *tag, const char *fmt, ...) {
     vsnprintf(msg, sizeof(msg), format, args);
     va_end(args);
 
-    println(msg);
+    print(msg);
 }
 
 void warnf(const char *tag, const char *fmt, ...) {
@@ -47,7 +47,7 @@ void warnf(const char *tag, const char *fmt, ...) {
     char format[N + 32];
     char msg[128];
 
-    snprintf(format, sizeof(format), "%-5s  %-10s %s", "WARN", tag, fmt);
+    snprintf(format, sizeof(format), "%-5s  %-10s %s\n", "WARN", tag, fmt);
 
     va_list args;
 
@@ -55,7 +55,7 @@ void warnf(const char *tag, const char *fmt, ...) {
     vsnprintf(msg, sizeof(msg), format, args);
     va_end(args);
 
-    println(msg);
+    print(msg);
 }
 
 void errorf(const char *tag, const char *fmt, ...) {
@@ -63,7 +63,7 @@ void errorf(const char *tag, const char *fmt, ...) {
     char format[N + 32];
     char msg[128];
 
-    snprintf(format, sizeof(format), "%-5s  %-10s %s", "ERROR", tag, fmt);
+    snprintf(format, sizeof(format), "%-5s  %-10s %s\n", "ERROR", tag, fmt);
 
     va_list args;
 
@@ -71,5 +71,5 @@ void errorf(const char *tag, const char *fmt, ...) {
     vsnprintf(msg, sizeof(msg), format, args);
     va_end(args);
 
-    println(msg);
+    print(msg);
 }

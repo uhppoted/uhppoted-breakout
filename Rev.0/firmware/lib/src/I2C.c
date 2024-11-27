@@ -117,11 +117,8 @@ void I2C_scan(i2c_inst_t *bus, const char *title) {
     char s[128];
     int ix = 0;
 
-    snprintf(s, sizeof(s), "\n%s", title);
-    println(s);
-
-    snprintf(s, sizeof(s), "   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F");
-    println(s);
+    snprintf(s, sizeof(s), "\n%s\n", title);
+    snprintf(s, sizeof(s), "   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F\n");
 
     for (int addr = 0; addr < (1 << 7); ++addr) {
         if (addr % 16 == 0) {
@@ -140,7 +137,8 @@ void I2C_scan(i2c_inst_t *bus, const char *title) {
         }
 
         if (addr % 16 == 15) {
-            println(s);
+            sprintf(&s[ix], "\n");
+            print(s);
             ix = 0;
             continue;
         }

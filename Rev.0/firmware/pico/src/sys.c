@@ -35,9 +35,9 @@ bool sys_init() {
     char s[64];
 
     if (!strcmp(WATCHDOG, "disabled") != 0) {
-        snprintf(s, sizeof(s), "-----  BREAKOUT-PICO   v%02x.%02x   <<< NO WATCHDOG >>>", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+        snprintf(s, sizeof(s), "-----  BREAKOUT-PICO   v%02x.%02x   <<< NO WATCHDOG >>>\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
     } else {
-        snprintf(s, sizeof(s), "-----  BREAKOUT-PICO   v%02x.%02x", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+        snprintf(s, sizeof(s), "-----  BREAKOUT-PICO   v%02x.%02x\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
     }
 
     snprintf(s, sizeof(s), "-----  BREAKOUT   %02x.02x", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
@@ -45,7 +45,7 @@ bool sys_init() {
     sysinit();
     cli_init();
     log_init();
-    println(s);
+    print(s);
 
     return true;
 }

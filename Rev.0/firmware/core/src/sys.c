@@ -179,15 +179,6 @@ void dispatch(uint32_t v) {
 
 void print(const char *msg) {
     _push(msg);
-    // _flush();
-}
-
-void println(const char *msg) {
-    char s[128];
-
-    snprintf(s, sizeof(s), "%s\n", msg);
-    _push(s);
-    // _flush();
 }
 
 void _push(const char *msg) {
