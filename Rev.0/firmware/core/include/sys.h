@@ -4,6 +4,8 @@
 
 typedef enum {
     MODE_UNKNOWN,
+    MODE_NONE,
+    MODE_LOG,
     MODE_CLI,
 } mode;
 

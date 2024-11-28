@@ -1,16 +1,16 @@
 # TODO
 
 - [x] Make Rev.0 emulator a 'local only' package
-- [ ] Zero2W serial logging (pigpio ?)
+- [ ] Zero2W serial logging
 - [ ] Zero2W USB UART
 
 - [ ] Rework print queue
       - [x] use circular buffer of char[128]
       - [x] remove free(msg) in _push
       - [x] use timer + MSG_LOG
+      - [x] MODE_LOG
+      - [x] MODE_NONE
       - [ ] overflow "..."
-      - [ ] MODE_LOG
-            - build flag
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
@@ -70,7 +70,6 @@
 ... debug     265 16 16 02 30 0e 10 06 0a 2b 10 ....
 ... received 16 16 02 30 0e 10 06 0a
 ```
-
           - [ ] Check all FIXMEs
           - [ ] Check that system doesn't freeze when print queue is full 
                 (i.e. why did it freeze when the CLI used a printf?)
@@ -78,6 +77,12 @@
           - [ ] bisync max message size
           - (?) bisync timeout
           - [ ] Reinstate watchdog reset
+
+| port | mode | SSMP | TTY     | Ok |
+|------|------|------|---------|----|
+| USB  | NONE | none | minicom |    |
+| USB  | NONE | ENQ  | minicom |    |
+| USB  | NONE | GET  | minicom |    |
 
     - monitor
       - get-board

@@ -40,7 +40,7 @@ bool sys_init() {
     uint offset = pio_add_program(pio, &ws2812_program);
 
     ws2812_program_init(pio, sm, offset, 16, 800000, true);
-    put_rgb(128, 0, 0);
+    put_rgb(128, 12, 0);
 
     // ... system tick
     if (!add_repeating_timer_ms(1000, sys_on_tick, &sys, &sys.timer)) {
@@ -68,14 +68,35 @@ bool sys_init() {
  *
  */
 void sys_tick() {
+    uint16_t errors = get_errors();
+
     sys.LED = !sys.LED;
 
-    if (sys.LED && get_mode() == MODE_CLI) {
-        put_rgb(8, 4, 0); // yellow'ish
+    if (sys.LED && errors != 0x0000) {
+        put_rgb(96, 0, 0);
     } else if (sys.LED) {
-        put_rgb(0, 0, 0); // off
-    } else {
         put_rgb(0, 8, 0);
+    } else {
+        switch (get_mode()) {
+        case MODE_NONE:
+            put_rgb(0, 0, 0); // off
+            break;
+
+        case MODE_LOG:
+            put_rgb(4, 4, 128); // blue
+            break;
+
+        case MODE_CLI:
+            put_rgb(0, 48, 96); // turquoise
+            break;
+
+        case MODE_UNKNOWN:
+            put_rgb(64, 16, 0); // yellow
+            break;
+
+        default:
+            put_rgb(32, 0, 96); // purple
+        }
     }
 
     if (!sys.reboot) {
@@ -96,7 +117,7 @@ void sys_tick() {
            heap,
            available,
            100.0f * used,
-           get_errors(),
+           errors,
            watchdogged);
 
     counter++;

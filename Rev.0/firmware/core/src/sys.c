@@ -45,18 +45,18 @@ struct {
     } queue;
 
     struct {
-        absolute_time_t mode;
+        absolute_time_t cli;
     } touched;
 
     mutex_t guard;
 } SYSTEM = {
-    .mode = MODE_UNKNOWN,
+    .mode = MODE_NONE,
     .queue = {
         .head = 0,
         .tail = 0,
     },
     .touched = {
-        .mode = 0,
+        .cli = 0,
     }};
 
 void _push(const char *);
@@ -66,7 +66,13 @@ void _print(const char *);
 void sysinit() {
     mutex_init(&SYSTEM.guard);
 
-    set_mode(MODE_UNKNOWN);
+    if (strcasecmp(MODE, "log") == 0) {
+        SYSTEM.mode = MODE_LOG;
+    } else if (strcasecmp(MODE, "CLI") == 0 || strcasecmp(MODE, "unknown") == 0) {
+        SYSTEM.mode = MODE_UNKNOWN; // NTS: will be set to MODE_CLI if/when terminal is connected
+    } else {
+        SYSTEM.mode = MODE_NONE;
+    }
 }
 
 bool sys_on_tick(repeating_timer_t *t) {
@@ -98,23 +104,36 @@ int sys_id(char *ID, int N) {
 
 mode get_mode() {
     switch (SYSTEM.mode) {
+    case MODE_NONE:
+        return MODE_NONE;
+
+    case MODE_LOG:
+        return MODE_LOG;
+
     case MODE_CLI:
         return MODE_CLI;
 
-    default:
+    case MODE_UNKNOWN:
         return MODE_UNKNOWN;
+
+    default:
+        return MODE_NONE;
     }
 }
 
 void set_mode(mode mode) {
-    if (SYSTEM.mode != mode) {
-        SYSTEM.mode = mode;
+    if (SYSTEM.mode == MODE_NONE) {
+        return;
     }
 
-    // ... unblock queue
-    if (mode == MODE_CLI) {
-        SYSTEM.touched.mode = get_absolute_time();
-        print("");
+    if (SYSTEM.mode != mode) {
+        SYSTEM.mode = mode;
+
+        // ... unblock queue
+        if (mode == MODE_CLI) {
+            SYSTEM.touched.cli = get_absolute_time();
+            print("");
+        }
     }
 }
 
@@ -148,16 +167,18 @@ void dispatch(uint32_t v) {
 
         // ... MODE_CLI timeout?
         absolute_time_t now = get_absolute_time();
-        int64_t delta = absolute_time_diff_us(SYSTEM.touched.mode, now) / 1000;
+        int64_t delta = absolute_time_diff_us(SYSTEM.touched.cli, now) / 1000;
 
         if (llabs(delta) > MODE_CLI_TIMEOUT) {
             set_mode(MODE_UNKNOWN);
         }
 
         // ... ping terminal
-        if (mutex_try_enter(&SYSTEM.guard, NULL)) {
-            _print(TERMINAL_QUERY_STATUS);
-            mutex_exit(&SYSTEM.guard);
+        if (get_mode() == MODE_CLI || get_mode() == MODE_UNKNOWN) {
+            if (mutex_try_enter(&SYSTEM.guard, NULL)) {
+                _print(TERMINAL_QUERY_STATUS);
+                mutex_exit(&SYSTEM.guard);
+            }
         }
 
         // ... bump log queue
@@ -178,7 +199,13 @@ void dispatch(uint32_t v) {
 }
 
 void print(const char *msg) {
-    _push(msg);
+    switch (SYSTEM.mode) {
+    case MODE_NONE:
+        return;
+
+    default:
+        _push(msg);
+    }
 }
 
 void _push(const char *msg) {
@@ -210,7 +237,7 @@ void _push(const char *msg) {
  *
  */
 void _flush() {
-    if (SYSTEM.mode != MODE_CLI) {
+    if (SYSTEM.mode != MODE_LOG && SYSTEM.mode != MODE_CLI) {
         return;
     }
 
