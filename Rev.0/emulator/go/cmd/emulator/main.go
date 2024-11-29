@@ -12,7 +12,7 @@ import (
 
 	"emulator/UT0311"
 	"emulator/config"
-	"emulator/driver/stub"
+	"emulator/driver/rpc"
 	"emulator/log"
 )
 
@@ -34,7 +34,7 @@ func main() {
 		errorf("%v", err)
 		os.Exit(1)
 	} else {
-		driver := stub.Stub{}
+		driver := rpcx.RPC{}
 		ut0311 := UT0311.NewUT0311(cfg, driver)
 
 		go func() {

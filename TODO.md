@@ -39,17 +39,8 @@
       - pico_stdio
 
 ### SSMP
-    - [ ] Migrate SSMP handler to UART1
-          - [x] ENQ
-          - [x] GET
-          - [x] pico: txrx/uart conflict
-          - [x] Remove MODE
-          - [x] Remove SSMP stuff from CLI
-          - [x] Move USB connected/disconnected to USB driver
-          - [x] pass buffer address in MSG
-          - [x] Move query-status + mode to sys
-          - [x] MODE_UNKNOWN on startup and then wait for query status response
-          - [x] MODE_CLI timeout
+    - [x] Migrate SSMP handler to UART1
+    - [ ] RPC
           
     - monitor
       - get-board
