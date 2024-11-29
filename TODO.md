@@ -10,7 +10,10 @@
       - [x] use timer + MSG_LOG
       - [x] MODE_LOG
       - [x] MODE_NONE
-      - [ ] overflow "..."
+      - [x] overflow "..."
+      - [ ] mutex around push/pop
+      - (?) check USB connected
+      - (?) setvbuf
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
@@ -47,43 +50,7 @@
           - [x] Move query-status + mode to sys
           - [x] MODE_UNKNOWN on startup and then wait for query status response
           - [x] MODE_CLI timeout
-          - [ ] weird intermittent reset
-                - ~~too many get requests~~
-                - ~~full queue~~
-                - ~~bisync decoder~~
-                - ~~UART interrupt handler~~
-                - ~~IOX or RTC~~
-                - ~~USB~~
-                - ~~loop in _print~~
-                - **CLI TERMINAL_QUERY_STATUS printf**
-                - something in sequence ? 
-                - U3_read ?
-                - alarms/timers disabled !!!!
-                - check all mutexes are try-lock (avoid priority inversion) 
-                - weird SSMP response but message processing is commented out?????
-```
-... debug     264 16 16 02 30 0e 10 06 0a 2b 10 ....
-... received 16 16 02 30 0e 10 06 0a
-... received 2b 10 06 10 01 04 10 01
-... received 84 80 00 10 02 10 01 10
-... received 05 00 03 d3 89
-... debug     265 16 16 02 30 0e 10 06 0a 2b 10 ....
-... received 16 16 02 30 0e 10 06 0a
-```
-          - [ ] Check all FIXMEs
-          - [ ] Check that system doesn't freeze when print queue is full 
-                (i.e. why did it freeze when the CLI used a printf?)
-          - [ ] Maybe only enable SSMP interrupt after a delay? 
-          - [ ] bisync max message size
-          - (?) bisync timeout
-          - [ ] Reinstate watchdog reset
-
-| port | mode | SSMP | TTY     | Ok |
-|------|------|------|---------|----|
-| USB  | NONE | none | minicom |    |
-| USB  | NONE | ENQ  | minicom |    |
-| USB  | NONE | GET  | minicom |    |
-
+          
     - monitor
       - get-board
 
@@ -162,7 +129,7 @@
     - https://groupgets.com/products/pureconnect
 
 ## R&D
-- [ ] https://interrupt.memfault.com/blog/diving-into-jtag-part-6
+- https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 - [ ] Pinout diagram
      - (?) [WireViz] https://github.com/formatc1702/WireViz
      - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator
@@ -174,6 +141,10 @@
      - (?) https://www.flickr.com/photos/28521811@N04/
      - (?) https://github.com/stevenj/GenPinoutSVG
      - (?) https://yaqwsx.github.io/Pinion/
+
+### Rust
+- https://rtic.rs/1/book/en/preface.html
+- https://github.com/embassy-rs/embassy
 
 ## Notes
 1. https://github.com/yaqwsx/PcbDraw

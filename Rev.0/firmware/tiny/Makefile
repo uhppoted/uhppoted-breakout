@@ -1,5 +1,6 @@
-SDK ?=$(HOME)/Development/tools/pico/pico-sdk
-PORT=/dev/tty.usbmodem14201
+SDK ?= $(HOME)/Development/tools/pico/pico-sdk
+RPI ?= phil
+PORT ?= /dev/tty.usbmodem14201
 
 RX8900SA_VDET ?= disabled
 RX8900SA_SWOFF ?= switch
@@ -45,6 +46,11 @@ run: build
 
 reboot: 
 	picotool reboot -f
+
+remote-run: build
+	scp build/breakout.uf2 $(RPI):/tmp
+	ssh $(RPI) "picotool load -v /tmp/breakout.uf2 -F"
+	ssh $(RPI) "picotool reboot"
 
 tty:
 	 minicom -b 115200 -o -D $(PORT)

@@ -68,7 +68,7 @@ void sysinit() {
 
     if (strcasecmp(MODE, "log") == 0) {
         SYSTEM.mode = MODE_LOG;
-    } else if (strcasecmp(MODE, "CLI") == 0 || strcasecmp(MODE, "unknown") == 0) {
+    } else if (strcasecmp(MODE, "cli") == 0 || strcasecmp(MODE, "unknown") == 0) {
         SYSTEM.mode = MODE_UNKNOWN; // NTS: will be set to MODE_CLI if/when terminal is connected
     } else {
         SYSTEM.mode = MODE_NONE;
@@ -166,15 +166,15 @@ void dispatch(uint32_t v) {
         sys_tick();
 
         // ... MODE_CLI timeout?
-        absolute_time_t now = get_absolute_time();
-        int64_t delta = absolute_time_diff_us(SYSTEM.touched.cli, now) / 1000;
-
-        if (llabs(delta) > MODE_CLI_TIMEOUT) {
-            set_mode(MODE_UNKNOWN);
-        }
-
-        // ... ping terminal
         if (get_mode() == MODE_CLI || get_mode() == MODE_UNKNOWN) {
+            absolute_time_t now = get_absolute_time();
+            int64_t delta = absolute_time_diff_us(SYSTEM.touched.cli, now) / 1000;
+
+            if (llabs(delta) > MODE_CLI_TIMEOUT) {
+                set_mode(MODE_UNKNOWN);
+            }
+
+            // ... ping terminal
             if (mutex_try_enter(&SYSTEM.guard, NULL)) {
                 _print(TERMINAL_QUERY_STATUS);
                 mutex_exit(&SYSTEM.guard);
@@ -214,12 +214,12 @@ void _push(const char *msg) {
     int next = (head + 1) % PRINT_QUEUE_SIZE;
 
     if (next == SYSTEM.queue.tail) {
-        if (tail == head) {
-            // TODO replace tail entry with "..."
-        } else {
-            tail++;
-            SYSTEM.queue.tail = tail % PRINT_QUEUE_SIZE;
-        }
+        snprintf(SYSTEM.queue.list[tail++], 128, "...\n");
+        tail %= PRINT_QUEUE_SIZE;
+
+        snprintf(SYSTEM.queue.list[tail], 128, "...\n");
+
+        SYSTEM.queue.tail = tail;
     }
 
     if (next != SYSTEM.queue.tail) {
