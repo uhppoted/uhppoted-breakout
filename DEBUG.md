@@ -4,24 +4,20 @@ Debugging weird intermittent reset:
 - alarms/timers get disabled
 - watchdog timer still working
 - UART interrupts still working
-- occasionally weird SSMP response even though message processing is commented out
-```
-... debug     264 16 16 02 30 0e 10 06 0a 2b 10 ....
-... received 16 16 02 30 0e 10 06 0a
-... received 2b 10 06 10 01 04 10 01
-... received 84 80 00 10 02 10 01 10
-... received 05 00 03 d3 89
-... debug     265 16 16 02 30 0e 10 06 0a 2b 10 ....
-... received 16 16 02 30 0e 10 06 0a
-```
+- seemed to freeze very quickly with put_led in SSMP::received
+  - unexpected interrupt handling chain somewhere??
+  - PIO ??
 
 ## Tests
 
-| port | mode | SSMP | TTY     | Ok |
-|------|------|------|---------|----|
-| USB  | NONE | none | -       | ✓  |
-| USB  | NONE | ENQ  | -       | ✓  |
-| USB  | NONE | GET  | -       | ✗  |
+| port | mode | SSMP       | TTY     | Ok | Notes                               |
+|------|------|------------|---------|----|-------------------------------------|
+| USB  | NONE | ASN.1+none | -       | ✓  |                                     |
+| USB  | NONE | ASN.1+ENQ  | -       | ✓  |                                     |
+| USB  | NONE | ASN.1+SEQ  | -       | ✗  | Hangs after about an hour           |
+| USB  | NONE | bisync+SEQ | -       | ✓  |                                     |
+| USB  | NONE | bisync+GET | -       | ✓  |                                     |
+| USB  | NONE | ASN.1+SEQ  | -       |    | _vector_ without any decoded fields |
 
 ## Possible causes
 
@@ -33,11 +29,13 @@ Debugging weird intermittent reset:
 - ~~USB~~
 - ~~loop in _print~~
 - ~~CLI TERMINAL_QUERY_STATUS printf~~
+- ~~only occurs with longer SSMP requests~~
+- ~~occasional SSMP echo although message processing is commented out~~ (in reset/BOOTSEL the RP2040 seems to echo input on GPIO 4/5)
 
-- ?? only occurs with longer SSMP requests
 - something in sequence ? 
-- U3_read ?
+  - check logic around unpack_sequence and *ix
 - check all mutexes are try-lock (priority inversion) 
+- U3_read ?
 
 ## TODO
 - [ ] Check all FIXMEs

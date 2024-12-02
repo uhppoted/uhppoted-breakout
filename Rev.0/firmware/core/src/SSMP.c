@@ -33,7 +33,7 @@ void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
 void on_SSMP();
 
-extern void sys_debug();
+// extern void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
 
 struct {
     circular_buffer buffer;
@@ -74,7 +74,6 @@ struct {
 void SSMP_init() {
     debugf("SSMP", "init");
 
-    // ... UART
     gpio_pull_up(SSMP_TX);
     gpio_pull_up(SSMP_RX);
 
@@ -126,22 +125,10 @@ void SSMP_ping() {
 }
 
 void on_SSMP() {
-    int poke = 0;
-
     while (uart_is_readable(SSMP_UART)) {
         uint8_t ch = uart_getc(SSMP_UART);
 
         buffer_push(&SSMP.buffer, ch);
-
-        // FIXME remove (debugging)
-        if (ch == '*') {
-            poke++;
-        }
-    }
-
-    // FIXME remove (debugging)
-    if (poke > 2) {
-        sys_debug();
     }
 
     circular_buffer *b = &SSMP.buffer;
@@ -169,6 +156,7 @@ void SSMP_enq() {
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
     debugf("SSMP", "received");
+    // put_rgb(32, 0, 96);
 
     // ... decode packet
     vector *fields = BER_decode(data, data_len);

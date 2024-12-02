@@ -3,6 +3,7 @@
 - [x] Make Rev.0 emulator a 'local only' package
 - [ ] Zero2W serial logging
 - [ ] Zero2W USB UART
+- [ ] MSG_POKE (because absolutely shouldn't call it from interrupt handler)
 
 - [ ] Rework print queue
       - [x] use circular buffer of char[128]
@@ -17,6 +18,7 @@
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
+- [ ] mutex around buffer push/pop
 
 - [ ] CLI: trace interval
 - [ ] CLI: poke
@@ -40,30 +42,19 @@
 
 ### SSMP
     - [x] Migrate SSMP handler to UART1
-    - [ ] RPC
           
-    - monitor
-      - get-board
-
-    - get-controller
+    - GET
+      - [x] controller ID
       - [x] version
       - [ ] released
-      - [ ] cache
 
     - [ ] ASN.1
-       - [x] Fix negative int encoding
-       - [x] Fix integer decoding
        - [x] free_packet: dynamic
+       - [x] check vector_free
        - [ ] check slice_free
        - [ ] check field_free
-       - [ ] check vector_free
-       - (?) free_value
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
     
-    - [ ] UART
-        - [x] set UART output translation (`uart_set_translate_crlf`)
-        - [x] Enable FIFO
-
 ### emulator
     - [ ] split architecture
           - SSMP driver
@@ -72,32 +63,17 @@
             - unix domain sockets
             - TCP/IP
 
-    - [ ] python
-          - [ ] aioconsole
-
-    - [ ] tinygo
-          - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
-
-    - [ ] ENQ/ACK loop
-    ```
-    request error (RX queue blocked)
-    request error (TX queue blocked)
-     ```
-    - [ ] ASN.1
-    - [ ] log CRC errors
     - [ ] get-controller
           - [ ] errors pipe in request
           - [ ] serialize requests
 
-    - [x] ENQ/ACK loop - use codec
-          - (?) use common rx codec??
-          - (?) use callback funcs rather than interface
-    - [ ] Fix 'read' goroutine that never exits
-    - (?) decode - partial packets
-    - [ ] prune handlers
+    - [ ] monitor
     - [ ] idle poll
-    - [ ] walk MIB to initialise/refresh cache
-    - [ ] // TODO: exponential backoff
+    - [ ] cache
+    - [ ] exponential backoff
+    - [ ] tinygo
+          - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
+    - [ ] Nerves
 
 ### MIB
     - [x] controller ID

@@ -38,13 +38,14 @@
 31. Route GND and +5V to PiZero2W header (jumper on +5V)
 32. Route UART0 and UART1 to PiZero2W header (with solder bridges/zero ohm resistors)
 33. DO and DI are actual D0 and D1, etc
-34. Protection resistors (560 ohms?) on UART1 pins
+34. Protection resistors (560 ohms?) on UART pins
+35. Pullups on UART pins
+    - https://electronics.stackexchange.com/questions/270834/pull-up-resistors-on-uart
 35. Add RTS and CTS to UART header
 36. Connect RX8900SA 1s output to GPIO
 37. Connect RX8900SA ALARM output to reset (jumper)
 38. Seriously consider an external hardware watchdog
 39. Rev.1-Pico (with pico footprint on back)
-40. Protect UART pins against overvoltage
 
 (?) Maybe put GND on pin 1 of UART/SPI header
 (?) https://www.olimex.com/Products/Components/IC/SY6280

@@ -37,10 +37,5 @@ const uint IOX_RESET = GPIO_14;
 const uint IOX_INT0 = GPIO_15;
 const uint IOX_INT1 = GPIO_9;
 
-const uint SPI_RX = GPIO_4;
-const uint SPI_TX = GPIO_7;
-const uint SPI_CSn = GPIO_5;
-const uint SPI_CLK = GPIO_6;
-
 const uint UART0_TX = GPIO_0;
 const uint UART0_RX = GPIO_1;
