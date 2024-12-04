@@ -39,6 +39,7 @@ struct {
     mode mode;
 
     struct {
+        mutex_t lock;
         int head;
         int tail;
         char list[PRINT_QUEUE_SIZE][128];
@@ -65,6 +66,7 @@ void _print(const char *);
 
 void sysinit() {
     mutex_init(&SYSTEM.guard);
+    mutex_init(&SYSTEM.queue.lock);
 
     if (strcasecmp(MODE, "log") == 0) {
         SYSTEM.mode = MODE_LOG;
@@ -209,22 +211,26 @@ void print(const char *msg) {
 }
 
 void _push(const char *msg) {
-    int head = SYSTEM.queue.head;
-    int tail = SYSTEM.queue.tail;
-    int next = (head + 1) % PRINT_QUEUE_SIZE;
+    if (mutex_try_enter(&SYSTEM.queue.lock, NULL)) {
+        int head = SYSTEM.queue.head;
+        int tail = SYSTEM.queue.tail;
+        int next = (head + 1) % PRINT_QUEUE_SIZE;
 
-    if (next == SYSTEM.queue.tail) {
-        snprintf(SYSTEM.queue.list[tail++], 128, "...\n");
-        tail %= PRINT_QUEUE_SIZE;
+        if (next == SYSTEM.queue.tail) {
+            snprintf(SYSTEM.queue.list[tail++], 128, "...\n");
+            tail %= PRINT_QUEUE_SIZE;
 
-        snprintf(SYSTEM.queue.list[tail], 128, "...\n");
+            snprintf(SYSTEM.queue.list[tail], 128, "...\n");
 
-        SYSTEM.queue.tail = tail;
-    }
+            SYSTEM.queue.tail = tail;
+        }
 
-    if (next != SYSTEM.queue.tail) {
-        snprintf(SYSTEM.queue.list[head], 128, "%s", msg);
-        SYSTEM.queue.head = next;
+        if (next != SYSTEM.queue.tail) {
+            snprintf(SYSTEM.queue.list[head], 128, "%s", msg);
+            SYSTEM.queue.head = next;
+        }
+
+        mutex_exit(&SYSTEM.queue.lock);
     }
 
     uint32_t m = MSG_LOG;
@@ -242,15 +248,18 @@ void _flush() {
     }
 
     if (mutex_try_enter(&SYSTEM.guard, NULL)) {
-        int head = SYSTEM.queue.head;
-        int tail = SYSTEM.queue.tail;
+        if (mutex_try_enter(&SYSTEM.queue.lock, NULL)) {
+            int head = SYSTEM.queue.head;
+            int tail = SYSTEM.queue.tail;
 
-        while (tail != head) {
-            _print(SYSTEM.queue.list[tail++]);
-            tail %= PRINT_QUEUE_SIZE;
+            while (tail != head) {
+                _print(SYSTEM.queue.list[tail++]);
+                tail %= PRINT_QUEUE_SIZE;
+            }
+
+            SYSTEM.queue.tail = tail;
+            mutex_exit(&SYSTEM.queue.lock);
         }
-
-        SYSTEM.queue.tail = tail;
 
         mutex_exit(&SYSTEM.guard);
     }

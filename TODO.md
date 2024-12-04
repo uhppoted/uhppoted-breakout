@@ -12,7 +12,7 @@
       - [x] MODE_LOG
       - [x] MODE_NONE
       - [x] overflow "..."
-      - [ ] mutex around push/pop
+      - [x] mutex around push/pop
       - (?) check USB connected
       - (?) setvbuf
 
