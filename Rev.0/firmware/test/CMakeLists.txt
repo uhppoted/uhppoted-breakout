@@ -37,7 +37,6 @@ add_executable(breakout
   ${LIB}/src/encoding/ASN.1/decode.c
 
   ${LIB}/src/types/fields.c
-  ${LIB}/src/types/vector.c
   ${LIB}/src/types/slice.c
 )
 
