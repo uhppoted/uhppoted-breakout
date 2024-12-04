@@ -1,7 +1,4 @@
-PORT=/dev/tty.usbmodem14201
-
 .DEFAULT_GOAL := build
-.PHONY: format
 
 update:
 	go get -u ./...
@@ -17,14 +14,10 @@ test: build
 	go test ./...
 
 run: build
-	./bin/emulator
+	./bin/emulator --config .config.rpc
+
+stub: build
+	./bin/emulator --config .config.stub
 
 get-controller:
 	../../../../uhppote-cli/bin/uhppote-cli get-device 405419896
-
-tty:
-	 minicom -b 115200 -o -D $(PORT)
-
-encode: build
-	./bin/ssmp 
-

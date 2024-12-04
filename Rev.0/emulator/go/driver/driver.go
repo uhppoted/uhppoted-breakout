@@ -5,5 +5,5 @@ import (
 )
 
 type Driver interface {
-	Get(oid types.OID) (uint32, error)
+	Get(oid types.OID) (any, error)
 }

@@ -1,6 +1,7 @@
 package rpcx
 
 import (
+	"fmt"
 	"net/rpc"
 
 	"emulator/MIB/types"
@@ -10,14 +11,15 @@ import (
 type RPC struct {
 }
 
-func (r RPC) Get(oid types.OID) (uint32, error) {
-	debugf("get %v\n", oid)
+func (r RPC) Get(oid types.OID) (any, error) {
+	debugf("get %v", oid)
 
-	var reply uint32
+	var key = fmt.Sprintf("%v", oid)
+	var reply any
 
 	if client, err := rpc.DialHTTP("tcp", "127.0.0.1:1234"); err != nil {
 		return 0, err
-	} else if err := client.Call("RPCD.Get", "asdfas", &reply); err != nil {
+	} else if err := client.Call("RPCD.Get", key, &reply); err != nil {
 		return 0, err
 	} else {
 		return reply, nil

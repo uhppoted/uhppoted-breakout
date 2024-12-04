@@ -1,6 +1,7 @@
 package rpcd
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -9,10 +10,29 @@ import (
 
 type RPCD int
 
-func (r *RPCD) Get(oid string, reply *uint32) error {
-	*reply = 405419896
+func (r *RPCD) Get(oid string, reply *any) error {
+	// ... controller ID
+	if oid == ".1.3.6.1.4.1.65536.2.1" {
+		*reply = uint32(405419896)
 
-	return nil
+		return nil
+	}
+
+	// ... controller version
+	if oid == ".1.3.6.1.4.1.65536.2.2" {
+		*reply = uint16(0x1234)
+
+		return nil
+	}
+
+	// ... controller release date
+	if oid == ".1.3.6.1.4.1.65536.2.3" {
+		*reply = "2024-01-15"
+
+		return nil
+	}
+
+	return fmt.Errorf("unknown OID %v", oid)
 }
 
 func Run() {

@@ -27,3 +27,4 @@
 | 0.1.3.6.1.4.1.65536.2.4 | controller address     | _public_   |
 | 0.1.3.6.1.4.1.65536.2.5 | controller netmask     | _public_   |
 | 0.1.3.6.1.4.1.65536.2.6 | controller gateway     | _public_   |
+| 0.1.3.6.1.4.1.65536.2.7 | controller MAC         | _public_   |

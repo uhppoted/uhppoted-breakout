@@ -79,6 +79,14 @@ controllerGateway OBJECT-TYPE
         "A 4 byte octet string representing the controller IPv4 gateway address."
     ::= { controller 6 }
 
+controllerMAC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 6 byte octet string representing the controller MAC address."
+    ::= { controller 7 }
+
 -- groups
 systemGroup OBJECT-GROUP
     OBJECTS { boardId }
@@ -93,7 +101,8 @@ controllerGroup OBJECT-GROUP
               controllerReleased,
               controllerAddress,
               controllerNetmask,
-              controllerGateway }
+              controllerGateway,
+              controllerMAC }
     STATUS  current
     DESCRIPTION
         "Controller configuration information."

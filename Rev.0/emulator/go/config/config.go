@@ -15,7 +15,12 @@ import (
 )
 
 type Config struct {
+	Driver  driver  `json:"driver"`
 	Network network `json:"network"`
+}
+
+type driver struct {
+	Driver string `json:"driver"`
 }
 
 type network struct {
@@ -44,12 +49,34 @@ func Load(filepath string) (Config, []byte, error) {
 	}
 }
 
-func (c Config) Get(oid types.OID) (netip.Addr, error) {
+func Get[T any](c Config, oid types.OID) (T, error) {
+	var null T
+
 	if types.OID.Equal(oid, MIB.OID_CONTROLLER_ADDRESS) {
-		return c.Network.IPv4.Address, nil
+		if v, ok := any(c.Network.IPv4.Address).(T); ok {
+			return v, nil
+		}
 	}
 
-	return netip.Addr{}, fmt.Errorf("invalid OID (%v)", oid)
+	if types.OID.Equal(oid, MIB.OID_CONTROLLER_NETMASK) {
+		if v, ok := any(c.Network.IPv4.Netmask).(T); ok {
+			return v, nil
+		}
+	}
+
+	if types.OID.Equal(oid, MIB.OID_CONTROLLER_GATEWAY) {
+		if v, ok := any(c.Network.IPv4.Gateway).(T); ok {
+			return v, nil
+		}
+	}
+
+	if types.OID.Equal(oid, MIB.OID_CONTROLLER_MAC) {
+		if v, ok := any(c.Network.IPv4.MAC).(T); ok {
+			return v, nil
+		}
+	}
+
+	return null, fmt.Errorf("invalid OID (%v)", oid)
 }
 
 func (v *IPv4) UnmarshalJSON(bytes []byte) error {

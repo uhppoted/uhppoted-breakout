@@ -1,4 +1,8 @@
 {
+    "driver": {
+        "driver": "stub"
+    },
+
     "network": {
         "IPv4": {
             "address": "192.168.1.123",
