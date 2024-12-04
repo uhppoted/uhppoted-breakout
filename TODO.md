@@ -27,7 +27,7 @@
 
 - [ ] syserror
       - (?) count up/down to auto-clear
-      - (?) orange LED on any system error 
+      - (?) red LED on any system error 
       - (?) log once on occurrence
       - (?) display in 'poke'
 
@@ -41,8 +41,6 @@
       - pico_stdio
 
 ### SSMP
-    - [x] Migrate SSMP handler to UART1
-          
     - GET
       - [x] controller ID
       - [x] version

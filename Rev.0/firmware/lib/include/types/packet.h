@@ -2,8 +2,8 @@
 
 #include <stdint.h>
 
+#include <types/fields.h>
 #include <types/slice.h>
-#include <types/vector.h>
 
 typedef enum {
     PACKET_UNKNOWN,

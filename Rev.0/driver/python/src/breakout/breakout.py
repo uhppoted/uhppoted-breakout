@@ -67,13 +67,13 @@ async def poke(transport):
       transport.write(msg)
 
 async def debug(transport):
-      msg = bytes(SEQUENCE)
+      msg = bytes(SEQUENCES)
       print('... debug    ',' '.join('{:02x}'.format(x) for x in msg[0:10]),'....')
       transport.write(msg)
 
 async def debugx(transport):
       counter = 0
-      msg = bytes(SEQUENCE)
+      msg = bytes(SEQUENCES)
       while True:
           counter += 1
           print('... debug    ',counter, ' '.join('{:02x}'.format(x) for x in msg[0:10]),'....')

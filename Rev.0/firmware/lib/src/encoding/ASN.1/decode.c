@@ -192,7 +192,9 @@ field *unpack_OID(const uint8_t *message, int N, int *ix) {
 
 field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
-    vector *fields = vector_new(); // FIXME unpack(&message[*ix], length);
+    // vector *fields = NULL;
+    // vector *fields = vector_new();
+    vector *fields = unpack(&message[*ix], length);
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));

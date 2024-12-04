@@ -1,6 +1,6 @@
 #pragma once
 
-#include <types/vector.h>
+#include <stdbool.h>
 
 typedef enum {
     FIELD_UNKNOWN = 0x00,
@@ -37,15 +37,25 @@ typedef struct field {
         } OID;
 
         struct {
-            vector *fields;
+            struct vector *fields;
         } sequence;
 
         struct {
-            vector *fields;
+            struct vector *fields;
         } pdu;
     };
 
     bool dynamic;
 } field;
 
+typedef struct vector {
+    bool dynamic;
+    int capacity;
+    int size;
+    struct field *fields[];
+} vector;
+
 extern void field_free(struct field *const);
+extern vector *vector_new();
+extern void vector_free(struct vector *);
+extern vector *vector_add(struct vector *, struct field *);

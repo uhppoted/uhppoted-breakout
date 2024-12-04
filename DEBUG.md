@@ -17,7 +17,9 @@ Debugging weird intermittent reset:
 | USB  | NONE | ASN.1+SEQ  | -       | ✗  | Hangs after about an hour           |
 | USB  | NONE | bisync+SEQ | -       | ✓  |                                     |
 | USB  | NONE | bisync+GET | -       | ✓  |                                     |
-| USB  | NONE | ASN.1+SEQ  | -       |    | _vector_ without any decoded fields |
+| USB  | NONE | ASN.1+SEQ  | -       | ✓  | _vector_ without any decoded fields |
+| USB  | NONE | ASN.1+SEQ  | -       | ✓  | _vector_ without NULL fields        |
+| USB  | NONE | ASN.1+SEQ  | -       | ✗  | _vector_ without vector_new()       |
 
 ## Possible causes
 
@@ -30,7 +32,7 @@ Debugging weird intermittent reset:
 - ~~loop in _print~~
 - ~~CLI TERMINAL_QUERY_STATUS printf~~
 - ~~only occurs with longer SSMP requests~~
-- ~~occasional SSMP echo although message processing is commented out~~ (in reset/BOOTSEL the RP2040 seems to echo input on GPIO 4/5)
+- ~~occasional SSMP echo although message processing is commented out~~ (in reset/BOOTSEL -needs pullups on the TX/RX pins)
 
 - something in sequence ? 
   - check logic around unpack_sequence and *ix

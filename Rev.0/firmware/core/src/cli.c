@@ -19,7 +19,7 @@
 #include <state.h>
 #include <sys.h>
 #include <types/buffer.h>
-#include <types/vector.h>
+#include <types/fields.h>
 
 #include <MIB.h>
 #include <auth.h>
