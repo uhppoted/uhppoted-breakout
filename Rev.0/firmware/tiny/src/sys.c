@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <pico/stdlib.h>
+#include <pico/sync.h>
 
 #include <hardware/pio.h>
 
@@ -22,18 +23,26 @@ uint32_t get_free_heap();
 uint32_t counter = 0;
 
 struct {
-    bool LED;
+    struct {
+        bool LED;
+        mutex_t guard;
+    } LED;
+
     bool reboot;
     repeating_timer_t timer;
 
     absolute_time_t touched;
 } sys = {
-    .LED = false,
+    .LED = {
+        .LED = false,
+    },
     .reboot = false,
     .touched = 0,
 };
 
 bool sys_init() {
+    mutex_init(&sys.LED.guard);
+
     // ... WS2812 LED
     PIO pio = pio0;
     int sm = 0;
@@ -70,11 +79,11 @@ bool sys_init() {
 void sys_tick() {
     uint16_t errors = get_errors();
 
-    sys.LED = !sys.LED;
+    sys.LED.LED = !sys.LED.LED;
 
-    if (sys.LED && errors != 0x0000) {
+    if (sys.LED.LED && errors != 0x0000) {
         put_rgb(96, 0, 0);
-    } else if (sys.LED) {
+    } else if (sys.LED.LED) {
         put_rgb(0, 8, 0);
     } else {
         switch (get_mode()) {
@@ -165,7 +174,10 @@ void sys_debug() {
 }
 
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {
-    uint32_t rgb = (red << 16u) | (green << 8u) | (blue / 16 << 0u);
+    if (mutex_try_enter(&sys.LED.guard, NULL)) {
+        uint32_t rgb = (red << 16u) | (green << 8u) | (blue / 16 << 0u);
 
-    pio_sm_put_blocking(pio0, 0, rgb << 8u);
+        pio_sm_put_blocking(pio0, 0, rgb << 8u);
+        mutex_exit(&sys.LED.guard);
+    }
 }

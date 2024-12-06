@@ -8,6 +8,7 @@ Debugging weird intermittent reset:
   - unexpected interrupt handling chain somewhere??
   - PIO ??
 
+
 ## Tests
 
 | port | mode | SSMP       | TTY     | Ok | Notes                               |
@@ -33,9 +34,10 @@ Debugging weird intermittent reset:
 - ~~CLI TERMINAL_QUERY_STATUS printf~~
 - ~~only occurs with longer SSMP requests~~
 - ~~occasional SSMP echo although message processing is commented out~~ (in reset/BOOTSEL -needs pullups on the TX/RX pins)
+- ~~check logic around unpack_sequence and *ix~~
 
+- corrupted message ??
 - something in sequence ? 
-  - check logic around unpack_sequence and *ix
 - check all mutexes are try-lock (priority inversion) 
 - U3_read ?
 

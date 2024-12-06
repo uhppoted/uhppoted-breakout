@@ -13,6 +13,7 @@ struct {
         bool U3;
         bool U4;
         bool watchdog;
+        bool debug;
         bool unknown;
     } errors;
 } STATE = {
@@ -23,6 +24,7 @@ struct {
         .U3 = false,
         .U4 = false,
         .watchdog = false,
+        .debug = false,
         .unknown = false,
     },
 };
@@ -58,6 +60,10 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
 
     case ERR_WATCHDOG:
         STATE.errors.watchdog = true;
+        break;
+
+    case ERR_DEBUG:
+        STATE.errors.debug = true;
         break;
 
     case ERR_UNKNOWN:
@@ -97,6 +103,9 @@ bool get_error(err error) {
     case ERR_WATCHDOG:
         return STATE.errors.watchdog;
 
+    case ERR_DEBUG:
+        return STATE.errors.debug;
+
     case ERR_UNKNOWN:
         return STATE.errors.unknown;
     }
@@ -113,6 +122,7 @@ uint16_t get_errors() {
     bits |= STATE.errors.U3 ? 0x0008 : 0x0000;
     bits |= STATE.errors.U4 ? 0x0010 : 0x0000;
     bits |= STATE.errors.watchdog ? 0x0020 : 0x0000;
+    bits |= STATE.errors.debug ? 0x4000 : 0x0000;
     bits |= STATE.errors.unknown ? 0x8000 : 0x0000;
 
     STATE.errors.I2C = false;
@@ -121,6 +131,7 @@ uint16_t get_errors() {
     STATE.errors.U3 = false;
     STATE.errors.U4 = false;
     //  STATE.errors.watchdog = false;
+    //  STATE.errors.debug = false;
     STATE.errors.unknown = false;
 
     return bits;
