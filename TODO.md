@@ -59,15 +59,17 @@
     - [ ] get-listener
     - [ ] set-listener
 
+    -  [ ] API
+           - [x] UDP
+           - [x] TCP/IP
+           - [ ] TLS
+           - [ ] Python CLI TCP socket not terminating/closing if no reply
+
     - [ ] RPC
           - [x] go-rpc
           - [ ] grpc
           - [ ] unix domain sockets
           - [ ] TCP/IP
-    -  [ ] API
-           - [x] UDP
-           - [ ] TCP/IP
-           - [ ] TLS
 
     - [ ] monitor
     - [ ] idle poll

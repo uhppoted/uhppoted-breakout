@@ -1,12 +1,10 @@
 package UT0311
 
 import (
-	"net"
-	"net/netip"
 	"reflect"
+	"sync"
 	"time"
 
-	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
 	"github.com/uhppoted/uhppote-core/messages"
 
 	"emulator/config"
@@ -17,6 +15,8 @@ import (
 type UT0311 struct {
 	config config.Config
 	driver driver.Driver
+	udp    UDP
+	tcp    TCP
 }
 
 func (ut0311 *UT0311) SetConfig(c config.Config) {
@@ -27,85 +27,44 @@ func NewUT0311(c config.Config, d driver.Driver) UT0311 {
 	return UT0311{
 		config: c,
 		driver: d,
+		udp:    UDP{},
+		tcp:    TCP{},
 	}
 }
 
 func (ut0311 *UT0311) Run() {
-	for {
-		if err := ut0311.listen(); err != nil {
-			warnf("%v", err)
-		}
+	var wg sync.WaitGroup
 
-		// TODO: exponential backoff
-		time.Sleep(5 * time.Second)
-	}
-}
+	wg.Add(1)
 
-// func (ut0311 *UT0311) initialise(config Config) {
-// 	var address netip.Addr
-// 	var netmask net.IPMask
-// 	var gateway netip.Addr
-// 	var MAC net.HardwareAddr
-//
-// 	if v := config.Network.IPv4; v != nil {
-// 		address = v.Address
-// 		netmask = v.Netmask
-// 		gateway = v.Gateway
-// 		MAC = v.MAC
-// 	}
-//
-// 	if v := config.Network.Interface; v != "" {
-// 		if addr, subnet, gw, mac, err := discover(v); err != nil {
-// 			warnf("%v", err)
-// 		} else {
-// 			address = addr
-// 			netmask = subnet
-// 			gateway = gw
-// 			MAC = mac
-// 		}
-// 	}
-//
-// 	if err := MIB.Init(address, netmask, gateway, MAC); err != nil {
-// 		warnf("%v", err)
-// 	}
-// }
-
-func (ut0311 UT0311) listen() error {
-	bind := netip.MustParseAddrPort("0.0.0.0:60000")
-
-	if socket, err := net.ListenUDP("udp4", net.UDPAddrFromAddrPort(bind)); err != nil {
-		return err
-	} else {
-		infof("listening on UDP address %v", bind)
-
-		defer socket.Close()
-
+	go func() {
 		for {
-			buffer := make([]byte, 2048)
-
-			if N, addr, err := socket.ReadFromUDPAddrPort(buffer); err != nil {
-				return err
-			} else {
-				debugf("UDP  received %v bytes from %v", N, addr)
-
-				if request, err := messages.UnmarshalRequest(buffer[0:N]); err != nil {
-					warnf("UDP  %v", err)
-				} else if reply, err := ut0311.received(request); err != nil {
-					warnf("UDP  %v", err)
-				} else if !isnil(reply) {
-					if packet, err := codec.Marshal(reply); err != nil {
-						warnf("UDP  %v", err)
-					} else if packet == nil {
-						warnf("UDP  invalid reply packet (%v)", packet)
-					} else if N, err := socket.WriteToUDPAddrPort(packet, addr); err != nil {
-						warnf("UDP  %v", err)
-					} else {
-						debugf("UDP  sent %v bytes to %v", N, addr)
-					}
-				}
+			if err := ut0311.udp.listen(ut0311.received); err != nil {
+				warnf("%v", err)
 			}
+
+			// TODO: exponential backoff
+			time.Sleep(5 * time.Second)
 		}
-	}
+
+		wg.Done()
+	}()
+
+	wg.Add(1)
+
+	go func() {
+		for {
+			if err := ut0311.tcp.listen(ut0311.received); err != nil {
+				warnf("%v", err)
+			}
+
+			// TODO: exponential backoff
+			time.Sleep(5 * time.Second)
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
 }
 
 func (ut0311 UT0311) received(request any) (any, error) {
