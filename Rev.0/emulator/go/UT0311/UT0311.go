@@ -113,7 +113,10 @@ func (ut0311 UT0311) received(request any) (any, error) {
 
 	switch rq := request.(type) {
 	case *messages.GetDeviceRequest:
-		return ut0311.GetController(rq)
+		return ut0311.getController(rq)
+
+	case *messages.SetAddressRequest:
+		return ut0311.setAddress(rq)
 
 	default:
 		warnf("unknown message type (%T)", request)

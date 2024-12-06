@@ -12,7 +12,7 @@ import (
 	"emulator/config"
 )
 
-func (ut0311 *UT0311) GetController(rq *messages.GetDeviceRequest) (messages.GetDeviceResponse, error) {
+func (ut0311 *UT0311) getController(rq *messages.GetDeviceRequest) (messages.GetDeviceResponse, error) {
 	response := messages.GetDeviceResponse{}
 
 	if v, err := ut0311.driver.Get(MIB.OID_CONTROLLER_ID); err != nil {

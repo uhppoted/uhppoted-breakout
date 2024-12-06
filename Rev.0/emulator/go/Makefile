@@ -21,3 +21,6 @@ stub: build
 
 get-controller:
 	../../../../uhppote-cli/bin/uhppote-cli get-device 405419896
+
+set-address:
+	../../../../uhppote-cli/bin/uhppote-cli set-address 405419896 192.168.1.100 255.255.255.0 0.0.0.0

@@ -53,17 +53,21 @@
        - [ ] check field_free
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
     
-### emulator
-    - [ ] split architecture
-          - SSMP driver
-          - UHPPOTE emulator
-          - RPC
-            - unix domain sockets
-            - TCP/IP
+### Emulator
+    - [x] get-controller
+    - [x] set-address
+    - [ ] get-listener
+    - [ ] set-listener
 
-    - [ ] get-controller
-          - [ ] errors pipe in request
-          - [ ] serialize requests
+    - [ ] RPC
+          - [x] go-rpc
+          - [ ] grpc
+          - [ ] unix domain sockets
+          - [ ] TCP/IP
+    -  [ ] API
+           - [x] UDP
+           - [ ] TCP/IP
+           - [ ] TLS
 
     - [ ] monitor
     - [ ] idle poll
@@ -72,6 +76,9 @@
     - [ ] tinygo
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
     - [ ] Nerves
+
+### Driver
+    - [ ] breakout-simulator
 
 ### MIB
     - [x] controller ID
