@@ -74,7 +74,7 @@ vector *vector_add(vector *v, struct field *f) {
     // .. reallocate and copy
     int capacity = v->capacity + CAPACITY;
     size_t size = sizeof(vector) + capacity * sizeof(struct field *);
-    vector *u = (vector *)malloc(size);
+    vector *u = (vector *)calloc(sizeof(uint8_t), size);
 
     if (u != NULL) {
         u->dynamic = true;
@@ -87,6 +87,10 @@ vector *vector_add(vector *v, struct field *f) {
 
         for (int i = 0; i < v->size; i++) {
             u->fields[i] = v->fields[i];
+        }
+
+        if (v->dynamic) {
+            free(v);
         }
 
         return vector_add(u, f);

@@ -104,9 +104,11 @@ field *unpack_integer(const uint8_t *message, int N, int *ix) {
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
-    f->dynamic = true;
-    f->tag = FIELD_INTEGER;
-    f->integer.value = value;
+    if (f != NULL) {
+        f->dynamic = true;
+        f->tag = FIELD_INTEGER;
+        f->integer.value = value;
+    }
 
     *ix += length;
 
@@ -122,10 +124,12 @@ field *unpack_octets(const uint8_t *message, int N, int *ix) {
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
-    f->dynamic = true;
-    f->tag = FIELD_OCTET_STRING;
-    f->octets.length = length;
-    f->octets.octets = octets;
+    if (f != NULL) {
+        f->dynamic = true;
+        f->tag = FIELD_OCTET_STRING;
+        f->octets.length = length;
+        f->octets.octets = octets;
+    }
 
     *ix += length;
 
@@ -138,8 +142,10 @@ field *unpack_null(const uint8_t *message, int N, int *ix) {
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
-    f->dynamic = true;
-    f->tag = FIELD_NULL;
+    if (f != NULL) {
+        f->dynamic = true;
+        f->tag = FIELD_NULL;
+    }
 
     *ix += length;
 
@@ -181,9 +187,12 @@ field *unpack_OID(const uint8_t *message, int N, int *ix) {
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
-    f->dynamic = true;
-    f->tag = FIELD_OID;
-    f->OID.OID = OID;
+
+    if (f != NULL) {
+        f->dynamic = true;
+        f->tag = FIELD_OID;
+        f->OID.OID = OID;
+    }
 
     *ix += length;
 
@@ -199,9 +208,11 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
-    f->dynamic = true;
-    f->tag = FIELD_SEQUENCE;
-    f->sequence.fields = fields;
+    if (f != NULL) {
+        f->dynamic = true;
+        f->tag = FIELD_SEQUENCE;
+        f->sequence.fields = fields;
+    }
 
     *ix += length;
 
@@ -214,8 +225,11 @@ field *unpack_get_request(const uint8_t *message, int N, int *ix) {
 
     // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
-    f->tag = FIELD_PDU_GET;
-    f->pdu.fields = fields;
+
+    if (f != NULL) {
+        f->tag = FIELD_PDU_GET;
+        f->pdu.fields = fields;
+    }
 
     *ix += length;
 
