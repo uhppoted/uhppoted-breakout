@@ -59,11 +59,13 @@
     - [ ] get-listener
     - [ ] set-listener
 
-    -  [ ] API
+    - [ ] API
            - [x] UDP
            - [x] TCP/IP
            - [ ] TLS
            - [ ] Python CLI TCP socket not terminating/closing if no reply
+           - [ ] Terminate gracefully on CTRL-C
+           - [ ] exponential backoff
 
     - [ ] RPC
           - [x] go-rpc
@@ -72,9 +74,9 @@
           - [ ] TCP/IP
 
     - [ ] monitor
+    - [ ] daemonize
     - [ ] idle poll
     - [ ] cache
-    - [ ] exponential backoff
     - [ ] tinygo
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
     - [ ] Nerves
