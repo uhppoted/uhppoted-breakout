@@ -84,27 +84,26 @@ vector *unpack(const uint8_t *bytes, int N) {
 
 field *unpack_integer(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
-    int64_t value = 0;
-
-    if (length <= 8) {
-        for (int i = 0; i < length; i++) {
-            uint8_t u8 = message[*ix + i];
-            value = ((u8 & 0x80) == 0x80) ? -1 : 0;
-            value <<= 8;
-            value |= message[*ix + i] & 0x00ff;
-            break;
-        }
-
-        for (int i = 1; i < length; i++) {
-            value <<= 8;
-            value |= message[*ix + i] & 0x00ff;
-        }
-    }
-
-    // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
     if (f != NULL) {
+        int64_t value = 0;
+
+        if (length <= 8) {
+            for (int i = 0; i < length; i++) {
+                uint8_t u8 = message[*ix + i];
+                value = ((u8 & 0x80) == 0x80) ? -1 : 0;
+                value <<= 8;
+                value |= message[*ix + i] & 0x00ff;
+                break;
+            }
+
+            for (int i = 1; i < length; i++) {
+                value <<= 8;
+                value |= message[*ix + i] & 0x00ff;
+            }
+        }
+
         f->dynamic = true;
         f->tag = FIELD_INTEGER;
         f->integer.value = value;
@@ -117,14 +116,15 @@ field *unpack_integer(const uint8_t *message, int N, int *ix) {
 
 field *unpack_octets(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
-    uint8_t *octets = (uint8_t *)calloc(length, sizeof(uint8_t));
-
-    memmove(octets, &message[*ix], length);
-
-    // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
     if (f != NULL) {
+        uint8_t *octets = (uint8_t *)calloc(length, sizeof(uint8_t));
+
+        if (octets != NULL) {
+            memmove(octets, &message[*ix], length);
+        }
+
         f->dynamic = true;
         f->tag = FIELD_OCTET_STRING;
         f->octets.length = length;
@@ -138,8 +138,6 @@ field *unpack_octets(const uint8_t *message, int N, int *ix) {
 
 field *unpack_null(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
-
-    // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
     if (f != NULL) {
@@ -154,41 +152,43 @@ field *unpack_null(const uint8_t *message, int N, int *ix) {
 
 field *unpack_OID(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
-    char *OID = (char *)calloc(256, sizeof(char));
-    char *p = OID;
-    char *end = p + 256;
-
-    p += snprintf(p, end - p, "0");
-
-    if (length > 0 && p < end) {
-        p += snprintf(p, end - p, ".%d", message[*ix] / 40);
-    }
-
-    if (length > 0 && p < end) {
-        p += snprintf(p, end - p, ".%d", message[*ix] % 40);
-    }
-
-    int i = 1;
-    while (i < length && p < end) {
-        uint64_t suboid = 0;
-
-        while (i < length && p < end) {
-            uint8_t b = message[*ix + i++];
-
-            suboid <<= 7;
-            suboid += (uint64_t)(b & 0x7f);
-
-            if ((b & 0x80) == 0x00) {
-                p += snprintf(p, end - p, ".%llu", suboid);
-                break;
-            }
-        }
-    }
-
-    // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
     if (f != NULL) {
+        char *OID = (char *)calloc(256, sizeof(char));
+
+        if (OID != NULL) {
+            char *p = OID;
+            char *end = p + 256;
+
+            p += snprintf(p, end - p, "0");
+
+            if (length > 0 && p < end) {
+                p += snprintf(p, end - p, ".%d", message[*ix] / 40);
+            }
+
+            if (length > 0 && p < end) {
+                p += snprintf(p, end - p, ".%d", message[*ix] % 40);
+            }
+
+            int i = 1;
+            while (i < length && p < end) {
+                uint64_t suboid = 0;
+
+                while (i < length && p < end) {
+                    uint8_t b = message[*ix + i++];
+
+                    suboid <<= 7;
+                    suboid += (uint64_t)(b & 0x7f);
+
+                    if ((b & 0x80) == 0x00) {
+                        p += snprintf(p, end - p, ".%llu", suboid);
+                        break;
+                    }
+                }
+            }
+        }
+
         f->dynamic = true;
         f->tag = FIELD_OID;
         f->OID.OID = OID;
@@ -201,14 +201,13 @@ field *unpack_OID(const uint8_t *message, int N, int *ix) {
 
 field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
-    // vector *fields = NULL;
-    // vector *fields = vector_new();
-    vector *fields = unpack(&message[*ix], length);
-
-    // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
     if (f != NULL) {
+        // vector *fields = NULL;
+        // vector *fields = vector_new();
+        vector *fields = unpack(&message[*ix], length);
+
         f->dynamic = true;
         f->tag = FIELD_SEQUENCE;
         f->sequence.fields = fields;
@@ -221,12 +220,11 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
 
 field *unpack_get_request(const uint8_t *message, int N, int *ix) {
     uint32_t length = unpack_length(message, N, ix);
-    vector *fields = unpack(&message[*ix], length);
-
-    // ... compose field
     field *f = (field *)calloc(1, sizeof(field));
 
     if (f != NULL) {
+        vector *fields = unpack(&message[*ix], length);
+
         f->tag = FIELD_PDU_GET;
         f->pdu.fields = fields;
     }
