@@ -6,6 +6,8 @@
 #include <pico/sync.h>
 
 #include <hardware/pio.h>
+#include <hardware/ticks.h>
+#include <hardware/timer.h>
 
 #include <breakout.h>
 #include <cli.h>
@@ -148,29 +150,13 @@ void sys_watchdog_update() {
 
 void sys_debug() {
     absolute_time_t now = get_absolute_time();
-    int64_t delta = absolute_time_diff_us(sys.touched, now) / 1000;
+    bool watchdog_tick = tick_is_running(TICK_WATCHDOG);
+    uint64_t timer_time = time_us_64();
 
-    put_rgb(0, 64, 255);
-
-    uint32_t heap = get_total_heap();
-    uint32_t available = get_free_heap();
-    float used = 1.0 - ((float)available / (float)heap);
-    char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
-
-    debugf("POKE", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
-           counter,
-           queue_get_level(&queue),
-           heap,
-           available,
-           100.0f * used,
-           get_errors(),
-           watchdogged);
-
-    debugf("POKE", "%-5u now:%ld  touched:%ld  delta:%ld",
-           counter,
-           now,
-           sys.touched,
-           delta);
+    printf(">> now: %llu\n", now);
+    printf(">> watchdog tick: %s\n", watchdog_tick ? "ok" : "stopped");
+    printf(">> timer time (us): %llu\n", timer_time);
+    printf("-------\n");
 }
 
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {

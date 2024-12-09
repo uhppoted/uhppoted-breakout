@@ -8,6 +8,12 @@ Debugging weird intermittent reset:
   - unexpected interrupt handling chain somewhere??
   - PIO ??
 
+- [Timer callback gets stuck when thread is running](https://github.com/orgs/micropython/discussions/10700)
+- [Timer callback stops with uart thread](https://forum.micropython.org/viewtopic.php?f=21&t=12194&p=66161&hilit=pico+thread#p66161)
+- [Problem with machine.Timer() and _thread on Raspberry Pi Pico (RP2040)](https://stackoverflow.com/questions/70048254/problem-with-machine-timer-and-thread-on-raspberry-pi-pico-rp2040)
+- [Repeating timer stops](https://forums.raspberrypi.com/viewtopic.php?t=378705)
+- [alarm pool can appear to stop working](https://github.com/raspberrypi/pico-sdk/issues/1953)
+- [stdio_uart and stdio_uart_init_full don't play nice with flush](https://github.com/raspberrypi/pico-sdk/issues/1936)
 
 ## Tests
 
@@ -41,13 +47,15 @@ Debugging weird intermittent reset:
 - check all mutexes are try-lock (priority inversion) 
 - U3_read ?
 - interrupt interrupting interrupt ?
+- [clocks_enable_resus](https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#group_hardware_clocks_1ga614700afaa5ee6767ef2cf662e63f84c)
 
+- [ ] Print out timer registers
+      - [x] 'now'
+- [x] Disable RTC update
 - [x] Increase request rate
 - [x] Mark head/tail as volatile
 - [ ] Mark head/tail as atomic (https://en.cppreference.com/w/c/language/atomic)
 - [ ] ... and then maybe make it a queue 
-- (?) Disable RTC update
-- Print out timer registers
 
 ## TODO
 - [ ] Check all FIXMEs

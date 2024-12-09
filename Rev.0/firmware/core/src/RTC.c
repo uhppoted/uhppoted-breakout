@@ -176,67 +176,68 @@ bool RTC_on_update(repeating_timer_t *rt) {
  * I2C0 task to update RTC struct from RX8900SA.
  */
 void RTC_read(void *data) {
-    if (RTC.initialised) {
-        uint16_t year = 0;
-        uint8_t month = 0;
-        uint8_t day = 0;
-        uint8_t hour = 0;
-        uint8_t minute = 0;
-        uint8_t second = 0;
-        uint8_t weekday = 0;
-        bool ok = true;
-        int err;
-
-        if (mutex_try_enter(&RTC.guard, NULL)) {
-
-            if ((err = RX8900SA_get_date(U5, &year, &month, &day)) != ERR_OK) {
-                set_error(ERR_RX8900SA, "RTC", "get-date error %d", err);
-                ok = false;
-            } else {
-                RTC.year = year;
-                RTC.month = month;
-                RTC.day = day;
-            }
-
-            if ((err = RX8900SA_get_time(U5, &hour, &minute, &second)) != ERR_OK) {
-                set_error(ERR_RX8900SA, "RTC", "get-time error %d", err);
-                ok = false;
-            } else {
-                RTC.hour = hour;
-                RTC.minute = minute;
-                RTC.second = second;
-            }
-
-            if ((err = RX8900SA_get_dow(U5, &weekday)) != ERR_OK) {
-                set_error(ERR_RX8900SA, "RTC", "get-dow error %d", err);
-                ok = false;
-            } else {
-                RTC.dow = weekday;
-            }
-
-            if (!RTC.ready && ok) {
-                RTC.ready = true;
-                infof("RTC", "READY %04d-%02d-%02d %02d:%02d:%02d", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
-            }
-
-            // // ... update onboard RTC
-            if (ok) {
-                datetime_t t = {
-                    .year = RTC.year,
-                    .month = RTC.month,
-                    .day = RTC.day,
-                    .dotw = weekday2dow(weekday),
-                    .hour = RTC.hour,
-                    .min = RTC.minute,
-                    .sec = RTC.second,
-                };
-
-                rtc_set_datetime(&t);
-            }
-
-            mutex_exit(&RTC.guard);
-        }
-    }
+    // FIXME - commented out while debugging weird issue
+    // if (RTC.initialised) {
+    //     uint16_t year = 0;
+    //     uint8_t month = 0;
+    //     uint8_t day = 0;
+    //     uint8_t hour = 0;
+    //     uint8_t minute = 0;
+    //     uint8_t second = 0;
+    //     uint8_t weekday = 0;
+    //     bool ok = true;
+    //     int err;
+    //
+    //     if (mutex_try_enter(&RTC.guard, NULL)) {
+    //
+    //         if ((err = RX8900SA_get_date(U5, &year, &month, &day)) != ERR_OK) {
+    //             set_error(ERR_RX8900SA, "RTC", "get-date error %d", err);
+    //             ok = false;
+    //         } else {
+    //             RTC.year = year;
+    //             RTC.month = month;
+    //             RTC.day = day;
+    //         }
+    //
+    //         if ((err = RX8900SA_get_time(U5, &hour, &minute, &second)) != ERR_OK) {
+    //             set_error(ERR_RX8900SA, "RTC", "get-time error %d", err);
+    //             ok = false;
+    //         } else {
+    //             RTC.hour = hour;
+    //             RTC.minute = minute;
+    //             RTC.second = second;
+    //         }
+    //
+    //         if ((err = RX8900SA_get_dow(U5, &weekday)) != ERR_OK) {
+    //             set_error(ERR_RX8900SA, "RTC", "get-dow error %d", err);
+    //             ok = false;
+    //         } else {
+    //             RTC.dow = weekday;
+    //         }
+    //
+    //         if (!RTC.ready && ok) {
+    //             RTC.ready = true;
+    //             infof("RTC", "READY %04d-%02d-%02d %02d:%02d:%02d", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
+    //         }
+    //
+    //         // // ... update onboard RTC
+    //         if (ok) {
+    //             datetime_t t = {
+    //                 .year = RTC.year,
+    //                 .month = RTC.month,
+    //                 .day = RTC.day,
+    //                 .dotw = weekday2dow(weekday),
+    //                 .hour = RTC.hour,
+    //                 .min = RTC.minute,
+    //                 .sec = RTC.second,
+    //             };
+    //
+    //             rtc_set_datetime(&t);
+    //         }
+    //
+    //         mutex_exit(&RTC.guard);
+    //     }
+    // }
 }
 
 /*
