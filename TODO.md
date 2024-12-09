@@ -56,7 +56,7 @@
 ### Emulator
     - [x] get-controller
     - [x] set-address
-    - [ ] get-listener
+    - [x] get-listener
     - [ ] set-listener
 
     - [ ] API

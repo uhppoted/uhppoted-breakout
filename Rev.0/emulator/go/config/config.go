@@ -17,6 +17,7 @@ import (
 type Config struct {
 	Driver  driver  `json:"driver"`
 	Network network `json:"network"`
+	Events  events  `json:"events"`
 }
 
 type driver struct {
@@ -33,6 +34,11 @@ type IPv4 struct {
 	Netmask net.IPMask       `json:"netmask"`
 	Gateway netip.Addr       `json:"gateway"`
 	MAC     net.HardwareAddr `json:"MAC"`
+}
+
+type events struct {
+	Listener netip.AddrPort `json:"listener"`
+	Interval uint8          `json:"interval"`
 }
 
 func Load(filepath string) (Config, []byte, error) {
@@ -72,6 +78,18 @@ func Get[T any](c Config, oid types.OID) (T, error) {
 
 	if types.OID.Equal(oid, MIB.OID_CONTROLLER_MAC) {
 		if v, ok := any(c.Network.IPv4.MAC).(T); ok {
+			return v, nil
+		}
+	}
+
+	if types.OID.Equal(oid, MIB.OID_EVENTS_LISTENER) {
+		if v, ok := any(c.Events.Listener).(T); ok {
+			return v, nil
+		}
+	}
+
+	if types.OID.Equal(oid, MIB.OID_EVENTS_INTERVAL) {
+		if v, ok := any(c.Events.Interval).(T); ok {
 			return v, nil
 		}
 	}

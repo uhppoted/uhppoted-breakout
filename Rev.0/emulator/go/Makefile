@@ -1,7 +1,8 @@
 .DEFAULT_GOAL := build
 
 update:
-	go get -u ./...
+#	go get -u ./...
+	go get -u github.com/uhppoted/uhppote-core@main
 	go mod tidy
 
 format:

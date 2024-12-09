@@ -20,6 +20,7 @@ uhppotedSSMP MODULE-IDENTITY
 internal   OBJECT IDENTIFIER ::= { uhppotedSSMP 0 }
 system     OBJECT IDENTIFIER ::= { uhppotedSSMP 1 }
 controller OBJECT IDENTIFIER ::= { uhppotedSSMP 2 }
+events     OBJECT IDENTIFIER ::= { uhppotedSSMP 3 }
 
 -- system
 boardId OBJECT-TYPE
@@ -87,6 +88,24 @@ controllerMAC OBJECT-TYPE
         "A 6 byte octet string representing the controller MAC address."
     ::= { controller 7 }
 
+-- events
+eventsListenerAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 6 byte octet string representing the controller IPv4 address:port."
+    ::= { events 1 }
+
+eventsListenerInterval OBJECT-TYPE
+    SYNTAX      Integer8 (0..255)
+    MAX-ACCESS  read-only
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An byte object representing the events auto-send interval (seconds)."
+    ::= { events 2 }
+
 -- groups
 systemGroup OBJECT-GROUP
     OBJECTS { boardId }
@@ -108,13 +127,23 @@ controllerGroup OBJECT-GROUP
         "Controller configuration information."
     ::= { internal 2 }
 
+eventsGroup OBJECT-GROUP
+    OBJECTS { eventsListenerAddress, 
+              eventsListenerInterval }
+    STATUS  current
+    DESCRIPTION
+        "Event subsystem configuration information."
+    ::= { internal 3 }
+
 -- compliance
 compliance MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
         "The compliance statement for the system and controller groups."
     MODULE  -- this module
-    MANDATORY-GROUPS { systemGroup, controllerGroup }
+    MANDATORY-GROUPS { systemGroup, 
+                       controllerGroup 
+                       eventsGroup }
     ::= { internal 0 }
 
 END

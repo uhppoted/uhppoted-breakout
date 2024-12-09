@@ -9,12 +9,14 @@
 |0.1.3.6.1.4.1.65536.0.1 | system object group     |            |
 |0.1.3.6.1.4.1.65536.0.2 | controller object group |            |
 
+
 ## System
 
 | OID                    | Description             | Notes      |
 |------------------------|-------------------------|------------|
 |0.1.3.6.1.4.1.65536.1   | system                  | 
 |0.1.3.6.1.4.1.65536.1.1 | RP2040 serial number    | _private_  |
+
 
 ## Controller
 
@@ -28,3 +30,12 @@
 | 0.1.3.6.1.4.1.65536.2.5 | controller netmask     | _public_   |
 | 0.1.3.6.1.4.1.65536.2.6 | controller gateway     | _public_   |
 | 0.1.3.6.1.4.1.65536.2.7 | controller MAC         | _public_   |
+
+
+## Events
+
+| OID                     | Description            | Notes      |
+|-------------------------|------------------------|------------|
+| 0.1.3.6.1.4.1.65536.3   | events                 | _public_   |
+| 0.1.3.6.1.4.1.65536.3.1 | listener address:port  | _public_   |
+| 0.1.3.6.1.4.1.65536.3.2 | listener interval      | _public_   |

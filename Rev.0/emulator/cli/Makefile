@@ -15,3 +15,8 @@ set-IPv4:
 	python3 main.py set-IPv4
 	python3 main.py --destination $(ADDRESS) --udp set-IPv4
 	python3 main.py --destination $(ADDRESS) --tcp set-IPv4
+
+get-listener:
+	python3 main.py get-listener
+	python3 main.py --destination $(ADDRESS) --udp get-listener
+	python3 main.py --destination $(ADDRESS) --tcp get-listener
