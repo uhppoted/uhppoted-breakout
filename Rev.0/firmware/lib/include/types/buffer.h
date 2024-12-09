@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 typedef struct circular_buffer {
-    int head;
-    int tail;
+    volatile int head;
+    volatile int tail;
     uint8_t bytes[256];
 } circular_buffer;
 

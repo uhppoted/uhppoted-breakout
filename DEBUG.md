@@ -40,6 +40,14 @@ Debugging weird intermittent reset:
 - something in sequence ? 
 - check all mutexes are try-lock (priority inversion) 
 - U3_read ?
+- interrupt interrupting interrupt ?
+
+- [x] Increase request rate
+- [x] Mark head/tail as volatile
+- [ ] Mark head/tail as atomic (https://en.cppreference.com/w/c/language/atomic)
+- [ ] ... and then maybe make it a queue 
+- (?) Disable RTC update
+- Print out timer registers
 
 ## TODO
 - [ ] Check all FIXMEs
