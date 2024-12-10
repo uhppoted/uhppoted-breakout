@@ -1,4 +1,6 @@
 .DS_Store
 bin
 go.work
+.certificate
+.key
 

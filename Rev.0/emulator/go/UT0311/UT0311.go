@@ -17,6 +17,7 @@ type UT0311 struct {
 	driver driver.Driver
 	udp    UDP
 	tcp    TCP
+	tls    TLS
 }
 
 func (ut0311 *UT0311) SetConfig(c config.Config) {
@@ -29,12 +30,14 @@ func NewUT0311(c config.Config, d driver.Driver) UT0311 {
 		driver: d,
 		udp:    UDP{},
 		tcp:    TCP{},
+		tls:    TLS{},
 	}
 }
 
 func (ut0311 *UT0311) Run() {
 	var wg sync.WaitGroup
 
+	// ... start UDP listener
 	wg.Add(1)
 
 	go func() {
@@ -50,6 +53,7 @@ func (ut0311 *UT0311) Run() {
 		wg.Done()
 	}()
 
+	// ... start TCP listener
 	wg.Add(1)
 
 	go func() {
@@ -63,6 +67,23 @@ func (ut0311 *UT0311) Run() {
 		}
 		wg.Done()
 	}()
+
+	// ... start TLS listener
+	wg.Add(1)
+
+	go func() {
+		for {
+			if err := ut0311.tls.listen(ut0311.received); err != nil {
+				warnf("%v", err)
+			}
+
+			// TODO: exponential backoff
+			time.Sleep(5 * time.Second)
+		}
+		wg.Done()
+	}()
+
+	// ... 'k, done
 
 	wg.Wait()
 }
