@@ -1,7 +1,6 @@
 package UT0311
 
 import (
-	"fmt"
 	"net/netip"
 
 	"github.com/uhppoted/uhppote-core/messages"
@@ -12,10 +11,8 @@ import (
 )
 
 func (ut0311 *UT0311) getListener(rq *messages.GetListenerRequest) (any, error) {
-	if v, err := ut0311.driver.Get(MIB.OID_CONTROLLER_ID); err != nil {
+	if id, err := ut0311.getID(); err != nil {
 		return nil, err
-	} else if id, ok := v.(uint32); !ok {
-		return nil, fmt.Errorf("invalid controller ID (%v)", id)
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
 	} else {

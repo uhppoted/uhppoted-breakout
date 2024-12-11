@@ -25,3 +25,9 @@ set-listener:
 	python3 main.py set-listener
 	python3 main.py --destination $(ADDRESS) --udp get-listener
 	python3 main.py --destination $(ADDRESS) --tcp get-listener
+
+get-time:
+	python3 main.py get-time
+	python3 main.py --destination $(ADDRESS) --udp get-time
+	python3 main.py --destination $(ADDRESS) --tcp get-time
+

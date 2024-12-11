@@ -28,6 +28,12 @@ Debugging weird intermittent reset:
 | USB  | NONE | ASN.1+SEQ  | -       | ✓  | _vector_ without NULL fields        |
 | USB  | NONE | ASN.1+SEQ  | -       | ✗  | _vector_ without vector_new()       |
 
+| RTC | U2 | U3 | U4 | LOG | CLI(USB) | CLU(UART0) | SSMP | Ok | Notes                |
+|-----|----|----|----|-----|----------|------------|-----------|----------------------|
+|  ✗  | ✗  | ✗  | ✗  |  ✗  |    ✗     |     ✗      |  ✓   | ✓  | 16hrs , no glitch    |
+|  ✓  | ✗  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   |    |                      |
+
+
 ## Possible causes
 
 - ~~too many get requests~~

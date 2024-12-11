@@ -88,6 +88,14 @@ controllerMAC OBJECT-TYPE
         "A 6 byte octet string representing the controller MAC address."
     ::= { controller 7 }
 
+controllerDateTime OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 19 byte octet string representing the controller date/time formatted YYYY-MM-dd HH:mm:ss."
+    ::= { controller 8 }
+
 -- events
 eventsListenerAddress OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(4))
@@ -121,7 +129,8 @@ controllerGroup OBJECT-GROUP
               controllerAddress,
               controllerNetmask,
               controllerGateway,
-              controllerMAC }
+              controllerMAC,
+              controllerDateTime }
     STATUS  current
     DESCRIPTION
         "Controller configuration information."

@@ -47,11 +47,12 @@
        - [ ] check field_free
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
     
-### Emulator
+### emulator
     - [x] get-controller
     - [x] set-address
     - [x] get-listener
     - [x] set-listener
+    - [x] get-time
 
     - [ ] write config to tmp file and move 
     - [ ] only save if changed
