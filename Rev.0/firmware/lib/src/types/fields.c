@@ -23,8 +23,7 @@ void field_free(field *f) {
             break;
 
         case FIELD_PDU_GET:
-            // vector_free(f->pdu.fields);
-            // free(f->pdu.fields);
+            vector_free(f->pdu.fields);
             break;
         }
 

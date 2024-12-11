@@ -65,12 +65,11 @@ vector *unpack(const uint8_t *bytes, int N) {
                 }
                 break;
 
-                //         case FIELD_PDU_GET:
-                //             if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
-                //                 // v = vector_add(v, f);
-                //                 // field_free(f);
-                //             }
-                //             break;
+            case FIELD_PDU_GET:
+                if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
 
             default:
                 debugf("ASN.1", "decode::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
@@ -204,8 +203,6 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
     field *f = (field *)calloc(1, sizeof(field));
 
     if (f != NULL) {
-        // vector *fields = NULL;
-        // vector *fields = vector_new();
         vector *fields = unpack(&message[*ix], length);
 
         f->dynamic = true;
@@ -225,6 +222,7 @@ field *unpack_get_request(const uint8_t *message, int N, int *ix) {
     if (f != NULL) {
         vector *fields = unpack(&message[*ix], length);
 
+        f->dynamic = true;
         f->tag = FIELD_PDU_GET;
         f->pdu.fields = fields;
     }
