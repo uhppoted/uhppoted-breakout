@@ -37,17 +37,23 @@ func (tcp TCP) listen(received func(any) (any, error)) error {
 
 						if request, err := messages.UnmarshalRequest(buffer[0:N]); err != nil {
 							warnf("TCP  %v", err)
-						} else if reply, err := received(request); err != nil {
-							warnf("TCP  %v", err)
-						} else if !isnil(reply) {
-							if packet, err := codec.Marshal(reply); err != nil {
+						} else {
+							reply, err := received(request)
+
+							if err != nil {
 								warnf("TCP  %v", err)
-							} else if packet == nil {
-								warnf("TCP  invalid reply packet (%v)", packet)
-							} else if N, err := client.Write(packet); err != nil {
-								warnf("TCP  %v", err)
-							} else {
-								debugf("TCP  sent %v bytes to %v", N, client.RemoteAddr())
+							}
+
+							if !isnil(reply) {
+								if packet, err := codec.Marshal(reply); err != nil {
+									warnf("TCP  %v", err)
+								} else if packet == nil {
+									warnf("TCP  invalid reply packet (%v)", packet)
+								} else if N, err := client.Write(packet); err != nil {
+									warnf("TCP  %v", err)
+								} else {
+									debugf("TCP  sent %v bytes to %v", N, client.RemoteAddr())
+								}
 							}
 						}
 					}

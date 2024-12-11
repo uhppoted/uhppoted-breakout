@@ -15,9 +15,10 @@ import (
 )
 
 type Config struct {
-	Driver  driver  `json:"driver"`
-	Network network `json:"network"`
-	Events  events  `json:"events"`
+	filepath string  `json:"-"`
+	Driver   driver  `json:"driver"`
+	Network  network `json:"network"`
+	Events   events  `json:"events"`
 }
 
 type driver struct {
@@ -42,7 +43,9 @@ type events struct {
 }
 
 func Load(filepath string) (Config, []byte, error) {
-	var config Config
+	config := Config{
+		filepath: filepath,
+	}
 
 	if bytes, err := os.ReadFile(filepath); err != nil {
 		return Config{}, nil, err
@@ -53,6 +56,18 @@ func Load(filepath string) (Config, []byte, error) {
 
 		return config, hash[:], nil
 	}
+}
+
+func Save(c Config) error {
+	filepath := c.filepath
+
+	if bytes, err := json.MarshalIndent(c, "", "    "); err != nil {
+		return err
+	} else if err := os.WriteFile(filepath, bytes, 0660); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func Get[T any](c Config, oid types.OID) (T, error) {
@@ -95,6 +110,67 @@ func Get[T any](c Config, oid types.OID) (T, error) {
 	}
 
 	return null, fmt.Errorf("invalid OID (%v)", oid)
+}
+
+func Set(c *Config, oid types.OID, v any) error {
+	if types.OID.Equal(oid, MIB.OID_EVENTS_LISTENER) {
+		if addrPort, ok := v.(netip.AddrPort); !ok {
+			return fmt.Errorf("invalid events listener address:port (%v)", v)
+		} else {
+			c.Events.Listener = addrPort
+
+			return nil
+		}
+	}
+
+	if types.OID.Equal(oid, MIB.OID_EVENTS_INTERVAL) {
+		if interval, ok := v.(uint8); !ok {
+			return fmt.Errorf("invalid events listener interval (%v)", v)
+		} else {
+			c.Events.Interval = interval
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("invalid OID (%v)", oid)
+}
+
+func (v *IPv4) MarshalJSON() ([]byte, error) {
+	ipv4 := struct {
+		Address netip.Addr `json:"address"`
+		Netmask string     `json:"netmask"`
+		Gateway netip.Addr `json:"gateway"`
+		MAC     string     `json:"MAC"`
+	}{
+		Address: v.Address,
+		Netmask: fmt.Sprintf("%d.%d.%d.%d", v.Netmask[0], v.Netmask[1], v.Netmask[2], v.Netmask[3]),
+		Gateway: v.Gateway,
+		MAC:     fmt.Sprintf("%v", v.MAC),
+	}
+
+	return json.Marshal(ipv4)
+	// 	return err
+	// } else if match := re.FindStringSubmatch(ipv4.Netmask); match == nil {
+	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
+	// } else if a, err := strconv.ParseUint(match[1], 10, 8); err != nil {
+	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
+	// } else if b, err := strconv.ParseUint(match[2], 10, 8); err != nil {
+	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
+	// } else if c, err := strconv.ParseUint(match[3], 10, 8); err != nil {
+	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
+	// } else if d, err := strconv.ParseUint(match[4], 10, 8); err != nil {
+	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
+	// } else if MAC, err := net.ParseMAC(ipv4.MAC); err != nil {
+	// 	return err
+	// } else {
+	// 	v.Address = ipv4.Address
+	// 	v.Netmask = net.IPv4Mask(uint8(a), uint8(b), uint8(c), uint8(d))
+	// 	v.Gateway = ipv4.Gateway
+	// 	v.MAC = MAC
+
+	// 	return nil
+	// }
 }
 
 func (v *IPv4) UnmarshalJSON(bytes []byte) error {

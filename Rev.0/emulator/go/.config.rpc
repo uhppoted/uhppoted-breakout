@@ -2,19 +2,17 @@
     "driver": {
         "driver": "rpc"
     },
-
     "network": {
+        "interface": "en3",
         "IPv4": {
             "address": "192.168.1.123",
             "netmask": "255.255.255.0",
             "gateway": "192.168.1.1",
             "MAC": "00:66:19:39:55:2d"
-        },
-        "interface": "en3"
+        }
     },
-
     "events": {
         "listener": "192.168.1.100:60001",
-        "interval": 30
+        "interval": 0
     }
 }

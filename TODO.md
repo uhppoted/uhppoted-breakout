@@ -4,21 +4,15 @@
 - [ ] Zero2W serial logging
 - [ ] Zero2W USB UART
 - [ ] MSG_POKE (because absolutely shouldn't call it from interrupt handler)
-
 - [ ] Rework print queue
-      - [x] use circular buffer of char[128]
-      - [x] remove free(msg) in _push
-      - [x] use timer + MSG_LOG
-      - [x] MODE_LOG
-      - [x] MODE_NONE
-      - [x] overflow "..."
-      - [x] mutex around push/pop
       - (?) check USB connected
       - (?) setvbuf
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
-- [ ] mutex around buffer push/pop
+- (?) mutex around buffer push/pop
+      - requires 'double' buffering otherwise pop will block interrupt reads
+      - or use queue ?
 
 - [ ] CLI: trace interval
 - [ ] CLI: poke
@@ -57,7 +51,11 @@
     - [x] get-controller
     - [x] set-address
     - [x] get-listener
-    - [ ] set-listener
+    - [x] set-listener
+
+    - [ ] write config to tmp file and move 
+    - [ ] only save if changed
+    - (?) mutex with config watcher
 
     - [ ] API
            - [x] UDP
@@ -87,6 +85,11 @@
 
 ### Driver
     - [ ] breakout-simulator
+
+### CLI
+    - Update on release 0.8.10
+      - [ ] get-listener
+      - [ ] set-listener
 
 ### MIB
     - [x] controller ID

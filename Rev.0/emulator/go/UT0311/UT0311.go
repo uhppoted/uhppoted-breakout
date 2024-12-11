@@ -101,6 +101,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 	case *messages.GetListenerRequest:
 		return ut0311.getListener(rq)
 
+	case *messages.SetListenerRequest:
+		return ut0311.setListener(rq)
+
 	default:
 		warnf("unknown message type (%T)", request)
 	}

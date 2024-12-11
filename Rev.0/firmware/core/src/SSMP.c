@@ -161,33 +161,35 @@ void SSMP_enq() {
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
     debugf("SSMP", "received");
 
-    if (data_len != 18) {
-        printf(">>>> %d\n", data_len);
-        put_rgb(32, 0, 96);
-        set_error(ERR_DEBUG, "SSMP", "corrupted");
-    } else if (memcmp(data, EXPECTED, 18) != 0) {
-        printf(">>>> %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-               data[0],
-               data[1],
-               data[2],
-               data[3],
-               data[4],
-               data[5],
-               data[6],
-               data[7],
-               data[8],
-               data[9],
-               data[10],
-               data[11],
-               data[12],
-               data[13],
-               data[14],
-               data[15],
-               data[16],
-               data[17]);
-        put_rgb(32, 0, 96);
-        set_error(ERR_DEBUG, "SSMP", "corrupted");
-    }
+    put_rgb(32, 0, 96);
+
+    // if (data_len != 18) {
+    //     printf(">>>> %d\n", data_len);
+    //     put_rgb(32, 0, 96);
+    //     set_error(ERR_DEBUG, "SSMP", "corrupted");
+    // } else if (memcmp(data, EXPECTED, 18) != 0) {
+    //     printf(">>>> %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+    //            data[0],
+    //            data[1],
+    //            data[2],
+    //            data[3],
+    //            data[4],
+    //            data[5],
+    //            data[6],
+    //            data[7],
+    //            data[8],
+    //            data[9],
+    //            data[10],
+    //            data[11],
+    //            data[12],
+    //            data[13],
+    //            data[14],
+    //            data[15],
+    //            data[16],
+    //            data[17]);
+    //     put_rgb(32, 0, 96);
+    //     set_error(ERR_DEBUG, "SSMP", "corrupted");
+    // }
 
     // ... decode packet
     vector *fields = BER_decode(data, data_len);
