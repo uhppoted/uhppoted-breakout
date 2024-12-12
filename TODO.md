@@ -53,7 +53,7 @@
     - [x] get-listener
     - [x] set-listener
     - [x] get-time
-    - [ ] set-time
+    - [x] set-time
 
     - [ ] write config to tmp file and move 
     - [ ] only save if changed
@@ -63,8 +63,8 @@
            - [x] UDP
            - [x] TCP/IP
            - [ ] TLS
-                 - [ ] mutual auth
                  - [x] CLI TLS
+                 - [ ] mutual auth
                  - https://eli.thegreenplace.net/2021/go-socket-servers-with-tls
                  - https://stackoverflow.com/questions/150167/how-do-i-list-export-private-keys-from-a-keystore
            - [ ] Python CLI TCP socket not terminating/closing if no reply

@@ -109,6 +109,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 	case *messages.GetTimeRequest:
 		return ut0311.getTime(rq)
 
+	case *messages.SetTimeRequest:
+		return ut0311.setTime(rq)
+
 	default:
 		warnf("unknown message type (%T)", request)
 	}

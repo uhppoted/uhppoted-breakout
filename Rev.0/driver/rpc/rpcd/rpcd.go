@@ -12,6 +12,11 @@ import (
 
 type RPCD int
 
+type KV struct {
+	OID   string
+	Value any
+}
+
 func (r *RPCD) Get(oid string, reply *any) error {
 	debugf("get %v", oid)
 
@@ -44,6 +49,19 @@ func (r *RPCD) Get(oid string, reply *any) error {
 	}
 
 	return fmt.Errorf("unknown OID %v", oid)
+}
+
+func (r *RPCD) Set(kv KV, reply *any) error {
+	debugf("set %v %v", kv.OID, kv.Value)
+
+	// ... controller date/time
+	if kv.OID == ".1.3.6.1.4.1.65536.2.8" {
+		*reply = time.Now().Format("2006-01-02 15:04:05")
+
+		return nil
+	}
+
+	return fmt.Errorf("unknown OID %v", kv.OID)
 }
 
 func Run() {

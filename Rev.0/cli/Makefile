@@ -35,3 +35,8 @@ get-time:
 	python3 main.py --destination $(ADDRESS) --protocol udp get-time
 	python3 main.py --destination $(ADDRESS) --protocol tcp get-time
 
+set-time:
+	python3 main.py set-time
+	python3 main.py --destination $(ADDRESS) --protocol udp set-time
+	python3 main.py --destination $(ADDRESS) --protocol tcp set-time
+
