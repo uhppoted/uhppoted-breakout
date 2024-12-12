@@ -36,28 +36,28 @@ func (tcp TLS) listen(received func(any) (any, error)) error {
 						buffer := make([]byte, 2048)
 
 						if N, err := client.Read(buffer); err != nil {
-							warnf("TCP read error (%v)", err)
+							warnf("TLS read error (%v)", err)
 						} else {
-							debugf("TCP  received %v bytes from %v", N, client.RemoteAddr())
+							debugf("TLS  received %v bytes from %v", N, client.RemoteAddr())
 
 							if request, err := messages.UnmarshalRequest(buffer[0:N]); err != nil {
-								warnf("TCP  %v", err)
+								warnf("TLS  %v", err)
 							} else {
 								reply, err := received(request)
 
 								if err != nil {
-									warnf("TCP  %v", err)
+									warnf("TLS  %v", err)
 								}
 
 								if !isnil(reply) {
 									if packet, err := codec.Marshal(reply); err != nil {
-										warnf("TCP  %v", err)
+										warnf("TLS  %v", err)
 									} else if packet == nil {
-										warnf("TCP  invalid reply packet (%v)", packet)
+										warnf("TLS  invalid reply packet (%v)", packet)
 									} else if N, err := client.Write(packet); err != nil {
-										warnf("TCP  %v", err)
+										warnf("TLS  %v", err)
 									} else {
-										debugf("TCP  sent %v bytes to %v", N, client.RemoteAddr())
+										debugf("TLS  sent %v bytes to %v", N, client.RemoteAddr())
 									}
 								}
 							}
