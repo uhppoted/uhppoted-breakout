@@ -55,8 +55,9 @@ class TLS:
         self.dump(request)
 
         addr = net.resolve(f'{dest_addr}')
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT, cafile='.cacerts')
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         context.load_verify_locations('.cacerts')
+        context.load_cert_chain(certfile='.certificate', keyfile='.key')
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

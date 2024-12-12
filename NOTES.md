@@ -88,6 +88,10 @@
 - https://github.com/ubirch/ubirch-mbed-nacl-cm0
 - https://www.semanticscholar.org/paper/True-random-number-generation-on-an-Atmel-AVR-Hlav%C3%A1c-L%C3%B3rencz/3948b47a9fb7a6b3632a1b631035bec3972932bc
 
+## TLS
+- https://eli.thegreenplace.net/2021/go-socket-servers-with-tls
+- https://www.electricmonk.nl/log/2018/06/02/ssl-tls-client-certificate-verification-with-python-v3-4-sslcontext/
+
 ## Flash ID
 1. https://forums.raspberrypi.com/viewtopic.php?t=331351
 2. https://forums.raspberrypi.com/viewtopic.php?t=316853

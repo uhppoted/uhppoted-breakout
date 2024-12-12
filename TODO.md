@@ -62,11 +62,12 @@
     - [ ] API
            - [x] UDP
            - [x] TCP/IP
+                 - [ ] allow multiple requests
            - [ ] TLS
                  - [x] CLI TLS
-                 - [ ] mutual auth
-                 - https://eli.thegreenplace.net/2021/go-socket-servers-with-tls
-                 - https://stackoverflow.com/questions/150167/how-do-i-list-export-private-keys-from-a-keystore
+                 - [x] mutual auth
+                 - [ ] configuration
+                 - [ ] allow multiple requests
            - [ ] Python CLI TCP socket not terminating/closing if no reply
            - [ ] Terminate gracefully on CTRL-C
            - [ ] exponential backoff

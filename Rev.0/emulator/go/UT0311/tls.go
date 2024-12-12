@@ -2,6 +2,9 @@ package UT0311
 
 import (
 	"crypto/tls"
+	"crypto/x509"
+	"fmt"
+	"os"
 
 	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
 	"github.com/uhppoted/uhppote-core/messages"
@@ -12,12 +15,21 @@ type TLS struct {
 
 func (tcp TLS) listen(received func(any) (any, error)) error {
 	bind := "0.0.0.0:60443"
+	certificates := x509.NewCertPool()
 
 	if certificate, err := tls.LoadX509KeyPair(".certificate", ".key"); err != nil {
 		return err
+	} else if CA, err := os.ReadFile(".CA"); err != nil {
+		return err
+	} else if !certificates.AppendCertsFromPEM(CA) {
+		return fmt.Errorf("error parsing CA/client certificates")
 	} else {
 
-		config := &tls.Config{Certificates: []tls.Certificate{certificate}}
+		config := &tls.Config{
+			Certificates: []tls.Certificate{certificate},
+			ClientAuth:   tls.RequireAndVerifyClientCert,
+			ClientCAs:    certificates,
+		}
 
 		if socket, err := tls.Listen("tcp4", bind, config); err != nil {
 			return err
