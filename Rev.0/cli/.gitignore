@@ -1,2 +1,3 @@
 .DS_Store
-
+.cacerts
+__pycache__

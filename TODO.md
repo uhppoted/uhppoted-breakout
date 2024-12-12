@@ -64,6 +64,7 @@
            - [ ] TLS
                  - [ ] mutual auth
                  - [ ] CLI TLS
+                       - https://docs.python.org/3/library/ssl.html#ssl.SSLContext.verify_mode
                  - https://eli.thegreenplace.net/2021/go-socket-servers-with-tls
                  - https://stackoverflow.com/questions/150167/how-do-i-list-export-private-keys-from-a-keystore
            - [ ] Python CLI TCP socket not terminating/closing if no reply

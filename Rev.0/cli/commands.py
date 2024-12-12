@@ -6,6 +6,10 @@ import sys
 import pathlib
 
 from uhppoted import uhppote
+from uhppoted import encode
+from uhppoted import decode
+
+import tls
 
 CONTROLLER = 405419896
 DOOR = 3
@@ -69,12 +73,7 @@ def exec(f, args):
 
     dest = args.destination
     timeout = args.timeout
-    protocol = 'udp'
-
-    if args.udp:
-        protocol = 'udp'
-    elif args.tcp:
-        protocol = 'tcp'
+    protocol = args.protocol
 
     u = uhppote.Uhppote(bind, broadcast, listen, debug)
     response = f(u, dest, timeout, args, protocol=protocol)
@@ -94,9 +93,19 @@ def get_all_controllers(u, dest, timeout, args, protocol='udp'):
 
 
 def get_controller(u, dest, timeout, args, protocol='udp'):
-    controller = (CONTROLLER, dest, protocol)
+    if protocol == 'tls':
+        request = encode.get_controller_request(CONTROLLER)
+        bind = '0.0.0.0'
 
-    return u.get_controller(controller, timeout=timeout)
+        reply = _send(request, bind, dest, timeout, True)
+        if reply != None:
+            return decode.get_controller_response(reply)
+        else:
+            return None
+    else:
+        controller = (CONTROLLER, dest, protocol)
+
+        return u.get_controller(controller, timeout=timeout)
 
 
 def set_IPv4(u, dest, timeout, args, protocol='udp'):
@@ -393,3 +402,10 @@ def listen(u, dest, timeout, args, protocol='udp'):
 def onEvent(event):
     if event != None:
         pprint.pprint(event.__dict__, indent=2, width=1)
+
+
+# INTERNAL: TLS handler
+def _send(request, bind, dest, timeout, debug):
+    transport = tls.TLS(bind, debug)
+
+    return transport.send(request, dest, timeout)
