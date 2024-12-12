@@ -41,10 +41,10 @@
       - [ ] released
 
     - [ ] ASN.1
-       - [x] free_packet: dynamic
-       - [x] check vector_free
-       - [ ] check slice_free
+       - [x] packet_free: dynamic
+       - [x] vector_free
        - [ ] check field_free
+       - [ ] check slice_free
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
     
 ### emulator
@@ -53,6 +53,7 @@
     - [x] get-listener
     - [x] set-listener
     - [x] get-time
+    - [ ] set-time
 
     - [ ] write config to tmp file and move 
     - [ ] only save if changed

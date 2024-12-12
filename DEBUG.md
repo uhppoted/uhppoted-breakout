@@ -31,7 +31,8 @@ Debugging weird intermittent reset:
 | RTC | U2 | U3 | U4 | LOG | CLI(USB) | CLU(UART0) | SSMP | Ok | Notes                |
 |-----|----|----|----|-----|----------|------------|-----------|----------------------|
 |  ✗  | ✗  | ✗  | ✗  |  ✗  |    ✗     |     ✗      |  ✓   | ✓  | 16hrs , no glitch    |
-|  ✓  | ✗  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   |    |                      |
+|  ✓  | ✗  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   | ✓  | 8hrs , no glitch     |
+|  ✓  | ✓  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   |    |                      |
 
 
 ## Possible causes

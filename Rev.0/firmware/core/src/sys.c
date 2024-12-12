@@ -149,7 +149,7 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_U3) {
-        U3_process(v & 0x000000ff);
+        // FIXME U3_process(v & 0x000000ff);
     }
 
     if ((v & MSG) == MSG_RX) {
@@ -161,7 +161,7 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_TTY) {
         struct circular_buffer *b = (struct circular_buffer *)(SRAM_BASE | (v & 0x0fffffff));
 
-        cli_rx(b);
+        // FIXME cli_rx(b);
     }
 
     if ((v & MSG) == MSG_TICK) {

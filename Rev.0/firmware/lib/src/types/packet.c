@@ -3,22 +3,22 @@
 
 #include <types/packet.h>
 
-void free_packet(packet *p) {
-    if (p == NULL) {
-        return;
-    }
+void packet_free(packet *p) {
+    if (p != NULL) {
+        free(p->community);
 
-    free(p->community);
+        switch (p->tag) {
+        case PACKET_GET:
+            free(p->get.OID);
+            break;
 
-    if (p->tag == PACKET_GET) {
-        free(p->get.OID);
-    }
+        case PACKET_GET_RESPONSE:
+            free(p->get_response.OID);
+            break;
+        }
 
-    if (p->tag == PACKET_GET_RESPONSE) {
-        free(p->get_response.OID);
-    }
-
-    if (p->dynamic) {
-        free(p);
+        if (p->dynamic) {
+            free(p);
+        }
     }
 }

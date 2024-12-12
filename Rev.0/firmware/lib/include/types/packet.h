@@ -52,4 +52,4 @@ typedef struct packet {
     bool dynamic;
 } packet;
 
-void free_packet(packet *);
+void packet_free(packet *);

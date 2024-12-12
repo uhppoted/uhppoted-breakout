@@ -68,7 +68,7 @@ bool sys_init() {
     }
 
     sysinit();
-    cli_init();
+    // FIXME cli_init();
     log_init();
     print(s);
 

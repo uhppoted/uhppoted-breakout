@@ -164,7 +164,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
 
     // ... decode packet
     vector *fields = BER_decode(data, data_len);
-    // packet *request = ssmp_decode(fields);
+    packet *request = ssmp_decode(fields);
 
     // // ... GET request?
     // if (request != NULL && request->tag == PACKET_GET) {
@@ -180,7 +180,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
     //     }
     // }
 
-    // free_packet(request);
+    packet_free(request);
     vector_free(fields);
 }
 
@@ -218,5 +218,5 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
 
     slice_free(&encoded);
     slice_free(&packed);
-    free_packet(&reply);
+    packet_free(&reply);
 }

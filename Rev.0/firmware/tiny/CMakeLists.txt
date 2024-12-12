@@ -37,14 +37,14 @@ add_executable(breakout
   ${CORE}/src/RTC.c
   ${CORE}/src/IOX.c
   ${CORE}/src/U2.c
-  ${CORE}/src/U3.c
-  ${CORE}/src/U4.c
+# ${CORE}/src/U3.c
+# ${CORE}/src/U4.c
   ${CORE}/src/SSMP.c
   ${CORE}/src/MIB.c
   ${CORE}/src/auth.c
   ${CORE}/src/state.c
   ${CORE}/src/log.c
-  ${CORE}/src/cli.c
+# ${CORE}/src/cli.c
   ${CORE}/src/ANSI.c
 
   ${LIB}/src/I2C.c
