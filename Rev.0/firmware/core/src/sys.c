@@ -149,7 +149,7 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_U3) {
-        // FIXME U3_process(v & 0x000000ff);
+        U3_process(v & 0x000000ff);
     }
 
     if ((v & MSG) == MSG_RX) {

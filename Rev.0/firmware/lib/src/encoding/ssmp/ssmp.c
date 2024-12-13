@@ -23,14 +23,32 @@ slice ssmp_encode(packet p) {
 
 struct packet *ssmp_decode(const vector *fields) {
     if (fields != NULL) {
-        // if (fields->size > 0 && fields->fields[0] != NULL && fields->fields[0]->tag == FIELD_SEQUENCE && fields->fields[0]->sequence.fields != NULL) {
-        //     vector message = *fields->fields[0]->sequence.fields;
-        //
-        //     // ... SSMP GET request ?
-        //     if (message.size > 2 && message.fields[2]->tag == FIELD_PDU_GET) {
-        //         return ssmp_decode_get(fields);
-        //     }
-        // }
+        if (fields->size > 0) {
+
+            if (fields->fields[0] != NULL) {
+                if (fields->fields[0]->tag == FIELD_SEQUENCE) {
+                    if (fields->fields[0]->sequence.fields != NULL) {
+                        vector *message = fields->fields[0]->sequence.fields;
+
+                        // ... version
+                        if (message->size > 0 && message->fields[0] != NULL) {
+                        }
+
+                        // ... community
+                        if (message->size > 1 && message->fields[1] != NULL) {
+                        }
+
+                        // ... PDU
+                        if (message->size > 2 && message->fields[2] != NULL) {
+                            // ... SSMP GET request ?
+                            if (message->fields[2]->tag == FIELD_PDU_GET) {
+                                return ssmp_decode_get(fields);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     return NULL;

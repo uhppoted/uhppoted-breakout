@@ -160,25 +160,25 @@ void SSMP_enq() {
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
     debugf("SSMP", "received");
-    put_rgb(32, 0, 96);
 
     // ... decode packet
     vector *fields = BER_decode(data, data_len);
     packet *request = ssmp_decode(fields);
 
-    // // ... GET request?
-    // if (request != NULL && request->tag == PACKET_GET) {
-    //     const char *community = request->community;
-    //     const char *oid = request->get.OID;
-    //     uint32_t code = request->get.request_id;
-    //
-    //     if (auth_authorised(community, oid)) {
-    //         if (auth_validate(community, code)) {
-    //             SSMP_touched();
-    //             SSMP_get(request->community, request->get.request_id, request->get.OID);
-    //         }
-    //     }
-    // }
+    // ... GET request?
+    if (request != NULL && request->tag == PACKET_GET) {
+        put_rgb(32, 0, 96);
+        //     const char *community = request->community;
+        //     const char *oid = request->get.OID;
+        //     uint32_t code = request->get.request_id;
+        //
+        //     if (auth_authorised(community, oid)) {
+        //         if (auth_validate(community, code)) {
+        //             SSMP_touched();
+        //             SSMP_get(request->community, request->get.request_id, request->get.OID);
+        //         }
+        //     }
+    }
 
     packet_free(request);
     vector_free(fields);

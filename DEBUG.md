@@ -32,7 +32,8 @@ Debugging weird intermittent reset:
 |-----|----|----|----|-----|----------|------------|-----------|----------------------|
 |  ✗  | ✗  | ✗  | ✗  |  ✗  |    ✗     |     ✗      |  ✓   | ✓  | 16hrs , no glitch    |
 |  ✓  | ✗  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   | ✓  | 8hrs , no glitch     |
-|  ✓  | ✓  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   |    |                      |
+|  ✓  | ✓  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   | ✓  | 9hrs , no glitch     |
+|  ✓  | ✓  | ✓  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   |    |                      |
 
 
 ## Possible causes
@@ -72,3 +73,18 @@ Debugging weird intermittent reset:
 - (?) bisync timeout
 - [ ] Reinstate watchdog reset
 
+## GET
+
+48 41 2 1 0 4 6 112 117 98 108 105 99 160 28 2 2 48 57 2 1 0 2 1 0 48 16 48 14 6 10 43 6 1 4 1 132 128 0 2 1 5 0
+
+48 41                         SEQUENCE
+   2 1 0                      INTEGER 0
+   4 6 112 117 98 108 105 99  STRING  public
+   160 28                     PDU     GET
+       2 2 48 57              INTEGER
+       2 1 0                  INTEGER error:0
+       2 1 0                  INTEGER error index:0
+       48 16                  SEQUENCE
+          48 14               SEQUENCE
+             6 10 43 6 1 4 1 132 128 0 2 1    OID ".1.3.6.1.4.1.65536.2.1"
+             5 0                              NULL
