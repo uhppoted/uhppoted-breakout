@@ -48,16 +48,13 @@
        - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
     
 ### emulator
+    - [x] write config to tmp file and move 
     - [x] get-controller
     - [x] set-address
     - [x] get-listener
     - [x] set-listener
     - [x] get-time
     - [x] set-time
-
-    - [ ] write config to tmp file and move 
-    - [ ] only save if changed
-    - (?) mutex with config watcher
 
     - [ ] API
            - [x] UDP
@@ -88,9 +85,10 @@
 
 ### Driver
     - [ ] breakout-simulator
+    - [ ] cache controller ID
 
 ### CLI
-    - Update on release 0.8.10
+    - Update on uhppoted-python release 0.8.10
       - [ ] get-listener
       - [ ] set-listener
 

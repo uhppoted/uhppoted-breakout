@@ -63,8 +63,19 @@ func Save(c Config) error {
 
 	if bytes, err := json.MarshalIndent(c, "", "    "); err != nil {
 		return err
-	} else if err := os.WriteFile(filepath, bytes, 0660); err != nil {
+	} else if f, err := os.CreateTemp("", "uhppoted.*.config"); err != nil {
 		return err
+	} else {
+		defer os.Remove(f.Name())
+
+		if _, err := f.Write(bytes); err != nil {
+			f.Close()
+			return err
+		} else if err := f.Close(); err != nil {
+			return err
+		} else if os.Rename(f.Name(), filepath); err != nil {
+			return err
+		}
 	}
 
 	return nil
