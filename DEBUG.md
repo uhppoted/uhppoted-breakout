@@ -28,13 +28,13 @@ Debugging weird intermittent reset:
 | USB  | NONE | ASN.1+SEQ  | -       | ✓  | _vector_ without NULL fields        |
 | USB  | NONE | ASN.1+SEQ  | -       | ✗  | _vector_ without vector_new()       |
 
-| RTC | U2 | U3 | U4 | LOG | CLI(USB) | CLI(UART0) | SSMP | Ok | Notes                |
-|-----|----|----|----|-----|----------|------------|-----------|----------------------|
-|  ✗  | ✗  | ✗  | ✗  |  ✗  |    ✗     |     ✗      |  ✓   | ✓  | 16hrs , no glitch    |
-|  ✓  | ✗  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   | ✓  | 8hrs , no glitch     |
-|  ✓  | ✓  | ✗  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   | ✓  | 9hrs , no glitch     |
-|  ✓  | ✓  | ✓  | ✗  |  ✓  |    ✗     |     ✗      |  ✓   | ✓  | 6hrs , no glitch     |
-|  ✓  | ✓  | ✓  | ✓  |  ✓  |    ✗     |     ✗      |  ✓   |    |                      |
+| RTC | U2 | U3 | U4 | LOG | CLI(USB) | CLI(UART0) | SSMP   | Ok | Notes                |
+|-----|----|----|----|-----|----------|------------|--------|----|----------------------|
+|  ✗  | ✗  | ✗  | ✗  |  ✗  |    ✗     |     ✗      | BER    | ✓  | 16hrs , no glitch    |
+|  ✓  | ✗  | ✗  | ✗  |  ✓  |    ✗     |     ✗      | BER    | ✓  | 8hrs , no glitch     |
+|  ✓  | ✓  | ✗  | ✗  |  ✓  |    ✗     |     ✗      | BER    | ✓  | 9hrs , no glitch     |
+|  ✓  | ✓  | ✓  | ✗  |  ✓  |    ✗     |     ✗      | decode | ✓  | 6hrs , no glitch     |
+|  ✓  | ✓  | ✓  | ✓  |  ✓  |    ✗     |     ✗      | decode | ✗  | **glitched**         |
 
 
 ## Possible causes
