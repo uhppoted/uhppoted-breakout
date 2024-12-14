@@ -37,6 +37,7 @@ const uint32_t MSG_TICK = 0xf0000000;
 
 struct {
     mode mode;
+    bool reboot;
 
     struct {
         mutex_t lock;
@@ -52,6 +53,7 @@ struct {
     mutex_t guard;
 } SYSTEM = {
     .mode = MODE_NONE,
+    .reboot = false,
     .queue = {
         .head = 0,
         .tail = 0,
@@ -75,6 +77,35 @@ void sysinit() {
     } else {
         SYSTEM.mode = MODE_NONE;
     }
+}
+
+/* Checks memory usage, etc.
+ *
+ */
+void syscheck() {
+    // ... check memory usage
+    uint32_t heap = get_total_heap();
+    uint32_t available = get_free_heap();
+    float used = 1.0 - ((float)available / (float)heap);
+
+    if (used > 0.5 && get_error(ERR_MEMORY)) {
+        set_error(ERR_MEMORY, "SYS", "memory usage %.1f%", 100.0 * used);
+    }
+
+    // ... kick watchdog
+    if (!SYSTEM.reboot) {
+        uint32_t msg = MSG_WATCHDOG;
+        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
+            set_error(ERR_QUEUE_FULL, "SYS", "watchdog: queue full");
+        }
+    }
+}
+
+/* Sets sys.reboot flag to inhibit watchdog reset.
+ *
+ */
+void sys_reboot() {
+    SYSTEM.reboot = true;
 }
 
 bool sys_on_tick(repeating_timer_t *t) {

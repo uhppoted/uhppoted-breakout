@@ -26,7 +26,8 @@
       - (?) display in 'poke'
 
 - [ ] system monitor
-      - error on e.g. 50% usage
+      - [x] error on e.g. 50% usage
+      - [ ] check memory usage monitor
 
 - [ ] Use Pico optimized libraries
       - pico_mem_ops
@@ -45,7 +46,6 @@
        - [x] vector_free
        - [ ] check field_free
        - [ ] check slice_free
-       - [ ] https://forums.raspberrypi.com/viewtopic.php?t=347638 
     
 ### emulator
     - [x] write config to tmp file and move 
@@ -55,6 +55,7 @@
     - [x] set-listener
     - [x] get-time
     - [x] set-time
+    - [ ] get-status
 
     - [ ] API
            - [x] UDP

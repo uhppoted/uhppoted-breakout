@@ -8,6 +8,7 @@
 struct {
     struct {
         bool queue;
+        bool memory;
         bool I2C;
         bool RX8900SA;
         bool U3;
@@ -19,6 +20,7 @@ struct {
 } STATE = {
     .errors = {
         .queue = false,
+        .memory = false,
         .I2C = false,
         .RX8900SA = false,
         .U3 = false,
@@ -28,6 +30,16 @@ struct {
         .unknown = false,
     },
 };
+
+const uint16_t BITMASK_ERR_MEMORY = 0x0001;
+const uint16_t BITMASK_ERR_QUEUE = 0x0002;
+const uint16_t BITMASK_ERR_I2C = 0x0004;
+const uint16_t BITMASK_ERR_RX8900SA = 0x0008;
+const uint16_t BITMASK_ERR_U3 = 0x0010;
+const uint16_t BITMASK_ERR_U4 = 0x0020;
+const uint16_t BITMASK_ERR_WATCHDOG = 0x0040;
+const uint16_t BITMASK_ERR_DEBUG = 0x4000;
+const uint16_t BITMASK_ERR_UNKNOWN = 0x8000;
 
 void set_error(err error, const char *tag, const char *fmt, ...) {
     switch (error) {
@@ -44,6 +56,10 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
 
     case ERR_QUEUE_FULL:
         STATE.errors.queue = true;
+        break;
+
+    case ERR_MEMORY:
+        STATE.errors.memory = true;
         break;
 
     case ERR_RX8900SA:
@@ -91,6 +107,9 @@ bool get_error(err error) {
     case ERR_QUEUE_FULL:
         return STATE.errors.queue;
 
+    case ERR_MEMORY:
+        return STATE.errors.memory;
+
     case ERR_RX8900SA:
         return STATE.errors.RX8900SA;
 
@@ -116,15 +135,17 @@ bool get_error(err error) {
 uint16_t get_errors() {
     uint16_t bits = 0x0000;
 
-    bits |= STATE.errors.I2C ? 0x0001 : 0x0000;
-    bits |= STATE.errors.queue ? 0x0002 : 0x0000;
-    bits |= STATE.errors.RX8900SA ? 0x0004 : 0x0000;
-    bits |= STATE.errors.U3 ? 0x0008 : 0x0000;
-    bits |= STATE.errors.U4 ? 0x0010 : 0x0000;
-    bits |= STATE.errors.watchdog ? 0x0020 : 0x0000;
-    bits |= STATE.errors.debug ? 0x4000 : 0x0000;
-    bits |= STATE.errors.unknown ? 0x8000 : 0x0000;
+    bits |= STATE.errors.memory ? BITMASK_ERR_MEMORY : 0x0000;
+    bits |= STATE.errors.queue ? BITMASK_ERR_QUEUE : 0x0000;
+    bits |= STATE.errors.I2C ? BITMASK_ERR_I2C : 0x0000;
+    bits |= STATE.errors.RX8900SA ? BITMASK_ERR_RX8900SA : 0x0000;
+    bits |= STATE.errors.U3 ? BITMASK_ERR_U3 : 0x0000;
+    bits |= STATE.errors.U4 ? BITMASK_ERR_U4 : 0x0000;
+    bits |= STATE.errors.watchdog ? BITMASK_ERR_WATCHDOG : 0x0000;
+    bits |= STATE.errors.debug ? BITMASK_ERR_DEBUG : 0x0000;
+    bits |= STATE.errors.unknown ? BITMASK_ERR_UNKNOWN : 0x0000;
 
+    //  STATE.errors.memory = false;
     STATE.errors.I2C = false;
     STATE.errors.queue = false;
     STATE.errors.RX8900SA = false;

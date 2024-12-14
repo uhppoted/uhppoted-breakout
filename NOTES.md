@@ -31,6 +31,7 @@
     - https://github.com/jackpal/gateway
     - https://gist.github.com/jftuga/18409ced62f9a59ecbc047800ab8e810
     - https://forum.golangbridge.org/t/get-set-network-interface-in-pure-go-code/9075/3
+22. [Memory usage](https://forums.raspberrypi.com/viewtopic.php?t=347638)
 
 ## RX8900SA
 1. https://github.com/citriena/RX8900RTC/blob/master/src/RX8900RTC.cpp

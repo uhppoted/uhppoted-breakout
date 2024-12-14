@@ -30,15 +30,12 @@ struct {
         mutex_t guard;
     } LED;
 
-    bool reboot;
     repeating_timer_t timer;
-
     absolute_time_t touched;
 } sys = {
     .LED = {
         .LED = false,
     },
-    .reboot = false,
     .touched = 0,
 };
 
@@ -79,6 +76,9 @@ bool sys_init() {
  *
  */
 void sys_tick() {
+    syscheck();
+
+    // ... flash LED
     uint16_t errors = get_errors();
 
     sys.LED.LED = !sys.LED.LED;
@@ -110,13 +110,6 @@ void sys_tick() {
         }
     }
 
-    if (!sys.reboot) {
-        uint32_t msg = MSG_WATCHDOG;
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            set_error(ERR_QUEUE_FULL, "SYS", "watchdog: queue full");
-        }
-    }
-
     uint32_t heap = get_total_heap();
     uint32_t available = get_free_heap();
     float used = 1.0 - ((float)available / (float)heap);
@@ -132,13 +125,6 @@ void sys_tick() {
            watchdogged);
 
     counter++;
-}
-
-/* Sets sys.reboot flag to inhibit watchdog reset.
- *
- */
-void sys_reboot() {
-    sys.reboot = true;
 }
 
 /* Resets the internal soft watchdog.

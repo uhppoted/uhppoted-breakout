@@ -42,6 +42,7 @@ extern queue_t queue;
 
 typedef enum {
     ERR_OK,
+    ERR_MEMORY,
     ERR_I2C_GENERIC,
     ERR_I2C_TIMEOUT,
     ERR_QUEUE_FULL,
