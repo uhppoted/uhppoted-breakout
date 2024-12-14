@@ -23,18 +23,17 @@ void IOX_init() {
 
     U2_setup();
     U3_setup();
-    // FIXME U4_setup();
+    U4_setup();
 
     infof("IOX", "initialised");
 }
 
-// FIXME
 void IOX_start() {
     infof("IOX", "start");
 
     U2_start();
     U3_start();
-    // FIXME U4_start();
+    U4_start();
 
     irq_set_enabled(IO_IRQ_BANK0, true);
 }

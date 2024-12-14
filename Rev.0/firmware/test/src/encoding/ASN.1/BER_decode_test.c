@@ -172,7 +172,6 @@ bool test_decode_integer(uint8_t *bytes, int length, int64_t expected, const cha
     }
 
     field_free(f);
-    free(f); // FIXME - add 'dynamic' to field struct
 
     return ok;
 }

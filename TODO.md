@@ -46,6 +46,7 @@
        - [x] vector_free
        - [ ] check field_free
        - [ ] check slice_free
+       - (?) field pool
     
 ### emulator
     - [x] write config to tmp file and move 
