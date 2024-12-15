@@ -216,9 +216,10 @@ void U4_setup() {
 }
 
 void U4_start() {
-    infof("U4", "start");
-
-    add_repeating_timer_ms(U4_TICK, U4_tick, NULL, &U4x.timer);
+    // FIXME
+    // infof("U4", "start");
+    //
+    // add_repeating_timer_ms(U4_TICK, U4_tick, NULL, &U4x.timer);
 }
 
 /*

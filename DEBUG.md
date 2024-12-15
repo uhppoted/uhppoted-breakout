@@ -36,6 +36,11 @@ Debugging weird intermittent reset:
 |  ✓  | ✓  | ✓  | ✗  |  ✓  |    ✗     |     ✗      | decode | ✓  | 6hrs , no glitch     |
 |  ✓  | ✓  | ✓  | ✓  |  ✓  |    ✗     |     ✗      | decode | ✗  | **glitched**         |
 
+### U4
+
+| init | Ok | Notes                |
+|------|----|----------------------|
+|  ✓   |    |                      |
 
 ## Possible causes
 
