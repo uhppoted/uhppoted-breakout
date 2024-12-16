@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"emulator/MIB"
-	"emulator/MIB/types"
 )
 
 type Config struct {
@@ -81,40 +80,40 @@ func Save(c Config) error {
 	return nil
 }
 
-func Get[T any](c Config, oid types.OID) (T, error) {
+func Get[T any](c Config, oid MIB.OID) (T, error) {
 	var null T
 
-	if types.OID.Equal(oid, MIB.OID_CONTROLLER_ADDRESS) {
+	if MIB.OID.Equal(oid, MIB.OID_CONTROLLER_ADDRESS) {
 		if v, ok := any(c.Network.IPv4.Address).(T); ok {
 			return v, nil
 		}
 	}
 
-	if types.OID.Equal(oid, MIB.OID_CONTROLLER_NETMASK) {
+	if MIB.OID.Equal(oid, MIB.OID_CONTROLLER_NETMASK) {
 		if v, ok := any(c.Network.IPv4.Netmask).(T); ok {
 			return v, nil
 		}
 	}
 
-	if types.OID.Equal(oid, MIB.OID_CONTROLLER_GATEWAY) {
+	if MIB.OID.Equal(oid, MIB.OID_CONTROLLER_GATEWAY) {
 		if v, ok := any(c.Network.IPv4.Gateway).(T); ok {
 			return v, nil
 		}
 	}
 
-	if types.OID.Equal(oid, MIB.OID_CONTROLLER_MAC) {
+	if MIB.OID.Equal(oid, MIB.OID_CONTROLLER_MAC) {
 		if v, ok := any(c.Network.IPv4.MAC).(T); ok {
 			return v, nil
 		}
 	}
 
-	if types.OID.Equal(oid, MIB.OID_EVENTS_LISTENER) {
+	if MIB.OID.Equal(oid, MIB.OID_EVENTS_LISTENER) {
 		if v, ok := any(c.Events.Listener).(T); ok {
 			return v, nil
 		}
 	}
 
-	if types.OID.Equal(oid, MIB.OID_EVENTS_INTERVAL) {
+	if MIB.OID.Equal(oid, MIB.OID_EVENTS_INTERVAL) {
 		if v, ok := any(c.Events.Interval).(T); ok {
 			return v, nil
 		}
@@ -123,8 +122,8 @@ func Get[T any](c Config, oid types.OID) (T, error) {
 	return null, fmt.Errorf("invalid OID (%v)", oid)
 }
 
-func Set(c *Config, oid types.OID, v any) error {
-	if types.OID.Equal(oid, MIB.OID_EVENTS_LISTENER) {
+func Set(c *Config, oid MIB.OID, v any) error {
+	if MIB.OID.Equal(oid, MIB.OID_EVENTS_LISTENER) {
 		if addrPort, ok := v.(netip.AddrPort); !ok {
 			return fmt.Errorf("invalid events listener address:port (%v)", v)
 		} else {
@@ -134,7 +133,7 @@ func Set(c *Config, oid types.OID, v any) error {
 		}
 	}
 
-	if types.OID.Equal(oid, MIB.OID_EVENTS_INTERVAL) {
+	if MIB.OID.Equal(oid, MIB.OID_EVENTS_INTERVAL) {
 		if interval, ok := v.(uint8); !ok {
 			return fmt.Errorf("invalid events listener interval (%v)", v)
 		} else {

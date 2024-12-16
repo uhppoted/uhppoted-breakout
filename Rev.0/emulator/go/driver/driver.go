@@ -1,10 +1,10 @@
 package driver
 
 import (
-	"emulator/MIB/types"
+	"emulator/MIB"
 )
 
 type Driver interface {
-	Get(oid types.OID) (any, error)
-	Set(oid types.OID, value any) (any, error)
+	Get(oid MIB.OID) (any, error)
+	Set(oid MIB.OID, value any) (any, error)
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/rpc"
 
-	"emulator/MIB/types"
+	"emulator/MIB"
 	"emulator/log"
 )
 
@@ -16,7 +16,7 @@ type KV struct {
 	Value any
 }
 
-func (r RPC) Get(oid types.OID) (any, error) {
+func (r RPC) Get(oid MIB.OID) (any, error) {
 	debugf("get %v", oid)
 
 	var key = fmt.Sprintf("%v", oid)
@@ -31,7 +31,7 @@ func (r RPC) Get(oid types.OID) (any, error) {
 	}
 }
 
-func (r RPC) Set(oid types.OID, value any) (any, error) {
+func (r RPC) Set(oid MIB.OID, value any) (any, error) {
 	debugf("get %v %v", oid, value)
 
 	var kv = KV{

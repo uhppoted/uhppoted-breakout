@@ -20,7 +20,13 @@ uhppotedSSMP MODULE-IDENTITY
 internal   OBJECT IDENTIFIER ::= { uhppotedSSMP 0 }
 system     OBJECT IDENTIFIER ::= { uhppotedSSMP 1 }
 controller OBJECT IDENTIFIER ::= { uhppotedSSMP 2 }
-events     OBJECT IDENTIFIER ::= { uhppotedSSMP 3 }
+doors      OBJECT IDENTIFIER ::= { uhppotedSSMP 3 }
+events     OBJECT IDENTIFIER ::= { uhppotedSSMP 4 }
+
+door1     OBJECT IDENTIFIER ::= { doors 1 }
+door2     OBJECT IDENTIFIER ::= { doors 2 }
+door3     OBJECT IDENTIFIER ::= { doors 3 }
+door4     OBJECT IDENTIFIER ::= { doors 4 }
 
 -- system
 boardId OBJECT-TYPE
@@ -96,6 +102,188 @@ controllerDateTime OBJECT-TYPE
         "A 19 byte octet string representing the controller date/time formatted YYYY-MM-dd HH:mm:ss."
     ::= { controller 8 }
 
+controllerError OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 1 byte controller error code"
+    ::= { controller 9 }
+
+controllerSpecialInfo OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 1 byte controller special info code"
+    ::= { controller 10 }
+
+-- doors
+
+-- door 1
+door1Mode OBJECT-TYPE
+    SYNTAX      INTEGER(0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'normally-open', 'normally-closed' or 'controlled'."
+    ::= { door1 1 }
+
+door1Delay OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 1 unlock delay (seconds)."
+    ::= { door1 2 }
+
+door1Unlocked OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 1 unlocked state."
+    ::= { door1 3 }
+
+door1Open OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 1 open state."
+    ::= { door1 4 }
+
+door1Button OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 1 button pressed."
+    ::= { door1 5 }
+
+-- door 2
+door2Mode OBJECT-TYPE
+    SYNTAX      INTEGER(0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'normally-open', 'normally-closed' or 'controlled'."
+    ::= { door2 1 }
+
+door2Delay OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 2 unlock delay (seconds)."
+    ::= { door2 2 }
+
+door2Unlocked OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 2 unlocked state."
+    ::= { door2 3 }
+
+door2Open OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 2 open state."
+    ::= { door2 4 }
+
+door2Button OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 2 button pressed."
+    ::= { door2 5 }
+
+-- door 3
+door3Mode OBJECT-TYPE
+    SYNTAX      INTEGER(0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'normally-open', 'normally-closed' or 'controlled'."
+    ::= { door3 1 }
+
+door3Delay OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 3 unlock delay (seconds)."
+    ::= { door3 2 }
+
+door3Unlocked OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 3 unlocked state."
+    ::= { door3 3 }
+
+door3Open OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 3 open state."
+    ::= { door3 4 }
+
+door3Button OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 3 button pressed."
+    ::= { door3 5 }
+
+-- door 4
+door4Mode OBJECT-TYPE
+    SYNTAX      INTEGER(0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'normally-open', 'normally-closed' or 'controlled'."
+    ::= { door4 1 }
+
+door4Delay OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 4 unlock delay (seconds)."
+    ::= { door4 2 }
+
+door4Unlocked OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 4 unlocked state."
+    ::= { door4 3 }
+
+door4Open OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 4 open state."
+    ::= { door4 4 }
+
+door4Button OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Door 4 button pressed."
+    ::= { door4 5 }
+
 -- events
 eventsListenerAddress OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(4))
@@ -106,8 +294,7 @@ eventsListenerAddress OBJECT-TYPE
     ::= { events 1 }
 
 eventsListenerInterval OBJECT-TYPE
-    SYNTAX      Integer8 (0..255)
-    MAX-ACCESS  read-only
+    SYNTAX      Integer32 (0..255)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -123,26 +310,57 @@ systemGroup OBJECT-GROUP
     ::= { internal 1 }
 
 controllerGroup OBJECT-GROUP
-    OBJECTS { controllerId, 
-              controllerVersion, 
+    OBJECTS { controllerId,
+              controllerVersion,
               controllerReleased,
               controllerAddress,
               controllerNetmask,
               controllerGateway,
               controllerMAC,
-              controllerDateTime }
+              controllerDateTime,
+              controllerError,
+              controllerSpecialInfo }
     STATUS  current
     DESCRIPTION
-        "Controller configuration information."
+        "Controller system information."
     ::= { internal 2 }
 
+doorsGroup OBJECT-GROUP
+    OBJECTS { door1Mode,
+              door1Delay,
+              door1Unlocked,
+              door1Open,
+              door1Button,
+            
+              door2Mode,
+              door2Delay,
+              door2Unlocked,
+              door2Open,
+              door2Button,
+            
+              door3Mode,
+              door3Delay,
+              door3Unlocked,
+              door3Open,
+              door3Button,
+            
+              door4Mode,
+              door4Delay,
+              door4Unlocked,
+              door4Open,
+              door4Button }
+    STATUS  current
+    DESCRIPTION
+        "Door configuration and state information."
+    ::= { internal 3 }
+
 eventsGroup OBJECT-GROUP
-    OBJECTS { eventsListenerAddress, 
+    OBJECTS { eventsListenerAddress,
               eventsListenerInterval }
     STATUS  current
     DESCRIPTION
         "Event subsystem configuration information."
-    ::= { internal 3 }
+    ::= { internal 4 }
 
 -- compliance
 compliance MODULE-COMPLIANCE
@@ -150,8 +368,9 @@ compliance MODULE-COMPLIANCE
     DESCRIPTION
         "The compliance statement for the system and controller groups."
     MODULE  -- this module
-    MANDATORY-GROUPS { systemGroup, 
-                       controllerGroup 
+    MANDATORY-GROUPS { systemGroup,
+                       controllerGroup,
+                       doorsGroup,
                        eventsGroup }
     ::= { internal 0 }
 

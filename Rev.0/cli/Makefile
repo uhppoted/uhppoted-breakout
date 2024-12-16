@@ -41,3 +41,11 @@ set-time:
 	python3 main.py --destination $(ADDRESS) --protocol udp set-time
 	python3 main.py --destination $(ADDRESS) --protocol tcp set-time
 
+get-status:
+	python3 main.py get-status
+#	python3 main.py --destination $(ADDRESS) --protocol udp get-status
+#	python3 main.py --destination $(ADDRESS) --protocol tcp get-status
+
+tls:
+	python3 main.py --destination $(TLS) --protocol tls get-controller
+

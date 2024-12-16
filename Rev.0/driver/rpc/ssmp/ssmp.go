@@ -33,6 +33,76 @@ func (s SSMP) Get(oid string) (any, error) {
 		return time.Now().Format("2006-01-02 15:04:05"), nil
 	}
 
+	// ... controller error
+	if oid == ".1.3.6.1.4.1.65536.2.9" {
+		return 0x12, nil
+	}
+
+	// ... controller special info
+	if oid == ".1.3.6.1.4.1.65536.2.10" {
+		return 0x23, nil
+	}
+
+	// ... door 1 unlocked
+	if oid == ".1.3.6.1.4.1.65536.3.1.3" {
+		return true, nil
+	}
+
+	// ... door 1 open
+	if oid == ".1.3.6.1.4.1.65536.3.1.4" {
+		return true, nil
+	}
+
+	// ... door 1 button
+	if oid == ".1.3.6.1.4.1.65536.3.1.5" {
+		return true, nil
+	}
+
+	// ... door 2 unlocked
+	if oid == ".1.3.6.1.4.1.65536.3.2.3" {
+		return true, nil
+	}
+
+	// ... door 2 open
+	if oid == ".1.3.6.1.4.1.65536.3.2.4" {
+		return true, nil
+	}
+
+	// ... door 2 button
+	if oid == ".1.3.6.1.4.1.65536.3.2.5" {
+		return false, nil
+	}
+
+	// ... door 3 unlocked
+	if oid == ".1.3.6.1.4.1.65536.3.3.3" {
+		return true, nil
+	}
+
+	// ... door 3 open
+	if oid == ".1.3.6.1.4.1.65536.3.3.4" {
+		return false, nil
+	}
+
+	// ... door 3 button
+	if oid == ".1.3.6.1.4.1.65536.3.3.5" {
+		return true, nil
+	}
+
+	// ... door 4 unlocked
+	if oid == ".1.3.6.1.4.1.65536.3.4.3" {
+		return false, nil
+	}
+
+	// ... door 4 open
+	if oid == ".1.3.6.1.4.1.65536.3.4.4" {
+		return true, nil
+	}
+
+	// ... door 4 button
+	if oid == ".1.3.6.1.4.1.65536.3.4.5" {
+		return false, nil
+	}
+
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 

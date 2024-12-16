@@ -45,7 +45,7 @@
        - [x] vector_free
        - [x] check field_free
        - [ ] check slice_free
-       - (?) field pool
+       - [ ] field pool
     
 ### emulator
     - [x] write config to tmp file and move 
@@ -99,6 +99,7 @@
           - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
     - [ ] system errors
     - [ ] system error messages
+    - [ ] use DATETIME, BOOLEAN, ENUMERATED etc
 
 ## PiZeroW
     - [ ] Reduce power consumption

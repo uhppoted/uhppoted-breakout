@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"emulator/MIB/types"
+	"emulator/MIB"
 	"emulator/log"
 )
 
@@ -16,7 +16,7 @@ type KV struct {
 	Value any
 }
 
-func (s Stub) Get(oid types.OID) (any, error) {
+func (s Stub) Get(oid MIB.OID) (any, error) {
 	debugf("get %v", oid)
 
 	key := fmt.Sprintf("%v", oid)
@@ -44,7 +44,7 @@ func (s Stub) Get(oid types.OID) (any, error) {
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (s Stub) Set(oid types.OID, value any) (any, error) {
+func (s Stub) Set(oid MIB.OID, value any) (any, error) {
 	debugf("set %v %v", oid, value)
 
 	key := fmt.Sprintf("%v", oid)
