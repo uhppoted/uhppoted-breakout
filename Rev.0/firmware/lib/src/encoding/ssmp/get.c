@@ -4,28 +4,13 @@
 #include <encoding/ASN.1/BER.h>
 #include <encoding/ssmp/ssmp.h>
 
-packet *ssmp_decode_get(const vector *fields) {
-    // vector message = *fields->fields[0]->sequence.fields;
-    //
-    // // ... SSMP GET request ?
-    int64_t version = 0;
-    char *community = NULL;
+packet *ssmp_decode_get(int64_t version, char *community, vector *pdu) {
     int64_t request_id = 0;
     int64_t error = 0;
     int64_t error_index = 0;
     char *OID = NULL;
 
-    // if (message.fields[0]->tag == FIELD_INTEGER) {
-    //     version = message.fields[0]->integer.value;
-    // }
-    //
-    // if (message.fields[1]->tag == FIELD_OCTET_STRING) {
-    //     community = strndup(message.fields[1]->octets.octets, message.fields[1]->octets.length);
-    // }
-    //
-    // if (message.fields[2]->sequence.fields != NULL) {
-    //     vector pdu = *message.fields[2]->sequence.fields;
-    //
+    // if (pdu != NULL) {
     //     if (pdu.size > 0 && pdu.fields[0]->tag == FIELD_INTEGER) {
     //         request_id = pdu.fields[0]->integer.value;
     //     }

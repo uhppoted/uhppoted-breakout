@@ -43,7 +43,7 @@
     - [ ] ASN.1
        - [x] packet_free: dynamic
        - [x] vector_free
-       - [ ] check field_free
+       - [x] check field_free
        - [ ] check slice_free
        - (?) field pool
     

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -5,7 +6,7 @@
 #include <encoding/ssmp/ssmp.h>
 
 extern slice ssmp_encode_get_response(packet);
-extern packet *ssmp_decode_get(const vector *fields);
+extern packet *ssmp_decode_get(int64_t version, char *community, vector *pdu);
 
 slice ssmp_encode(packet p) {
     if (p.tag == PACKET_GET_RESPONSE) {
@@ -30,20 +31,29 @@ struct packet *ssmp_decode(const vector *fields) {
                     if (fields->fields[0]->sequence.fields != NULL) {
                         vector *message = fields->fields[0]->sequence.fields;
 
-                        // ... version
-                        if (message->size > 0 && message->fields[0] != NULL) {
-                        }
+                        // ... SSMP GET request ?
+                        if (message->size > 2 && message->fields[2] != NULL && message->fields[2]->tag == FIELD_PDU_GET) {
+                            int64_t version = 0;
+                            char *community = NULL;
+                            vector *pdu = NULL;
 
-                        // ... community
-                        if (message->size > 1 && message->fields[1] != NULL) {
-                        }
-
-                        // ... PDU
-                        if (message->size > 2 && message->fields[2] != NULL) {
-                            // ... SSMP GET request ?
-                            if (message->fields[2]->tag == FIELD_PDU_GET) {
-                                return ssmp_decode_get(fields);
+                            // ... version
+                            if (message->fields[0] != NULL && message->fields[0]->tag == FIELD_INTEGER) {
+                                version = message->fields[0]->integer.value;
                             }
+
+                            // ... community
+                            if (message->fields[1] != NULL && message->fields[1]->tag == FIELD_OCTET_STRING) {
+                                community = strndup(message->fields[1]->octets.octets, message->fields[1]->octets.length);
+                            } else {
+                                community = strndup("", 0);
+                            }
+
+                            if (message->fields[2]->pdu.fields != NULL) {
+                                pdu = message->fields[2]->pdu.fields;
+                            }
+
+                            return ssmp_decode_get(version, community, pdu);
                         }
                     }
                 }
