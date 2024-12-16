@@ -216,88 +216,87 @@ void U4_setup() {
 }
 
 void U4_start() {
-    // FIXME
-    // infof("U4", "start");
-    //
-    // add_repeating_timer_ms(U4_TICK, U4_tick, NULL, &U4x.timer);
+    infof("U4", "start");
+
+    add_repeating_timer_ms(U4_TICK, U4_tick, NULL, &U4x.timer);
 }
 
 /*
  * Decrements relay and LED timers.
  */
 bool U4_tick(repeating_timer_t *rt) {
-    uint16_t outputs = U4x.outputs;
-
-    if (mutex_try_enter(&U4x.guard, NULL)) {
-        // ... health check
-        U4x.tock -= U4_TICK;
-        if (U4x.tock < 0) {
-            U4x.tock = U4_TOCK;
-
-            operation *op = (operation *)calloc(1, sizeof(operation));
-
-            op->tag = U4_HEALTHCHECK;
-            op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
-
-            struct closure task = {
-                .f = U4_healthcheck,
-                .data = op,
-            };
-
-            if (!I2C0_push(&task)) {
-                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-            }
-        }
-
-        // ... update relays
-        for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
-            if (r->timer > 0) {
-                r->timer = clamp(r->timer - U4_TICK, 0, 60000);
-                if (r->timer == 0) {
-                    U4_clear(r->mask);
-                }
-            }
-        }
-
-        // ... update LEDs
-        for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
-            if (l->timer > 0) {
-                l->timer = clamp(l->timer - U4_TICK, 0, 60000);
-                if (l->timer == 0) {
-                    if ((l->blinks > 0) && (l->interval > 0)) {
-                        l->blinks--;
-                        l->timer = l->interval;
-                        U4_toggle(l->mask);
-                    } else {
-                        U4_clear(l->mask);
-                    }
-                }
-            }
-        }
-
-        // ... update outputs
-        if (outputs != U4x.outputs || U4x.write) {
-            outputs = U4x.outputs;
-
-            operation *op = (operation *)calloc(1, sizeof(operation));
-
-            op->tag = U4_WRITE;
-            op->write.outputs = (outputs ^ U4x.polarity) & MASK;
-
-            struct closure task = {
-                .f = U4_write,
-                .data = op,
-            };
-
-            if (!I2C0_push(&task)) {
-                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-            }
-
-            U4x.write = false;
-        }
-
-        mutex_exit(&U4x.guard);
-    }
+    // uint16_t outputs = U4x.outputs;
+    //
+    // if (mutex_try_enter(&U4x.guard, NULL)) {
+    //     // ... health check
+    //     U4x.tock -= U4_TICK;
+    //     if (U4x.tock < 0) {
+    //         U4x.tock = U4_TOCK;
+    //
+    //         operation *op = (operation *)calloc(1, sizeof(operation));
+    //
+    //         op->tag = U4_HEALTHCHECK;
+    //         op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
+    //
+    //         struct closure task = {
+    //             .f = U4_healthcheck,
+    //             .data = op,
+    //         };
+    //
+    //         if (!I2C0_push(&task)) {
+    //             set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+    //         }
+    //     }
+    //
+    //     // ... update relays
+    //     for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
+    //         if (r->timer > 0) {
+    //             r->timer = clamp(r->timer - U4_TICK, 0, 60000);
+    //             if (r->timer == 0) {
+    //                 U4_clear(r->mask);
+    //             }
+    //         }
+    //     }
+    //
+    //     // ... update LEDs
+    //     for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
+    //         if (l->timer > 0) {
+    //             l->timer = clamp(l->timer - U4_TICK, 0, 60000);
+    //             if (l->timer == 0) {
+    //                 if ((l->blinks > 0) && (l->interval > 0)) {
+    //                     l->blinks--;
+    //                     l->timer = l->interval;
+    //                     U4_toggle(l->mask);
+    //                 } else {
+    //                     U4_clear(l->mask);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //
+    //     // ... update outputs
+    //     if (outputs != U4x.outputs || U4x.write) {
+    //         outputs = U4x.outputs;
+    //
+    //         operation *op = (operation *)calloc(1, sizeof(operation));
+    //
+    //         op->tag = U4_WRITE;
+    //         op->write.outputs = (outputs ^ U4x.polarity) & MASK;
+    //
+    //         struct closure task = {
+    //             .f = U4_write,
+    //             .data = op,
+    //         };
+    //
+    //         if (!I2C0_push(&task)) {
+    //             set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+    //         }
+    //
+    //         U4x.write = false;
+    //     }
+    //
+    //     mutex_exit(&U4x.guard);
+    // }
 
     return true;
 }
