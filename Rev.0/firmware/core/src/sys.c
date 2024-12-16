@@ -88,7 +88,7 @@ void syscheck() {
     uint32_t available = get_free_heap();
     float used = 1.0 - ((float)available / (float)heap);
 
-    if (used > 0.5 && get_error(ERR_MEMORY)) {
+    if (used > 0.5 && !get_error(ERR_MEMORY)) {
         set_error(ERR_MEMORY, "SYS", "memory usage %.1f%", 100.0 * used);
     }
 

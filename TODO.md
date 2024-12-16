@@ -1,6 +1,5 @@
 # TODO
 
-- [x] Make Rev.0 emulator a 'local only' package
 - [ ] Zero2W serial logging
 - [ ] Zero2W USB UART
 - [ ] MSG_POKE (because absolutely shouldn't call it from interrupt handler)
@@ -25,9 +24,9 @@
       - (?) log once on occurrence
       - (?) display in 'poke'
 
-- [ ] system monitor
+- [x] system monitor
       - [x] error on e.g. 50% usage
-      - [ ] check memory usage monitor
+      - [x] check memory usage monitor
 
 - [ ] Use Pico optimized libraries
       - pico_mem_ops
