@@ -168,9 +168,16 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
     // ... GET request?
     if (request != NULL && request->tag == PACKET_GET) {
         put_rgb(32, 0, 96);
-        //     const char *community = request->community;
-        //     const char *oid = request->get.OID;
-        //     uint32_t code = request->get.request_id;
+
+        debugf("SSMP", ">> GET %lld %lld %lld %s",
+               request->get.request_id,
+               request->get.error,
+               request->get.error_index,
+               request->community);
+
+        // const char *community = request->community;
+        // const char *oid = request->get.OID;
+        // uint32_t code = request->get.request_id;
         //
         //     if (auth_authorised(community, oid)) {
         //         if (auth_validate(community, code)) {

@@ -10,34 +10,34 @@ packet *ssmp_decode_get(int64_t version, char *community, vector *pdu) {
     int64_t error_index = 0;
     char *OID = NULL;
 
-    // if (pdu != NULL) {
-    //     if (pdu.size > 0 && pdu.fields[0]->tag == FIELD_INTEGER) {
-    //         request_id = pdu.fields[0]->integer.value;
-    //     }
-    //
-    //     if (pdu.size > 1 && pdu.fields[1]->tag == FIELD_INTEGER) {
-    //         error = pdu.fields[1]->integer.value;
-    //     }
-    //
-    //     if (pdu.size > 2 && pdu.fields[2]->tag == FIELD_INTEGER) {
-    //         error_index = pdu.fields[2]->integer.value;
-    //     }
-    //
-    //     if (pdu.size > 3 && pdu.fields[3]->tag == FIELD_SEQUENCE && pdu.fields[3]->sequence.fields != NULL) {
-    //         vector content = *pdu.fields[3]->sequence.fields;
-    //
-    //         if (content.size > 0 && content.fields[0]->tag == FIELD_SEQUENCE && content.fields[0]->sequence.fields != NULL) {
-    //             vector rq = *content.fields[0]->sequence.fields;
-    //
-    //             if (rq.size > 0 && rq.fields[0]->tag == FIELD_OID) {
-    //                 OID = strdup(rq.fields[0]->OID.OID);
-    //             }
-    //
-    //             if (rq.size > 1 && rq.fields[1]->tag == FIELD_NULL) {
-    //             }
-    //         }
-    //     }
-    // }
+    if (pdu != NULL) {
+        if (pdu->size > 0 && pdu->fields[0]->tag == FIELD_INTEGER) {
+            request_id = pdu->fields[0]->integer.value;
+        }
+
+        if (pdu->size > 1 && pdu->fields[1]->tag == FIELD_INTEGER) {
+            error = pdu->fields[1]->integer.value;
+        }
+
+        if (pdu->size > 2 && pdu->fields[2]->tag == FIELD_INTEGER) {
+            error_index = pdu->fields[2]->integer.value;
+        }
+
+        //     if (pdu.size > 3 && pdu.fields[3]->tag == FIELD_SEQUENCE && pdu.fields[3]->sequence.fields != NULL) {
+        //         vector content = *pdu.fields[3]->sequence.fields;
+        //
+        //         if (content.size > 0 && content.fields[0]->tag == FIELD_SEQUENCE && content.fields[0]->sequence.fields != NULL) {
+        //             vector rq = *content.fields[0]->sequence.fields;
+        //
+        //             if (rq.size > 0 && rq.fields[0]->tag == FIELD_OID) {
+        //                 OID = strdup(rq.fields[0]->OID.OID);
+        //             }
+        //
+        //             if (rq.size > 1 && rq.fields[1]->tag == FIELD_NULL) {
+        //             }
+        //         }
+        //     }
+    }
 
     packet *p = (packet *)calloc(1, sizeof(packet));
 

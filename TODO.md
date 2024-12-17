@@ -19,14 +19,10 @@
       - system error messages
 
 - [ ] syserror
+      - [x] red LED on any system error 
+      - [ ] log once on occurrence
       - (?) count up/down to auto-clear
-      - (?) red LED on any system error 
-      - (?) log once on occurrence
       - (?) display in 'poke'
-
-- [x] system monitor
-      - [x] error on e.g. 50% usage
-      - [x] check memory usage monitor
 
 - [ ] Use Pico optimized libraries
       - pico_mem_ops
@@ -71,6 +67,7 @@
            - [ ] exponential backoff
 
     - [ ] RPC
+          - https://go.dev/blog/protobuf-opaque
           - [x] go-rpc
           - [ ] grpc
           - [ ] unix domain sockets
