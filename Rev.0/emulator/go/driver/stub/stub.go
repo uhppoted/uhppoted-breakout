@@ -16,7 +16,7 @@ type KV struct {
 	Value any
 }
 
-func (s Stub) Get(oid MIB.OID) (any, error) {
+func (s Stub) get(oid MIB.OID) (any, error) {
 	debugf("get %v", oid)
 
 	key := fmt.Sprintf("%v", oid)
@@ -42,6 +42,56 @@ func (s Stub) Get(oid MIB.OID) (any, error) {
 	}
 
 	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (s Stub) GetUint8(oid MIB.OID) (uint8, error) {
+	if v, err := s.get(oid); err != nil {
+		return 0, err
+	} else if u8, ok := v.(uint8); !ok {
+		return 0, fmt.Errorf("invalid uint8 value (%T)", v)
+	} else {
+		return u8, nil
+	}
+}
+
+func (s Stub) GetUint16(oid MIB.OID) (uint16, error) {
+	if v, err := s.get(oid); err != nil {
+		return 0, err
+	} else if u16, ok := v.(uint16); !ok {
+		return 0, fmt.Errorf("invalid uint16 value (%T)", v)
+	} else {
+		return u16, nil
+	}
+}
+
+func (s Stub) GetUint32(oid MIB.OID) (uint32, error) {
+	if v, err := s.get(oid); err != nil {
+		return 0, err
+	} else if u32, ok := v.(uint32); !ok {
+		return 0, fmt.Errorf("invalid uint32 value (%T)", v)
+	} else {
+		return u32, nil
+	}
+}
+
+func (s Stub) GetBool(oid MIB.OID) (bool, error) {
+	if v, err := s.get(oid); err != nil {
+		return false, err
+	} else if b, ok := v.(bool); !ok {
+		return false, fmt.Errorf("invalid value - expected 'bool', got %T", v)
+	} else {
+		return b, nil
+	}
+}
+
+func (s Stub) GetString(oid MIB.OID) (string, error) {
+	if v, err := s.get(oid); err != nil {
+		return "", err
+	} else if s, ok := v.(string); !ok {
+		return "", fmt.Errorf("invalid string value (%T)", v)
+	} else {
+		return s, nil
+	}
 }
 
 func (s Stub) Set(oid MIB.OID, value any) (any, error) {

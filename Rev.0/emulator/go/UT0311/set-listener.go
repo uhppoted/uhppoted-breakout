@@ -6,10 +6,11 @@ import (
 
 	"emulator/MIB"
 	"emulator/config"
+	"emulator/driver"
 )
 
 func (ut0311 *UT0311) setListener(rq *messages.SetListenerRequest) (any, error) {
-	if id, err := ut0311.getID(); err != nil {
+	if id, err := driver.Get[uint32](ut0311.driver, MIB.OID_CONTROLLER_ID); err != nil {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil

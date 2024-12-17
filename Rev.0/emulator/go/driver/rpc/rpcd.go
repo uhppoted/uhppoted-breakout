@@ -16,7 +16,7 @@ type KV struct {
 	Value any
 }
 
-func (r RPC) Get(oid MIB.OID) (any, error) {
+func (r RPC) get(oid MIB.OID) (any, error) {
 	debugf("get %v", oid)
 
 	var key = fmt.Sprintf("%v", oid)
@@ -28,6 +28,56 @@ func (r RPC) Get(oid MIB.OID) (any, error) {
 		return 0, err
 	} else {
 		return reply, nil
+	}
+}
+
+func (r RPC) GetUint8(oid MIB.OID) (uint8, error) {
+	if v, err := r.get(oid); err != nil {
+		return 0, err
+	} else if u8, ok := v.(uint8); !ok {
+		return 0, fmt.Errorf("invalid uint8 value (%T)", v)
+	} else {
+		return u8, nil
+	}
+}
+
+func (r RPC) GetUint16(oid MIB.OID) (uint16, error) {
+	if v, err := r.get(oid); err != nil {
+		return 0, err
+	} else if u16, ok := v.(uint16); !ok {
+		return 0, fmt.Errorf("invalid uint16 value (%T)", v)
+	} else {
+		return u16, nil
+	}
+}
+
+func (r RPC) GetUint32(oid MIB.OID) (uint32, error) {
+	if v, err := r.get(oid); err != nil {
+		return 0, err
+	} else if u32, ok := v.(uint32); !ok {
+		return 0, fmt.Errorf("invalid uint32 value (%T)", v)
+	} else {
+		return u32, nil
+	}
+}
+
+func (r RPC) GetBool(oid MIB.OID) (bool, error) {
+	if v, err := r.get(oid); err != nil {
+		return false, err
+	} else if b, ok := v.(bool); !ok {
+		return false, fmt.Errorf("invalid boolean value (%T)", v)
+	} else {
+		return b, nil
+	}
+}
+
+func (r RPC) GetString(oid MIB.OID) (string, error) {
+	if v, err := r.get(oid); err != nil {
+		return "", err
+	} else if s, ok := v.(string); !ok {
+		return "", fmt.Errorf("invalid string value (%T)", v)
+	} else {
+		return s, nil
 	}
 }
 

@@ -1,7 +1,6 @@
 package UT0311
 
 import (
-	"fmt"
 	"net"
 	"net/netip"
 
@@ -10,10 +9,11 @@ import (
 
 	"emulator/MIB"
 	"emulator/config"
+	"emulator/driver"
 )
 
 func (ut0311 *UT0311) getController(rq *messages.GetDeviceRequest) (any, error) {
-	if id, err := ut0311.getID(); err != nil {
+	if id, err := driver.Get[uint32](ut0311.driver, MIB.OID_CONTROLLER_ID); err != nil {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
@@ -46,22 +46,16 @@ func (ut0311 *UT0311) getController(rq *messages.GetDeviceRequest) (any, error) 
 			response.MacAddress = []byte(MAC)
 		}
 
-		if v, err := ut0311.driver.Get(MIB.OID_CONTROLLER_VERSION); err != nil {
+		if version, err := driver.Get[uint16](ut0311.driver, MIB.OID_CONTROLLER_VERSION); err != nil {
 			return nil, err
-		} else if version, ok := v.(uint16); !ok {
-			return nil, fmt.Errorf("invalid controller version (%v)", version)
 		} else {
 			response.Version = types.Version(version)
 		}
 
-		if v, err := ut0311.driver.Get(MIB.OID_CONTROLLER_RELEASED); err != nil {
+		if released, err := driver.Get[types.Date](ut0311.driver, MIB.OID_CONTROLLER_RELEASED); err != nil {
 			return nil, err
-		} else if released, ok := v.(string); !ok {
-			return nil, fmt.Errorf("invalid controller release date (%v)", released)
-		} else if date, err := types.ParseDate(released); err != nil {
-			return nil, fmt.Errorf("invalid controller release date (%v)", released)
 		} else {
-			response.Date = date
+			response.Date = released
 		}
 
 		return response, nil

@@ -1,14 +1,12 @@
 package UT0311
 
 import (
-	"fmt"
 	"reflect"
 	"sync"
 	"time"
 
 	"github.com/uhppoted/uhppote-core/messages"
 
-	"emulator/MIB"
 	"emulator/config"
 	"emulator/driver"
 	"emulator/log"
@@ -137,16 +135,6 @@ func isnil(v any) bool {
 	}
 
 	return false
-}
-
-func (ut0311 *UT0311) getID() (uint32, error) {
-	if v, err := ut0311.driver.Get(MIB.OID_CONTROLLER_ID); err != nil {
-		return 0, err
-	} else if id, ok := v.(uint32); !ok {
-		return 0, fmt.Errorf("invalid controller ID (%v)", v)
-	} else {
-		return id, nil
-	}
 }
 
 func debugf(format string, args ...any) {

@@ -35,12 +35,12 @@ func (s SSMP) Get(oid string) (any, error) {
 
 	// ... controller error
 	if oid == ".1.3.6.1.4.1.65536.2.9" {
-		return 0x12, nil
+		return uint8(0x12), nil
 	}
 
 	// ... controller special info
 	if oid == ".1.3.6.1.4.1.65536.2.10" {
-		return 0x23, nil
+		return uint8(0x23), nil
 	}
 
 	// ... door 1 unlocked
