@@ -21,7 +21,9 @@ internal   OBJECT IDENTIFIER ::= { uhppotedSSMP 0 }
 system     OBJECT IDENTIFIER ::= { uhppotedSSMP 1 }
 controller OBJECT IDENTIFIER ::= { uhppotedSSMP 2 }
 doors      OBJECT IDENTIFIER ::= { uhppotedSSMP 3 }
-events     OBJECT IDENTIFIER ::= { uhppotedSSMP 4 }
+inputs     OBJECT IDENTIFIER ::= { uhppotedSSMP 4 }
+cards      OBJECT IDENTIFIER ::= { uhppotedSSMP 5 }
+events     OBJECT IDENTIFIER ::= { uhppotedSSMP 6 }
 
 door1     OBJECT IDENTIFIER ::= { doors 1 }
 door2     OBJECT IDENTIFIER ::= { doors 2 }
@@ -111,12 +113,21 @@ controllerError OBJECT-TYPE
     ::= { controller 9 }
 
 controllerSpecialInfo OBJECT-TYPE
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      Integer32 (0..2147483647)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "A 1 byte controller special info code"
     ::= { controller 10 }
+
+controllerSequenceNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A uint32 message sequence number"
+    ::= { controller 11 }
+
 
 -- doors
 
@@ -284,6 +295,27 @@ door4Button OBJECT-TYPE
         "Door 4 button pressed."
     ::= { door4 5 }
 
+-- inputs
+inputTamperDetect OBJECT-TYPE
+    SYNTAX      INTEGER(0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tamper detect relay contact (normally closed)."
+    ::= { inputs 1 }
+
+inputFireAlarm OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fire alarm relay contact (normally closed)."
+    ::= { inputs 2 }
+
+
+-- cards
+
+
 -- events
 eventsListenerAddress OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(4))
@@ -319,7 +351,8 @@ controllerGroup OBJECT-GROUP
               controllerMAC,
               controllerDateTime,
               controllerError,
-              controllerSpecialInfo }
+              controllerSpecialInfo,
+              controllerSequenceNumber }
     STATUS  current
     DESCRIPTION
         "Controller system information."
@@ -354,23 +387,41 @@ doorsGroup OBJECT-GROUP
         "Door configuration and state information."
     ::= { internal 3 }
 
+inputsGroup OBJECT-GROUP
+    OBJECTS { inputTamperDetect,
+              inputFireAlarm }
+    STATUS  current
+    DESCRIPTION
+        "Input state information."
+    ::= { internal 4 }
+
+cardsGroup OBJECT-GROUP
+    OBJECTS { }
+    STATUS  current
+    DESCRIPTION
+        "Cards list."
+    ::= { internal 5 }
+
 eventsGroup OBJECT-GROUP
     OBJECTS { eventsListenerAddress,
               eventsListenerInterval }
     STATUS  current
     DESCRIPTION
-        "Event subsystem configuration information."
-    ::= { internal 4 }
+        "Events list."
+    ::= { internal 6 }
+
 
 -- compliance
 compliance MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
-        "The compliance statement for the system and controller groups."
+        "The compliance statement for the system, controller, doors, inputs, cards and events groups."
     MODULE  -- this module
     MANDATORY-GROUPS { systemGroup,
                        controllerGroup,
                        doorsGroup,
+                       inputsGroup,
+                       cardsGroup,
                        eventsGroup }
     ::= { internal 0 }
 

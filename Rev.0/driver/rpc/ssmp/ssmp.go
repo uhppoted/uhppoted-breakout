@@ -103,6 +103,16 @@ func (s SSMP) Get(oid string) (any, error) {
 		return false, nil
 	}
 
+	// ... tamper detect
+	if oid == ".1.3.6.1.4.1.65536.4.1" {
+		return true, nil
+	}
+
+	// ... fire alarm
+	if oid == ".1.3.6.1.4.1.65536.4.2" {
+		return false, nil
+	}
+
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 

@@ -6,6 +6,8 @@ import (
 
 	"emulator/MIB"
 	"emulator/driver"
+	"emulator/events"
+	"emulator/system"
 )
 
 func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
@@ -17,6 +19,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		response := messages.GetStatusResponse{
 			SerialNumber: types.SerialNumber(id),
 			RelayState:   0x00,
+			InputState:   0x00,
 		}
 
 		if datetime, err := driver.Get[types.DateTime](ut0311.driver, MIB.OID_CONTROLLER_DATETIME); err != nil {
@@ -36,6 +39,12 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			return nil, err
 		} else {
 			response.SpecialInfo = v
+		}
+
+		if v, err := system.Get[uint32](ut0311.system, MIB.OID_CONTROLLER_SEQUENCE_NUMBER); err != nil {
+			return nil, err
+		} else {
+			response.SequenceId = v
 		}
 
 		// ... door 1
@@ -112,6 +121,68 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			return nil, err
 		} else {
 			response.Door4Button = pressed
+		}
+
+		// ... inputs
+		if tampered, err := driver.Get[bool](ut0311.driver, MIB.OID_INPUTS_TAMPER_DETECT); err != nil {
+			return nil, err
+		} else if tampered {
+			response.InputState |= 0x01
+		}
+
+		if fire, err := driver.Get[bool](ut0311.driver, MIB.OID_INPUTS_FIRE_ALARM); err != nil {
+			return nil, err
+		} else if fire {
+			response.InputState |= 0x02
+		}
+
+		// ... event
+		if index, err := events.Get[uint32](ut0311.events, MIB.OID_EVENTS_CURRENT); err != nil {
+			return nil, err
+		} else if index > 0 {
+			response.EventIndex = index
+
+			if event, err := events.Get[uint8](ut0311.events, MIB.Indexed(MIB.OID_EVENTS_EVENT_EVENT, index)); err != nil {
+				return nil, err
+			} else {
+				response.EventType = event
+			}
+
+			if granted, err := events.Get[bool](ut0311.events, MIB.Indexed(MIB.OID_EVENTS_EVENT_GRANTED, index)); err != nil {
+				return nil, err
+			} else {
+				response.Granted = granted
+			}
+
+			if door, err := events.Get[uint8](ut0311.events, MIB.Indexed(MIB.OID_EVENTS_EVENT_DOOR, index)); err != nil {
+				return nil, err
+			} else {
+				response.Door = door
+			}
+
+			if direction, err := events.Get[uint8](ut0311.events, MIB.Indexed(MIB.OID_EVENTS_EVENT_DIRECTION, index)); err != nil {
+				return nil, err
+			} else {
+				response.Direction = direction
+			}
+
+			if card, err := events.Get[uint32](ut0311.events, MIB.Indexed(MIB.OID_EVENTS_EVENT_CARD, index)); err != nil {
+				return nil, err
+			} else {
+				response.CardNumber = card
+			}
+
+			if timestamp, err := events.Get[types.DateTime](ut0311.events, MIB.Indexed(MIB.OID_EVENTS_EVENT_TIMESTAMP, index)); err != nil {
+				return nil, err
+			} else {
+				response.Timestamp = timestamp
+			}
+
+			if reason, err := events.Get[uint8](ut0311.events, MIB.Indexed(MIB.OID_EVENTS_EVENT_REASON, index)); err != nil {
+				return nil, err
+			} else {
+				response.Reason = reason
+			}
 		}
 
 		return response, nil

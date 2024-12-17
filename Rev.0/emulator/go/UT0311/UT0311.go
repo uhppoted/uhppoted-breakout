@@ -9,15 +9,22 @@ import (
 
 	"emulator/config"
 	"emulator/driver"
+	"emulator/events"
+	evt "emulator/events/impl"
 	"emulator/log"
+	"emulator/system"
+	sys "emulator/system/impl"
 )
 
 type UT0311 struct {
 	config config.Config
 	driver driver.Driver
-	udp    UDP
-	tcp    TCP
-	tls    TLS
+	system system.System
+	events events.Events
+
+	udp UDP
+	tcp TCP
+	tls TLS
 }
 
 func (ut0311 *UT0311) SetConfig(c config.Config) {
@@ -28,6 +35,8 @@ func NewUT0311(c config.Config, d driver.Driver) UT0311 {
 	return UT0311{
 		config: c,
 		driver: d,
+		system: sys.System{},
+		events: evt.Events{},
 		udp:    UDP{},
 		tcp:    TCP{},
 		tls:    TLS{},

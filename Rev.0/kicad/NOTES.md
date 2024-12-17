@@ -49,6 +49,12 @@
 40. 3v3 test point
 41. 5VDC test point
 42. GND test point
+43. External I2C (SCL/SDA)
+    - fire alarm
+    - tamper detect
+    - (?) maybe route additional connector to spare GPIO mux for
+        - fire alarm
+        - tamper detect
 
 (?) Maybe put GND on pin 1 of UART/SPI header
 (?) https://www.olimex.com/Products/Components/IC/SY6280

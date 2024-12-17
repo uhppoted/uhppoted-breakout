@@ -30,6 +30,8 @@
       - pico_malloc
       - pico_stdio
 
+- [ ] doors should be unlocked on boot/power-off
+
 ### SSMP
     - GET
       - [x] controller ID
@@ -52,6 +54,12 @@
     - [x] get-time
     - [x] set-time
     - [ ] get-status
+          - [x] seq no
+          - [x] inputs
+          - [x] event
+          - [ ] clean up MIB indexing
+          - [ ] genericize lookup
+    - [ ] Move event listener and interval to controller MIB block
 
     - [ ] API
            - [x] UDP
@@ -60,8 +68,8 @@
            - [ ] TLS
                  - [x] CLI TLS
                  - [x] mutual auth
-                 - [ ] configuration
                  - [ ] allow multiple requests
+                 - [ ] configuration
            - [ ] Python CLI TCP socket not terminating/closing if no reply
            - [ ] Terminate gracefully on CTRL-C
            - [ ] exponential backoff
