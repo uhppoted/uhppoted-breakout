@@ -273,28 +273,28 @@ bool U4_tick(repeating_timer_t *rt) {
         //             }
         //         }
         //     }
-        //
-        //     // ... update outputs
-        //     if (outputs != U4x.outputs || U4x.write) {
-        //         outputs = U4x.outputs;
-        //
-        //         operation *op = (operation *)calloc(1, sizeof(operation));
-        //
-        //         op->tag = U4_WRITE;
-        //         op->write.outputs = (outputs ^ U4x.polarity) & MASK;
-        //
-        //         struct closure task = {
-        //             .f = U4_write,
-        //             .data = op,
-        //         };
-        //
-        //         if (!I2C0_push(&task)) {
-        //             set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-        //         }
-        //
-        //         U4x.write = false;
-        //     }
-        //
+
+        // ... update outputs
+        if (outputs != U4x.outputs || U4x.write) {
+            outputs = U4x.outputs;
+
+            operation *op = (operation *)calloc(1, sizeof(operation));
+
+            op->tag = U4_WRITE;
+            op->write.outputs = (outputs ^ U4x.polarity) & MASK;
+
+            struct closure task = {
+                .f = U4_write,
+                .data = op,
+            };
+
+            if (!I2C0_push(&task)) {
+                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+            }
+
+            U4x.write = false;
+        }
+
         mutex_exit(&U4x.guard);
     }
 

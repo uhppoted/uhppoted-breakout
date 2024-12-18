@@ -38,11 +38,12 @@ Debugging weird intermittent reset:
 
 ### U4
 
-| init | setup | relays | Ok | Notes           |
-|------|-------|--------|----|-----------------|
-|  ✓   |   x   |   x    | ✓  |                 |
-|  ✓   |   ✓   |   x    | ✓  |                 |
-|  ✓   |   ✓   |   ✓    |    |                 |
+| init | setup | relays | LEDs | outputs | monitor | Ok | Notes           |
+|------|-------|--------|------|---------|---------|----|-----------------|
+|  ✓   |   x   |   x    |  x   |   x     |    x    | ✓  |                 |
+|  ✓   |   ✓   |   x    |  x   |   x     |    x    | ✓  |                 |
+|  ✓   |   ✓   |   ✓    |  x   |   x     |    x    | ✓  |                 |
+|  ✓   |   ✓   |   ✓    |  x   |   ✓     |    x    |    |                 |
 
 ## Possible causes
 
