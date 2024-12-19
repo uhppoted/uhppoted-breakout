@@ -258,21 +258,21 @@ bool U4_tick(repeating_timer_t *rt) {
             }
         }
 
-        //     // ... update LEDs
-        //     for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
-        //         if (l->timer > 0) {
-        //             l->timer = clamp(l->timer - U4_TICK, 0, 60000);
-        //             if (l->timer == 0) {
-        //                 if ((l->blinks > 0) && (l->interval > 0)) {
-        //                     l->blinks--;
-        //                     l->timer = l->interval;
-        //                     U4_toggle(l->mask);
-        //                 } else {
-        //                     U4_clear(l->mask);
-        //                 }
-        //             }
-        //         }
-        //     }
+        // ... update LEDs
+        for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
+            if (l->timer > 0) {
+                l->timer = clamp(l->timer - U4_TICK, 0, 60000);
+                if (l->timer == 0) {
+                    if ((l->blinks > 0) && (l->interval > 0)) {
+                        l->blinks--;
+                        l->timer = l->interval;
+                        U4_toggle(l->mask);
+                    } else {
+                        U4_clear(l->mask);
+                    }
+                }
+            }
+        }
 
         // ... update outputs
         if (outputs != U4x.outputs || U4x.write) {
