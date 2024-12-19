@@ -115,6 +115,7 @@ void SSMP_reset() {
  */
 void SSMP_touched() {
     SSMP.touched = get_absolute_time();
+    put_rgb(32, 0, 96);
 }
 
 void SSMP_ping() {
@@ -135,11 +136,13 @@ void on_SSMP() {
     }
 
     circular_buffer *b = &SSMP.buffer;
-    uint32_t msg = MSG_RX | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
+    message msg = {
+        .message = MSG_RX,
+        .tag = MSG_BUFFER,
+        .buffer = &SSMP.buffer,
+    };
 
-    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-        set_error(ERR_QUEUE_FULL, "SSMP", "rx: queue full");
-    }
+    push(msg);
 }
 
 void SSMP_rx(circular_buffer *buffer) {
@@ -179,11 +182,10 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         uint32_t code = request->get.request_id;
 
         if (auth_authorised(community, oid)) {
-            put_rgb(32, 0, 96);
-            //         if (auth_validate(community, code)) {
-            //             SSMP_touched();
-            //             SSMP_get(request->community, request->get.request_id, request->get.OID);
-            //         }
+            if (auth_validate(community, code)) {
+                SSMP_touched();
+                //             SSMP_get(request->community, request->get.request_id, request->get.OID);
+            }
         }
     }
 

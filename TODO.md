@@ -31,6 +31,7 @@
       - pico_stdio
 
 - [ ] doors should be unlocked on boot/power-off
+- [ ] move error handling to breakout.c
 
 ### SSMP
     - GET

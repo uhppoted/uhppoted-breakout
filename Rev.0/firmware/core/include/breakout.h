@@ -38,8 +38,6 @@ extern const struct I2C U3;
 extern const struct I2C U4;
 extern const struct I2C U5;
 
-extern queue_t queue;
-
 typedef enum {
     ERR_OK,
     ERR_MEMORY,
@@ -54,3 +52,24 @@ typedef enum {
     ERR_DEBUG,
     ERR_UNKNOWN,
 } err;
+
+typedef enum {
+    MSG_UINT32,
+    MSG_BUFFER,
+    MSG_UNKNOWN,
+} msg_type;
+
+struct circular_buffer;
+
+typedef struct message {
+    uint32_t message;
+    msg_type tag;
+    union {
+        uint32_t u32;
+        struct circular_buffer *buffer;
+    };
+} message;
+
+extern queue_t queue;
+
+extern bool push(message m);
