@@ -58,8 +58,8 @@
           - [x] seq no
           - [x] inputs
           - [x] event
-          - [ ] genericize lookup
-                - define seperate SCMP get/set interfaces
+          - [x] genericize lookup
+                - [x] define seperate SCMP get/set interfaces
                 - [x] use SCMP::Set for config event listener and interval
           - [ ] clean up MIB indexing
     - [ ] Move event listener and interval to controller MIB block

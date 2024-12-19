@@ -19,13 +19,13 @@ func (ut0311 *UT0311) getListener(rq *messages.GetListenerRequest) (any, error) 
 			SerialNumber: types.SerialNumber(id),
 		}
 
-		if listener, err := scmp.Get[netip.AddrPort](&ut0311.config, scmp.OID_EVENTS_LISTENER); err != nil {
+		if listener, err := scmp.Get[netip.AddrPort](ut0311.config, scmp.OID_EVENTS_LISTENER); err != nil {
 			return nil, err
 		} else {
 			response.AddrPort = listener
 		}
 
-		if interval, err := scmp.Get[uint8](&ut0311.config, scmp.OID_EVENTS_INTERVAL); err != nil {
+		if interval, err := scmp.Get[uint8](ut0311.config, scmp.OID_EVENTS_INTERVAL); err != nil {
 			return nil, err
 		} else {
 			response.Interval = interval

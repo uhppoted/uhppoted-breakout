@@ -8,19 +8,21 @@ import (
 	"github.com/uhppoted/uhppote-core/types"
 )
 
-type SCMP interface {
+type GetV interface {
 	GetUint8(oid OID) (uint8, error)
 	GetUint16(oid OID) (uint16, error)
 	GetUint32(oid OID) (uint32, error)
 	GetBool(oid OID) (bool, error)
 	GetString(oid OID) (string, error)
 	GetOctets(oid OID) ([]byte, error)
+}
 
+type SetV interface {
 	SetUint8(oid OID, v uint8) (uint8, error)
 	SetString(oid OID, v string) (string, error)
 }
 
-func Get[T any](scmp SCMP, oid OID) (T, error) {
+func Get[T any](scmp GetV, oid OID) (T, error) {
 	var zero T
 
 	switch any(zero).(type) {
@@ -114,7 +116,7 @@ func Get[T any](scmp SCMP, oid OID) (T, error) {
 	return zero, fmt.Errorf("unknown type %T", zero)
 }
 
-func Set[T any](scmp SCMP, oid OID, val T) (T, error) {
+func Set[T any](scmp SetV, oid OID, val T) (T, error) {
 	var zero T
 
 	switch v := any(val).(type) {
