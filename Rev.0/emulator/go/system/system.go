@@ -3,69 +3,57 @@ package system
 import (
 	"fmt"
 
-	"github.com/uhppoted/uhppote-core/types"
-
-	"emulator/MIB"
+	"emulator/log"
+	"emulator/scmp"
 )
 
-type System interface {
-	GetUint8(oid MIB.OID) (uint8, error)
-	GetUint16(oid MIB.OID) (uint16, error)
-	GetUint32(oid MIB.OID) (uint32, error)
-	GetBool(oid MIB.OID) (bool, error)
-	GetString(oid MIB.OID) (string, error)
+type System struct {
 }
 
-func Get[T any](system System, oid MIB.OID) (T, error) {
-	var zero T
+func (sys System) GetUint8(oid scmp.OID) (uint8, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
 
-	switch any(zero).(type) {
-	case uint8:
-		if v, err := system.GetUint8(oid); err != nil {
-			return zero, err
-		} else {
-			return any(v).(T), nil
-		}
+func (sys System) GetUint16(oid scmp.OID) (uint16, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
 
-	case uint16:
-		if v, err := system.GetUint16(oid); err != nil {
-			return zero, err
-		} else {
-			return any(v).(T), nil
-		}
-
-	case uint32:
-		if v, err := system.GetUint32(oid); err != nil {
-			return zero, err
-		} else {
-			return any(v).(T), nil
-		}
-
-	case bool:
-		if v, err := system.GetBool(oid); err != nil {
-			return zero, err
-		} else {
-			return any(v).(T), nil
-		}
-
-	case types.Date:
-		if v, err := system.GetString(oid); err != nil {
-			return zero, err
-		} else if date, err := types.ParseDate(v); err != nil {
-			return zero, err
-		} else {
-			return any(date).(T), nil
-		}
-
-	case types.DateTime:
-		if v, err := system.GetString(oid); err != nil {
-			return zero, err
-		} else if datetime, err := types.ParseDateTime(v); err != nil {
-			return zero, err
-		} else {
-			return any(datetime).(T), nil
-		}
+func (sys System) GetUint32(oid scmp.OID) (uint32, error) {
+	if scmp.OID.Equal(oid, scmp.OID_CONTROLLER_SEQUENCE_NUMBER) {
+		return 0, nil
 	}
 
-	return zero, fmt.Errorf("unknown type %T", zero)
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (sys System) GetBool(oid scmp.OID) (bool, error) {
+	return false, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (sys System) GetString(oid scmp.OID) (string, error) {
+	return "", fmt.Errorf("unknown OID %v", oid)
+}
+
+func (sys System) GetOctets(oid scmp.OID) ([]byte, error) {
+	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (sys *System) SetString(oid scmp.OID, value string) (string, error) {
+	return "", fmt.Errorf("unknown OID %v", oid)
+}
+
+func debugf(format string, args ...any) {
+	log.Debugf("SYS", format, args...)
+}
+
+func infof(format string, args ...any) {
+	log.Infof("SYS", format, args...)
+}
+
+func warnf(format string, args ...any) {
+	log.Warnf("SYS", format, args...)
+}
+
+func errorf(format string, args ...any) {
+	log.Errorf("SYS", format, args...)
 }

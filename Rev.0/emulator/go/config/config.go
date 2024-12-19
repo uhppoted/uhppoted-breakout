@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"emulator/MIB"
+	"emulator/scmp"
 )
 
 type Config struct {
@@ -80,50 +80,66 @@ func Save(c Config) error {
 	return nil
 }
 
-func Get[T any](c Config, oid MIB.OID) (T, error) {
-	var null T
-
-	if MIB.OID.Equal(oid, MIB.OID_CONTROLLER_ADDRESS) {
-		if v, ok := any(c.Network.IPv4.Address).(T); ok {
-			return v, nil
-		}
+func (c Config) GetUint8(oid scmp.OID) (uint8, error) {
+	if scmp.OID.Equal(oid, scmp.OID_EVENTS_INTERVAL) {
+		return c.Events.Interval, nil
 	}
 
-	if MIB.OID.Equal(oid, MIB.OID_CONTROLLER_NETMASK) {
-		if v, ok := any(c.Network.IPv4.Netmask).(T); ok {
-			return v, nil
-		}
-	}
-
-	if MIB.OID.Equal(oid, MIB.OID_CONTROLLER_GATEWAY) {
-		if v, ok := any(c.Network.IPv4.Gateway).(T); ok {
-			return v, nil
-		}
-	}
-
-	if MIB.OID.Equal(oid, MIB.OID_CONTROLLER_MAC) {
-		if v, ok := any(c.Network.IPv4.MAC).(T); ok {
-			return v, nil
-		}
-	}
-
-	if MIB.OID.Equal(oid, MIB.OID_EVENTS_LISTENER) {
-		if v, ok := any(c.Events.Listener).(T); ok {
-			return v, nil
-		}
-	}
-
-	if MIB.OID.Equal(oid, MIB.OID_EVENTS_INTERVAL) {
-		if v, ok := any(c.Events.Interval).(T); ok {
-			return v, nil
-		}
-	}
-
-	return null, fmt.Errorf("invalid OID (%v)", oid)
+	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func Set(c *Config, oid MIB.OID, v any) error {
-	if MIB.OID.Equal(oid, MIB.OID_EVENTS_LISTENER) {
+func (c Config) GetUint16(oid scmp.OID) (uint16, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c Config) GetUint32(oid scmp.OID) (uint32, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c Config) GetBool(oid scmp.OID) (bool, error) {
+	return false, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c Config) GetString(oid scmp.OID) (string, error) {
+	if scmp.OID.Equal(oid, scmp.OID_EVENTS_LISTENER) {
+		return fmt.Sprintf("%v", c.Events.Listener), nil
+	}
+
+	return "", fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c Config) GetOctets(oid scmp.OID) ([]byte, error) {
+	if scmp.OID.Equal(oid, scmp.OID_CONTROLLER_ADDRESS) {
+		addr := c.Network.IPv4.Address.As4()
+
+		return addr[:], nil
+	}
+
+	if scmp.OID.Equal(oid, scmp.OID_CONTROLLER_NETMASK) {
+		return c.Network.IPv4.Netmask, nil
+	}
+
+	if scmp.OID.Equal(oid, scmp.OID_CONTROLLER_GATEWAY) {
+		addr := c.Network.IPv4.Gateway.As4()
+
+		return addr[:], nil
+	}
+
+	if scmp.OID.Equal(oid, scmp.OID_CONTROLLER_MAC) {
+		bytes := c.Network.IPv4.MAC
+
+		return bytes[:], nil
+	}
+
+	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c *Config) SetString(oid scmp.OID, value string) (string, error) {
+	return "", fmt.Errorf("unknown OID %v", oid)
+}
+
+func Set(c *Config, oid scmp.OID, v any) error {
+	if scmp.OID.Equal(oid, scmp.OID_EVENTS_LISTENER) {
 		if addrPort, ok := v.(netip.AddrPort); !ok {
 			return fmt.Errorf("invalid events listener address:port (%v)", v)
 		} else {
@@ -133,7 +149,7 @@ func Set(c *Config, oid MIB.OID, v any) error {
 		}
 	}
 
-	if MIB.OID.Equal(oid, MIB.OID_EVENTS_INTERVAL) {
+	if scmp.OID.Equal(oid, scmp.OID_EVENTS_INTERVAL) {
 		if interval, ok := v.(uint8); !ok {
 			return fmt.Errorf("invalid events listener interval (%v)", v)
 		} else {

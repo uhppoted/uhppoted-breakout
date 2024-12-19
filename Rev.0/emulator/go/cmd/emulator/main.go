@@ -12,9 +12,6 @@ import (
 
 	"emulator/UT0311"
 	"emulator/config"
-	"emulator/driver"
-	"emulator/driver/rpc"
-	"emulator/driver/stub"
 	"emulator/log"
 )
 
@@ -36,16 +33,16 @@ func main() {
 		errorf("%v", err)
 		os.Exit(1)
 	} else {
-		var driver driver.Driver
+		// var driver driver.Driver
+		//
+		// switch cfg.Driver.Driver {
+		// case "stub":
+		// 	driver = stub.Stub{}
+		// case "rpc":
+		// 	driver = rpcx.RPC{}
+		// }
 
-		switch cfg.Driver.Driver {
-		case "stub":
-			driver = stub.Stub{}
-		case "rpc":
-			driver = rpcx.RPC{}
-		}
-
-		ut0311 := UT0311.NewUT0311(cfg, driver)
+		ut0311 := UT0311.NewUT0311(cfg)
 
 		go func() {
 			ut0311.Run()

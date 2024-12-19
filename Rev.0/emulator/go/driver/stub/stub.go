@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"emulator/MIB"
 	"emulator/log"
+	"emulator/scmp"
 )
 
 type Stub struct {
@@ -16,7 +16,7 @@ type KV struct {
 	Value any
 }
 
-func (s Stub) get(oid MIB.OID) (any, error) {
+func (s Stub) get(oid scmp.OID) (any, error) {
 	debugf("get %v", oid)
 
 	key := fmt.Sprintf("%v", oid)
@@ -44,7 +44,7 @@ func (s Stub) get(oid MIB.OID) (any, error) {
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (s Stub) GetUint8(oid MIB.OID) (uint8, error) {
+func (s Stub) GetUint8(oid scmp.OID) (uint8, error) {
 	if v, err := s.get(oid); err != nil {
 		return 0, err
 	} else if u8, ok := v.(uint8); !ok {
@@ -54,7 +54,7 @@ func (s Stub) GetUint8(oid MIB.OID) (uint8, error) {
 	}
 }
 
-func (s Stub) GetUint16(oid MIB.OID) (uint16, error) {
+func (s Stub) GetUint16(oid scmp.OID) (uint16, error) {
 	if v, err := s.get(oid); err != nil {
 		return 0, err
 	} else if u16, ok := v.(uint16); !ok {
@@ -64,7 +64,7 @@ func (s Stub) GetUint16(oid MIB.OID) (uint16, error) {
 	}
 }
 
-func (s Stub) GetUint32(oid MIB.OID) (uint32, error) {
+func (s Stub) GetUint32(oid scmp.OID) (uint32, error) {
 	if v, err := s.get(oid); err != nil {
 		return 0, err
 	} else if u32, ok := v.(uint32); !ok {
@@ -74,7 +74,7 @@ func (s Stub) GetUint32(oid MIB.OID) (uint32, error) {
 	}
 }
 
-func (s Stub) GetBool(oid MIB.OID) (bool, error) {
+func (s Stub) GetBool(oid scmp.OID) (bool, error) {
 	if v, err := s.get(oid); err != nil {
 		return false, err
 	} else if b, ok := v.(bool); !ok {
@@ -84,7 +84,7 @@ func (s Stub) GetBool(oid MIB.OID) (bool, error) {
 	}
 }
 
-func (s Stub) GetString(oid MIB.OID) (string, error) {
+func (s Stub) GetString(oid scmp.OID) (string, error) {
 	if v, err := s.get(oid); err != nil {
 		return "", err
 	} else if s, ok := v.(string); !ok {
@@ -94,7 +94,7 @@ func (s Stub) GetString(oid MIB.OID) (string, error) {
 	}
 }
 
-func (s Stub) Set(oid MIB.OID, value any) (any, error) {
+func (s Stub) Set(oid scmp.OID, value any) (any, error) {
 	debugf("set %v %v", oid, value)
 
 	key := fmt.Sprintf("%v", oid)

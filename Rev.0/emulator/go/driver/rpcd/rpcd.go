@@ -1,11 +1,11 @@
-package rpcx
+package rpcd
 
 import (
 	"fmt"
 	"net/rpc"
 
-	"emulator/MIB"
 	"emulator/log"
+	"emulator/scmp"
 )
 
 type RPC struct {
@@ -16,7 +16,7 @@ type KV struct {
 	Value any
 }
 
-func (r RPC) get(oid MIB.OID) (any, error) {
+func (r RPC) get(oid scmp.OID) (any, error) {
 	debugf("get %v", oid)
 
 	var key = fmt.Sprintf("%v", oid)
@@ -31,7 +31,7 @@ func (r RPC) get(oid MIB.OID) (any, error) {
 	}
 }
 
-func (r RPC) GetUint8(oid MIB.OID) (uint8, error) {
+func (r RPC) GetUint8(oid scmp.OID) (uint8, error) {
 	if v, err := r.get(oid); err != nil {
 		return 0, err
 	} else if u8, ok := v.(uint8); !ok {
@@ -41,7 +41,7 @@ func (r RPC) GetUint8(oid MIB.OID) (uint8, error) {
 	}
 }
 
-func (r RPC) GetUint16(oid MIB.OID) (uint16, error) {
+func (r RPC) GetUint16(oid scmp.OID) (uint16, error) {
 	if v, err := r.get(oid); err != nil {
 		return 0, err
 	} else if u16, ok := v.(uint16); !ok {
@@ -51,7 +51,7 @@ func (r RPC) GetUint16(oid MIB.OID) (uint16, error) {
 	}
 }
 
-func (r RPC) GetUint32(oid MIB.OID) (uint32, error) {
+func (r RPC) GetUint32(oid scmp.OID) (uint32, error) {
 	if v, err := r.get(oid); err != nil {
 		return 0, err
 	} else if u32, ok := v.(uint32); !ok {
@@ -61,7 +61,7 @@ func (r RPC) GetUint32(oid MIB.OID) (uint32, error) {
 	}
 }
 
-func (r RPC) GetBool(oid MIB.OID) (bool, error) {
+func (r RPC) GetBool(oid scmp.OID) (bool, error) {
 	if v, err := r.get(oid); err != nil {
 		return false, err
 	} else if b, ok := v.(bool); !ok {
@@ -71,7 +71,7 @@ func (r RPC) GetBool(oid MIB.OID) (bool, error) {
 	}
 }
 
-func (r RPC) GetString(oid MIB.OID) (string, error) {
+func (r RPC) GetString(oid scmp.OID) (string, error) {
 	if v, err := r.get(oid); err != nil {
 		return "", err
 	} else if s, ok := v.(string); !ok {
@@ -81,7 +81,17 @@ func (r RPC) GetString(oid MIB.OID) (string, error) {
 	}
 }
 
-func (r RPC) Set(oid MIB.OID, value any) (any, error) {
+func (r RPC) GetOctets(oid scmp.OID) ([]byte, error) {
+	if v, err := r.get(oid); err != nil {
+		return nil, err
+	} else if bytes, ok := v.([]byte); !ok {
+		return nil, fmt.Errorf("invalid octets value (%T)", v)
+	} else {
+		return bytes, nil
+	}
+}
+
+func (r RPC) SetString(oid scmp.OID, value string) (string, error) {
 	debugf("get %v %v", oid, value)
 
 	var kv = KV{
@@ -92,11 +102,13 @@ func (r RPC) Set(oid MIB.OID, value any) (any, error) {
 	var reply any
 
 	if client, err := rpc.DialHTTP("tcp", "127.0.0.1:1234"); err != nil {
-		return nil, err
+		return "", err
 	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
-		return nil, err
+		return "", err
+	} else if s, ok := reply.(string); !ok {
+		return "", fmt.Errorf("invalid reply - expected 'string', got '%T'", reply)
 	} else {
-		return reply, nil
+		return s, nil
 	}
 }
 

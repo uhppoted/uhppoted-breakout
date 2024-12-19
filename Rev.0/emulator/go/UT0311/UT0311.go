@@ -8,17 +8,15 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 
 	"emulator/config"
-	"emulator/driver"
+	"emulator/driver/rpcd"
 	"emulator/events"
-	evt "emulator/events/impl"
 	"emulator/log"
 	"emulator/system"
-	sys "emulator/system/impl"
 )
 
 type UT0311 struct {
 	config config.Config
-	driver driver.Driver
+	driver rpcd.RPC
 	system system.System
 	events events.Events
 
@@ -31,12 +29,12 @@ func (ut0311 *UT0311) SetConfig(c config.Config) {
 	ut0311.config = c
 }
 
-func NewUT0311(c config.Config, d driver.Driver) UT0311 {
+func NewUT0311(c config.Config) UT0311 {
 	return UT0311{
 		config: c,
-		driver: d,
-		system: sys.System{},
-		events: evt.Events{},
+		driver: rpcd.RPC{},
+		system: system.System{},
+		events: events.Events{},
 		udp:    UDP{},
 		tcp:    TCP{},
 		tls:    TLS{},

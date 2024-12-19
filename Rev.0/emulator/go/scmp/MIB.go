@@ -1,4 +1,4 @@
-package MIB
+package scmp
 
 import (
 	"slices"
