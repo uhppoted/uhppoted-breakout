@@ -75,6 +75,10 @@ func (e Events) GetOctets(oid scmp.OID) ([]byte, error) {
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
+func (e *Events) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
+
 func (e *Events) SetString(oid scmp.OID, value string) (string, error) {
 	return "", fmt.Errorf("unknown OID %v", oid)
 }

@@ -134,32 +134,28 @@ func (c Config) GetOctets(oid scmp.OID) ([]byte, error) {
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (c *Config) SetString(oid scmp.OID, value string) (string, error) {
-	return "", fmt.Errorf("unknown OID %v", oid)
+func (c *Config) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
+	if scmp.OID.Equal(oid, scmp.OID_EVENTS_INTERVAL) {
+		c.Events.Interval = val
+
+		return c.Events.Interval, nil
+	}
+
+	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func Set(c *Config, oid scmp.OID, v any) error {
+func (c *Config) SetString(oid scmp.OID, val string) (string, error) {
 	if scmp.OID.Equal(oid, scmp.OID_EVENTS_LISTENER) {
-		if addrPort, ok := v.(netip.AddrPort); !ok {
-			return fmt.Errorf("invalid events listener address:port (%v)", v)
+		if addrPort, err := netip.ParseAddrPort(val); err != nil {
+			return "", err
 		} else {
 			c.Events.Listener = addrPort
 
-			return nil
+			return fmt.Sprintf("%v", c.Events.Listener), nil
 		}
 	}
 
-	if scmp.OID.Equal(oid, scmp.OID_EVENTS_INTERVAL) {
-		if interval, ok := v.(uint8); !ok {
-			return fmt.Errorf("invalid events listener interval (%v)", v)
-		} else {
-			c.Events.Interval = interval
-
-			return nil
-		}
-	}
-
-	return fmt.Errorf("invalid OID (%v)", oid)
+	return "", fmt.Errorf("unknown OID %v", oid)
 }
 
 func (v *IPv4) MarshalJSON() ([]byte, error) {

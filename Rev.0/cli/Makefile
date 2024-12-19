@@ -28,8 +28,8 @@ get-listener:
 
 set-listener:
 	python3 main.py set-listener
-	python3 main.py --destination $(ADDRESS) --protocol udp get-listener
-	python3 main.py --destination $(ADDRESS) --protocol tcp get-listener
+	python3 main.py --destination $(ADDRESS) --protocol udp set-listener
+	python3 main.py --destination $(ADDRESS) --protocol tcp set-listener
 
 get-time:
 	python3 main.py get-time
@@ -43,8 +43,8 @@ set-time:
 
 get-status:
 	python3 main.py get-status
-#	python3 main.py --destination $(ADDRESS) --protocol udp get-status
-#	python3 main.py --destination $(ADDRESS) --protocol tcp get-status
+	python3 main.py --destination $(ADDRESS) --protocol udp get-status
+	python3 main.py --destination $(ADDRESS) --protocol tcp get-status
 
 tls:
 	python3 main.py --destination $(TLS) --protocol tls get-controller

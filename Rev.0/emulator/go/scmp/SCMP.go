@@ -16,6 +16,7 @@ type SCMP interface {
 	GetString(oid OID) (string, error)
 	GetOctets(oid OID) ([]byte, error)
 
+	SetUint8(oid OID, v uint8) (uint8, error)
 	SetString(oid OID, v string) (string, error)
 }
 
@@ -113,19 +114,35 @@ func Get[T any](scmp SCMP, oid OID) (T, error) {
 	return zero, fmt.Errorf("unknown type %T", zero)
 }
 
-func Set[T any](scmp SCMP, oid OID, v T) (T, error) {
+func Set[T any](scmp SCMP, oid OID, val T) (T, error) {
 	var zero T
 
-	switch any(v).(type) {
-	case types.DateTime:
-		if u, err := scmp.SetString(oid, fmt.Sprintf("%v", v)); err != nil {
+	switch v := any(val).(type) {
+	case uint8:
+		if u8, err := scmp.SetUint8(oid, v); err != nil {
 			return zero, err
-		} else if datetime, err := types.ParseDateTime(u); err != nil {
+		} else {
+			return any(u8).(T), nil
+		}
+
+	case netip.AddrPort:
+		if s, err := scmp.SetString(oid, fmt.Sprintf("%v", v)); err != nil {
+			return zero, err
+		} else if addr, err := netip.ParseAddrPort(s); err != nil {
+			return zero, err
+		} else {
+			return any(addr).(T), nil
+		}
+
+	case types.DateTime:
+		if s, err := scmp.SetString(oid, fmt.Sprintf("%v", v)); err != nil {
+			return zero, err
+		} else if datetime, err := types.ParseDateTime(s); err != nil {
 			return zero, err
 		} else {
 			return any(datetime).(T), nil
 		}
 	}
 
-	return zero, fmt.Errorf("unknown type %T", v)
+	return zero, fmt.Errorf("unknown type %T", val)
 }

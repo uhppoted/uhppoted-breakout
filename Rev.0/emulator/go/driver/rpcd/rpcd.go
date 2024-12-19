@@ -91,6 +91,27 @@ func (r RPC) GetOctets(oid scmp.OID) ([]byte, error) {
 	}
 }
 
+func (r RPC) SetUint8(oid scmp.OID, value uint8) (uint8, error) {
+	debugf("get %v %v", oid, value)
+
+	var kv = KV{
+		OID:   fmt.Sprintf("%v", oid),
+		Value: value,
+	}
+
+	var reply any
+
+	if client, err := rpc.DialHTTP("tcp", "127.0.0.1:1234"); err != nil {
+		return 0, err
+	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
+		return 0, err
+	} else if u8, ok := reply.(uint8); !ok {
+		return 0, fmt.Errorf("invalid reply - expected 'uint8', got '%T'", reply)
+	} else {
+		return u8, nil
+	}
+}
+
 func (r RPC) SetString(oid scmp.OID, value string) (string, error) {
 	debugf("get %v %v", oid, value)
 
