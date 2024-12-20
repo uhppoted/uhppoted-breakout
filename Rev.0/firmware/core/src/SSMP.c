@@ -115,7 +115,6 @@ void SSMP_reset() {
  */
 void SSMP_touched() {
     SSMP.touched = get_absolute_time();
-    put_rgb(32, 0, 96);
 }
 
 void SSMP_ping() {
@@ -179,12 +178,12 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
 
         const char *community = request->community;
         const char *oid = request->get.OID;
-        uint32_t code = request->get.request_id;
+        uint32_t rqid = request->get.request_id;
 
         if (auth_authorised(community, oid)) {
-            if (auth_validate(community, code)) {
+            if (auth_validate(community, rqid)) {
                 SSMP_touched();
-                //             SSMP_get(request->community, request->get.request_id, request->get.OID);
+                SSMP_get(community, rqid, oid);
             }
         }
     }
@@ -197,35 +196,39 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
  *
  */
 void SSMP_get(const char *community, int64_t rqid, const char *OID) {
-    debugf("SSMP", "GET");
     value v = MIB_get(OID);
 
-    packet reply = {
-        .tag = PACKET_GET_RESPONSE,
-        .version = 0,
-        .community = strdup(community),
-        .get_response = {
-            .request_id = rqid,
-            .error = 0,
-            .error_index = 0,
-            .OID = strdup(OID),
-            .value = v,
-        },
-    };
+    debugf("SSMP", "GET %s", OID);
+    debugf("SSMP", "GET tag: %d", v.tag);
 
-    if (v.tag == VALUE_UNKNOWN) {
-        reply.get_response.error = SSMP_ERROR_NO_SUCH_OBJECT;
-        reply.get_response.error_index = 1;
-    }
+    put_rgb(32, 0, 96);
 
-    // ... encode
-    slice packed = ssmp_encode(reply);
-    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
-
-    debugf("SSMP", "GET/response %u", encoded.length);
-    uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
-
-    slice_free(&encoded);
-    slice_free(&packed);
-    packet_free(&reply);
+    // packet reply = {
+    //     .tag = PACKET_GET_RESPONSE,
+    //     .version = 0,
+    //     .community = strdup(community),
+    //     .get_response = {
+    //         .request_id = rqid,
+    //         .error = 0,
+    //         .error_index = 0,
+    //         .OID = strdup(OID),
+    //         .value = v,
+    //     },
+    // };
+    //
+    // if (v.tag == VALUE_UNKNOWN) {
+    //     reply.get_response.error = SSMP_ERROR_NO_SUCH_OBJECT;
+    //     reply.get_response.error_index = 1;
+    // }
+    //
+    // // ... encode
+    // slice packed = ssmp_encode(reply);
+    // slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+    //
+    // debugf("SSMP", "GET/response %u", encoded.length);
+    // uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
+    //
+    // slice_free(&encoded);
+    // slice_free(&packed);
+    // packet_free(&reply);
 }
