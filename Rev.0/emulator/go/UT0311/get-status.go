@@ -139,43 +139,43 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		} else if index > 0 {
 			response.EventIndex = index
 
-			if event, err := scmp.Get[uint8](ut0311.events, scmp.Indexed(scmp.OID_EVENTS_EVENT_EVENT, index)); err != nil {
+			if event, err := scmp.GetIndexed[uint8](ut0311.events, scmp.OID_EVENTS_EVENT_EVENT, index); err != nil {
 				return nil, err
 			} else {
 				response.EventType = event
 			}
 
-			if granted, err := scmp.Get[bool](ut0311.events, scmp.Indexed(scmp.OID_EVENTS_EVENT_GRANTED, index)); err != nil {
+			if granted, err := scmp.GetIndexed[bool](ut0311.events, scmp.OID_EVENTS_EVENT_GRANTED, index); err != nil {
 				return nil, err
 			} else {
 				response.Granted = granted
 			}
 
-			if door, err := scmp.Get[uint8](ut0311.events, scmp.Indexed(scmp.OID_EVENTS_EVENT_DOOR, index)); err != nil {
+			if door, err := scmp.GetIndexed[uint8](ut0311.events, scmp.OID_EVENTS_EVENT_DOOR, index); err != nil {
 				return nil, err
 			} else {
 				response.Door = door
 			}
 
-			if direction, err := scmp.Get[uint8](ut0311.events, scmp.Indexed(scmp.OID_EVENTS_EVENT_DIRECTION, index)); err != nil {
+			if direction, err := scmp.GetIndexed[uint8](ut0311.events, scmp.OID_EVENTS_EVENT_DIRECTION, index); err != nil {
 				return nil, err
 			} else {
 				response.Direction = direction
 			}
 
-			if card, err := scmp.Get[uint32](ut0311.events, scmp.Indexed(scmp.OID_EVENTS_EVENT_CARD, index)); err != nil {
+			if card, err := scmp.GetIndexed[uint32](ut0311.events, scmp.OID_EVENTS_EVENT_CARD, index); err != nil {
 				return nil, err
 			} else {
 				response.CardNumber = card
 			}
 
-			if timestamp, err := scmp.Get[types.DateTime](ut0311.events, scmp.Indexed(scmp.OID_EVENTS_EVENT_TIMESTAMP, index)); err != nil {
+			if timestamp, err := scmp.GetIndexed[types.DateTime](ut0311.events, scmp.OID_EVENTS_EVENT_TIMESTAMP, index); err != nil {
 				return nil, err
 			} else {
 				response.Timestamp = timestamp
 			}
 
-			if reason, err := scmp.Get[uint8](ut0311.events, scmp.Indexed(scmp.OID_EVENTS_EVENT_REASON, index)); err != nil {
+			if reason, err := scmp.GetIndexed[uint8](ut0311.events, scmp.OID_EVENTS_EVENT_REASON, index); err != nil {
 				return nil, err
 			} else {
 				response.Reason = reason

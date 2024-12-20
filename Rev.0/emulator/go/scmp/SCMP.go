@@ -17,6 +17,15 @@ type GetV interface {
 	GetOctets(oid OID) ([]byte, error)
 }
 
+type GetI interface {
+	GetIndexedUint8(oid OID, index uint32) (uint8, error)
+	GetIndexedUint16(oid OID, index uint32) (uint16, error)
+	GetIndexedUint32(oid OID, index uint32) (uint32, error)
+	GetIndexedBool(oid OID, index uint32) (bool, error)
+	GetIndexedString(oid OID, index uint32) (string, error)
+	GetIndexedOctets(oid OID, index uint32) ([]byte, error)
+}
+
 type SetV interface {
 	SetUint8(oid OID, v uint8) (uint8, error)
 	SetString(oid OID, v string) (string, error)
@@ -105,6 +114,44 @@ func Get[T any](scmp GetV, oid OID) (T, error) {
 
 	case types.DateTime:
 		if v, err := scmp.GetString(oid); err != nil {
+			return zero, err
+		} else if datetime, err := types.ParseDateTime(v); err != nil {
+			return zero, err
+		} else {
+			return any(datetime).(T), nil
+		}
+	}
+
+	return zero, fmt.Errorf("unknown type %T", zero)
+}
+
+func GetIndexed[T any](scmp GetI, oid OID, index uint32) (T, error) {
+	var zero T
+
+	switch any(zero).(type) {
+	case uint8:
+		if v, err := scmp.GetIndexedUint8(oid, index); err != nil {
+			return zero, err
+		} else {
+			return any(v).(T), nil
+		}
+
+	case uint32:
+		if v, err := scmp.GetIndexedUint32(oid, index); err != nil {
+			return zero, err
+		} else {
+			return any(v).(T), nil
+		}
+
+	case bool:
+		if v, err := scmp.GetIndexedBool(oid, index); err != nil {
+			return zero, err
+		} else {
+			return any(v).(T), nil
+		}
+
+	case types.DateTime:
+		if v, err := scmp.GetIndexedString(oid, index); err != nil {
 			return zero, err
 		} else if datetime, err := types.ParseDateTime(v); err != nil {
 			return zero, err

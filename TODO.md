@@ -54,12 +54,12 @@
     - [x] set-listener
     - [x] get-time
     - [x] set-time
-    - [ ] get-status
+    - [x] get-status
           - [x] seq no
           - [x] inputs
           - [x] event
           - [x] genericize lookup
-          - [ ] clean up MIB indexing
+          - [x] clean up MIB indexing
     - [ ] Move event listener and interval to controller MIB block
 
     - [ ] API
