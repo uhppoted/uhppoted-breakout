@@ -19,7 +19,7 @@ func (sys System) GetUint16(oid scmp.OID) (uint16, error) {
 }
 
 func (sys System) GetUint32(oid scmp.OID) (uint32, error) {
-	if scmp.OID.Equal(oid, scmp.OID_CONTROLLER_SEQUENCE_NUMBER) {
+	if scmp.Is(oid, scmp.OID_CONTROLLER_SEQUENCE_NUMBER) {
 		return 0, nil
 	}
 

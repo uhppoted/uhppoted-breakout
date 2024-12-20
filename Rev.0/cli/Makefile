@@ -8,7 +8,7 @@ build: format
 	python3 -m compileall .
 
 debug:
-	python3 main.py set-listener
+	python3 main.py get-status
 
 get-controller:
 	python3 main.py get-controller

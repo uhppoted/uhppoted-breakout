@@ -2,7 +2,6 @@ package events
 
 import (
 	"fmt"
-	"slices"
 
 	"emulator/log"
 	"emulator/scmp"
@@ -12,20 +11,23 @@ type Events struct {
 }
 
 func (e Events) GetUint8(oid scmp.OID) (uint8, error) {
-	if index := scmp.Index(oid, scmp.OID_EVENTS_EVENT_GRANTED); index == 13579 {
-		if slices.Equal(oid[9:], scmp.OID_EVENTS_EVENT_EVENT[9:]) {
+	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_EVENT) {
+		if index := scmp.Index(oid); index == 13579 {
 			return 6, nil
 		}
-
-		if slices.Equal(oid[9:], scmp.OID_EVENTS_EVENT_DOOR[9:]) {
+	}
+	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_DOOR) {
+		if index := scmp.Index(oid); index == 13579 {
 			return 4, nil
 		}
-
-		if slices.Equal(oid[9:], scmp.OID_EVENTS_EVENT_DIRECTION[9:]) {
+	}
+	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_DIRECTION) {
+		if index := scmp.Index(oid); index == 13579 {
 			return 2, nil
 		}
-
-		if slices.Equal(oid[9:], scmp.OID_EVENTS_EVENT_REASON[9:]) {
+	}
+	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_REASON) {
+		if index := scmp.Index(oid); index == 13579 {
 			return 15, nil
 		}
 	}
@@ -38,12 +40,12 @@ func (e Events) GetUint16(oid scmp.OID) (uint16, error) {
 }
 
 func (e Events) GetUint32(oid scmp.OID) (uint32, error) {
-	if scmp.OID.Equal(oid, scmp.OID_EVENTS_CURRENT) {
+	if scmp.Is(oid, scmp.OID_EVENTS_CURRENT) {
 		return 13579, nil
 	}
 
-	if index := scmp.Index(oid, scmp.OID_EVENTS_EVENT_CARD); index == 13579 {
-		if slices.Equal(oid[9:], scmp.OID_EVENTS_EVENT_CARD[9:]) {
+	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_CARD) {
+		if index := scmp.Index(oid); index == 13579 {
 			return 10058400, nil
 		}
 	}
@@ -52,8 +54,8 @@ func (e Events) GetUint32(oid scmp.OID) (uint32, error) {
 }
 
 func (e Events) GetBool(oid scmp.OID) (bool, error) {
-	if index := scmp.Index(oid, scmp.OID_EVENTS_EVENT_EVENT); index == 13579 {
-		if slices.Equal(oid[9:], scmp.OID_EVENTS_EVENT_GRANTED[9:]) {
+	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_GRANTED) {
+		if index := scmp.Index(oid); index == 13579 {
 			return true, nil
 		}
 	}
@@ -62,8 +64,8 @@ func (e Events) GetBool(oid scmp.OID) (bool, error) {
 }
 
 func (e Events) GetString(oid scmp.OID) (string, error) {
-	if index := scmp.Index(oid, scmp.OID_EVENTS_EVENT_TIMESTAMP); index == 13579 {
-		if slices.Equal(oid[9:], scmp.OID_EVENTS_EVENT_TIMESTAMP[9:]) {
+	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_TIMESTAMP) {
+		if index := scmp.Index(oid); index == 13579 {
 			return "2024-12-17 15:52:45", nil
 		}
 	}
