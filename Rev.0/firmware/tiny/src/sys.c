@@ -19,6 +19,12 @@
 
 extern void sysinit();
 
+// FIXME remove
+extern struct {
+    queue_t queue;
+    mutex_t guard;
+} I2C0;
+
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
 uint32_t get_total_heap();
 uint32_t get_free_heap();
@@ -115,9 +121,10 @@ void sys_tick() {
     float used = 1.0 - ((float)available / (float)heap);
     const char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
 
-    debugf("SYS", "%-5u queue:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
+    debugf("SYS", "%-5u queue:%u  I2C0:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
            counter,
            queue_get_level(&queue),
+           queue_get_level(&I2C0.queue),
            heap,
            available,
            100.0f * used,
