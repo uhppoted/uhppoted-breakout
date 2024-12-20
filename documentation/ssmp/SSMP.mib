@@ -30,6 +30,8 @@ door2     OBJECT IDENTIFIER ::= { doors 2 }
 door3     OBJECT IDENTIFIER ::= { doors 3 }
 door4     OBJECT IDENTIFIER ::= { doors 4 }
 
+event_indices OBJECT IDENTIFIER ::= { events 0 }
+
 -- system
 boardId OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(0..32))
@@ -128,6 +130,21 @@ controllerSequenceNumber OBJECT-TYPE
         "A uint32 message sequence number"
     ::= { controller 11 }
 
+controllerEventsListener OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 6 byte octet string representing the event listener IPv4 address:port."
+    ::= { controller 12 }
+
+controllerUploadInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An byte object representing the status + event auto-send interval (seconds)."
+    ::= { controller 13 }
 
 -- doors
 
@@ -317,21 +334,22 @@ inputFireAlarm OBJECT-TYPE
 
 
 -- events
-eventsListenerAddress OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(4))
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "A 6 byte octet string representing the controller IPv4 address:port."
-    ::= { events 1 }
 
-eventsListenerInterval OBJECT-TYPE
-    SYNTAX      Integer32 (0..255)
+eventsFirst OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "An byte object representing the events auto-send interval (seconds)."
-    ::= { events 2 }
+        "Index of first stored event"
+    ::= { events_indices 1 }
+
+eventsLast OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index of last stored event"
+    ::= { event_indices 2 }
 
 -- groups
 systemGroup OBJECT-GROUP
@@ -352,7 +370,9 @@ controllerGroup OBJECT-GROUP
               controllerDateTime,
               controllerError,
               controllerSpecialInfo,
-              controllerSequenceNumber }
+              controllerSequenceNumber,
+              controllerEventsListener,
+              controllerUploadInterval }
     STATUS  current
     DESCRIPTION
         "Controller system information."
@@ -403,8 +423,8 @@ cardsGroup OBJECT-GROUP
     ::= { internal 5 }
 
 eventsGroup OBJECT-GROUP
-    OBJECTS { eventsListenerAddress,
-              eventsListenerInterval }
+    OBJECTS { eventsFirst,
+              eventsLast }
     STATUS  current
     DESCRIPTION
         "Events list."

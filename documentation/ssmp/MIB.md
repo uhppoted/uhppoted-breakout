@@ -37,6 +37,8 @@
 | 0.1.3.6.1.4.1.65536.2.9   | controller error           | _public_   |
 | 0.1.3.6.1.4.1.65536.2.10  | controller special info    | _public_   |
 | 0.1.3.6.1.4.1.65536.2.11  | controller sequence number | _public_   |
+| 0.1.3.6.1.4.1.65536.2.12  | controller event listener  | _public_   |
+| 0.1.3.6.1.4.1.65536.2.13  | controller upload interval | _public_   |
 
 
 ## Doors
@@ -88,6 +90,13 @@
 | OID                       | Description                | Notes      |
 |---------------------------|----------------------------|------------|
 | 0.1.3.6.1.4.1.65536.6     | events                     | _public_   |
-| 0.1.3.6.1.4.1.65536.6.0.1 | current event id           | _public_   |
-| 0.1.3.6.1.4.1.65536.6.1   | listener address:port      | _public_   |
-| 0.1.3.6.1.4.1.65536.6.2   | listener interval          | _public_   |
+| 0.1.3.6.1.4.1.65536.6.0.1 | first event id             | _public_   |
+| 0.1.3.6.1.4.1.65536.6.0.2 | last event id              | _public_   |
+|                           |                            | _public_   |
+| 0.1.3.6.1.4.1.65536.6.x.1 | event X event              | _public_   |
+| 0.1.3.6.1.4.1.65536.6.x.2 | event X granted            | _public_   |
+| 0.1.3.6.1.4.1.65536.6.x.3 | event X door               | _public_   |
+| 0.1.3.6.1.4.1.65536.6.x.4 | event X direction          | _public_   |
+| 0.1.3.6.1.4.1.65536.6.x.5 | event X card               | _public_   |
+| 0.1.3.6.1.4.1.65536.6.x.6 | event X timestamp          | _public_   |
+| 0.1.3.6.1.4.1.65536.6.x.7 | event X reason             | _public_   |

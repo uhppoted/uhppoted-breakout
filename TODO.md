@@ -55,12 +55,7 @@
     - [x] get-time
     - [x] set-time
     - [x] get-status
-          - [x] seq no
-          - [x] inputs
-          - [x] event
-          - [x] genericize lookup
-          - [x] clean up MIB indexing
-    - [ ] Move event listener and interval to controller MIB block
+    - [x] Move event listener and interval to controller MIB block
 
     - [ ] API
            - [x] UDP

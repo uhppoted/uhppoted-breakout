@@ -75,7 +75,7 @@ func (e Events) GetIndexedUint16(oid scmp.OID, index uint32) (uint16, error) {
 }
 
 func (e Events) GetUint32(oid scmp.OID) (uint32, error) {
-	if scmp.Is(oid, scmp.OID_EVENTS_CURRENT) {
+	if scmp.Is(oid, scmp.OID_EVENTS_LAST) {
 		return 13579, nil
 	}
 

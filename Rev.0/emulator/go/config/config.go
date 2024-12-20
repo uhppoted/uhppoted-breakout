@@ -81,7 +81,7 @@ func Save(c Config) error {
 }
 
 func (c Config) GetUint8(oid scmp.OID) (uint8, error) {
-	if scmp.Is(oid, scmp.OID_EVENTS_INTERVAL) {
+	if scmp.Is(oid, scmp.OID_CONTROLLER_UPLOAD_INTERVAL) {
 		return c.Events.Interval, nil
 	}
 
@@ -101,7 +101,7 @@ func (c Config) GetBool(oid scmp.OID) (bool, error) {
 }
 
 func (c Config) GetString(oid scmp.OID) (string, error) {
-	if scmp.Is(oid, scmp.OID_EVENTS_LISTENER) {
+	if scmp.Is(oid, scmp.OID_CONTROLLER_EVENT_LISTENER) {
 		return fmt.Sprintf("%v", c.Events.Listener), nil
 	}
 
@@ -135,7 +135,7 @@ func (c Config) GetOctets(oid scmp.OID) ([]byte, error) {
 }
 
 func (c *Config) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
-	if scmp.Is(oid, scmp.OID_EVENTS_INTERVAL) {
+	if scmp.Is(oid, scmp.OID_CONTROLLER_UPLOAD_INTERVAL) {
 		c.Events.Interval = val
 
 		return c.Events.Interval, nil
@@ -145,7 +145,7 @@ func (c *Config) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
 }
 
 func (c *Config) SetString(oid scmp.OID, val string) (string, error) {
-	if scmp.Is(oid, scmp.OID_EVENTS_LISTENER) {
+	if scmp.Is(oid, scmp.OID_CONTROLLER_EVENT_LISTENER) {
 		if addrPort, err := netip.ParseAddrPort(val); err != nil {
 			return "", err
 		} else {

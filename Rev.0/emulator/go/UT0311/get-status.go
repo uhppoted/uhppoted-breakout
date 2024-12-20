@@ -134,7 +134,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... event
-		if index, err := scmp.Get[uint32](ut0311.events, scmp.OID_EVENTS_CURRENT); err != nil {
+		if index, err := scmp.Get[uint32](ut0311.events, scmp.OID_EVENTS_LAST); err != nil {
 			return nil, err
 		} else if index > 0 {
 			response.EventIndex = index
