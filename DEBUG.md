@@ -44,7 +44,9 @@ Debugging weird intermittent reset:
 |  ✓   |   ✓   |   x    |  x   |   x     |    x    | ✓  |                 |
 |  ✓   |   ✓   |   ✓    |  x   |   x     |    x    | ✓  |                 |
 |  ✓   |   ✓   |   ✓    |  x   |   ✓     |    x    | ✓  |                 |
-|  ✓   |   ✓   |   ✓    |  ✓   |   ✓     |    x    |    |                 |
+|  ✓   |   ✓   |   ✓    |  ✓   |   ✓     |    x    | ✓  |                 |
+|  ✓   |   ✓   |   ✓    |  ✓   |   ✓     |    ✓    |    |                 |
+
 
 ## Possible causes
 

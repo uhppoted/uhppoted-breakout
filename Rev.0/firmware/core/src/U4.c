@@ -228,25 +228,25 @@ bool U4_tick(repeating_timer_t *rt) {
     uint16_t outputs = U4x.outputs;
 
     if (mutex_try_enter(&U4x.guard, NULL)) {
-        //     // ... health check
-        //     U4x.tock -= U4_TICK;
-        //     if (U4x.tock < 0) {
-        //         U4x.tock = U4_TOCK;
-        //
-        //         operation *op = (operation *)calloc(1, sizeof(operation));
-        //
-        //         op->tag = U4_HEALTHCHECK;
-        //         op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
-        //
-        //         struct closure task = {
-        //             .f = U4_healthcheck,
-        //             .data = op,
-        //         };
-        //
-        //         if (!I2C0_push(&task)) {
-        //             set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-        //         }
-        //     }
+        // ... health check
+        U4x.tock -= U4_TICK;
+        if (U4x.tock < 0) {
+            U4x.tock = U4_TOCK;
+
+            operation *op = (operation *)calloc(1, sizeof(operation));
+
+            op->tag = U4_HEALTHCHECK;
+            op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
+
+            struct closure task = {
+                .f = U4_healthcheck,
+                .data = op,
+            };
+
+            if (!I2C0_push(&task)) {
+                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+            }
+        }
 
         // ... update relays
         for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
