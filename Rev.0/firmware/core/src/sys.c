@@ -109,10 +109,13 @@ void sys_reboot() {
 }
 
 bool sys_on_tick(repeating_timer_t *t) {
-    uint32_t msg = MSG_TICK;
-    if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-        set_error(ERR_QUEUE_FULL, "SYS", "tick: queue full");
-    }
+    message msg = {
+        .message = MSG_TICK,
+        .tag = MSG_UINT32,
+        .u32 = 0,
+    };
+
+    push(msg);
 
     return true;
 }
