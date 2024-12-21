@@ -49,10 +49,11 @@ Debugging weird intermittent reset:
 
 ### U4::healthcheck
 
-| task | op::NULL |       |       |       |       | Ok | Notes           |
+| push | op::NULL |       |       |       |       | Ok | Notes           |
 |------|----------|-------|-------|-------|-------|----|-----------------|
 |  ✓   |   x      |   x   |   x   |   x   |   x   | x  |                 |
 |  ✓   |   ✓      |   x   |   x   |   x   |   x   | x  |                 |
+|  x   |   ✓      |   x   |   x   |   x   |   x   |    |                 |
 
 ## Possible causes
 

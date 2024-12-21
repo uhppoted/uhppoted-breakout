@@ -246,10 +246,11 @@ bool U4_tick(repeating_timer_t *rt) {
                     .data = op,
                 };
 
-                if (!I2C0_push(&task)) {
-                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-                    free(op);
-                }
+                // if (!I2C0_push(&task)) {
+                //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                //     free(op);
+                // }
+                free(op);
             }
         }
 
