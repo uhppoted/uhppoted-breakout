@@ -235,17 +235,21 @@ bool U4_tick(repeating_timer_t *rt) {
 
             operation *op = (operation *)calloc(1, sizeof(operation));
 
-            op->tag = U4_HEALTHCHECK;
-            op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
+            if (op == NULL) {
+                set_error(ERR_DEBUG, "U4", "NULL op");
+            } else {
+                op->tag = U4_HEALTHCHECK;
+                op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
 
-            struct closure task = {
-                .f = U4_healthcheck,
-                .data = op,
-            };
+                struct closure task = {
+                    .f = U4_healthcheck,
+                    .data = op,
+                };
 
-            if (!I2C0_push(&task)) {
-                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-                free(op);
+                if (!I2C0_push(&task)) {
+                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                    free(op);
+                }
             }
         }
 
@@ -281,20 +285,24 @@ bool U4_tick(repeating_timer_t *rt) {
 
             operation *op = (operation *)calloc(1, sizeof(operation));
 
-            op->tag = U4_WRITE;
-            op->write.outputs = (outputs ^ U4x.polarity) & MASK;
+            if (op == NULL) {
+                set_error(ERR_DEBUG, "U4", "NULL op");
+            } else {
+                op->tag = U4_WRITE;
+                op->write.outputs = (outputs ^ U4x.polarity) & MASK;
 
-            struct closure task = {
-                .f = U4_write,
-                .data = op,
-            };
+                struct closure task = {
+                    .f = U4_write,
+                    .data = op,
+                };
 
-            if (!I2C0_push(&task)) {
-                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-                free(op);
+                if (!I2C0_push(&task)) {
+                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                    free(op);
+                }
+
+                U4x.write = false;
             }
-
-            U4x.write = false;
         }
 
         mutex_exit(&U4x.guard);
