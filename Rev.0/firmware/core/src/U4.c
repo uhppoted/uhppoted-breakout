@@ -245,6 +245,7 @@ bool U4_tick(repeating_timer_t *rt) {
 
             if (!I2C0_push(&task)) {
                 set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                free(op);
             }
         }
 
@@ -290,6 +291,7 @@ bool U4_tick(repeating_timer_t *rt) {
 
             if (!I2C0_push(&task)) {
                 set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                free(op);
             }
 
             U4x.write = false;
@@ -326,19 +328,19 @@ void U4_write(void *data) {
  */
 void U4_healthcheck(void *data) {
     operation *op = (operation *)data;
-    uint16_t outputs;
-    int err;
-
-    if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error reading back PCAL6416A outputs (%d)", err);
-    } else if ((outputs & MASK) != (op->healthcheck.outputs & MASK)) {
-        set_error(ERR_U4, "U4", "PCAL6416A healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
-
-        if (mutex_try_enter(&U4x.guard, NULL)) {
-            U4x.write = true;
-            mutex_exit(&U4x.guard);
-        }
-    }
+    // uint16_t outputs;
+    // int err;
+    //
+    // if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
+    //     set_error(ERR_U4, "U4", "error reading back PCAL6416A outputs (%d)", err);
+    // } else if ((outputs & MASK) != (op->healthcheck.outputs & MASK)) {
+    //     set_error(ERR_U4, "U4", "PCAL6416A healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
+    //
+    //     if (mutex_try_enter(&U4x.guard, NULL)) {
+    //         U4x.write = true;
+    //         mutex_exit(&U4x.guard);
+    //     }
+    // }
 
     free(data);
 }

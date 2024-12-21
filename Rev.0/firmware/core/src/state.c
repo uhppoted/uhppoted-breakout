@@ -86,14 +86,14 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
         break;
     }
 
-    // char msg[64];
-    //
-    // va_list args;
-    // va_start(args, fmt);
-    // vsnprintf(msg, sizeof(msg), fmt, args);
-    // va_end(args);
-    //
-    // errorf(tag, "%s", msg);
+    char msg[64];
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(msg, sizeof(msg), fmt, args);
+    va_end(args);
+
+    errorf(tag, "%s", msg);
 }
 
 bool get_error(err error) {
