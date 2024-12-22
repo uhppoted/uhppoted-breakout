@@ -42,58 +42,58 @@ const uint16_t BITMASK_ERR_DEBUG = 0x4000;
 const uint16_t BITMASK_ERR_UNKNOWN = 0x8000;
 
 void set_error(err error, const char *tag, const char *fmt, ...) {
-    switch (error) {
-    case ERR_OK:
-        break;
-
-    case ERR_I2C_GENERIC:
-        STATE.errors.I2C = true;
-        break;
-
-    case ERR_I2C_TIMEOUT:
-        STATE.errors.I2C = true;
-        break;
-
-    case ERR_QUEUE_FULL:
-        STATE.errors.queue = true;
-        break;
-
-    case ERR_MEMORY:
-        STATE.errors.memory = true;
-        break;
-
-    case ERR_RX8900SA:
-        STATE.errors.RX8900SA = true;
-        break;
-
-    case ERR_U3:
-        STATE.errors.U3 = true;
-        break;
-
-    case ERR_U4:
-        STATE.errors.U4 = true;
-        break;
-
-    case ERR_WATCHDOG:
-        STATE.errors.watchdog = true;
-        break;
-
-    case ERR_DEBUG:
-        STATE.errors.debug = true;
-        break;
-
-    case ERR_UNKNOWN:
-        break;
-    }
-
-    char msg[64];
-
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(msg, sizeof(msg), fmt, args);
-    va_end(args);
-
-    errorf(tag, "%s", msg);
+    // switch (error) {
+    // case ERR_OK:
+    //     break;
+    //
+    // case ERR_I2C_GENERIC:
+    //     STATE.errors.I2C = true;
+    //     break;
+    //
+    // case ERR_I2C_TIMEOUT:
+    //     STATE.errors.I2C = true;
+    //     break;
+    //
+    // case ERR_QUEUE_FULL:
+    //     STATE.errors.queue = true;
+    //     break;
+    //
+    // case ERR_MEMORY:
+    //     STATE.errors.memory = true;
+    //     break;
+    //
+    // case ERR_RX8900SA:
+    //     STATE.errors.RX8900SA = true;
+    //     break;
+    //
+    // case ERR_U3:
+    //     STATE.errors.U3 = true;
+    //     break;
+    //
+    // case ERR_U4:
+    //     STATE.errors.U4 = true;
+    //     break;
+    //
+    // case ERR_WATCHDOG:
+    //     STATE.errors.watchdog = true;
+    //     break;
+    //
+    // case ERR_DEBUG:
+    //     STATE.errors.debug = true;
+    //     break;
+    //
+    // case ERR_UNKNOWN:
+    //     break;
+    // }
+    //
+    // char msg[64];
+    //
+    // va_list args;
+    // va_start(args, fmt);
+    // vsnprintf(msg, sizeof(msg), fmt, args);
+    // va_end(args);
+    //
+    // errorf(tag, "%s", msg);
 }
 
 bool get_error(err error) {
