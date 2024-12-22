@@ -235,8 +235,6 @@ bool U4_tick(repeating_timer_t *rt) {
 
             operation *op = (operation *)calloc(1, sizeof(operation));
 
-            debugf("U4", ">> op %p", op);
-
             // if (op == NULL) {
             //     set_error(ERR_DEBUG, "U4", "NULL op");
             // } else {
