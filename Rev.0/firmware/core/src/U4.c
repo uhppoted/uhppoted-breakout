@@ -233,8 +233,10 @@ bool U4_tick(repeating_timer_t *rt) {
         if (U4x.tock < 0) {
             U4x.tock = U4_TOCK;
 
-            // operation *op = (operation *)calloc(1, sizeof(operation));
-            //
+            operation *op = (operation *)calloc(1, sizeof(operation));
+
+            debugf("U4", ">> op %p", op);
+
             // if (op == NULL) {
             //     set_error(ERR_DEBUG, "U4", "NULL op");
             // } else {
@@ -250,7 +252,7 @@ bool U4_tick(repeating_timer_t *rt) {
             //     //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
             //     //     free(op);
             //     // }
-            //     free(op);
+            free(op);
             // }
         }
 
