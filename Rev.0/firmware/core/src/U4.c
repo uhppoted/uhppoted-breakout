@@ -10,6 +10,7 @@
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
+#include <trace.h>
 
 const uint16_t MASK = 0x07ff;
 
@@ -225,6 +226,8 @@ void U4_start() {
  * Decrements relay and LED timers.
  */
 bool U4_tick(repeating_timer_t *rt) {
+    uint32_t trace = trace_in(TRACE_U4_TICK);
+
     uint16_t outputs = U4x.outputs;
 
     if (mutex_try_enter(&U4x.guard, NULL)) {
@@ -235,23 +238,22 @@ bool U4_tick(repeating_timer_t *rt) {
 
             operation *op = (operation *)calloc(1, sizeof(operation));
 
-            // if (op == NULL) {
-            //     set_error(ERR_DEBUG, "U4", "NULL op");
-            // } else {
-            //     op->tag = U4_HEALTHCHECK;
-            //     op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
-            //
-            //     struct closure task = {
-            //         .f = U4_healthcheck,
-            //         .data = op,
-            //     };
-            //
-            //     // if (!I2C0_push(&task)) {
-            //     //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-            //     //     free(op);
-            //     // }
-            free(op);
-            // }
+            if (op == NULL) {
+                set_error(ERR_DEBUG, "U4", "NULL op");
+            } else {
+                //     op->tag = U4_HEALTHCHECK;
+                //     op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
+                //
+                //     struct closure task = {
+                //         .f = U4_healthcheck,
+                //         .data = op,
+                //     };
+                //
+                //     // if (!I2C0_push(&task)) {
+                //     //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                free(op);
+                //     // }
+            }
         }
 
         // ... update relays
@@ -308,6 +310,8 @@ bool U4_tick(repeating_timer_t *rt) {
 
         mutex_exit(&U4x.guard);
     }
+
+    trace_out(TRACE_U4_TICK, trace);
 
     return true;
 }

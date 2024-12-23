@@ -1,6 +1,5 @@
 # TODO
 
-- [x] Make Rev.0 emulator a 'local only' package
 - [ ] Zero2W serial logging
 - [ ] Zero2W USB UART
 - [ ] MSG_POKE (because absolutely shouldn't call it from interrupt handler)
@@ -56,7 +55,7 @@
     - [x] set-listener
     - [x] get-time
     - [x] set-time
-    - [ ] get-status
+    - [x] get-status
 
     - [ ] API
            - [x] UDP

@@ -17,6 +17,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
+#include <trace.h>
 
 #define _VERSION "v0.0"
 #define _I2C0SDA 12
@@ -38,6 +39,14 @@ int main() {
 
     if (watchdog_caused_reboot()) {
         set_error(ERR_WATCHDOG, "SYS", "watchdog reboot");
+
+        // FIXME remove - debugging
+        printf(">>>> WATCHDOG REBOOT\n");
+        while (true) {
+            trace_dump();
+            sleep_ms(2500);
+        }
+        // END FIXME
     }
 
     if (strcmp(WATCHDOG, "disabled") != 0) {

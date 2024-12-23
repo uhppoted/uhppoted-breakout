@@ -19,7 +19,7 @@ clean:
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
 	       cmake -DMODE="log" \
-	             -DWATCHDOG="disabled" \
+	             -DWATCHDOG="enabled" \
 	             -DI2C0_CLOCK="100kHz" -DI2C1_CLOCK="400kHz" \
 	             -DRX8900SA_VDET="$(RX8900SA_VDET)" -DRX8900SA_SWOFF="$(RX8900SA_SWOFF)" -DRX8900SA_BKSMP="$(RX8900SA_BKSMP)" \
 	             -DCONTROLLER=$(CONTROLLER) \
