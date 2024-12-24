@@ -8,6 +8,7 @@
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
+#include <trace.h>
 
 typedef struct IIR {
     float x₁;
@@ -164,6 +165,8 @@ void U3_start() {
 }
 
 bool U3_on_update(repeating_timer_t *rt) {
+    uint32_t trace = trace_in(TRACE_U3_TICK);
+
     closure task = {
         .f = U3_read,
         .data = &U3x,
@@ -172,6 +175,8 @@ bool U3_on_update(repeating_timer_t *rt) {
     if (!I2C0_push(&task)) {
         set_error(ERR_QUEUE_FULL, "U3", "update: queue full");
     }
+
+    trace_out(TRACE_U3_TICK, trace);
 
     return true;
 }

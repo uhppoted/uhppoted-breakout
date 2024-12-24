@@ -18,6 +18,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
+#include <trace.h>
 
 #define PRINT_QUEUE_SIZE 64
 
@@ -171,6 +172,8 @@ void set_mode(mode mode) {
 }
 
 void dispatch(uint32_t v) {
+    uint32_t trace = trace_in(TRACE_SYS_DISPATCH);
+
     if ((v & MSG) == MSG_DEBUG) {
         debugf("SYS", "... debug??");
     }
@@ -229,6 +232,8 @@ void dispatch(uint32_t v) {
         watchdog_update();
         sys_watchdog_update();
     }
+
+    trace_out(TRACE_SYS_DISPATCH, trace);
 }
 
 void print(const char *msg) {

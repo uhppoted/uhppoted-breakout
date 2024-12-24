@@ -11,6 +11,7 @@
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
+#include <trace.h>
 
 int64_t RTC_on_setup(alarm_id_t id, void *data);
 void RTC_setup();
@@ -160,6 +161,8 @@ void RTC_start() {
 }
 
 bool RTC_on_update(repeating_timer_t *rt) {
+    uint32_t trace = trace_in(TRACE_RTC_TICK);
+
     closure task = {
         .f = RTC_read,
         .data = &RTC,
@@ -168,6 +171,8 @@ bool RTC_on_update(repeating_timer_t *rt) {
     if (!I2C0_push(&task)) {
         set_error(ERR_QUEUE_FULL, "RTC", "update: queue full");
     }
+
+    trace_out(TRACE_RTC_TICK, trace);
 
     return true;
 }

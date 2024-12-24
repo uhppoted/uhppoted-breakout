@@ -16,6 +16,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
+#include <trace.h>
 #include <types/buffer.h>
 
 #define BAUD_RATE 115200
@@ -159,6 +160,8 @@ void SSMP_enq() {
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
+    uint32_t trace = trace_in(TRACE_SSMP_RECEIVE);
+
     debugf("SSMP", "received");
 
     // ... decode packet
@@ -182,6 +185,8 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
 
     packet_free(request);
     vector_free(fields);
+
+    trace_out(TRACE_SSMP_RECEIVE, trace);
 }
 
 /* SSMP GET response

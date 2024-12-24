@@ -53,6 +53,7 @@ int main() {
         watchdog_enable(WATCHDOG_TIMEOUT, true);
     }
 
+    trace_init();
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
 

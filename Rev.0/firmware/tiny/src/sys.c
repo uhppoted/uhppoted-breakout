@@ -14,6 +14,7 @@
 #include <log.h>
 #include <state.h>
 #include <sys.h>
+#include <trace.h>
 
 #include "ws2812.pio.h"
 
@@ -82,6 +83,8 @@ bool sys_init() {
  *
  */
 void sys_tick() {
+    uint32_t trace = trace_in(TRACE_SYS_TICK);
+
     syscheck();
 
     // ... flash LED
@@ -132,6 +135,8 @@ void sys_tick() {
            watchdogged);
 
     counter++;
+
+    trace_out(TRACE_SYS_TICK, trace);
 }
 
 /* Resets the internal soft watchdog.

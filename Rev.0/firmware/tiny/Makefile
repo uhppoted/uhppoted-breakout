@@ -42,7 +42,11 @@ build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make
 
 run: build
-	picotool load -v build/breakout.uf2 -f
+#	picotool load -v build/breakout.uf2 -f
+	scp build/breakout.uf2 $(RPI):/tmp
+	ssh $(RPI) "picotool load -v /tmp/breakout.uf2 -F"
+	ssh $(RPI) "picotool reboot"
+
 
 reboot: 
 	picotool reboot -f

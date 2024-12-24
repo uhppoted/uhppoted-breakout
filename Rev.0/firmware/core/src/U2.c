@@ -10,6 +10,7 @@
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
+#include <trace.h>
 
 struct reader;
 struct keypad;
@@ -165,6 +166,8 @@ void U2_start() {
  * Process  active reader/keypad timers.
  */
 bool U2_tick(repeating_timer_t *rt) {
+    uint32_t trace = trace_in(TRACE_U2_TICK);
+
     if (mutex_try_enter(&U2x.guard, NULL)) {
         struct reader *reader = U2x.readers;
         struct keypad *keypad = U2x.keypads;
@@ -181,6 +184,8 @@ bool U2_tick(repeating_timer_t *rt) {
 
         mutex_exit(&U2x.guard);
     }
+
+    trace_out(TRACE_U2_TICK, trace);
 
     return true;
 }

@@ -10,8 +10,16 @@ const uint32_t SCRATCH_TRACE_OUT = 2;
 
 volatile uint32_t trace_count = 0;
 
-// Ref. https://forums.raspberrypi.com/viewtopic.php?t=354617
-// int stacktrace __attribute__((section(".uninitialized_data")));
+typedef struct stacktrace {
+    int head;
+    uint32_t stack[64];
+} stacktrace;
+
+stacktrace STACKTRACE __attribute__((section(".uninitialized_data")));
+
+void trace_init() {
+    STACKTRACE.head = 0;
+}
 
 uint32_t trace_in(uint32_t id) {
     uint32_t count = ++trace_count;
@@ -19,11 +27,15 @@ uint32_t trace_in(uint32_t id) {
     watchdog_hw->scratch[SCRATCH_TRACE_ID] = id;
     watchdog_hw->scratch[SCRATCH_TRACE_IN] = count;
 
+    STACKTRACE.head++;
+
     return count;
 }
 
 void trace_out(uint32_t id, uint32_t count) {
     watchdog_hw->scratch[SCRATCH_TRACE_OUT] = count;
+
+    STACKTRACE.head--;
 }
 
 void trace_dump() {
@@ -35,5 +47,6 @@ void trace_dump() {
     printf("     ID:  %lu\n", trace_id);
     printf("     in:  %lu\n", trace_in);
     printf("     out: %lu\n", trace_out);
+    printf("     stacktrace: %d\n", STACKTRACE.head);
     printf("     ----\n");
 }
