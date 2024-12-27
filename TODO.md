@@ -65,7 +65,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [ ] API
            - [x] UDP
            - [x] TCP/IP
-                 - [ ] allow multiple requests
+                 - [x] allow multiple requests
            - [ ] TLS
                  - [x] CLI TLS
                  - [x] mutual auth

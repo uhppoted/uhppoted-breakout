@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import time
 import traceback
 
 from trace import Trace
@@ -14,7 +15,7 @@ def main():
         usage()
         return -1
 
-    parser = argparse.ArgumentParser(description='uhppoted-codegen example')
+    parser = argparse.ArgumentParser(description='uhppoted-breakout CLI')
 
     parser.add_argument('command', type=str, help='command')
 
@@ -47,7 +48,7 @@ def main():
                         default=2.5,
                         help='(optional) operation timeout (in seconds). Defaults to 2.5.')
 
-    parser.add_argument('--protocol', choices=['udp', 'tcp', 'tls'], default='udp', help='transport protocol')
+    parser.add_argument('--protocol', choices=['udp', 'tcp', 'tcp::pool', 'tls'], default='udp', help='transport protocol')
 
     args = parser.parse_args()
     cmd = args.command
@@ -62,6 +63,20 @@ def main():
                     print()
                     print(f'*** ERROR  {cmd}: {x}')
                     print()
+    elif cmd == 'debug':
+        try:
+           for i in range(3):
+               exec(commands()['get-controller'], args)
+               time.sleep(5)
+        except Exception as x:
+            print()
+            print(f'*** ERROR  {cmd}: {x}')
+            print()
+            if debug:
+                print(traceback.format_exc())
+
+            sys.exit(1)
+
     elif cmd in commands():
         try:
             exec(commands()[cmd], args)

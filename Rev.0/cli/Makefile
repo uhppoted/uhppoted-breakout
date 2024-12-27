@@ -8,7 +8,7 @@ build: format
 	python3 -m compileall .
 
 debug:
-	python3 main.py get-status
+	python3 main.py --destination $(ADDRESS) --protocol tcp::pool debug
 
 get-controller:
 	python3 main.py get-controller

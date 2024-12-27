@@ -1,8 +1,8 @@
 '''
-UHPPOTE TLS communications wrapper.
+UHPPOTE TCP communications wrapper.
 
 Implements the functionality to send and receive 64 byte TCP packets to/from a UHPPOTE 
-access controller over TLS.
+access controller using a 'pooled' TCP/IP connection.
 '''
 
 import socket
@@ -15,18 +15,19 @@ import ipaddress
 from uhppoted import net
 
 
-class TLS:
+class Pool:
+    pool = {}
 
     def __init__(self, bind='0.0.0.0', debug=False):
         '''
-        Initialises a TLS communications wrapper with the bind address.
+        Initialises a TCP/IP communications wrapper with the bind address.
 
             Parameters:
                bind      (string)  The IPv4 address:port to which to bind when sending a request.
                debug     (bool)    Dumps the sent and received packets to the console if enabled.
 
             Returns:
-               Initialised TCP object.
+               Initialised TCPPool object.
 
             Raises:
                Exception  If any of the supplied IPv4 values cannot be translated to a valid IPv4 
@@ -55,26 +56,34 @@ class TLS:
         self.dump(request)
 
         addr = net.resolve(f'{dest_addr}')
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-        context.load_verify_locations('.cacerts')
-        context.load_cert_chain(certfile='.certificate', keyfile='.key')
+        pool = self.pool
+        key = f'{addr[0]}:{addr[1]}'
+        sock = None
 
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, net.WRITE_TIMEOUT)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, net.READ_TIMEOUT)
+        if key in pool:
+           s = pool[key]
+           if s.fileno() != -1:
+              sock = s
 
-            with context.wrap_socket(sock, server_hostname=f'{addr[0]}') as ssock:
-                if not is_INADDR_ANY(self._bind):
-                    ssock.bind(self._bind)
+        if not sock:
+           sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+           if not is_INADDR_ANY(self._bind):
+              sock.bind(self._bind)
+        
+           sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+           sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, net.WRITE_TIMEOUT)
+           sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, net.READ_TIMEOUT)
 
-                ssock.connect(addr)
-                ssock.sendall(request)
+           sock.connect(addr)
 
-                if request[1] == 0x96:
-                    return None
-                else:
-                    return _read(ssock, timeout=timeout, debug=self._debug)
+        pool[key] = sock
+
+        sock.sendall(request)
+
+        if request[1] == 0x96:
+           return None
+        else:
+           return _read(sock, timeout=timeout, debug=self._debug)
 
     def dump(self, packet):
         '''

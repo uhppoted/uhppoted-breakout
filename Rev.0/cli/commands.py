@@ -10,6 +10,7 @@ from uhppoted import encode
 from uhppoted import decode
 
 import tls
+import pool
 
 CONTROLLER = 405419896
 DOOR = 3
@@ -97,11 +98,22 @@ def get_controller(u, dest, timeout, args, protocol='udp'):
         request = encode.get_controller_request(CONTROLLER)
         bind = '0.0.0.0'
 
-        reply = _send(request, bind, dest, timeout, True)
+        reply = _tls(request, bind, dest, timeout, True)
         if reply != None:
             return decode.get_controller_response(reply)
         else:
             return None
+
+    elif protocol == 'tcp::pool':
+        request = encode.get_controller_request(CONTROLLER)
+        bind = '0.0.0.0'
+
+        reply = _pool(request, bind, dest, timeout, True)
+        if reply != None:
+            return decode.get_controller_response(reply)
+        else:
+            return None
+
     else:
         controller = (CONTROLLER, dest, protocol)
 
@@ -405,7 +417,13 @@ def onEvent(event):
 
 
 # INTERNAL: TLS handler
-def _send(request, bind, dest, timeout, debug):
+def _tls(request, bind, dest, timeout, debug):
     transport = tls.TLS(bind, debug)
+
+    return transport.send(request, dest, timeout)
+
+# INTERNAL: pooled TCP handler
+def _pool(request, bind, dest, timeout, debug):
+    transport = pool.Pool(bind, debug)
 
     return transport.send(request, dest, timeout)
