@@ -57,6 +57,18 @@ Debugging weird intermittent reset:
 |  x   |   ✓      |     x     |   ✓    |       |       | x  |                 |
 |  x   |   x      |     x     |   x    |       |       |    |                 |
 
+```
+     ----
+>>>> TRACE
+     ID:  5
+     in:  3866904
+     out: 3866904
+     stacktrace: 3
+                 0  1 TRACE_SYS_DISPATCH
+                 1  7 TRACE_SSMP_RECEIVE
+                 2  5 TRACE_U4_TICK
+```
+
 ## Possible causes
 
 - ~~too many get requests~~

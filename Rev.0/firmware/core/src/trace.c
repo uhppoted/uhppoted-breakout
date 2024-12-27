@@ -27,7 +27,9 @@ uint32_t trace_in(uint32_t id) {
     watchdog_hw->scratch[SCRATCH_TRACE_ID] = id;
     watchdog_hw->scratch[SCRATCH_TRACE_IN] = count;
 
-    STACKTRACE.head++;
+    if (STACKTRACE.head >= 0 && STACKTRACE.head < sizeof(STACKTRACE.stack)) {
+        STACKTRACE.stack[STACKTRACE.head++] = id;
+    }
 
     return count;
 }
@@ -48,5 +50,10 @@ void trace_dump() {
     printf("     in:  %lu\n", trace_in);
     printf("     out: %lu\n", trace_out);
     printf("     stacktrace: %d\n", STACKTRACE.head);
+
+    for (int i = 0; i < STACKTRACE.head; i++) {
+        printf("                 %-2d %lu\n", i, STACKTRACE.stack[i]);
+    }
+
     printf("     ----\n");
 }
