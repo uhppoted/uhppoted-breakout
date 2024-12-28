@@ -68,6 +68,27 @@ Debugging weird intermittent reset:
                  1  7 TRACE_SSMP_RECEIVE
                  2  5 TRACE_U4_TICK
 ```
+```
+>>>> TRACE
+     ID:  5
+     in:  32537248
+     out: 32537248
+     stacktrace: 3
+                 0  1
+                 1  7
+                 2  5
+     ----
+>>>> TRACE
+     ID:  5
+     in:  17731256
+     out: 17731256
+     stacktrace: 3
+                 0  1
+                 1  7
+                 2  5
+     ----
+
+```
 
 ## Possible causes
 
