@@ -234,8 +234,9 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... health check
         U4x.tock -= U4_TICK;
         if (U4x.tock < 0) {
-            U4x.tock = U4_TOCK;
+            uint32_t trace1 = trace_in(TRACE_U4_HEALTHCHECK);
 
+            U4x.tock = U4_TOCK;
             operation *op = (operation *)calloc(1, sizeof(operation));
 
             if (op == NULL) {
@@ -254,9 +255,11 @@ bool U4_tick(repeating_timer_t *rt) {
                 free(op);
                 //     // }
             }
+            trace_out(TRACE_U4_HEALTHCHECK, trace1);
         }
 
         // ... update relays
+        uint32_t trace2 = trace_in(TRACE_U4_RELAYS);
         for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
             if (r->timer > 0) {
                 r->timer = clamp(r->timer - U4_TICK, 0, 60000);
@@ -265,8 +268,10 @@ bool U4_tick(repeating_timer_t *rt) {
                 }
             }
         }
+        trace_out(TRACE_U4_RELAYS, trace2);
 
         // ... update LEDs
+        uint32_t trace3 = trace_in(TRACE_U4_LEDS);
         for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
             if (l->timer > 0) {
                 l->timer = clamp(l->timer - U4_TICK, 0, 60000);
@@ -281,11 +286,13 @@ bool U4_tick(repeating_timer_t *rt) {
                 }
             }
         }
+        trace_out(TRACE_U4_LEDS, trace3);
 
         // ... update outputs
         if (outputs != U4x.outputs || U4x.write) {
-            outputs = U4x.outputs;
+            uint32_t trace4 = trace_in(TRACE_U4_OUTPUTS);
 
+            outputs = U4x.outputs;
             operation *op = (operation *)calloc(1, sizeof(operation));
 
             if (op == NULL) {
@@ -306,6 +313,8 @@ bool U4_tick(repeating_timer_t *rt) {
 
                 U4x.write = false;
             }
+
+            trace_out(TRACE_U4_OUTPUTS, trace4);
         }
 
         mutex_exit(&U4x.guard);

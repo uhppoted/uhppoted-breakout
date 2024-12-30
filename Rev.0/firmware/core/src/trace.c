@@ -8,6 +8,21 @@ const uint32_t SCRATCH_TRACE_ID = 1;
 const uint32_t SCRATCH_TRACE_IN = 2;
 const uint32_t SCRATCH_TRACE_OUT = 2;
 
+const char *TRACEPOINTS[] = {
+    "unknown",
+    "sys::dispatch",
+    "sys::tick",
+    "U2::tick",
+    "U3_::tick",
+    "U4::tick",
+    "U4::healthcheck",
+    "U4::relays",
+    "U4::leds",
+    "U4::outputs",
+    "RTC::tick",
+    "SSMP::receive",
+};
+
 volatile uint32_t trace_count = 0;
 
 typedef struct stacktrace {
@@ -52,7 +67,10 @@ void trace_dump() {
     printf("     stacktrace: %d\n", STACKTRACE.head);
 
     for (int i = 0; i < STACKTRACE.head; i++) {
-        printf("                 %-2d %lu\n", i, STACKTRACE.stack[i]);
+        uint32_t tracepoint = STACKTRACE.stack[i];
+        const char *description = TRACEPOINTS[tracepoint];
+
+        printf("                 %-2d %-2lu  %s\n", i, tracepoint, description);
     }
 
     printf("     ----\n");
