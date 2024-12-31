@@ -24,7 +24,7 @@ const char *TRACEPOINTS[] = {
     "U4::free",
     "RTC::tick",
     "SSMP::receive",
-    "ASN.1::decode(2)",
+    "ASN.1::decode",
     "ASN.1::unpack.new",
     "ASN.1::unpack.int",
     "ASN.1::unpack.octets",
@@ -34,6 +34,9 @@ const char *TRACEPOINTS[] = {
     "ASN.1::unpack.pdu",
     "ASN.1::unpack.def",
     "SSMP::decode",
+    "SSMP::debug.1",
+    "SSMP::debug.2",
+    "SSMP::debug.3",
 };
 
 volatile uint32_t trace_count = 0;
@@ -73,7 +76,7 @@ void trace_dump() {
     uint32_t trace_in = watchdog_hw->scratch[SCRATCH_TRACE_IN];
     uint32_t trace_out = watchdog_hw->scratch[SCRATCH_TRACE_OUT];
 
-    printf(">>>> TRACE\n");
+    printf(">>>> TRACE %s\n", RELEASED);
     printf("     ID:  %lu\n", trace_id);
     printf("     in:  %lu\n", trace_in);
     printf("     out: %lu\n", trace_out);

@@ -28,6 +28,9 @@ typedef enum {
     TRACE_ASN1_UNPACK_PDU,    // 22
     TRACE_ASN1_UNPACK_DEF,    // 23
     TRACE_SSMP_DECODE,        // 24
+    TRACE_SSMP_DEBUG1,        // 25
+    TRACE_SSMP_DEBUG2,        // 26
+    TRACE_SSMP_DEBUG3,        // 27
 } TRACE;
 
 extern uint32_t trace_in(uint32_t);

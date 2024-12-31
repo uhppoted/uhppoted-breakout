@@ -165,10 +165,16 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
     debugf("SSMP", "received");
 
     // ... decode packet
+    uint32_t debug1 = trace_in(TRACE_SSMP_DEBUG1);
     vector *fields = BER_decode(data, data_len);
+    trace_out(TRACE_SSMP_DEBUG1, debug1);
+
+    uint32_t debug2 = trace_in(TRACE_SSMP_DEBUG2);
     packet *request = ssmp_decode(fields);
+    trace_out(TRACE_SSMP_DEBUG2, debug2);
 
     // ... GET request?
+    uint32_t debug3 = trace_in(TRACE_SSMP_DEBUG3);
     if (request != NULL && request->tag == PACKET_GET) {
         put_rgb(32, 0, 96);
         //     const char *community = request->community;
@@ -182,6 +188,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         //         }
         //     }
     }
+    trace_out(TRACE_SSMP_DEBUG3, debug3);
 
     packet_free(request);
     vector_free(fields);
