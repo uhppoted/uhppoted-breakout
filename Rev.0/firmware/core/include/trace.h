@@ -18,6 +18,8 @@ typedef enum {
     TRACE_U4_FREE,        // 12
     TRACE_RTC_TICK,       // 13
     TRACE_SSMP_RECEIVE,   // 14
+    TRACE_ASN1_DECODE,    // 15
+    TRACE_SSMP_DECODE,    // 16
 } TRACE;
 
 extern uint32_t trace_in(uint32_t);

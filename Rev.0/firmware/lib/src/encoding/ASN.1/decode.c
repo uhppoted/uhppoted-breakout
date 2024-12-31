@@ -4,6 +4,7 @@
 
 #include <encoding/ASN.1/BER.h>
 #include <log.h>
+#include <trace.h>
 
 // clang-format off
 field *unpack_integer    (const uint8_t *, int, int *);
@@ -20,7 +21,12 @@ vector *unpack(const uint8_t *bytes, int N);
 uint32_t unpack_length(const uint8_t *message, int N, int *ix);
 
 vector *BER_decode(const uint8_t *message, int N) {
-    return unpack(message, N);
+    uint32_t trace = trace_in(TRACE_ASN1_DECODE);
+
+    vector *v = unpack(message, N);
+    trace_out(TRACE_ASN1_DECODE, trace);
+
+    return v;
 }
 
 vector *unpack(const uint8_t *bytes, int N) {

@@ -58,7 +58,6 @@ Debugging weird intermittent reset:
 |  x   |   x      |     x     |   x    |       |       |    |                 |
 
 ```
-     ----
 >>>> TRACE
      ID:  5
      in:  3866904
@@ -78,7 +77,18 @@ Debugging weird intermittent reset:
                  1  11  SSMP::receive
                  2  5   U4::tick
                  3  6   U4::healthcheck
-     ----
+```
+```
+>>>> TRACE
+     ID:  10
+     in:  13652892
+     out: 13652892
+     stacktrace: 5
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  5   U4::tick
+                 3  6   U4::healthcheck
+                 4  10  U4::calloc
 ```
 
 ## Possible causes

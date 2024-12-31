@@ -3,6 +3,7 @@
 
 #include <encoding/ASN.1/BER.h>
 #include <encoding/ssmp/ssmp.h>
+#include <trace.h>
 
 extern slice ssmp_encode_get_response(packet);
 extern packet *ssmp_decode_get(const vector *fields);
@@ -22,6 +23,7 @@ slice ssmp_encode(packet p) {
 }
 
 struct packet *ssmp_decode(const vector *fields) {
+    uint32_t trace = trace_in(TRACE_SSMP_DECODE);
     if (fields != NULL) {
         if (fields->size > 0) {
 
@@ -42,7 +44,9 @@ struct packet *ssmp_decode(const vector *fields) {
                         if (message->size > 2 && message->fields[2] != NULL) {
                             // ... SSMP GET request ?
                             if (message->fields[2]->tag == FIELD_PDU_GET) {
-                                return ssmp_decode_get(fields);
+                                packet *p = ssmp_decode_get(fields);
+                                trace_out(TRACE_SSMP_DECODE, trace);
+                                return p;
                             }
                         }
                     }
@@ -51,5 +55,6 @@ struct packet *ssmp_decode(const vector *fields) {
         }
     }
 
+    trace_out(TRACE_SSMP_DECODE, trace);
     return NULL;
 }

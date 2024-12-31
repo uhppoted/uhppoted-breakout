@@ -24,6 +24,8 @@ const char *TRACEPOINTS[] = {
     "U4::free",
     "RTC::tick",
     "SSMP::receive",
+    "ASN.1::decode",
+    "SSMP::decode",
 };
 
 volatile uint32_t trace_count = 0;
