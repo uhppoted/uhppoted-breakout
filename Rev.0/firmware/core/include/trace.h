@@ -27,6 +27,9 @@ typedef enum {
     TRACE_ASN1_UNPACK_SEQ,    // 21
     TRACE_ASN1_UNPACK_PDU,    // 22
     TRACE_ASN1_UNPACK_DEF,    // 23
+    TRACE_ASN1_INT,           // 24
+    TRACE_ASN1_INT_CALLOC,    // 25
+    TRACE_ASN1_INT_FIELD,     // 26
     TRACE_SSMP_DECODE,        // 24
     TRACE_SSMP_DEBUG1,        // 25
     TRACE_SSMP_DEBUG2,        // 26

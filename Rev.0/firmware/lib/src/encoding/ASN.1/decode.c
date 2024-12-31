@@ -103,9 +103,15 @@ vector *unpack(const uint8_t *bytes, int N) {
 }
 
 field *unpack_integer(const uint8_t *message, int N, int *ix) {
-    uint32_t length = unpack_length(message, N, ix);
-    field *f = (field *)calloc(1, sizeof(field));
+    uint32_t trace = trace_in(TRACE_ASN1_INT);
 
+    uint32_t length = unpack_length(message, N, ix);
+
+    uint32_t trace1 = trace_in(TRACE_ASN1_INT_CALLOC);
+    field *f = (field *)calloc(1, sizeof(field));
+    trace_out(TRACE_ASN1_INT_CALLOC, trace1);
+
+    uint32_t trace2 = trace_in(TRACE_ASN1_INT_FIELD);
     if (f != NULL) {
         int64_t value = 0;
 
@@ -128,8 +134,11 @@ field *unpack_integer(const uint8_t *message, int N, int *ix) {
         f->tag = FIELD_INTEGER;
         f->integer.value = value;
     }
+    trace_out(TRACE_ASN1_INT_FIELD, trace2);
 
     *ix += length;
+
+    trace_out(TRACE_ASN1_INT, trace);
 
     return f;
 }
