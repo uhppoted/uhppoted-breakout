@@ -19,14 +19,15 @@ typedef enum {
     TRACE_RTC_TICK,           // 13
     TRACE_SSMP_RECEIVE,       // 14
     TRACE_ASN1_DECODE,        // 15
-    TRACE_ASN1_UNPACK_INT,    // 16
-    TRACE_ASN1_UNPACK_OCTETS, // 17
-    TRACE_ASN1_UNPACK_NULL,   // 18
-    TRACE_ASN1_UNPACK_OID,    // 19
-    TRACE_ASN1_UNPACK_SEQ,    // 20
-    TRACE_ASN1_UNPACK_PDU,    // 21
-    TRACE_ASN1_UNPACK_DEF,    // 22
-    TRACE_SSMP_DECODE,        // 23
+    TRACE_ASN1_NEW,           // 16
+    TRACE_ASN1_UNPACK_INT,    // 17
+    TRACE_ASN1_UNPACK_OCTETS, // 18
+    TRACE_ASN1_UNPACK_NULL,   // 19
+    TRACE_ASN1_UNPACK_OID,    // 20
+    TRACE_ASN1_UNPACK_SEQ,    // 21
+    TRACE_ASN1_UNPACK_PDU,    // 22
+    TRACE_ASN1_UNPACK_DEF,    // 23
+    TRACE_SSMP_DECODE,        // 24
 } TRACE;
 
 extern uint32_t trace_in(uint32_t);

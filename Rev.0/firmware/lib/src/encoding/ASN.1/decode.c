@@ -27,7 +27,9 @@ vector *BER_decode(const uint8_t *message, int N) {
 vector *unpack(const uint8_t *bytes, int N) {
     uint32_t trace = trace_in(TRACE_ASN1_DECODE);
 
+    uint32_t tracev = trace_in(TRACE_ASN1_NEW);
     vector *v = vector_new();
+    trace_out(TRACE_ASN1_NEW, tracev);
 
     if (v != NULL) {
         int ix = 0;
