@@ -8,6 +8,7 @@ import traceback
 from trace import Trace
 from commands import commands
 from commands import exec
+from commands import debug_get_controller
 
 
 def main():
@@ -65,9 +66,7 @@ def main():
                     print()
     elif cmd == 'debug':
         try:
-           for i in range(3):
-               exec(commands()['get-controller'], args)
-               time.sleep(5)
+           debug_tcp_read(args)
         except Exception as x:
             print()
             print(f'*** ERROR  {cmd}: {x}')
@@ -93,6 +92,13 @@ def main():
         print(f'  ERROR: invalid command ({cmd})')
         print()
 
+def debug_tcp_read(args):
+    exec(debug_get_controller, args)
+
+def debug_connection_pool(args):
+    for i in range(3):
+        exec(commands()['get-controller'], args)
+        time.sleep(5)
 
 def usage():
     print()

@@ -69,7 +69,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
            - [ ] TLS
                  - [x] allow multiple requests
                  - [ ] configuration
-           - [ ] Python CLI TCP socket not terminating/closing if no reply
+           - [x] Python CLI TCP socket not terminating/closing if no reply
            - [ ] Terminate gracefully on CTRL-C
            - [ ] exponential backoff
 
