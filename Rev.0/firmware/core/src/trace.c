@@ -25,6 +25,13 @@ const char *TRACEPOINTS[] = {
     "RTC::tick",
     "SSMP::receive",
     "ASN.1::decode",
+    "ASN.1::unpack.int",
+    "ASN.1::unpack.octets",
+    "ASN.1::unpack.null",
+    "ASN.1::unpack.oid",
+    "ASN.1::unpack.seq",
+    "ASN.1::unpack.pdu",
+    "ASN.1::unpack.def",
     "SSMP::decode",
 };
 

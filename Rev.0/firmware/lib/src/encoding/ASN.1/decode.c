@@ -21,15 +21,12 @@ vector *unpack(const uint8_t *bytes, int N);
 uint32_t unpack_length(const uint8_t *message, int N, int *ix);
 
 vector *BER_decode(const uint8_t *message, int N) {
-    uint32_t trace = trace_in(TRACE_ASN1_DECODE);
-
-    vector *v = unpack(message, N);
-    trace_out(TRACE_ASN1_DECODE, trace);
-
-    return v;
+    return unpack(message, N);
 }
 
 vector *unpack(const uint8_t *bytes, int N) {
+    uint32_t trace = trace_in(TRACE_ASN1_DECODE);
+
     vector *v = vector_new();
 
     if (v != NULL) {
@@ -41,49 +38,65 @@ vector *unpack(const uint8_t *bytes, int N) {
             uint8_t tag = bytes[ix++];
 
             switch (tag) {
-            case FIELD_INTEGER:
+            case FIELD_INTEGER: {
+                uint32_t tracex = trace_in(TRACE_ASN1_UNPACK_INT);
                 if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
                     v = vector_add(v, f);
                 }
-                break;
+                trace_out(TRACE_ASN1_UNPACK_INT, tracex);
+            } break;
 
-            case FIELD_OCTET_STRING:
+            case FIELD_OCTET_STRING: {
+                uint32_t tracex = trace_in(TRACE_ASN1_UNPACK_OCTETS);
                 if ((f = unpack_octets(bytes, N, &ix)) != NULL) {
                     v = vector_add(v, f);
                 }
-                break;
+                trace_out(TRACE_ASN1_UNPACK_OCTETS, tracex);
+            } break;
 
-            case FIELD_NULL:
+            case FIELD_NULL: {
+                uint32_t tracex = trace_in(TRACE_ASN1_UNPACK_NULL);
                 if ((f = unpack_null(bytes, N, &ix)) != NULL) {
                     v = vector_add(v, f);
                 }
-                break;
+                trace_out(TRACE_ASN1_UNPACK_NULL, tracex);
+            } break;
 
-            case FIELD_OID:
+            case FIELD_OID: {
+                uint32_t tracex = trace_in(TRACE_ASN1_UNPACK_OID);
                 if ((f = unpack_OID(bytes, N, &ix)) != NULL) {
                     v = vector_add(v, f);
                 }
-                break;
+                trace_out(TRACE_ASN1_UNPACK_OID, tracex);
+            } break;
 
-            case FIELD_SEQUENCE:
+            case FIELD_SEQUENCE: {
+                uint32_t tracex = trace_in(TRACE_ASN1_UNPACK_SEQ);
                 if ((f = unpack_sequence(bytes, N, &ix)) != NULL) {
                     v = vector_add(v, f);
                 }
-                break;
+                trace_out(TRACE_ASN1_UNPACK_SEQ, tracex);
+            } break;
 
-            case FIELD_PDU_GET:
+            case FIELD_PDU_GET: {
+                uint32_t tracex = trace_in(TRACE_ASN1_UNPACK_PDU);
                 if ((f = unpack_get_request(bytes, N, &ix)) != NULL) {
                     v = vector_add(v, f);
                 }
-                break;
+                trace_out(TRACE_ASN1_UNPACK_PDU, tracex);
+            } break;
 
-            default:
+            default: {
+                uint32_t tracex = trace_in(TRACE_ASN1_UNPACK_DEF);
                 debugf("ASN.1", "decode::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
                 ix = N;
+                trace_out(TRACE_ASN1_UNPACK_DEF, tracex);
+            }
             }
         }
     }
 
+    trace_out(TRACE_ASN1_DECODE, trace);
     return v;
 }
 
