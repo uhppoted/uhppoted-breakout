@@ -70,24 +70,15 @@ Debugging weird intermittent reset:
 ```
 ```
 >>>> TRACE
-     ID:  5
-     in:  32537248
-     out: 32537248
-     stacktrace: 3
-                 0  1
-                 1  7
-                 2  5
+     ID:  6
+     in:  26473970
+     out: 26473970
+     stacktrace: 4
+                 0  1   sys::dispatch
+                 1  11  SSMP::receive
+                 2  5   U4::tick
+                 3  6   U4::healthcheck
      ----
->>>> TRACE
-     ID:  5
-     in:  17731256
-     out: 17731256
-     stacktrace: 3
-                 0  1
-                 1  7
-                 2  5
-     ----
-
 ```
 
 ## Possible causes

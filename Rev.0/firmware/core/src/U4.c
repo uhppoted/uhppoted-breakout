@@ -237,10 +237,14 @@ bool U4_tick(repeating_timer_t *rt) {
             uint32_t trace1 = trace_in(TRACE_U4_HEALTHCHECK);
 
             U4x.tock = U4_TOCK;
+            uint32_t trace1x = trace_in(TRACE_U4_CALLOC);
             operation *op = (operation *)calloc(1, sizeof(operation));
+            trace_out(TRACE_U4_CALLOC, trace1x);
 
             if (op == NULL) {
+                uint32_t trace1y = trace_in(TRACE_U4_SET_ERROR);
                 set_error(ERR_DEBUG, "U4", "NULL op");
+                trace_out(TRACE_U4_SET_ERROR, trace1y);
             } else {
                 //     op->tag = U4_HEALTHCHECK;
                 //     op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
@@ -252,7 +256,9 @@ bool U4_tick(repeating_timer_t *rt) {
                 //
                 //     // if (!I2C0_push(&task)) {
                 //     //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                uint32_t trace1z = trace_in(TRACE_U4_FREE);
                 free(op);
+                trace_out(TRACE_U4_FREE, trace1z);
                 //     // }
             }
             trace_out(TRACE_U4_HEALTHCHECK, trace1);

@@ -19,6 +19,9 @@ const char *TRACEPOINTS[] = {
     "U4::relays",
     "U4::leds",
     "U4::outputs",
+    "U4::calloc",
+    "U4::set_error",
+    "U4::free",
     "RTC::tick",
     "SSMP::receive",
 };

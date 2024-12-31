@@ -13,8 +13,11 @@ typedef enum {
     TRACE_U4_RELAYS,      // 7
     TRACE_U4_LEDS,        // 8
     TRACE_U4_OUTPUTS,     // 9
-    TRACE_RTC_TICK,       // 10
-    TRACE_SSMP_RECEIVE,   // 11
+    TRACE_U4_CALLOC,      // 10
+    TRACE_U4_SET_ERROR,   // 11
+    TRACE_U4_FREE,        // 12
+    TRACE_RTC_TICK,       // 13
+    TRACE_SSMP_RECEIVE,   // 14
 } TRACE;
 
 extern uint32_t trace_in(uint32_t);
