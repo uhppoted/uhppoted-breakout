@@ -103,6 +103,26 @@ Debugging weird intermittent reset:
                  4  6   U4::healthcheck
                  5  10  U4::calloc
 ```
+```
+>>>> TRACE 2024-12-31 13:20
+     ID:  10
+     in:  15027212
+     out: 15027212
+     stacktrace: 12
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  25  SSMP::debug.1
+                 3  15  ASN.1::decode
+                 4  21  ASN.1::unpack.seq
+                 5  15  ASN.1::decode
+                 6  22  ASN.1::unpack.pdu
+                 7  15  ASN.1::decode
+                 8  17  ASN.1::unpack.int
+                 9  5   U4::tick
+                 10 6   U4::healthcheck
+                 11 10  U4::calloc
+```
+
 
 ## Possible causes
 
