@@ -9,6 +9,7 @@ build: format
 
 debug:
 	python3 main.py --destination $(ADDRESS) --protocol tcp::pool debug
+	python3 main.py --destination $(TLS)     --protocol tls debug
 
 get-controller:
 	python3 main.py get-controller

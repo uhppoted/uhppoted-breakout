@@ -133,6 +133,10 @@ def _read(sock, timeout=2.5, debug=False):
 
     while True:
         reply = sock.recv(1024)
+
+        if len(reply) == 0:
+            return None
+        
         if len(reply) == 64:
             if debug:
                 net.dump(reply)

@@ -16,6 +16,7 @@ from uhppoted import net
 
 
 class TLS:
+    pool = {}
 
     def __init__(self, bind='0.0.0.0', debug=False):
         '''
@@ -54,27 +55,43 @@ class TLS:
         '''
         self.dump(request)
 
-        addr = net.resolve(f'{dest_addr}')
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         context.load_verify_locations('.cacerts')
         context.load_cert_chain(certfile='.certificate', keyfile='.key')
 
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, net.WRITE_TIMEOUT)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, net.READ_TIMEOUT)
+        addr = net.resolve(f'{dest_addr}')
+        pool = self.pool
+        key = f'{addr[0]}:{addr[1]}'
+        ssock = None
 
-            with context.wrap_socket(sock, server_hostname=f'{addr[0]}') as ssock:
-                if not is_INADDR_ANY(self._bind):
-                    ssock.bind(self._bind)
+        if key in pool:
+           s = pool[key]
+           if s.fileno() != -1:
+              ssock = s
 
-                ssock.connect(addr)
-                ssock.sendall(request)
+        if not ssock:
+           sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-                if request[1] == 0x96:
-                    return None
-                else:
-                    return _read(ssock, timeout=timeout, debug=self._debug)
+           sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+           sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, net.WRITE_TIMEOUT)
+           sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, net.READ_TIMEOUT)
+           sock.settimeout(5)
+
+           ssock = context.wrap_socket(sock, server_hostname=f'{addr[0]}')
+
+           if not is_INADDR_ANY(self._bind):
+               ssock.bind(self._bind)
+
+           ssock.connect(addr)
+        
+        pool[key] = ssock
+
+        ssock.sendall(request)
+
+        if request[1] == 0x96:
+           return None
+        else:
+           return _read(ssock, timeout=timeout, debug=self._debug)
 
     def dump(self, packet):
         '''
@@ -124,6 +141,10 @@ def _read(sock, timeout=2.5, debug=False):
 
     while True:
         reply = sock.recv(1024)
+
+        if len(reply) == 0:
+            return None
+        
         if len(reply) == 64:
             if debug:
                 net.dump(reply)

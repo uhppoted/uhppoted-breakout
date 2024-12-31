@@ -29,9 +29,9 @@ func (tcp TCP) listen(received func(any) (any, error)) error {
 
 		for {
 			if client, err := socket.Accept(); err != nil {
-				warnf("TCP accept error (%v)", err)
+				warnf("TCP  accept error (%v)", err)
 			} else {
-				infof("TCP incoming")
+				infof("TCP  incoming")
 
 				go func() {
 					if err := tcp.read(client, received); err != nil {
@@ -44,7 +44,10 @@ func (tcp TCP) listen(received func(any) (any, error)) error {
 }
 
 func (tcp TCP) read(socket net.Conn, received func(any) (any, error)) error {
-	defer socket.Close()
+	defer func() {
+		socket.Close()
+		debugf("TCP  closed connection to %v", socket.RemoteAddr())
+	}()
 
 	for {
 		buffer := make([]byte, 2048)
@@ -59,6 +62,8 @@ func (tcp TCP) read(socket net.Conn, received func(any) (any, error)) error {
 			return nil
 		} else if err != nil {
 			return err
+		} else if N == 0 {
+			return nil
 		} else {
 			debugf("TCP  received %v bytes from %v", N, socket.RemoteAddr())
 
@@ -66,7 +71,6 @@ func (tcp TCP) read(socket net.Conn, received func(any) (any, error)) error {
 				warnf("TCP  %v", err)
 			} else {
 				reply, err := received(request)
-
 				if err != nil {
 					warnf("TCP  %v", err)
 				}
