@@ -36,15 +36,13 @@ add_executable(mvb
   ${CORE}/src/I2C1.c
   ${CORE}/src/RTC.c
   ${CORE}/src/IOX.c
-# ${CORE}/src/U2.c
-  ${CORE}/src/U3.c
+# ${CORE}/src/U3.c
   ${CORE}/src/U4.c
   ${CORE}/src/SSMP.c
   ${CORE}/src/MIB.c
   ${CORE}/src/auth.c
   ${CORE}/src/state.c
   ${CORE}/src/log.c
-# ${CORE}/src/cli.c
   ${CORE}/src/ANSI.c
   ${CORE}/src/trace.c
 

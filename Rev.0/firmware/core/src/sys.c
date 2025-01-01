@@ -11,8 +11,7 @@
 #include <pico/unique_id.h>
 
 #include <SSMP.h>
-#include <U2.h>
-#include <U3.h>
+// #include <U3.h>
 #include <breakout.h>
 #include <cli.h>
 #include <log.h>
@@ -178,13 +177,9 @@ void dispatch(uint32_t v) {
         debugf("SYS", "... debug??");
     }
 
-    // if ((v & MSG) == MSG_WIO) {
-    //     U2_wio(v & 0x0000ffff);
+    // if ((v & MSG) == MSG_U3) {
+    //     U3_process(v & 0x000000ff);
     // }
-
-    if ((v & MSG) == MSG_U3) {
-        U3_process(v & 0x000000ff);
-    }
 
     if ((v & MSG) == MSG_RX) {
         struct circular_buffer *b = (struct circular_buffer *)(SRAM_BASE | (v & 0x0fffffff));

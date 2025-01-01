@@ -20,7 +20,24 @@
                  9  5   U4::tick
                  10 6   U4::healthcheck
                  11 10  U4::calloc
-     ----
 ```
 
-2. 
+2. Without U2
+```
+>>>> TRACE 2025-01-01 12:48
+     ID:  10
+     in:  704943
+     out: 704943
+     stacktrace: 9
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  35  SSMP::vector.free
+                 3  37  vector::free
+                 4  37  vector::free
+                 5  37  vector::free
+                 6  5   U4::tick
+                 7  6   U4::healthcheck
+                 8  10  U4::calloc
+```
+
+3. ??
