@@ -42,6 +42,8 @@ const char *TRACEPOINTS[] = {
     "SSMP::GET",
     "SSMP::packet.free",
     "SSMP::vector.free",
+    "vector::new",
+    "vector::free",
 };
 
 volatile uint32_t trace_count = 0;

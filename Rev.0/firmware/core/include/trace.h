@@ -36,6 +36,8 @@ typedef enum {
     TRACE_SSMP_GET,           // 27
     TRACE_SSMP_PACKET_FREE,   // 28
     TRACE_SSMP_VECTOR_FREE,   // 29
+    TRACE_VECTOR_NEW,         // 30
+    TRACE_VECTOR_FREE,        // 31
 } TRACE;
 
 extern uint32_t trace_in(uint32_t);
