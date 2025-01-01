@@ -162,6 +162,18 @@ Debugging weird intermittent reset:
                  6  6   U4::healthcheck
                  7  10  U4::calloc
 ```
+```
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  28  SSMP::BER
+                 3  15  ASN.1::decode
+                 4  21  ASN.1::unpack.seq
+                 5  15  ASN.1::decode
+                 6  22  ASN.1::unpack.pdu
+                 7  5   U4::tick
+                 8  6   U4::healthcheck
+                 9  10  U4::calloc
+```
 ## Possible causes
 
 - ~~too many get requests~~

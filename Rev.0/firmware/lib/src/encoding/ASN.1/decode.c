@@ -246,9 +246,15 @@ field *unpack_sequence(const uint8_t *message, int N, int *ix) {
 }
 
 field *unpack_get_request(const uint8_t *message, int N, int *ix) {
-    uint32_t length = unpack_length(message, N, ix);
-    field *f = (field *)calloc(1, sizeof(field));
+    uint32_t trace = trace_in(TRACE_ASN1_PDU);
 
+    uint32_t length = unpack_length(message, N, ix);
+
+    uint32_t trace1 = trace_in(TRACE_ASN1_PDU_CALLOC);
+    field *f = (field *)calloc(1, sizeof(field));
+    trace_out(TRACE_ASN1_PDU_CALLOC, trace1);
+
+    uint32_t trace2 = trace_in(TRACE_ASN1_PDU_FIELDS);
     if (f != NULL) {
         vector *fields = unpack(&message[*ix], length);
 
@@ -256,8 +262,11 @@ field *unpack_get_request(const uint8_t *message, int N, int *ix) {
         f->tag = FIELD_PDU_GET;
         f->pdu.fields = fields;
     }
+    trace_out(TRACE_ASN1_PDU_FIELDS, trace2);
 
     *ix += length;
+
+    trace_out(TRACE_ASN1_PDU, trace);
 
     return f;
 }
