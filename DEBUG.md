@@ -122,7 +122,31 @@ Debugging weird intermittent reset:
                  10 6   U4::healthcheck
                  11 10  U4::calloc
 ```
-
+```
+>>>> TRACE 2024-12-31 15:46
+     ID:  10
+     in:  4739850
+     out: 4739850
+     stacktrace: 5
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  5   U4::tick
+                 3  6   U4::healthcheck
+                 4  10  U4::calloc
+```
+```
+>>>> TRACE 2024-12-31 16:22
+     ID:  10
+     in:  2330188
+     out: 2330188
+     stacktrace: 6
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  32  SSMP::vector.free
+                 3  5   U4::tick
+                 4  6   U4::healthcheck
+                 5  10  U4::calloc
+```
 
 ## Possible causes
 

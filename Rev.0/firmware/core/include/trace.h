@@ -31,9 +31,11 @@ typedef enum {
     TRACE_ASN1_INT_CALLOC,    // 25
     TRACE_ASN1_INT_FIELD,     // 26
     TRACE_SSMP_DECODE,        // 24
-    TRACE_SSMP_DEBUG1,        // 25
-    TRACE_SSMP_DEBUG2,        // 26
-    TRACE_SSMP_DEBUG3,        // 27
+    TRACE_SSMP_BER,           // 25
+    TRACE_SSMP_PACKET,        // 26
+    TRACE_SSMP_GET,           // 27
+    TRACE_SSMP_PACKET_FREE,   // 28
+    TRACE_SSMP_VECTOR_FREE,   // 29
 } TRACE;
 
 extern uint32_t trace_in(uint32_t);

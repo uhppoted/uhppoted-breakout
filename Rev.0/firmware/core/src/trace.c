@@ -37,9 +37,11 @@ const char *TRACEPOINTS[] = {
     "ASN.1::int_calloc",
     "ASN.1::int_field",
     "SSMP::decode",
-    "SSMP::debug.1",
-    "SSMP::debug.2",
-    "SSMP::debug.3",
+    "SSMP::BER",
+    "SSMP::packet",
+    "SSMP::GET",
+    "SSMP::packet.free",
+    "SSMP::vector.free",
 };
 
 volatile uint32_t trace_count = 0;

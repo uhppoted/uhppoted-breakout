@@ -165,16 +165,16 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
     debugf("SSMP", "received");
 
     // ... decode packet
-    uint32_t debug1 = trace_in(TRACE_SSMP_DEBUG1);
+    uint32_t trace1 = trace_in(TRACE_SSMP_BER);
     vector *fields = BER_decode(data, data_len);
-    trace_out(TRACE_SSMP_DEBUG1, debug1);
+    trace_out(TRACE_SSMP_BER, trace1);
 
-    uint32_t debug2 = trace_in(TRACE_SSMP_DEBUG2);
+    uint32_t trace2 = trace_in(TRACE_SSMP_PACKET);
     packet *request = ssmp_decode(fields);
-    trace_out(TRACE_SSMP_DEBUG2, debug2);
+    trace_out(TRACE_SSMP_PACKET, trace2);
 
     // ... GET request?
-    uint32_t debug3 = trace_in(TRACE_SSMP_DEBUG3);
+    uint32_t trace3 = trace_in(TRACE_SSMP_GET);
     if (request != NULL && request->tag == PACKET_GET) {
         put_rgb(32, 0, 96);
         //     const char *community = request->community;
@@ -188,10 +188,15 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         //         }
         //     }
     }
-    trace_out(TRACE_SSMP_DEBUG3, debug3);
+    trace_out(TRACE_SSMP_GET, trace3);
 
+    uint32_t trace4 = trace_in(TRACE_SSMP_PACKET_FREE);
     packet_free(request);
+    trace_out(TRACE_SSMP_PACKET_FREE, trace4);
+
+    uint32_t trace5 = trace_in(TRACE_SSMP_VECTOR_FREE);
     vector_free(fields);
+    trace_out(TRACE_SSMP_VECTOR_FREE, trace5);
 
     trace_out(TRACE_SSMP_RECEIVE, trace);
 }
