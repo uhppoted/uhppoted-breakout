@@ -56,6 +56,7 @@
         - fire alarm
         - tamper detect
 
+(?) RS-485 for serial I/O (multidrop)
 (?) Maybe put GND on pin 1 of UART/SPI header
 (?) https://www.olimex.com/Products/Components/IC/SY6280
     - https://hackaday.com/2024/07/03/usb-and-the-myth-of-500-milliamps/

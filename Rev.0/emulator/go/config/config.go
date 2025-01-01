@@ -18,6 +18,7 @@ type Config struct {
 	Driver   driver  `json:"driver"`
 	Network  network `json:"network"`
 	Events   events  `json:"events"`
+	TLS      TLS     `json:"TLS"`
 }
 
 type driver struct {
@@ -36,6 +37,11 @@ type IPv4 struct {
 	MAC     net.HardwareAddr `json:"MAC"`
 }
 
+type TLS struct {
+	Certificate string `json:"certificate"`
+	CA          string `json:"CA"`
+}
+
 type events struct {
 	Listener netip.AddrPort `json:"listener"`
 	Interval uint8          `json:"interval"`
@@ -44,6 +50,10 @@ type events struct {
 func Load(filepath string) (Config, []byte, error) {
 	config := Config{
 		filepath: filepath,
+		TLS: TLS{
+			Certificate: ".certificate",
+			CA:          ".CA",
+		},
 	}
 
 	if bytes, err := os.ReadFile(filepath); err != nil {

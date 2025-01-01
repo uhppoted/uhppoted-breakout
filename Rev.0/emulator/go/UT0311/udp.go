@@ -11,7 +11,7 @@ import (
 type UDP struct {
 }
 
-func (udp UDP) listen(received func(any) (any, error)) error {
+func (c UDP) listen(received func(any) (any, error)) error {
 	bind := netip.MustParseAddrPort("0.0.0.0:60000")
 
 	if socket, err := net.ListenUDP("udp4", net.UDPAddrFromAddrPort(bind)); err != nil {

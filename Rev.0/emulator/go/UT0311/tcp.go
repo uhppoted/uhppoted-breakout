@@ -17,7 +17,7 @@ type TCP struct {
 
 const READ_TIMEOUT = 30000 * time.Millisecond
 
-func (tcp TCP) listen(received func(any) (any, error)) error {
+func (c TCP) listen(received func(any) (any, error)) error {
 	bind := netip.MustParseAddrPort("0.0.0.0:60000")
 
 	if socket, err := net.ListenTCP("tcp4", net.TCPAddrFromAddrPort(bind)); err != nil {
@@ -34,7 +34,7 @@ func (tcp TCP) listen(received func(any) (any, error)) error {
 				infof("TCP  incoming")
 
 				go func() {
-					if err := tcp.read(client, received); err != nil {
+					if err := c.read(client, received); err != nil {
 						warnf("TCP read error (%v)", err)
 					}
 				}()
@@ -43,7 +43,7 @@ func (tcp TCP) listen(received func(any) (any, error)) error {
 	}
 }
 
-func (tcp TCP) read(socket net.Conn, received func(any) (any, error)) error {
+func (c TCP) read(socket net.Conn, received func(any) (any, error)) error {
 	defer func() {
 		socket.Close()
 		debugf("TCP  closed connection to %v", socket.RemoteAddr())

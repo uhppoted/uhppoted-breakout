@@ -37,7 +37,10 @@ func NewUT0311(c config.Config) UT0311 {
 		events: events.Events{},
 		udp:    UDP{},
 		tcp:    TCP{},
-		tls:    TLS{},
+		tls: TLS{
+			Certificate: c.TLS.Certificate,
+			CA:          c.TLS.CA,
+		},
 	}
 }
 

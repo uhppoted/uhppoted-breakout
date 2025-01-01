@@ -15,15 +15,17 @@ import (
 )
 
 type TLS struct {
+	Certificate string
+	CA          string
 }
 
-func (tcp TLS) listen(received func(any) (any, error)) error {
+func (c TLS) listen(received func(any) (any, error)) error {
 	bind := "0.0.0.0:60443"
 	certificates := x509.NewCertPool()
 
-	if certificate, err := tls.LoadX509KeyPair(".certificate", ".key"); err != nil {
+	if certificate, err := tls.LoadX509KeyPair(c.Certificate, ".key"); err != nil {
 		return err
-	} else if CA, err := os.ReadFile(".CA"); err != nil {
+	} else if CA, err := os.ReadFile(c.CA); err != nil {
 		return err
 	} else if !certificates.AppendCertsFromPEM(CA) {
 		return fmt.Errorf("error parsing CA/client certificates")
@@ -49,7 +51,7 @@ func (tcp TLS) listen(received func(any) (any, error)) error {
 					infof("TLS  incoming")
 
 					go func() {
-						if err := tcp.read(client, received); err != nil {
+						if err := c.read(client, received); err != nil {
 							warnf("TLS read error (%v)", err)
 						}
 					}()
@@ -59,7 +61,7 @@ func (tcp TLS) listen(received func(any) (any, error)) error {
 	}
 }
 
-func (tcp TLS) read(socket net.Conn, received func(any) (any, error)) error {
+func (c TLS) read(socket net.Conn, received func(any) (any, error)) error {
 	defer func() {
 		socket.Close()
 		debugf("TLS  closed connection to %v", socket.RemoteAddr())

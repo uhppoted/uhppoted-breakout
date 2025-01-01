@@ -53,6 +53,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     
 ### emulator
     - [x] write config to tmp file and move 
+    - [x] Move event listener and interval to controller MIB block
     - [x] get-controller
     - [x] set-address
     - [x] get-listener
@@ -60,18 +61,16 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] get-time
     - [x] set-time
     - [x] get-status
-    - [x] Move event listener and interval to controller MIB block
+    - [ ] get-door
+    - [ ] set-door
+    - [ ] set-door-passcodes
 
     - [ ] API
-           - [x] UDP
-           - [x] TCP/IP
-                 - [x] allow multiple requests
-           - [ ] TLS
-                 - [x] allow multiple requests
-                 - [ ] configuration
-           - [x] Python CLI TCP socket not terminating/closing if no reply
+           - [x] TLS
+                 - [x] configuration
            - [ ] Terminate gracefully on CTRL-C
            - [ ] exponential backoff
+           - [ ] rate limiting
 
     - [ ] RPC
           - https://go.dev/blog/protobuf-opaque
