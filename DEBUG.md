@@ -186,6 +186,62 @@ Debugging weird intermittent reset:
                  4  6   U4::healthcheck
                  5  10  U4::calloc
 ```
+```
+                 2  31  SSMP::BER
+                 3  15  ASN.1::decode
+                 4  21  ASN.1::unpack.seq
+                 5  15  ASN.1::decode
+                 6  22  ASN.1::unpack.pdu
+                 7  27  ASN.1::pdu
+                 8  29  ASN.1::pdu.fields
+                 9  15  ASN.1::decode
+                 10 17  ASN.1::unpack.int
+                 11 24  ASN.1::int
+                 12 25  ASN.1::int_calloc
+                 13 5   U4::tick
+                 14 6   U4::healthcheck
+                 15 10  U4::calloc
+     ----
+>>>> TRACE 2024-12-31 20:45
+     ID:  10
+     in:  2373792
+     out: 2373792
+     stacktrace: 16
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  31  SSMP::BER
+                 3  15  ASN.1::decode
+                 4  21  ASN.1::unpack.seq
+                 5  15  ASN.1::decode
+                 6  22  ASN.1::unpack.pdu
+                 7  27  ASN.1::pdu
+                 8  29  ASN.1::pdu.fields
+                 9  15  ASN.1::decode
+                 10 17  ASN.1::unpack.int
+                 11 24  ASN.1::int
+                 12 25  ASN.1::int_calloc
+                 13 5   U4::tick
+                 14 6   U4::healthcheck
+                 15 10  U4::calloc
+```
+```
+>>>> TRACE 2024-12-31 20:45
+     ID:  10
+     in:  6530558
+     out: 6530558
+     stacktrace: 11
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  35  SSMP::vector.free
+                 3  37  vector::free
+                 4  37  vector::free
+                 5  37  vector::free
+                 6  37  vector::free
+                 7  37  vector::free
+                 8  5   U4::tick
+                 9  6   U4::healthcheck
+                 10 10  U4::calloc
+```
 
 ## Possible causes
 
