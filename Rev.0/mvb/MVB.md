@@ -1,5 +1,10 @@
 # minimum-viable-bug
 
+- [call to calloc() deadlocks with clang/picolibc](https://github.com/raspberrypi/pico-sdk/issues/1947)
+- [Realloc() is not wrapped for multi-core safety](https://github.com/raspberrypi/pico-sdk/issues/863)
+- [prevent self-deadlock with PICOLIBC due to calloc/realloc internally calling malloc/free](https://github.com/raspberrypi/pico-sdk/pull/2069)
+
+## Traces
 1. Base
 ```
      ----
@@ -41,3 +46,10 @@
 ```
 
 3. ??
+
+
+## Notes
+- https://forums.raspberrypi.com/viewtopic.php?t=361131
+- https://github.com/raspberrypi/pico-sdk/issues/426
+- https://forums.raspberrypi.com/viewtopic.php?t=336993
+- https://interrupt.memfault.com/blog/boostrapping-libc-with-newlib
