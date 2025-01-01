@@ -174,6 +174,19 @@ Debugging weird intermittent reset:
                  8  6   U4::healthcheck
                  9  10  U4::calloc
 ```
+>>>> TRACE 2024-12-31 19:37
+     ID:  10
+     in:  6594457
+     out: 6594457
+     stacktrace: 6
+                 0  1   sys::dispatch
+                 1  14  SSMP::receive
+                 2  34  SSMP::packet.free
+                 3  5   U4::tick
+                 4  6   U4::healthcheck
+                 5  10  U4::calloc
+```
+
 ## Possible causes
 
 - ~~too many get requests~~
