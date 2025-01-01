@@ -3,7 +3,7 @@
 #include <I2C0.h>
 #include <I2C1.h>
 #include <IOX.h>
-#include <U2.h>
+// #include <U2.h>
 #include <U3.h>
 #include <U4.h>
 #include <breakout.h>
@@ -21,7 +21,7 @@ void IOX_init() {
     gpio_put(IOX_RESET, 1);
     sleep_us(25);
 
-    U2_setup();
+    // U2_setup();
     U3_setup();
     U4_setup();
 
@@ -31,7 +31,7 @@ void IOX_init() {
 void IOX_start() {
     infof("IOX", "start");
 
-    U2_start();
+    // U2_start();
     U3_start();
     U4_start();
 

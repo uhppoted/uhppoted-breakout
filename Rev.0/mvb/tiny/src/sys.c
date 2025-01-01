@@ -67,16 +67,12 @@ bool sys_init() {
     char s[64];
 
     if (!strcmp(WATCHDOG, "disabled") != 0) {
-        snprintf(s, sizeof(s),
-                 "-----  MVB (TINY)   v%02x.%02x   <<< NO WATCHDOG >>> %s\n",
-                 (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff, RELEASED);
+        snprintf(s, sizeof(s), "-----  MVB (TINY) %s <<< NO WATCHDOG >>>\n", RELEASED);
     } else {
-        snprintf(s, sizeof(s), "-----  MVB (TINY)   v%02x.%02x %s\n",
-                 (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff, RELEASED);
+        snprintf(s, sizeof(s), "-----  MVB (TINY) %s\n", RELEASED);
     }
 
     sysinit();
-    // FIXME cli_init();
     log_init();
     print(s);
 

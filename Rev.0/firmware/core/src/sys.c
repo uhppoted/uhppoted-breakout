@@ -178,9 +178,9 @@ void dispatch(uint32_t v) {
         debugf("SYS", "... debug??");
     }
 
-    if ((v & MSG) == MSG_WIO) {
-        U2_wio(v & 0x0000ffff);
-    }
+    // if ((v & MSG) == MSG_WIO) {
+    //     U2_wio(v & 0x0000ffff);
+    // }
 
     if ((v & MSG) == MSG_U3) {
         U3_process(v & 0x000000ff);
