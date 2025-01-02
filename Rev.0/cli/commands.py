@@ -37,8 +37,8 @@ def commands():
         'set-time': set_time,
         'get-listener': get_listener,
         'set-listener': set_listener,
-        'get-door-control': get_door_control,
-        'set-door-control': set_door_control,
+        'get-door': get_door,
+        'set-door': set_door,
         'get-status': get_status,
         'open-door': open_door,
         'get-cards': get_cards,
@@ -169,14 +169,14 @@ def set_listener(u, dest, timeout, args, protocol='udp'):
     return u.set_listener(controller, address, port, timeout=timeout)
 
 
-def get_door_control(u, dest, timeout, args, protocol='udp'):
+def get_door(u, dest, timeout, args, protocol='udp'):
     controller = (CONTROLLER, dest, protocol)
     door = DOOR
 
     return u.get_door_control(controller, door, timeout=timeout)
 
 
-def set_door_control(u, dest, timeout, args, protocol='udp'):
+def set_door(u, dest, timeout, args, protocol='udp'):
     controller = (CONTROLLER, dest, protocol)
     door = DOOR
     mode = MODE

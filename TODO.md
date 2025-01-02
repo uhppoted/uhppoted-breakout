@@ -61,13 +61,11 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] get-time
     - [x] set-time
     - [x] get-status
-    - [ ] get-door
+    - [x] get-door
     - [ ] set-door
     - [ ] set-door-passcodes
 
     - [ ] API
-           - [x] TLS
-                 - [x] configuration
            - [ ] Terminate gracefully on CTRL-C
            - [ ] exponential backoff
            - [ ] rate limiting

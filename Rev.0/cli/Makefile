@@ -10,6 +10,9 @@ build: format
 debug:
 	python3 main.py --destination $(ADDRESS) debug
 
+tls:
+	python3 main.py --destination $(TLS) --protocol tls get-controller
+
 get-controller:
 	python3 main.py get-controller
 	python3 main.py --destination $(ADDRESS) --protocol udp get-controller
@@ -46,6 +49,8 @@ get-status:
 	python3 main.py --destination $(ADDRESS) --protocol udp get-status
 	python3 main.py --destination $(ADDRESS) --protocol tcp get-status
 
-tls:
-	python3 main.py --destination $(TLS) --protocol tls get-controller
+get-door:
+	python3 main.py get-door
+	python3 main.py --destination $(ADDRESS) --protocol udp get-door
+	python3 main.py --destination $(ADDRESS) --protocol tcp get-door
 
