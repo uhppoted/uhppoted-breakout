@@ -62,7 +62,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] set-time
     - [x] get-status
     - [x] get-door
-    - [ ] set-door
+    - [x] set-door
     - [ ] set-door-passcodes
 
     - [ ] API

@@ -54,3 +54,9 @@ get-door:
 	python3 main.py --destination $(ADDRESS) --protocol udp get-door
 	python3 main.py --destination $(ADDRESS) --protocol tcp get-door
 
+set-door:
+	python3 main.py set-door
+	python3 main.py --destination $(ADDRESS) --protocol udp set-door
+	python3 main.py --destination $(ADDRESS) --protocol tcp set-door
+
+

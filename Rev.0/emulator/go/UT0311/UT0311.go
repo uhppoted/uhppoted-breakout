@@ -126,6 +126,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 	case *messages.GetDoorControlStateRequest:
 		return ut0311.getDoor(rq)
 
+	case *messages.SetDoorControlStateRequest:
+		return ut0311.setDoor(rq)
+
 	default:
 		warnf("unknown message type (%T)", request)
 	}

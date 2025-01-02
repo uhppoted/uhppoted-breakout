@@ -7,7 +7,7 @@ import (
 	"emulator/scmp"
 )
 
-func (ut0311 *UT0311) getDoor(rq *messages.GetDoorControlStateRequest) (any, error) {
+func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, error) {
 	if id, err := scmp.Get[uint32](ut0311.driver, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
@@ -15,14 +15,14 @@ func (ut0311 *UT0311) getDoor(rq *messages.GetDoorControlStateRequest) (any, err
 	} else if door := rq.Door; door < 1 || door > 4 {
 		return nil, nil
 	} else {
-		response := messages.GetDoorControlStateResponse{
+		response := messages.SetDoorControlStateResponse{
 			SerialNumber: types.SerialNumber(id),
 			Door:         door,
 		}
 
 		if oid, ok := modes[door]; !ok {
 			return nil, nil
-		} else if mode, err := scmp.Get[uint8](ut0311.driver, oid); err != nil {
+		} else if mode, err := scmp.Set[uint8](ut0311.driver, oid, rq.ControlState); err != nil {
 			return nil, err
 		} else {
 			response.ControlState = mode
@@ -30,7 +30,7 @@ func (ut0311 *UT0311) getDoor(rq *messages.GetDoorControlStateRequest) (any, err
 
 		if oid, ok := delays[door]; !ok {
 			return nil, nil
-		} else if delay, err := scmp.Get[uint8](ut0311.driver, oid); err != nil {
+		} else if delay, err := scmp.Set[uint8](ut0311.driver, oid, rq.Delay); err != nil {
 			return nil, err
 		} else {
 			response.Delay = delay

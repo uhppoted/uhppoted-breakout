@@ -164,6 +164,46 @@ func (s SSMP) Set(oid string, value any) (any, error) {
 		return time.Now().Format("2006-01-02 15:04:05"), nil
 	}
 
+	// ... door 1 mode
+	if oid == ".1.3.6.1.4.1.65536.3.1.3.1" {
+		return uint8(1), nil
+	}
+
+	// ... door 1 delay
+	if oid == ".1.3.6.1.4.1.65536.3.1.3.1" {
+		return uint8(5), nil
+	}
+
+	// ... door 2 mode
+	if oid == ".1.3.6.1.4.1.65536.3.2.1" {
+		return uint8(1), nil
+	}
+
+	// ... door 2 delay
+	if oid == ".1.3.6.1.4.1.65536.3.2.2" {
+		return uint8(5), nil
+	}
+
+	// ... door 3 mode
+	if oid == ".1.3.6.1.4.1.65536.3.3.1" {
+		return uint8(3), nil
+	}
+
+	// ... door 3 delay
+	if oid == ".1.3.6.1.4.1.65536.3.3.2" {
+		return uint8(17), nil
+	}
+
+	// ... door 4 mode
+	if oid == ".1.3.6.1.4.1.65536.3.4.1" {
+		return uint8(1), nil
+	}
+
+	// ... door 4 delay
+	if oid == ".1.3.6.1.4.1.65536.3.4.2" {
+		return uint8(5), nil
+	}
+
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
