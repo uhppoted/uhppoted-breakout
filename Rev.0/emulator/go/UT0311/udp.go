@@ -1,18 +1,59 @@
 package UT0311
 
 import (
+	"errors"
 	"net"
 	"net/netip"
+	"sync"
 
 	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
 	"github.com/uhppoted/uhppote-core/messages"
 )
 
 type UDP struct {
+	socket  *net.UDPConn
+	wg      sync.WaitGroup
+	closing bool
 }
 
-func (c UDP) listen(received func(any) (any, error)) error {
+func makeUDP() *UDP {
+	return &UDP{}
+}
+
+func (c *UDP) listen(received func(any) (any, error)) error {
+	if err := listen(c, received); err != nil {
+		if errors.Is(err, net.ErrClosed) && c.closing {
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *UDP) stop() error {
+	c.closing = true
+
+	if c.socket != nil {
+		if err := c.socket.Close(); err != nil {
+			return err
+		} else {
+			c.wg.Wait()
+		}
+	}
+
+	return nil
+}
+
+func listen(c *UDP, received func(any) (any, error)) error {
 	bind := netip.MustParseAddrPort("0.0.0.0:60000")
+
+	c.wg.Add(1)
+
+	defer func() {
+		c.wg.Done()
+	}()
 
 	if socket, err := net.ListenUDP("udp4", net.UDPAddrFromAddrPort(bind)); err != nil {
 		return err
@@ -20,6 +61,8 @@ func (c UDP) listen(received func(any) (any, error)) error {
 		infof("listening on UDP address %v", bind)
 
 		defer socket.Close()
+
+		c.socket = socket
 
 		for {
 			buffer := make([]byte, 2048)

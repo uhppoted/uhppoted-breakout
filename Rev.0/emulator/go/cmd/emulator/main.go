@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/sha256"
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"slices"
@@ -33,15 +32,6 @@ func main() {
 		errorf("%v", err)
 		os.Exit(1)
 	} else {
-		// var driver driver.Driver
-		//
-		// switch cfg.Driver.Driver {
-		// case "stub":
-		// 	driver = stub.Stub{}
-		// case "rpc":
-		// 	driver = rpcx.RPC{}
-		// }
-
 		ut0311 := UT0311.NewUT0311(cfg)
 
 		go func() {
@@ -57,7 +47,8 @@ func main() {
 		signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 		<-interrupt
-		fmt.Printf("  ... interrupted\n")
+
+		ut0311.Stop()
 	}
 }
 

@@ -20,9 +20,11 @@ type UT0311 struct {
 	system system.System
 	events events.Events
 
-	udp UDP
+	udp *UDP
 	tcp TCP
 	tls TLS
+
+	closing bool
 }
 
 func (ut0311 *UT0311) SetConfig(c config.Config) {
@@ -35,12 +37,15 @@ func NewUT0311(c config.Config) UT0311 {
 		driver: rpcd.RPC{},
 		system: system.System{},
 		events: events.Events{},
-		udp:    UDP{},
-		tcp:    TCP{},
+
+		udp: makeUDP(),
+		tcp: TCP{},
 		tls: TLS{
 			Certificate: c.TLS.Certificate,
 			CA:          c.TLS.CA,
 		},
+
+		closing: false,
 	}
 }
 
@@ -51,13 +56,13 @@ func (ut0311 *UT0311) Run() {
 	wg.Add(1)
 
 	go func() {
-		for {
+		for !ut0311.closing {
 			if err := ut0311.udp.listen(ut0311.received); err != nil {
 				warnf("%v", err)
 			}
 
 			// TODO: exponential backoff
-			time.Sleep(5 * time.Second)
+			time.Sleep(2500 * time.Millisecond)
 		}
 
 		wg.Done()
@@ -96,6 +101,31 @@ func (ut0311 *UT0311) Run() {
 	// ... 'k, done
 
 	wg.Wait()
+}
+
+func (ut0311 *UT0311) Stop() {
+	infof("stopping")
+
+	c := make(chan struct{})
+	timeout := time.Duration(10) * time.Second
+
+	ut0311.closing = true
+
+	go func() {
+		infof("stopping UDP")
+		if err := ut0311.udp.stop(); err != nil {
+			warnf("%v", err)
+		}
+
+		c <- struct{}{}
+	}()
+
+	select {
+	case <-c:
+		infof("terminated")
+	case <-time.After(timeout):
+		warnf("shutdown timeout")
+	}
 }
 
 func (ut0311 UT0311) received(request any) (any, error) {

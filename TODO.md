@@ -67,6 +67,9 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 
     - [ ] API
            - [ ] Terminate gracefully on CTRL-C
+                 - [x] UDP
+                 - [ ] TCP
+                 - [ ] TLS
            - [ ] exponential backoff
            - [ ] rate limiting
 
