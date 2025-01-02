@@ -33,6 +33,28 @@
     - https://forum.golangbridge.org/t/get-set-network-interface-in-pure-go-code/9075/3
 22. [Memory usage](https://forums.raspberrypi.com/viewtopic.php?t=347638)
 
+## malloc/free
+- https://forums.raspberrypi.com/viewtopic.php?t=361131
+- https://github.com/raspberrypi/pico-sdk/issues/426
+- https://forums.raspberrypi.com/viewtopic.php?t=336993
+- https://interrupt.memfault.com/blog/boostrapping-libc-with-newlib
+
+- https://community.st.com/t5/stm32cubeide-mcus/newlib-malloc-locking-mechanism-to-be-thread-safe/td-p/240082
+- https://www.nadler.com/embedded/newlibAndFreeRTOS.html
+- https://stackoverflow.com/questions/39088598/malloc-in-newlib-does-it-waste-memory-after-one-big-failure-allocation
+- https://esp32.com/viewtopic.php?t=8419
+- https://forums.freertos.org/t/malloc-free-thread-interrupt-safe/3452
+- https://stackoverflow.com/questions/43222519/malloc-alternative-for-interrupt-safety
+- https://stackoverflow.com/questions/855763/is-malloc-thread-safe
+- https://github.com/eblot/newlib/blob/master/newlib/libc/sys/linux/malloc.c
+- https://github.com/ARM-software/CMSIS_5/issues/177
+- https://www.reddit.com/r/embedded/comments/9uvogb/freertos_malloc_and_c_standard_library/
+
+
+> No, it is not thread-safe. There may actually be a malloc_lock() and malloc_unlock() function available in your
+> C library. I know that these exist for the Newlib library. I had to use this to implement a mutex for my
+> processor, which is multi-threaded in hardware.
+
 ## RX8900SA
 1. https://github.com/citriena/RX8900RTC/blob/master/src/RX8900RTC.cpp
 
