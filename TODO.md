@@ -63,7 +63,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] get-status
     - [x] get-door
     - [x] set-door
-    - [ ] set-door-passcodes
+    - [x] set-door-passcodes
 
     - [ ] API
            - [ ] Terminate gracefully on CTRL-C

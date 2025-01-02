@@ -20,7 +20,7 @@ func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, err
 			Door:         door,
 		}
 
-		if oid, ok := modes[door]; !ok {
+		if oid, ok := lookup.modes[door]; !ok {
 			return nil, nil
 		} else if mode, err := scmp.Set[uint8](ut0311.driver, oid, rq.ControlState); err != nil {
 			return nil, err
@@ -28,7 +28,7 @@ func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, err
 			response.ControlState = mode
 		}
 
-		if oid, ok := delays[door]; !ok {
+		if oid, ok := lookup.delays[door]; !ok {
 			return nil, nil
 		} else if delay, err := scmp.Set[uint8](ut0311.driver, oid, rq.Delay); err != nil {
 			return nil, err

@@ -59,4 +59,11 @@ set-door:
 	python3 main.py --destination $(ADDRESS) --protocol udp set-door
 	python3 main.py --destination $(ADDRESS) --protocol tcp set-door
 
+set-door-passcodes:
+	python3 main.py set-door-passcodes
+	python3 main.py --destination $(ADDRESS) --protocol udp set-door-passcodes
+	python3 main.py --destination $(ADDRESS) --protocol tcp set-door-passcodes
+
+
+
 

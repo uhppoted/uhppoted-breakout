@@ -168,6 +168,10 @@ func (c *Config) SetString(oid scmp.OID, val string) (string, error) {
 	return "", fmt.Errorf("unknown OID %v", oid)
 }
 
+func (c *Config) SetUint32A(oid scmp.OID, val []uint32) ([]uint32, error) {
+	return []uint32{}, fmt.Errorf("unknown OID %v", oid)
+}
+
 func (v *IPv4) MarshalJSON() ([]byte, error) {
 	ipv4 := struct {
 		Address netip.Addr `json:"address"`
@@ -182,27 +186,6 @@ func (v *IPv4) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(ipv4)
-	// 	return err
-	// } else if match := re.FindStringSubmatch(ipv4.Netmask); match == nil {
-	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
-	// } else if a, err := strconv.ParseUint(match[1], 10, 8); err != nil {
-	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
-	// } else if b, err := strconv.ParseUint(match[2], 10, 8); err != nil {
-	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
-	// } else if c, err := strconv.ParseUint(match[3], 10, 8); err != nil {
-	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
-	// } else if d, err := strconv.ParseUint(match[4], 10, 8); err != nil {
-	// 	return fmt.Errorf("invalid netmask (%v)", ipv4.Netmask)
-	// } else if MAC, err := net.ParseMAC(ipv4.MAC); err != nil {
-	// 	return err
-	// } else {
-	// 	v.Address = ipv4.Address
-	// 	v.Netmask = net.IPv4Mask(uint8(a), uint8(b), uint8(c), uint8(d))
-	// 	v.Gateway = ipv4.Gateway
-	// 	v.MAC = MAC
-
-	// 	return nil
-	// }
 }
 
 func (v *IPv4) UnmarshalJSON(bytes []byte) error {

@@ -126,10 +126,31 @@ func (r RPC) SetString(oid scmp.OID, value string) (string, error) {
 		return "", err
 	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
 		return "", err
-	} else if s, ok := reply.(string); !ok {
+	} else if v, ok := reply.(string); !ok {
 		return "", fmt.Errorf("invalid reply - expected 'string', got '%T'", reply)
 	} else {
-		return s, nil
+		return v, nil
+	}
+}
+
+func (r RPC) SetUint32A(oid scmp.OID, value []uint32) ([]uint32, error) {
+	debugf("get %v %v", oid, value)
+
+	var kv = KV{
+		OID:   fmt.Sprintf("%v", oid),
+		Value: value,
+	}
+
+	var reply any
+
+	if client, err := rpc.DialHTTP("tcp", "127.0.0.1:1234"); err != nil {
+		return []uint32{}, err
+	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
+		return []uint32{}, err
+	} else if v, ok := reply.([]uint32); !ok {
+		return []uint32{}, fmt.Errorf("invalid reply - expected 'uint8', got '%T'", reply)
+	} else {
+		return v, nil
 	}
 }
 
