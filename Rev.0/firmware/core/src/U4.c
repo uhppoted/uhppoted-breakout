@@ -9,6 +9,7 @@
 #include <U4.h>
 #include <breakout.h>
 #include <log.h>
+#include <mempool.h>
 #include <state.h>
 #include <trace.h>
 
@@ -238,7 +239,8 @@ bool U4_tick(repeating_timer_t *rt) {
 
             U4x.tock = U4_TOCK;
             uint32_t trace1x = trace_in(TRACE_U4_CALLOC);
-            operation *op = (operation *)calloc(1, sizeof(operation));
+            // operation *op = (operation *)calloc(1, sizeof(operation));
+            operation *op = (operation *)mempool_calloc(1, sizeof(operation));
             trace_out(TRACE_U4_CALLOC, trace1x);
 
             if (op == NULL) {
@@ -257,7 +259,8 @@ bool U4_tick(repeating_timer_t *rt) {
                 //     // if (!I2C0_push(&task)) {
                 //     //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
                 uint32_t trace1z = trace_in(TRACE_U4_FREE);
-                free(op);
+                // free(op);
+                mempool_free(op);
                 trace_out(TRACE_U4_FREE, trace1z);
                 //     // }
             }

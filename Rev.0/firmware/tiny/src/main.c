@@ -15,6 +15,7 @@
 #include <SSMP.h>
 #include <breakout.h>
 #include <log.h>
+#include <mempool.h>
 #include <state.h>
 #include <sys.h>
 #include <trace.h>
@@ -62,6 +63,8 @@ int main() {
         warnf("SYS", "ERROR INITIALISING SYSTEM");
         return -1;
     }
+
+    mempool_init();
 
     // ... initialise FIFO, timers and I2C
     I2C0_init();

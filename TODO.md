@@ -34,6 +34,11 @@
       - pico_malloc
       - pico_stdio
 
+### mempool
+- [ ] alloc
+- [ ] free
+- [ ] guard
+
 ### SSMP
     - GET
       - [x] controller ID
