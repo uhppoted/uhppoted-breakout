@@ -1,5 +1,10 @@
+#include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+
+#include <pico/stdlib.h>
+#include <pico/sync.h>
 
 #include <log.h>
 #include <mempool.h>
@@ -7,39 +12,61 @@
 #define MEMPOOL_CHUNKSIZE 16
 #define MEMPOOL_SIZE 32
 
+typedef struct memchunk {
+    bool allocated;
+    uint8_t data[MEMPOOL_CHUNKSIZE];
+} memchunk;
+
 struct {
-    volatile int head;
-    volatile int tail;
-    uint8_t pool[MEMPOOL_SIZE][MEMPOOL_CHUNKSIZE];
-} mempool = {
-    .head = MEMPOOL_SIZE - 1,
-    .tail = 0,
-};
+    mutex_t guard;
+    memchunk pool[MEMPOOL_SIZE];
+} mempool = {};
 
 void mempool_init() {
+    mutex_init(&mempool.guard);
+
+    memchunk *p = mempool.pool;
+    for (int i = 0; i < MEMPOOL_SIZE; i++, p++) {
+        p->allocated = false;
+    }
 }
 
 void *mempool_calloc(size_t N, size_t size) {
-    int tail = mempool.tail;
-    void *chunk = NULL;
+    memchunk *chunk = NULL;
 
-    if (tail != mempool.head) {
-        chunk = mempool.pool[tail++];
-        mempool.tail = tail % MEMPOOL_SIZE;
+    if (N * size > MEMPOOL_CHUNKSIZE) {
+        panic("mempool: chunk too large");
+    } else if (mutex_try_enter(&mempool.guard, NULL)) {
+        memchunk *p = mempool.pool;
+        for (int i = 0; i < MEMPOOL_SIZE; i++, p++) {
+            if (!p->allocated) {
+                p->allocated = true;
+                chunk = p;
+                break;
+            }
+        }
 
-        memset(chunk, 0, MEMPOOL_CHUNKSIZE);
+        mutex_exit(&mempool.guard);
+
+        if (chunk == NULL) {
+            panic("out of pool memory");
+        } else {
+            memset(chunk->data, 0, MEMPOOL_CHUNKSIZE);
+        }
     }
 
-    return chunk;
+    return chunk ? chunk->data : NULL;
 }
 
 void mempool_free(void *p) {
     if (p != NULL) {
-        int head = mempool.head;
-        int next = (head + 1) % MEMPOOL_SIZE;
+        memchunk *chunk = mempool.pool;
 
-        if (next != mempool.tail) {
-            mempool.head = next;
+        for (int i = 0; i < MEMPOOL_SIZE; i++, chunk++) {
+            if (chunk->data == p) {
+                chunk->allocated = false;
+                break;
+            }
         }
     }
 }
