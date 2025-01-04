@@ -28,7 +28,7 @@
 
 queue_t queue;
 
-const uint32_t WATCHDOG_TIMEOUT = 5000; // ms
+const uint32_t WATCHDOG_TIMEOUT = 7500; // ms
 
 int main() {
     bi_decl(bi_program_description("uhppoted-breakout"));
@@ -73,11 +73,13 @@ int main() {
     multicore_launch_core1(I2C0_run);
 
     // ... initialise RTC, IO expanders and serial port
+    sleep_ms(5000); // FIXME remove - delay to let USB initialise
+
     RTC_init();
     IOX_init();
     SSMP_init();
 
-    sleep_ms(2500); // FIXME remove - delay to let USB initialise
+    // sleep_ms(2500); // FIXME remove - delay to let USB initialise
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();

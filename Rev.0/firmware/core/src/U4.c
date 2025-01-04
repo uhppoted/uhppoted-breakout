@@ -9,7 +9,6 @@
 #include <U4.h>
 #include <breakout.h>
 #include <log.h>
-#include <mempool.h>
 #include <state.h>
 #include <trace.h>
 
@@ -137,6 +136,7 @@ struct {
         LED LEDs[7];
     } LEDs;
 
+    queue_t pool;
     repeating_timer_t timer;
     mutex_t guard;
 } U4x = {
@@ -169,6 +169,18 @@ struct {
 
 void U4_setup() {
     infof("U4", "setup");
+
+    // ... create operations 'mempool'
+    queue_init(&U4x.pool, sizeof(operation *), 16);
+
+    int i = 0;
+    while (!queue_is_full(&U4x.pool)) {
+        operation *op = (operation *)calloc(1, sizeof(operation));
+
+        printf(">>> OP %d %p\n", ++i, op);
+
+        queue_try_add(&U4x.pool, &op);
+    }
 
     // ... configure PCAL6416A
     int err;
@@ -240,8 +252,14 @@ bool U4_tick(repeating_timer_t *rt) {
             U4x.tock = U4_TOCK;
             uint32_t trace1x = trace_in(TRACE_U4_CALLOC);
             // operation *op = (operation *)calloc(1, sizeof(operation));
-            operation *op = (operation *)mempool_calloc(1, sizeof(operation));
+            // operation *op = (operation *)mempool_calloc(1, sizeof(operation));
+            operation *op = NULL;
+            if (!queue_try_remove(&U4x.pool, &op)) {
+                panic("U4::operations pool empty");
+            }
             trace_out(TRACE_U4_CALLOC, trace1x);
+
+            printf(">>> >> OP %p\n", op);
 
             if (op == NULL) {
                 uint32_t trace1y = trace_in(TRACE_U4_SET_ERROR);
@@ -260,7 +278,12 @@ bool U4_tick(repeating_timer_t *rt) {
                 //     //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
                 uint32_t trace1z = trace_in(TRACE_U4_FREE);
                 // free(op);
-                mempool_free(op);
+                // mempool_free(op);
+
+                if (!queue_try_add(&U4x.pool, &op)) {
+                    panic("U4::operations pool full");
+                }
+
                 trace_out(TRACE_U4_FREE, trace1z);
                 //     // }
             }
@@ -372,8 +395,12 @@ void U4_healthcheck(void *data) {
     //         mutex_exit(&U4x.guard);
     //     }
     // }
+    // 
+    // free(data);
 
-    free(data);
+    if (!queue_try_add(&U4x.pool, &op)) {
+                    panic("U4::operations pool full");
+    }
 }
 
 void U4_set_relay(int relay, uint16_t delay) {
