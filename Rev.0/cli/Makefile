@@ -17,7 +17,7 @@ get-controller:
 	python3 main.py get-controller
 	python3 main.py --destination $(ADDRESS) --protocol udp get-controller
 	python3 main.py --destination $(ADDRESS) --protocol tcp get-controller
-#	python3 main.py --destination $(TLS)     --protocol tls get-controller
+	python3 main.py --destination $(TLS)     --protocol tls get-controller
 
 set-IPv4:
 	python3 main.py set-IPv4

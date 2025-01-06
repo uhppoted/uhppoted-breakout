@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"sync"
 	"time"
 
 	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
@@ -17,11 +18,32 @@ import (
 type TLS struct {
 	Certificate string
 	CA          string
+
+	socket  net.Listener
+	wg      sync.WaitGroup
+	closing bool
 }
 
-func (c TLS) listen(received func(any) (any, error)) error {
+func makeTLS(certificate string, ca string) *TLS {
+	return &TLS{
+		Certificate: certificate,
+		CA:          ca,
+	}
+}
+
+func (c TLS) isClosing() bool {
+	return c.closing
+}
+
+func (c *TLS) listen(received func(any) (any, error)) error {
 	bind := "0.0.0.0:60443"
 	certificates := x509.NewCertPool()
+
+	c.wg.Add(1)
+
+	defer func() {
+		c.wg.Done()
+	}()
 
 	if certificate, err := tls.LoadX509KeyPair(c.Certificate, ".key"); err != nil {
 		return err
@@ -44,9 +66,11 @@ func (c TLS) listen(received func(any) (any, error)) error {
 
 			defer socket.Close()
 
+			c.socket = socket
+
 			for {
 				if client, err := socket.Accept(); err != nil {
-					warnf("TLS  accept error (%v)", err)
+					return err
 				} else {
 					infof("TLS  incoming")
 
@@ -107,6 +131,20 @@ func (c TLS) read(socket net.Conn, received func(any) (any, error)) error {
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (c *TLS) stop() error {
+	c.closing = true
+
+	if c.socket != nil {
+		if err := c.socket.Close(); err != nil {
+			return err
+		} else {
+			c.wg.Wait()
+		}
 	}
 
 	return nil

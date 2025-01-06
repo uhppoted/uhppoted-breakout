@@ -30,7 +30,7 @@ type UT0311 struct {
 
 	udp *UDP
 	tcp *TCP
-	tls TLS
+	tls *TLS
 
 	closing bool
 }
@@ -48,10 +48,7 @@ func NewUT0311(c config.Config) UT0311 {
 
 		udp: makeUDP(),
 		tcp: makeTCP(),
-		tls: TLS{
-			Certificate: c.TLS.Certificate,
-			CA:          c.TLS.CA,
-		},
+		tls: makeTLS(c.TLS.Certificate, c.TLS.CA),
 
 		closing: false,
 	}
@@ -62,10 +59,9 @@ func (ut0311 *UT0311) Run() {
 
 	// ... start UDP listener
 	wg.Add(1)
-
 	go func() {
 		for !ut0311.closing {
-			if err := ut0311.listen(ut0311.udp, ut0311.received); err != nil {
+			if err := ut0311.listen(ut0311.udp); err != nil {
 				warnf("%v", err)
 			}
 
@@ -78,10 +74,9 @@ func (ut0311 *UT0311) Run() {
 
 	// ... start TCP listener
 	wg.Add(1)
-
 	go func() {
 		for !ut0311.closing {
-			if err := ut0311.listen(ut0311.tcp, ut0311.received); err != nil {
+			if err := ut0311.listen(ut0311.tcp); err != nil {
 				warnf("%v", err)
 			}
 
@@ -93,15 +88,14 @@ func (ut0311 *UT0311) Run() {
 
 	// ... start TLS listener
 	wg.Add(1)
-
 	go func() {
-		for {
-			if err := ut0311.tls.listen(ut0311.received); err != nil {
+		for !ut0311.closing {
+			if err := ut0311.listen(ut0311.tls); err != nil {
 				warnf("%v", err)
 			}
 
 			// TODO: exponential backoff
-			time.Sleep(5 * time.Second)
+			time.Sleep(2500 * time.Millisecond)
 		}
 		wg.Done()
 	}()
@@ -141,6 +135,16 @@ func (ut0311 *UT0311) Stop() {
 		wg.Done()
 	}()
 
+	wg.Add(1)
+	go func() {
+		infof("stopping TLS")
+		if err := ut0311.tls.stop(); err != nil {
+			warnf("%v", err)
+		}
+
+		wg.Done()
+	}()
+
 	go func() {
 		wg.Wait()
 		closed <- struct{}{}
@@ -154,8 +158,8 @@ func (ut0311 *UT0311) Stop() {
 	}
 }
 
-func (ut0311 UT0311) listen(c listener, received func(any) (any, error)) error {
-	if err := c.listen(received); err != nil {
+func (ut0311 UT0311) listen(c listener) error {
+	if err := c.listen(ut0311.received); err != nil {
 		if errors.Is(err, net.ErrClosed) && c.isClosing() {
 			return nil
 		} else {

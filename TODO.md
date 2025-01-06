@@ -64,12 +64,18 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] get-door
     - [x] set-door
     - [x] set-door-passcodes
+    - [ ] get-cards
+    - [ ] get-card
+    - [ ] get-card-by-index
+    - [ ] put-card
+    - [ ] delete-card
+    - [ ] delete-all-cards
 
     - [ ] API
-           - [ ] Terminate gracefully on CTRL-C
+           - [x] Terminate gracefully on CTRL-C
                  - [x] UDP
                  - [x] TCP
-                 - [ ] TLS
+                 - [x] TLS
            - [ ] exponential backoff
            - [ ] rate limiting
 
