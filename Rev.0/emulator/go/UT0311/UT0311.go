@@ -1,6 +1,8 @@
 package UT0311
 
 import (
+	"errors"
+	"net"
 	"reflect"
 	"sync"
 	"time"
@@ -14,6 +16,12 @@ import (
 	"emulator/system"
 )
 
+type listener interface {
+	listen(received func(any) (any, error)) error
+	stop() error
+	isClosing() bool
+}
+
 type UT0311 struct {
 	config config.Config
 	driver rpcd.RPC
@@ -21,7 +29,7 @@ type UT0311 struct {
 	events events.Events
 
 	udp *UDP
-	tcp TCP
+	tcp *TCP
 	tls TLS
 
 	closing bool
@@ -39,7 +47,7 @@ func NewUT0311(c config.Config) UT0311 {
 		events: events.Events{},
 
 		udp: makeUDP(),
-		tcp: TCP{},
+		tcp: makeTCP(),
 		tls: TLS{
 			Certificate: c.TLS.Certificate,
 			CA:          c.TLS.CA,
@@ -57,7 +65,7 @@ func (ut0311 *UT0311) Run() {
 
 	go func() {
 		for !ut0311.closing {
-			if err := ut0311.udp.listen(ut0311.received); err != nil {
+			if err := ut0311.listen(ut0311.udp, ut0311.received); err != nil {
 				warnf("%v", err)
 			}
 
@@ -72,13 +80,13 @@ func (ut0311 *UT0311) Run() {
 	wg.Add(1)
 
 	go func() {
-		for {
-			if err := ut0311.tcp.listen(ut0311.received); err != nil {
+		for !ut0311.closing {
+			if err := ut0311.listen(ut0311.tcp, ut0311.received); err != nil {
 				warnf("%v", err)
 			}
 
 			// TODO: exponential backoff
-			time.Sleep(5 * time.Second)
+			time.Sleep(2500 * time.Millisecond)
 		}
 		wg.Done()
 	}()
@@ -106,26 +114,56 @@ func (ut0311 *UT0311) Run() {
 func (ut0311 *UT0311) Stop() {
 	infof("stopping")
 
-	c := make(chan struct{})
+	var wg sync.WaitGroup
+
+	closed := make(chan struct{})
 	timeout := time.Duration(10) * time.Second
 
 	ut0311.closing = true
 
+	wg.Add(1)
 	go func() {
 		infof("stopping UDP")
 		if err := ut0311.udp.stop(); err != nil {
 			warnf("%v", err)
 		}
 
-		c <- struct{}{}
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		infof("stopping TCP")
+		if err := ut0311.tcp.stop(); err != nil {
+			warnf("%v", err)
+		}
+
+		wg.Done()
+	}()
+
+	go func() {
+		wg.Wait()
+		closed <- struct{}{}
 	}()
 
 	select {
-	case <-c:
+	case <-closed:
 		infof("terminated")
 	case <-time.After(timeout):
 		warnf("shutdown timeout")
 	}
+}
+
+func (ut0311 UT0311) listen(c listener, received func(any) (any, error)) error {
+	if err := c.listen(received); err != nil {
+		if errors.Is(err, net.ErrClosed) && c.isClosing() {
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (ut0311 UT0311) received(request any) (any, error) {

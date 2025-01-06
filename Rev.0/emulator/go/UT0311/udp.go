@@ -1,7 +1,6 @@
 package UT0311
 
 import (
-	"errors"
 	"net"
 	"net/netip"
 	"sync"
@@ -20,33 +19,11 @@ func makeUDP() *UDP {
 	return &UDP{}
 }
 
+func (c UDP) isClosing() bool {
+	return c.closing
+}
+
 func (c *UDP) listen(received func(any) (any, error)) error {
-	if err := listen(c, received); err != nil {
-		if errors.Is(err, net.ErrClosed) && c.closing {
-			return nil
-		} else {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (c *UDP) stop() error {
-	c.closing = true
-
-	if c.socket != nil {
-		if err := c.socket.Close(); err != nil {
-			return err
-		} else {
-			c.wg.Wait()
-		}
-	}
-
-	return nil
-}
-
-func listen(c *UDP, received func(any) (any, error)) error {
 	bind := netip.MustParseAddrPort("0.0.0.0:60000")
 
 	c.wg.Add(1)
@@ -96,4 +73,18 @@ func listen(c *UDP, received func(any) (any, error)) error {
 			}
 		}
 	}
+}
+
+func (c *UDP) stop() error {
+	c.closing = true
+
+	if c.socket != nil {
+		if err := c.socket.Close(); err != nil {
+			return err
+		} else {
+			c.wg.Wait()
+		}
+	}
+
+	return nil
 }

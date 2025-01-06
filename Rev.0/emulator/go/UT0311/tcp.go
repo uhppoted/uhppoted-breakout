@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/netip"
 	"os"
+	"sync"
 	"time"
 
 	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
@@ -13,12 +14,29 @@ import (
 )
 
 type TCP struct {
+	socket  *net.TCPListener
+	wg      sync.WaitGroup
+	closing bool
 }
 
 const READ_TIMEOUT = 30000 * time.Millisecond
 
-func (c TCP) listen(received func(any) (any, error)) error {
+func makeTCP() *TCP {
+	return &TCP{}
+}
+
+func (c TCP) isClosing() bool {
+	return c.closing
+}
+
+func (c *TCP) listen(received func(any) (any, error)) error {
 	bind := netip.MustParseAddrPort("0.0.0.0:60000")
+
+	c.wg.Add(1)
+
+	defer func() {
+		c.wg.Done()
+	}()
 
 	if socket, err := net.ListenTCP("tcp4", net.TCPAddrFromAddrPort(bind)); err != nil {
 		return err
@@ -27,9 +45,11 @@ func (c TCP) listen(received func(any) (any, error)) error {
 
 		defer socket.Close()
 
+		c.socket = socket
+
 		for {
 			if client, err := socket.Accept(); err != nil {
-				warnf("TCP  accept error (%v)", err)
+				return err
 			} else {
 				infof("TCP  incoming")
 
@@ -87,6 +107,20 @@ func (c TCP) read(socket net.Conn, received func(any) (any, error)) error {
 					}
 				}
 			}
+		}
+	}
+
+	return nil
+}
+
+func (c *TCP) stop() error {
+	c.closing = true
+
+	if c.socket != nil {
+		if err := c.socket.Close(); err != nil {
+			return err
+		} else {
+			c.wg.Wait()
 		}
 	}
 
