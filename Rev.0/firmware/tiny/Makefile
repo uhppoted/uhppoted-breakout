@@ -19,7 +19,7 @@ clean:
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
 	       cmake -DMODE="log" \
-	             -DWATCHDOG="disabled" \
+	             -DWATCHDOG="enabled" \
 	             -DI2C0_CLOCK="100kHz" -DI2C1_CLOCK="400kHz" \
 	             -DRX8900SA_VDET="$(RX8900SA_VDET)" -DRX8900SA_SWOFF="$(RX8900SA_SWOFF)" -DRX8900SA_BKSMP="$(RX8900SA_BKSMP)" \
 	             -DCONTROLLER=$(CONTROLLER) \
@@ -41,16 +41,23 @@ format:
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make
 
-run: build
+run-local: build
 	picotool load -v build/breakout.uf2 -f
-
-reboot: 
-	picotool reboot -f
 
 remote-run: build
 	scp build/breakout.uf2 $(RPI):/tmp
 	ssh $(RPI) "picotool load -v /tmp/breakout.uf2 -F"
 	ssh $(RPI) "picotool reboot"
+
+run: remote-run
+
+reboot-local: 
+	ssh $(RPI) "picotool reboot"
+
+reboot-remote: 
+	picotool reboot -f
+
+reboot: reboot-remote
 
 tty:
 	 minicom -b 115200 -o -D $(PORT)

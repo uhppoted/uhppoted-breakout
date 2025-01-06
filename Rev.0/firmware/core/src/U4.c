@@ -10,6 +10,7 @@
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
+#include <types/mempool.h>
 
 const uint16_t MASK = 0x07ff;
 
@@ -135,6 +136,7 @@ struct {
         LED LEDs[7];
     } LEDs;
 
+    mempool pool;
     repeating_timer_t timer;
     mutex_t guard;
 } U4x = {
@@ -167,6 +169,9 @@ struct {
 
 void U4_setup() {
     infof("U4", "setup");
+
+    // ... initialise mempool
+    mempool_init(&U4x.pool);
 
     // ... configure PCAL6416A
     int err;
@@ -228,72 +233,78 @@ bool U4_tick(repeating_timer_t *rt) {
     uint16_t outputs = U4x.outputs;
 
     if (mutex_try_enter(&U4x.guard, NULL)) {
-        //     // ... health check
-        //     U4x.tock -= U4_TICK;
-        //     if (U4x.tock < 0) {
-        //         U4x.tock = U4_TOCK;
-        //
-        //         operation *op = (operation *)calloc(1, sizeof(operation));
-        //
-        //         op->tag = U4_HEALTHCHECK;
-        //         op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
-        //
-        //         struct closure task = {
-        //             .f = U4_healthcheck,
-        //             .data = op,
-        //         };
-        //
-        //         if (!I2C0_push(&task)) {
-        //             set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+        // ... health check
+        U4x.tock -= U4_TICK;
+        if (U4x.tock < 0) {
+            U4x.tock = U4_TOCK;
+
+            operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
+
+            debugf("U4", ">>> healthcheck %p", op);
+
+            // operation *op = (operation *)calloc(1, sizeof(operation));
+            //
+            // op->tag = U4_HEALTHCHECK;
+            // op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
+            //
+            // struct closure task = {
+            //     .f = U4_healthcheck,
+            //     .data = op,
+            // };
+            //
+            // if (!I2C0_push(&task)) {
+            //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+            // }
+
+            mempool_free(&U4x.pool, op);
+        }
+
+        // // ... update relays
+        // for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
+        //     if (r->timer > 0) {
+        //         r->timer = clamp(r->timer - U4_TICK, 0, 60000);
+        //         if (r->timer == 0) {
+        //             U4_clear(r->mask);
         //         }
         //     }
+        // }
 
-        // ... update relays
-        for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
-            if (r->timer > 0) {
-                r->timer = clamp(r->timer - U4_TICK, 0, 60000);
-                if (r->timer == 0) {
-                    U4_clear(r->mask);
-                }
-            }
-        }
+        // // ... update LEDs
+        // for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
+        //     if (l->timer > 0) {
+        //         l->timer = clamp(l->timer - U4_TICK, 0, 60000);
+        //         if (l->timer == 0) {
+        //             if ((l->blinks > 0) && (l->interval > 0)) {
+        //                 l->blinks--;
+        //                 l->timer = l->interval;
+        //                 U4_toggle(l->mask);
+        //             } else {
+        //                 U4_clear(l->mask);
+        //             }
+        //         }
+        //     }
+        // }
 
-        // ... update LEDs
-        for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
-            if (l->timer > 0) {
-                l->timer = clamp(l->timer - U4_TICK, 0, 60000);
-                if (l->timer == 0) {
-                    if ((l->blinks > 0) && (l->interval > 0)) {
-                        l->blinks--;
-                        l->timer = l->interval;
-                        U4_toggle(l->mask);
-                    } else {
-                        U4_clear(l->mask);
-                    }
-                }
-            }
-        }
-
-        // ... update outputs
-        if (outputs != U4x.outputs || U4x.write) {
-            outputs = U4x.outputs;
-
-            operation *op = (operation *)calloc(1, sizeof(operation));
-
-            op->tag = U4_WRITE;
-            op->write.outputs = (outputs ^ U4x.polarity) & MASK;
-
-            struct closure task = {
-                .f = U4_write,
-                .data = op,
-            };
-
-            if (!I2C0_push(&task)) {
-                set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-            }
-
-            U4x.write = false;
-        }
+        // // ... update outputs
+        // if (outputs != U4x.outputs || U4x.write) {
+        //     outputs = U4x.outputs;
+        //
+        //     operation *op = (operation *)calloc(1, sizeof(operation));
+        //
+        //     op->tag = U4_WRITE;
+        //     op->write.outputs = (outputs ^ U4x.polarity) & MASK;
+        //
+        //     struct closure task = {
+        //         .f = U4_write,
+        //         .data = op,
+        //     };
+        //
+        //     if (!I2C0_push(&task)) {
+        //         set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+        //     }
+        //
+        //     U4x.write = false;
+        // }
 
         mutex_exit(&U4x.guard);
     }

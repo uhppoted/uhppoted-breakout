@@ -38,9 +38,17 @@ int main() {
 
     if (watchdog_caused_reboot()) {
         set_error(ERR_WATCHDOG, "SYS", "watchdog reboot");
-    }
 
-    if (strcmp(WATCHDOG, "disabled") != 0) {
+        // FIXME remove - debugging
+        printf(">>>> WATCHDOG REBOOT\n");
+        while (true) {
+            sleep_ms(2500);
+            printf("     ... watchdogged\n");
+        }
+        // END FIXME
+    } else
+
+        if (strcmp(WATCHDOG, "disabled") != 0) {
         watchdog_enable(WATCHDOG_TIMEOUT, true);
     }
 

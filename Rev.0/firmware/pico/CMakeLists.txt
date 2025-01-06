@@ -57,6 +57,7 @@ add_executable(breakout
   ${LIB}/src/types/packet.c
   ${LIB}/src/types/fields.c
   ${LIB}/src/types/buffer.c
+  ${LIB}/src/types/mempool.c
 
   ${LIB}/src/encoding/bisync/bisync.c
   ${LIB}/src/encoding/bisync/crc.c
