@@ -6,12 +6,13 @@
 
 typedef struct memchunk {
     bool allocated;
-    uint8_t data[16];
+    uint8_t data[16] __attribute__((aligned(4)));
 } memchunk;
 
 typedef struct mempool {
     mutex_t guard;
-    struct memchunk pool[32];
+    uint32_t head;
+    struct memchunk pool[32] __attribute__((aligned(4)));
 } mempool;
 
 extern void mempool_init(mempool *pool);

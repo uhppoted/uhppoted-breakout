@@ -236,27 +236,25 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... health check
         U4x.tock -= U4_TICK;
         if (U4x.tock < 0) {
-            U4x.tock = U4_TOCK;
-
             operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
 
-            debugf("U4", ">>> healthcheck %p", op);
+            if (op != NULL) {
 
-            // operation *op = (operation *)calloc(1, sizeof(operation));
-            //
-            // op->tag = U4_HEALTHCHECK;
-            // op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
-            //
-            // struct closure task = {
-            //     .f = U4_healthcheck,
-            //     .data = op,
-            // };
-            //
-            // if (!I2C0_push(&task)) {
-            //     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-            // }
+                op->tag = U4_HEALTHCHECK;
+                op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
 
-            mempool_free(&U4x.pool, op);
+                struct closure task = {
+                    .f = U4_healthcheck,
+                    .data = op,
+                };
+
+                if (I2C0_push(&task)) {
+                    U4x.tock = U4_TOCK;
+                } else {
+                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                    mempool_free(&U4x.pool, op);
+                }
+            }
         }
 
         // // ... update relays
@@ -351,7 +349,7 @@ void U4_healthcheck(void *data) {
         }
     }
 
-    free(data);
+    mempool_free(&U4x.pool, op);
 }
 
 void U4_set_relay(int relay, uint16_t delay) {
