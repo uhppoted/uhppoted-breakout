@@ -11,10 +11,11 @@ typedef struct memchunk {
 
 typedef struct mempool {
     mutex_t guard;
+    uint32_t size;
     uint32_t head;
     struct memchunk pool[32] __attribute__((aligned(4)));
 } mempool;
 
-extern void mempool_init(mempool *pool);
+extern void mempool_init(mempool *pool, uint32_t size);
 extern void *mempool_alloc(mempool *pool, size_t N, size_t size);
 extern void mempool_free(mempool *pool, void *p);

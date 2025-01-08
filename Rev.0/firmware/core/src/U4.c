@@ -28,6 +28,7 @@ const uint16_t ERR = 0x0100;
 const uint16_t IN = 0x0200;
 const uint16_t SYS = 0x0400;
 
+const uint32_t U4_POOLSIZE = 32;
 const int32_t U4_TICK = 10;   // ms
 const int32_t U4_TOCK = 1000; // ms
 const int ID_ERR = -1;
@@ -171,7 +172,7 @@ void U4_setup() {
     infof("U4", "setup");
 
     // ... initialise mempool
-    mempool_init(&U4x.pool);
+    mempool_init(&U4x.pool, U4_POOLSIZE);
 
     // ... configure PCAL6416A
     int err;
@@ -239,7 +240,7 @@ bool U4_tick(repeating_timer_t *rt) {
             operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
 
             if (op != NULL) {
-
+                debugf("U4", ">>> op::healthcheck %p", op);
                 op->tag = U4_HEALTHCHECK;
                 op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
 
@@ -251,8 +252,8 @@ bool U4_tick(repeating_timer_t *rt) {
                 if (I2C0_push(&task)) {
                     U4x.tock = U4_TOCK;
                 } else {
-                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
                     mempool_free(&U4x.pool, op);
+                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
                 }
             }
         }
@@ -283,26 +284,31 @@ bool U4_tick(repeating_timer_t *rt) {
         //     }
         // }
 
-        // // ... update outputs
-        // if (outputs != U4x.outputs || U4x.write) {
-        //     outputs = U4x.outputs;
-        //
-        //     operation *op = (operation *)calloc(1, sizeof(operation));
-        //
-        //     op->tag = U4_WRITE;
-        //     op->write.outputs = (outputs ^ U4x.polarity) & MASK;
-        //
-        //     struct closure task = {
-        //         .f = U4_write,
-        //         .data = op,
-        //     };
-        //
-        //     if (!I2C0_push(&task)) {
-        //         set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
-        //     }
-        //
-        //     U4x.write = false;
-        // }
+        // ... update outputs
+        if (outputs != U4x.outputs || U4x.write) {
+            operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
+
+            if (op != NULL) {
+                debugf("U4", ">>> op::write %p", op);
+
+                outputs = U4x.outputs;
+
+                op->tag = U4_WRITE;
+                op->write.outputs = (outputs ^ U4x.polarity) & MASK;
+
+                struct closure task = {
+                    .f = U4_write,
+                    .data = op,
+                };
+
+                if (!I2C0_push(&task)) {
+                    mempool_free(&U4x.pool, op);
+                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                } else {
+                    U4x.write = false;
+                }
+            }
+        }
 
         mutex_exit(&U4x.guard);
     }
@@ -327,7 +333,7 @@ void U4_write(void *data) {
         set_error(ERR_U4, "U4", "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
     }
 
-    free(data);
+    mempool_free(&U4x.pool, op);
 }
 
 /*

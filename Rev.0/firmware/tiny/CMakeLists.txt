@@ -21,6 +21,9 @@ add_compile_definitions(CONTROLLER=${CONTROLLER})
 add_compile_definitions(VERSION=${VERSION})
 add_compile_definitions(RELEASED="${RELEASED}")
 
+add_compile_definitions(PARAM_ASSERTIONS_ENABLE_ALL=1)
+
+
 set(CORE "../core")
 set(LIB  "../lib")
 

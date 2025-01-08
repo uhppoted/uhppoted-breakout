@@ -37,6 +37,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 
 - [ ] doors should be unlocked on boot/power-off
 - [ ] move error handling to breakout.c
+- [ ] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
 
 ### SSMP
     - GET
