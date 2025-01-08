@@ -2,10 +2,13 @@ package UT0311
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"reflect"
 	"sync"
 	"time"
+
+	"golang.org/x/time/rate"
 
 	"github.com/uhppoted/uhppote-core/messages"
 
@@ -18,6 +21,8 @@ import (
 
 const BACKOFF = 500 * time.Millisecond
 const MAX_BACKOFF = 60 * time.Second
+const RATE_LIMIT = 5.0   // requests/second
+const BURST_LIMIT = 10.0 // burst requests
 
 type listener interface {
 	listen(received func(any) (any, error)) error
@@ -31,9 +36,10 @@ type UT0311 struct {
 	system system.System
 	events events.Events
 
-	udp *UDP
-	tcp *TCP
-	tls *TLS
+	udp       *UDP
+	tcp       *TCP
+	tls       *TLS
+	rateLimit *rate.Limiter
 
 	closing bool
 }
@@ -49,9 +55,10 @@ func NewUT0311(c config.Config) UT0311 {
 		system: system.System{},
 		events: events.Events{},
 
-		udp: makeUDP(),
-		tcp: makeTCP(),
-		tls: makeTLS(c.TLS.Certificate, c.TLS.CA),
+		udp:       makeUDP(),
+		tcp:       makeTCP(),
+		tls:       makeTLS(c.TLS.Certificate, c.TLS.CA),
+		rateLimit: rate.NewLimiter(RATE_LIMIT, BURST_LIMIT),
 
 		closing: false,
 	}
@@ -172,6 +179,10 @@ func (ut0311 *UT0311) listen(tag string, c listener) {
 
 func (ut0311 UT0311) received(request any) (any, error) {
 	infof("UDP  request %T", request)
+
+	if !ut0311.rateLimit.Allow() {
+		return nil, fmt.Errorf("rate limit exceeded")
+	}
 
 	switch rq := request.(type) {
 	case *messages.GetDeviceRequest:

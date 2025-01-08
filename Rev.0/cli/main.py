@@ -8,6 +8,7 @@ import traceback
 from trace import Trace
 from commands import commands
 from commands import exec
+from commands import get_controller
 from commands import debug_get_controller
 
 
@@ -66,7 +67,7 @@ def main():
                     print()
     elif cmd == 'debug':
         try:
-           debug_tcp_read(args)
+           debug_rate_limit(args)
         except Exception as x:
             print()
             print(f'*** ERROR  {cmd}: {x}')
@@ -91,6 +92,21 @@ def main():
         print()
         print(f'  ERROR: invalid command ({cmd})')
         print()
+
+def debug_rate_limit(args):
+    start= time.time()
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    exec(get_controller, args)
+    print("--- %s seconds ---" % (time.time() - start))
 
 def debug_tcp_read(args):
     exec(debug_get_controller, args)
