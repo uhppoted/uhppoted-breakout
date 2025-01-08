@@ -16,6 +16,9 @@ import (
 	"emulator/system"
 )
 
+const BACKOFF = 500 * time.Millisecond
+const MAX_BACKOFF = 60 * time.Second
+
 type listener interface {
 	listen(received func(any) (any, error)) error
 	stop() error
@@ -60,43 +63,21 @@ func (ut0311 *UT0311) Run() {
 	// ... start UDP listener
 	wg.Add(1)
 	go func() {
-		for !ut0311.closing {
-			if err := ut0311.listen(ut0311.udp); err != nil {
-				warnf("%v", err)
-			}
-
-			// TODO: exponential backoff
-			time.Sleep(2500 * time.Millisecond)
-		}
-
+		ut0311.listen("UDP", ut0311.udp)
 		wg.Done()
 	}()
 
 	// ... start TCP listener
 	wg.Add(1)
 	go func() {
-		for !ut0311.closing {
-			if err := ut0311.listen(ut0311.tcp); err != nil {
-				warnf("%v", err)
-			}
-
-			// TODO: exponential backoff
-			time.Sleep(2500 * time.Millisecond)
-		}
+		ut0311.listen("TCP", ut0311.tcp)
 		wg.Done()
 	}()
 
 	// ... start TLS listener
 	wg.Add(1)
 	go func() {
-		for !ut0311.closing {
-			if err := ut0311.listen(ut0311.tls); err != nil {
-				warnf("%v", err)
-			}
-
-			// TODO: exponential backoff
-			time.Sleep(2500 * time.Millisecond)
-		}
+		ut0311.listen("TLS", ut0311.tls)
 		wg.Done()
 	}()
 
@@ -158,16 +139,35 @@ func (ut0311 *UT0311) Stop() {
 	}
 }
 
-func (ut0311 UT0311) listen(c listener) error {
-	if err := c.listen(ut0311.received); err != nil {
-		if errors.Is(err, net.ErrClosed) && c.isClosing() {
-			return nil
+func (ut0311 *UT0311) listen(tag string, c listener) {
+	delay := BACKOFF
+
+	for {
+		timer := time.AfterFunc(10*time.Second, func() {
+			delay = BACKOFF
+		})
+
+		if err := c.listen(ut0311.received); err != nil {
+			if !errors.Is(err, net.ErrClosed) || !c.isClosing() {
+				warnf("%v", err)
+			}
+		}
+
+		timer.Stop()
+
+		if ut0311.closing {
+			break
+		}
+
+		warnf("%v  reconnecting in %v", tag, delay)
+
+		time.Sleep(delay)
+		if dt := 2 * delay; dt > MAX_BACKOFF {
+			delay = MAX_BACKOFF
 		} else {
-			return err
+			delay = dt
 		}
 	}
-
-	return nil
 }
 
 func (ut0311 UT0311) received(request any) (any, error) {
