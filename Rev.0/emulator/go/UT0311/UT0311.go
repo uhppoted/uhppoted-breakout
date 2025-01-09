@@ -12,6 +12,7 @@ import (
 
 	"github.com/uhppoted/uhppote-core/messages"
 
+	"emulator/cards"
 	"emulator/config"
 	"emulator/driver/rpcd"
 	"emulator/events"
@@ -35,6 +36,7 @@ type UT0311 struct {
 	driver rpcd.RPC
 	system system.System
 	events events.Events
+	cards  cards.Cards
 
 	udp       *UDP
 	tcp       *TCP
@@ -55,6 +57,7 @@ func NewUT0311(c config.Config) UT0311 {
 		driver: rpcd.RPC{},
 		system: system.System{},
 		events: events.Events{},
+		cards:  cards.Cards{},
 
 		udp:       makeUDP(cm),
 		tcp:       makeTCP(cm),
@@ -215,6 +218,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 
 	case *messages.SetDoorPasscodesRequest:
 		return ut0311.setDoorPasscodes(rq)
+
+	case *messages.GetCardsRequest:
+		return ut0311.getCards(rq)
 
 	default:
 		warnf("unknown message type (%T)", request)

@@ -65,7 +65,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] get-door
     - [x] set-door
     - [x] set-door-passcodes
-    - [ ] get-cards
+    - [x] get-cards
     - [ ] get-card
     - [ ] get-card-by-index
     - [ ] put-card
