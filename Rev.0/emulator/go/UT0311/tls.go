@@ -15,19 +15,25 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 )
 
+const TLS_READ_TIMEOUT = 30000 * time.Millisecond
+
 type TLS struct {
 	Certificate string
 	CA          string
 
-	socket  net.Listener
-	wg      sync.WaitGroup
-	closing bool
+	socket      net.Listener
+	wg          sync.WaitGroup
+	cm          *ConnectionManager
+	readTimeout time.Duration
+	closing     bool
 }
 
-func makeTLS(certificate string, ca string) *TLS {
+func makeTLS(certificate string, ca string, cm *ConnectionManager) *TLS {
 	return &TLS{
 		Certificate: certificate,
 		CA:          ca,
+		cm:          cm,
+		readTimeout: TLS_READ_TIMEOUT,
 	}
 }
 
@@ -71,6 +77,8 @@ func (c *TLS) listen(received func(any) (any, error)) error {
 			for {
 				if client, err := socket.Accept(); err != nil {
 					return err
+				} else if err := c.cm.add(client); err != nil {
+					warnf("TLS  %v", err)
 				} else {
 					infof("TLS  incoming")
 
@@ -78,6 +86,8 @@ func (c *TLS) listen(received func(any) (any, error)) error {
 						if err := c.read(client, received); err != nil {
 							warnf("TLS read error (%v)", err)
 						}
+
+						c.cm.remove(client)
 					}()
 				}
 			}
@@ -93,7 +103,7 @@ func (c TLS) read(socket net.Conn, received func(any) (any, error)) error {
 
 	for {
 		buffer := make([]byte, 2048)
-		deadline := time.Now().Add(READ_TIMEOUT)
+		deadline := time.Now().Add(c.readTimeout)
 
 		socket.SetReadDeadline(deadline)
 

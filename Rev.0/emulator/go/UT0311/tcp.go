@@ -13,16 +13,21 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 )
 
+const TCP_READ_TIMEOUT = 30000 * time.Millisecond
+
 type TCP struct {
-	socket  *net.TCPListener
-	wg      sync.WaitGroup
-	closing bool
+	socket      *net.TCPListener
+	wg          sync.WaitGroup
+	cm          *ConnectionManager
+	readTimeout time.Duration
+	closing     bool
 }
 
-const READ_TIMEOUT = 30000 * time.Millisecond
-
-func makeTCP() *TCP {
-	return &TCP{}
+func makeTCP(cm *ConnectionManager) *TCP {
+	return &TCP{
+		cm:          cm,
+		readTimeout: TCP_READ_TIMEOUT,
+	}
 }
 
 func (c TCP) isClosing() bool {
@@ -50,6 +55,9 @@ func (c *TCP) listen(received func(any) (any, error)) error {
 		for {
 			if client, err := socket.Accept(); err != nil {
 				return err
+			} else if err := c.cm.add(client); err != nil {
+				warnf("TCP  %v", err)
+				client.Close()
 			} else {
 				infof("TCP  incoming")
 
@@ -57,6 +65,8 @@ func (c *TCP) listen(received func(any) (any, error)) error {
 					if err := c.read(client, received); err != nil {
 						warnf("TCP read error (%v)", err)
 					}
+
+					c.cm.remove(client)
 				}()
 			}
 		}
@@ -71,7 +81,7 @@ func (c TCP) read(socket net.Conn, received func(any) (any, error)) error {
 
 	for {
 		buffer := make([]byte, 2048)
-		deadline := time.Now().Add(READ_TIMEOUT)
+		deadline := time.Now().Add(c.readTimeout)
 
 		socket.SetReadDeadline(deadline)
 

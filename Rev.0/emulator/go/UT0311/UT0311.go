@@ -49,15 +49,16 @@ func (ut0311 *UT0311) SetConfig(c config.Config) {
 }
 
 func NewUT0311(c config.Config) UT0311 {
+	cm := NewConnectionManager(MAX_CONNECTIONS)
 	return UT0311{
 		config: c,
 		driver: rpcd.RPC{},
 		system: system.System{},
 		events: events.Events{},
 
-		udp:       makeUDP(),
-		tcp:       makeTCP(),
-		tls:       makeTLS(c.TLS.Certificate, c.TLS.CA),
+		udp:       makeUDP(cm),
+		tcp:       makeTCP(cm),
+		tls:       makeTLS(c.TLS.Certificate, c.TLS.CA, cm),
 		rateLimit: rate.NewLimiter(RATE_LIMIT, BURST_LIMIT),
 
 		closing: false,

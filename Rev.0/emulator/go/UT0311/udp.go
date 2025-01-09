@@ -12,11 +12,14 @@ import (
 type UDP struct {
 	socket  *net.UDPConn
 	wg      sync.WaitGroup
+	cm      *ConnectionManager
 	closing bool
 }
 
-func makeUDP() *UDP {
-	return &UDP{}
+func makeUDP(cm *ConnectionManager) *UDP {
+	return &UDP{
+		cm: cm,
+	}
 }
 
 func (c UDP) isClosing() bool {
