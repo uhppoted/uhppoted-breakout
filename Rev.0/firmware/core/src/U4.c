@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
@@ -172,7 +169,7 @@ void U4_setup() {
     infof("U4", "setup");
 
     // ... initialise mempool
-    mempool_init(&U4x.pool, U4_POOLSIZE);
+    mempool_init(&U4x.pool, U4_POOLSIZE, sizeof(operation));
 
     // ... configure PCAL6416A
     int err;
@@ -237,6 +234,7 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... health check
         U4x.tock -= U4_TICK;
         if (U4x.tock < 0) {
+            U4x.tock = U4_TOCK;
             operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
 
             if (op != NULL) {
@@ -258,31 +256,31 @@ bool U4_tick(repeating_timer_t *rt) {
             }
         }
 
-        // // ... update relays
-        // for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
-        //     if (r->timer > 0) {
-        //         r->timer = clamp(r->timer - U4_TICK, 0, 60000);
-        //         if (r->timer == 0) {
-        //             U4_clear(r->mask);
-        //         }
-        //     }
-        // }
+        // ... update relays
+        for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
+            if (r->timer > 0) {
+                r->timer = clamp(r->timer - U4_TICK, 0, 60000);
+                if (r->timer == 0) {
+                    U4_clear(r->mask);
+                }
+            }
+        }
 
-        // // ... update LEDs
-        // for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
-        //     if (l->timer > 0) {
-        //         l->timer = clamp(l->timer - U4_TICK, 0, 60000);
-        //         if (l->timer == 0) {
-        //             if ((l->blinks > 0) && (l->interval > 0)) {
-        //                 l->blinks--;
-        //                 l->timer = l->interval;
-        //                 U4_toggle(l->mask);
-        //             } else {
-        //                 U4_clear(l->mask);
-        //             }
-        //         }
-        //     }
-        // }
+        // ... update LEDs
+        for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
+            if (l->timer > 0) {
+                l->timer = clamp(l->timer - U4_TICK, 0, 60000);
+                if (l->timer == 0) {
+                    if ((l->blinks > 0) && (l->interval > 0)) {
+                        l->blinks--;
+                        l->timer = l->interval;
+                        U4_toggle(l->mask);
+                    } else {
+                        U4_clear(l->mask);
+                    }
+                }
+            }
+        }
 
         // ... update outputs
         if (outputs != U4x.outputs || U4x.write) {

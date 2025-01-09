@@ -203,24 +203,24 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
 
     put_rgb(32, 0, 96);
 
-    // packet reply = {
-    //     .tag = PACKET_GET_RESPONSE,
-    //     .version = 0,
-    //     .community = strdup(community),
-    //     .get_response = {
-    //         .request_id = rqid,
-    //         .error = 0,
-    //         .error_index = 0,
-    //         .OID = strdup(OID),
-    //         .value = v,
-    //     },
-    // };
-    //
-    // if (v.tag == VALUE_UNKNOWN) {
-    //     reply.get_response.error = SSMP_ERROR_NO_SUCH_OBJECT;
-    //     reply.get_response.error_index = 1;
-    // }
-    //
+    packet reply = {
+        .tag = PACKET_GET_RESPONSE,
+        .version = 0,
+        .community = strdup(community),
+        .get_response = {
+            .request_id = rqid,
+            .error = 0,
+            .error_index = 0,
+            .OID = strdup(OID),
+            .value = v,
+        },
+    };
+
+    if (v.tag == VALUE_UNKNOWN) {
+        reply.get_response.error = SSMP_ERROR_NO_SUCH_OBJECT;
+        reply.get_response.error_index = 1;
+    }
+
     // // ... encode
     // slice packed = ssmp_encode(reply);
     // slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
@@ -230,5 +230,5 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     //
     // slice_free(&encoded);
     // slice_free(&packed);
-    // packet_free(&reply);
+    packet_free(&reply);
 }

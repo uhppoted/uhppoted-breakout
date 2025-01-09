@@ -40,7 +40,7 @@ format:
 	clang-format -i ../lib/src/crypt/otp/*.c       ../lib/include/crypt/otp/*.h
 
 build: format
-	export PICO_SDK_PATH=$(SDK) && cd build && make clean && make
+	export PICO_SDK_PATH=$(SDK) && cd build && make
 
 run-local: build
 	picotool load -v build/breakout.uf2 -f
