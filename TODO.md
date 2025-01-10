@@ -20,7 +20,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 
 - [ ] CLI: trace interval
 - [ ] CLI: poke
-      - system errors
       - system error messages
 
 - [ ] syserror
@@ -76,7 +75,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
         - [x] exponential backoff
         - [x] rate limiting
         - [x] limit number TCP/IP + TLS connections
-        - [ ] limit TCP/IP + TLS connection rate
+        - [x] limit TCP/IP + TLS connection rate
         - [ ] shutdown active TCP/IP + TLS connections on close
 
     - [ ] RPC

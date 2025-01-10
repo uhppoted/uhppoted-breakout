@@ -22,8 +22,8 @@ import (
 
 const BACKOFF = 500 * time.Millisecond
 const MAX_BACKOFF = 60 * time.Second
-const RATE_LIMIT = 5.0   // requests/second
-const BURST_LIMIT = 10.0 // burst requests
+const REQUEST_RATE_LIMIT = 5.0   // requests/second
+const REQUEST_BURST_LIMIT = 10.0 // burst requests
 
 type listener interface {
 	listen(received func(any) (any, error)) error
@@ -38,10 +38,10 @@ type UT0311 struct {
 	events events.Events
 	cards  cards.Cards
 
-	udp       *UDP
-	tcp       *TCP
-	tls       *TLS
-	rateLimit *rate.Limiter
+	udp  *UDP
+	tcp  *TCP
+	tls  *TLS
+	rate *rate.Limiter
 
 	closing bool
 }
@@ -59,10 +59,10 @@ func NewUT0311(c config.Config) UT0311 {
 		events: events.Events{},
 		cards:  cards.Cards{},
 
-		udp:       makeUDP(cm),
-		tcp:       makeTCP(cm),
-		tls:       makeTLS(c.TLS.Certificate, c.TLS.CA, cm),
-		rateLimit: rate.NewLimiter(RATE_LIMIT, BURST_LIMIT),
+		udp:  makeUDP(cm),
+		tcp:  makeTCP(cm),
+		tls:  makeTLS(c.TLS.Certificate, c.TLS.CA, cm),
+		rate: rate.NewLimiter(REQUEST_RATE_LIMIT, REQUEST_BURST_LIMIT),
 
 		closing: false,
 	}
@@ -184,8 +184,8 @@ func (ut0311 *UT0311) listen(tag string, c listener) {
 func (ut0311 UT0311) received(request any) (any, error) {
 	infof("UDP  request %T", request)
 
-	if !ut0311.rateLimit.Allow() {
-		return nil, fmt.Errorf("rate limit exceeded")
+	if !ut0311.rate.Allow() {
+		return nil, fmt.Errorf("request rate limit exceeded")
 	}
 
 	switch rq := request.(type) {
