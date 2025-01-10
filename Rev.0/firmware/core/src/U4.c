@@ -234,11 +234,10 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... health check
         U4x.tock -= U4_TICK;
         if (U4x.tock < 0) {
-            U4x.tock = U4_TOCK;
             operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
 
             if (op != NULL) {
-                debugf("U4", ">>> op::healthcheck %p", op);
+                debugf("U4", ">>> op::healthcheck %p", op); // FIXME remove - debugging only
                 op->tag = U4_HEALTHCHECK;
                 op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
 
@@ -247,11 +246,11 @@ bool U4_tick(repeating_timer_t *rt) {
                     .data = op,
                 };
 
-                if (I2C0_push(&task)) {
-                    U4x.tock = U4_TOCK;
-                } else {
+                if (!I2C0_push(&task)) {
                     mempool_free(&U4x.pool, op);
                     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                } else {
+                    U4x.tock = U4_TOCK;
                 }
             }
         }
@@ -287,8 +286,6 @@ bool U4_tick(repeating_timer_t *rt) {
             operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
 
             if (op != NULL) {
-                debugf("U4", ">>> op::write %p", op);
-
                 outputs = U4x.outputs;
 
                 op->tag = U4_WRITE;

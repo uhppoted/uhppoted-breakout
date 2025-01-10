@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,10 +26,16 @@ void mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
     pool->size = 0;
     pool->chunksize = chunksize;
 
-    memchunk *p = pool->pool;
-    for (int i = 0; i < size; i++, p++) {
-        p->allocated = false;
-        pool->size++;
+    for (int i = 0; i < MEMPOOL_SIZE; i++) {
+        pool->pool[i] = NULL;
+    }
+
+    for (int i = 0; i < size; i++) {
+        memchunk *p = (memchunk *)calloc(1, sizeof(memchunk));
+        if (p != NULL) {
+            p->allocated = false;
+            pool->pool[pool->size++] = p;
+        }
     }
 }
 
@@ -43,7 +50,7 @@ void *mempool_alloc(mempool *pool, size_t N, size_t size) {
         panic("mempool::alloc chunk too large");
     } else if (mutex_try_enter(&pool->guard, NULL)) {
         for (int i = 0; i < poolsize; i++) {
-            memchunk *p = &pool->pool[pool->head++ % MEMPOOL_SIZE];
+            memchunk *p = pool->pool[pool->head++ % poolsize];
             if (!p->allocated) {
                 p->allocated = true;
                 chunk = p;
@@ -71,9 +78,9 @@ void mempool_free(mempool *pool, void *p) {
     const uint32_t poolsize = pool->size;
 
     if (p != NULL) {
-        memchunk *chunk = pool->pool;
+        for (int i = 0; i < poolsize; i++) {
+            memchunk *chunk = pool->pool[i];
 
-        for (int i = 0; i < poolsize; i++, chunk++) {
             if (chunk->data == p) {
                 chunk->allocated = false;
                 break;

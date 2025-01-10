@@ -16,7 +16,7 @@ slice ssmp_encode_get_response(packet p) {
         .tag = FIELD_OCTET_STRING,
         .octets = {
             .length = strlen(p.community),
-            .octets = p.community,
+            .octets = strdup(p.community),
         },
     };
 
@@ -44,7 +44,7 @@ slice ssmp_encode_get_response(packet p) {
     field oid = {
         .tag = FIELD_OID,
         .OID = {
-            .OID = p.get_response.OID,
+            .OID = strdup(p.get_response.OID),
         },
     };
 
@@ -66,7 +66,7 @@ slice ssmp_encode_get_response(packet p) {
     case VALUE_OCTET_STRING:
         value.tag = FIELD_OCTET_STRING;
         value.octets.length = p.get_response.value.octets.length;
-        value.octets.octets = p.get_response.value.octets.bytes;
+        value.octets.octets = strdup(p.get_response.value.octets.bytes);
         break;
     };
 
@@ -112,5 +112,9 @@ slice ssmp_encode_get_response(packet p) {
     response.sequence.fields = vector_add(response.sequence.fields, &community);
     response.sequence.fields = vector_add(response.sequence.fields, &pdu);
 
-    return BER_encode(response);
+    slice encoded = BER_encode(response);
+
+    field_free(&response);
+
+    return encoded;
 }

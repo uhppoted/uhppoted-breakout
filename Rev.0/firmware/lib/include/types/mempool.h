@@ -14,7 +14,7 @@ typedef struct mempool {
     uint32_t chunksize;
     uint32_t head;
     mutex_t guard;
-    struct memchunk pool[32] __attribute__((aligned(4)));
+    struct memchunk *pool[32] __attribute__((aligned(4)));
 } mempool;
 
 extern void mempool_init(mempool *pool, uint32_t size, uint32_t chunksize);
