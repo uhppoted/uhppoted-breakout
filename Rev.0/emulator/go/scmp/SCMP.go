@@ -159,6 +159,15 @@ func GetIndexed[T any](scmp GetI, oid OID, index uint32) (T, error) {
 		} else {
 			return any(datetime).(T), nil
 		}
+
+	case types.Date:
+		if v, err := scmp.GetIndexedString(oid, index); err != nil {
+			return zero, err
+		} else if date, err := types.ParseDate(v); err != nil {
+			return zero, err
+		} else {
+			return any(date).(T), nil
+		}
 	}
 
 	return zero, fmt.Errorf("unknown type %T", zero)

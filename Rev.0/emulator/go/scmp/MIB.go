@@ -48,6 +48,15 @@ var OID_INPUTS_TAMPER_DETECT = OID{1, 3, 6, 1, 4, 1, 65536, 4, 1}
 var OID_INPUTS_FIRE_ALARM = OID{1, 3, 6, 1, 4, 1, 65536, 4, 2}
 
 var OID_CARDS_COUNT = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 1}
+var OID_CARDS_CARD = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff}
+var OID_CARDS_CARD_CARD_NUMBER = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff, 1}
+var OID_CARDS_CARD_START_DATE = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff, 2}
+var OID_CARDS_CARD_END_DATE = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff, 3}
+var OID_CARDS_CARD_DOOR1 = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff, 4, 1}
+var OID_CARDS_CARD_DOOR2 = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff, 4, 2}
+var OID_CARDS_CARD_DOOR3 = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff, 4, 3}
+var OID_CARDS_CARD_DOOR4 = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff, 4, 4}
+var OID_CARDS_CARD_PIN = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 0xffffffff, 5}
 
 var OID_EVENTS_FIRST = OID{1, 3, 6, 1, 4, 1, 65536, 6, 0, 1}
 var OID_EVENTS_LAST = OID{1, 3, 6, 1, 4, 1, 65536, 6, 0, 2}

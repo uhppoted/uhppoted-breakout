@@ -69,3 +69,9 @@ get-cards:
 	python3 main.py --destination $(ADDRESS) --protocol udp get-cards
 	python3 main.py --destination $(ADDRESS) --protocol tcp get-cards
 
+get-card:
+	python3 main.py get-card
+	python3 main.py --destination $(ADDRESS) --protocol udp get-card
+	python3 main.py --destination $(ADDRESS) --protocol tcp get-card
+
+
