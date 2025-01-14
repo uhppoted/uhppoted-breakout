@@ -12,8 +12,8 @@
 #include <log.h>
 #include <types/mempool.h>
 
-#define MEMPOOL_CHUNKSIZE 16
-#define MEMPOOL_SIZE 32
+#define MEMPOOL_CHUNKSIZE 64
+#define MEMPOOL_SIZE 64
 
 bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
     assert(pool != NULL);
@@ -29,7 +29,7 @@ bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
 
     // ... round up pool size to power of 2
     // Ref. https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2
-    uint32_t chunks = size > 2 ? size : 2;
+    uint32_t chunks = size < 2 ? 2 : size;
 
     chunks--;
     chunks |= chunks >> 1;
@@ -40,15 +40,12 @@ bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
     chunks++;
 
     // ... allocate chunks list
-    pool->pool = (memchunk **)calloc(32, sizeof(memchunk *));
-
+    pool->pool = (memchunk **)calloc(chunks, sizeof(memchunk *));
     if (pool->pool == NULL) {
         return false;
     }
 
-    debugf("POOL", "------------ pool:%lu  chunks:%lu  pool:%p", size, chunks, pool->pool);
-
-    for (int i = 0; i < MEMPOOL_SIZE; i++) {
+    for (int i = 0; i < chunks; i++) {
         pool->pool[i] = NULL;
     }
 

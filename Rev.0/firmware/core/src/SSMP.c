@@ -95,7 +95,7 @@ void SSMP_init() {
     infof("SSMP", "initialised");
 }
 
-// Enables interrupt handler.
+// Enables UART IRQ
 void SSMP_start() {
     debugf("SSMP", "start");
 
@@ -226,7 +226,7 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
     debugf("SSMP", "GET/response %u", encoded.length);
-    // uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
+    uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
 
     slice_free(&encoded);
     slice_free(&packed);

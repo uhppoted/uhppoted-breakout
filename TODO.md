@@ -48,8 +48,10 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
        - [x] packet_free: dynamic
        - [x] vector_free
        - [x] check field_free
-       - [ ] check slice_free
+       - [x] check slice_free
        - [ ] field pool
+
+    - (?) queue UART write
     
 ### emulator
     - [x] write config to tmp file and move 
