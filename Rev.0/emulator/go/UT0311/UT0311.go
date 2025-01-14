@@ -225,6 +225,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 	case *messages.GetCardByIDRequest:
 		return ut0311.getCard(rq)
 
+	case *messages.GetCardByIndexRequest:
+		return ut0311.getCardByIndex(rq)
+
 	default:
 		warnf("unknown message type (%T)", request)
 	}

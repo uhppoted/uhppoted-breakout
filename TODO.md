@@ -67,6 +67,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] get-cards
     - [x] get-card
     - [ ] get-card-by-index
+    - [ ] *** rework get-card/get-card-by-index to use record/sequence/map/something
     - [ ] put-card
     - [ ] delete-card
     - [ ] delete-all-cards

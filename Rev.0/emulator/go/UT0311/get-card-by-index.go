@@ -9,23 +9,22 @@ import (
 	"emulator/scmp"
 )
 
-func (ut0311 *UT0311) getCard(rq *messages.GetCardByIDRequest) (any, error) {
+func (ut0311 *UT0311) getCardByIndex(rq *messages.GetCardByIndexRequest) (any, error) {
 	if id, err := scmp.Get[uint32](ut0311.driver, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
 	} else {
-		response := messages.GetCardByIDResponse{
+		response := messages.GetCardByIndexResponse{
 			SerialNumber: types.SerialNumber(id),
 		}
 
-		if index, err := scmp.GetIndexed[uint32](ut0311.cards, scmp.OID_CARDS_CARD, rq.CardNumber); err != nil {
-			return nil, err
-		} else if index > 0 {
+		if index := rq.Index; index > 0 {
 			if card, err := scmp.GetIndexed[uint32](ut0311.cards, scmp.OID_CARDS_CARD_NUMBER, index); err != nil {
 				return nil, err
-			} else if card != rq.CardNumber {
-				return nil, fmt.Errorf("error retrieving card %v", rq.CardNumber)
+			} else if card == 0 {
+				return nil, fmt.Errorf("card not found")
+
 			} else {
 				response.CardNumber = card
 			}

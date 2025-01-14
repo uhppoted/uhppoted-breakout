@@ -74,4 +74,11 @@ get-card:
 	python3 main.py --destination $(ADDRESS) --protocol udp get-card
 	python3 main.py --destination $(ADDRESS) --protocol tcp get-card
 
+get-card-by-index:
+	python3 main.py get-card-by-index
+	python3 main.py --destination $(ADDRESS) --protocol udp get-card-by-index
+	python3 main.py --destination $(ADDRESS) --protocol tcp get-card-by-index
+
+
+
 

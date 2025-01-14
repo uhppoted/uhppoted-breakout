@@ -14,26 +14,26 @@ func (c Cards) GetUint8(oid scmp.OID) (uint8, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (c Cards) GetIndexedUint8(oid scmp.OID, card uint32) (uint8, error) {
-	if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR1) && card != 10058400 {
+func (c Cards) GetIndexedUint8(oid scmp.OID, index uint32) (uint8, error) {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR1) && index != 17 {
 		return 0, nil
 	} else if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR1) {
 		return 1, nil
 	}
 
-	if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR2) && card != 10058400 {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR2) && index != 17 {
 		return 0, nil
 	} else if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR2) {
 		return 1, nil
 	}
 
-	if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR3) && card != 10058400 {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR3) && index != 17 {
 		return 0, nil
 	} else if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR3) {
 		return 0, nil
 	}
 
-	if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR4) && card != 10058400 {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR4) && index != 17 {
 		return 0, nil
 	} else if scmp.Is(oid, scmp.OID_CARDS_CARD_DOOR4) {
 		return 29, nil
@@ -62,10 +62,16 @@ func (c Cards) GetIndexedUint32(oid scmp.OID, index uint32) (uint32, error) {
 	if scmp.Is(oid, scmp.OID_CARDS_CARD) && index != 10058400 {
 		return 0, nil
 	} else if scmp.Is(oid, scmp.OID_CARDS_CARD) {
-		return 1, nil
+		return 17, nil
 	}
 
-	if scmp.Is(oid, scmp.OID_CARDS_CARD_PIN) && index != 10058400 {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD_NUMBER) && index != 17 {
+		return 0, nil
+	} else if scmp.Is(oid, scmp.OID_CARDS_CARD_NUMBER) {
+		return 10058400, nil
+	}
+
+	if scmp.Is(oid, scmp.OID_CARDS_CARD_PIN) && index != 17 {
 		return 0, nil
 	} else if scmp.Is(oid, scmp.OID_CARDS_CARD_PIN) {
 		return 54321, nil
@@ -87,13 +93,13 @@ func (c Cards) GetString(oid scmp.OID) (string, error) {
 }
 
 func (c Cards) GetIndexedString(oid scmp.OID, index uint32) (string, error) {
-	if scmp.Is(oid, scmp.OID_CARDS_CARD_START_DATE) && index != 10058400 {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD_START_DATE) && index != 17 {
 		return "", nil
 	} else if scmp.Is(oid, scmp.OID_CARDS_CARD_START_DATE) {
 		return "2024-01-01", nil
 	}
 
-	if scmp.Is(oid, scmp.OID_CARDS_CARD_END_DATE) && index != 10058400 {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD_END_DATE) && index != 17 {
 		return "", nil
 	} else if scmp.Is(oid, scmp.OID_CARDS_CARD_END_DATE) {
 		return "2024-12-31", nil
