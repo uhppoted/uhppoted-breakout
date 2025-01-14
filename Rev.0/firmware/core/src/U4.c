@@ -169,7 +169,9 @@ void U4_setup() {
     infof("U4", "setup");
 
     // ... initialise mempool
-    mempool_init(&U4x.pool, U4_POOLSIZE, sizeof(operation));
+    if (!mempool_init(&U4x.pool, U4_POOLSIZE, sizeof(operation))) {
+        set_error(ERR_U4, "U4", "error initialising mempool");
+    }
 
     // ... configure PCAL6416A
     int err;

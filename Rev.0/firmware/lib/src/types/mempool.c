@@ -9,12 +9,13 @@
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
+#include <log.h>
 #include <types/mempool.h>
 
 #define MEMPOOL_CHUNKSIZE 16
 #define MEMPOOL_SIZE 32
 
-void mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
+bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
     assert(pool != NULL);
     assert(offsetof(memchunk, data) % 4 == 0);
     assert(size <= MEMPOOL_SIZE);
@@ -26,17 +27,48 @@ void mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
     pool->size = 0;
     pool->chunksize = chunksize;
 
+    // ... round up pool size to power of 2
+    // Ref. https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2
+    uint32_t chunks = size > 2 ? size : 2;
+
+    chunks--;
+    chunks |= chunks >> 1;
+    chunks |= chunks >> 2;
+    chunks |= chunks >> 4;
+    chunks |= chunks >> 8;
+    chunks |= chunks >> 16;
+    chunks++;
+
+    // ... allocate chunks list
+    pool->pool = (memchunk **)calloc(32, sizeof(memchunk *));
+
+    if (pool->pool == NULL) {
+        return false;
+    }
+
+    debugf("POOL", "------------ pool:%lu  chunks:%lu  pool:%p", size, chunks, pool->pool);
+
     for (int i = 0; i < MEMPOOL_SIZE; i++) {
         pool->pool[i] = NULL;
     }
 
+    // ... pad chunksize 'for in case' and round up to multiple of 4 bytes
+    uint32_t bytes = chunksize + 1;
+    while ((bytes % 4) != 0) {
+        bytes++;
+    }
+
+    // ... allocate pool chunks
     for (int i = 0; i < size; i++) {
-        memchunk *p = (memchunk *)calloc(1, sizeof(memchunk));
+        memchunk *p = (memchunk *)calloc(1, bytes);
         if (p != NULL) {
             p->allocated = false;
             pool->pool[pool->size++] = p;
         }
     }
+
+    // ... good to go
+    return true;
 }
 
 void *mempool_alloc(mempool *pool, size_t N, size_t size) {

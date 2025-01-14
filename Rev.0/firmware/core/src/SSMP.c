@@ -223,12 +223,12 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
 
     // ... encode
     slice packed = ssmp_encode(reply);
-    // slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
-    //
-    // debugf("SSMP", "GET/response %u", encoded.length);
+    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+
+    debugf("SSMP", "GET/response %u", encoded.length);
     // uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
-    //
-    // slice_free(&encoded);
+
+    slice_free(&encoded);
     slice_free(&packed);
     packet_free(&reply);
 }
