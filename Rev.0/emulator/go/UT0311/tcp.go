@@ -62,7 +62,7 @@ func (c *TCP) listen(received func(any) (any, error)) error {
 				infof("TCP  incoming")
 
 				go func() {
-					if err := c.read(client, received); err != nil {
+					if err := c.read(client, received); err != nil && !c.closing {
 						warnf("TCP read error (%v)", err)
 					}
 

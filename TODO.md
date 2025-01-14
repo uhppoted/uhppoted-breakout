@@ -74,12 +74,12 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [ ] delete-card
     - [ ] delete-all-cards
 
-    - [ ] API
+    - [x] API
         - [x] exponential backoff
         - [x] rate limiting
         - [x] limit number TCP/IP + TLS connections
         - [x] limit TCP/IP + TLS connection rate
-        - [ ] shutdown active TCP/IP + TLS connections on close
+        - [x] shutdown active TCP/IP + TLS connections on close
 
     - [ ] RPC
           - https://go.dev/blog/protobuf-opaque

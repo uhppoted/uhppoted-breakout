@@ -83,7 +83,7 @@ func (c *TLS) listen(received func(any) (any, error)) error {
 					infof("TLS  incoming")
 
 					go func() {
-						if err := c.read(client, received); err != nil {
+						if err := c.read(client, received); err != nil && !c.closing {
 							warnf("TLS read error (%v)", err)
 						}
 

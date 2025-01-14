@@ -38,6 +38,7 @@ type UT0311 struct {
 	events events.Events
 	cards  cards.Cards
 
+	cm   *ConnectionManager
 	udp  *UDP
 	tcp  *TCP
 	tls  *TLS
@@ -59,6 +60,7 @@ func NewUT0311(c config.Config) UT0311 {
 		events: events.Events{},
 		cards:  cards.Cards{},
 
+		cm:   cm,
 		udp:  makeUDP(cm),
 		tcp:  makeTCP(cm),
 		tls:  makeTLS(c.TLS.Certificate, c.TLS.CA, cm),
@@ -131,6 +133,16 @@ func (ut0311 *UT0311) Stop() {
 	go func() {
 		infof("stopping TLS")
 		if err := ut0311.tls.stop(); err != nil {
+			warnf("%v", err)
+		}
+
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		infof("closing active connections")
+		if err := ut0311.cm.close(); err != nil {
 			warnf("%v", err)
 		}
 
