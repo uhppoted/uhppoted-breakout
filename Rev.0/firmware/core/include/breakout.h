@@ -9,6 +9,7 @@ extern const uint32_t MSG_DEBUG;
 extern const uint32_t MSG_RX;
 extern const uint32_t MSG_TTY;
 extern const uint32_t MSG_WIO;
+extern const uint32_t MSG_PIN;
 extern const uint32_t MSG_U3;
 extern const uint32_t MSG_TICK;
 extern const uint32_t MSG_LOG;
@@ -45,6 +46,7 @@ typedef enum {
     ERR_I2C_TIMEOUT,
     ERR_QUEUE_FULL,
     ERR_RX8900SA,
+    ERR_U2,
     ERR_U3,
     ERR_U4,
     ERR_VLF,
@@ -54,9 +56,10 @@ typedef enum {
 } err;
 
 typedef enum {
-    MSG_UINT32,
-    MSG_BUFFER,
-    MSG_UNKNOWN,
+    MESSAGE_UINT32,
+    MESSAGE_BUFFER,
+    MESSAGE_PIN,
+    MESSAGE_UNKNOWN,
 } msg_type;
 
 struct circular_buffer;
@@ -67,6 +70,7 @@ typedef struct message {
     union {
         uint32_t u32;
         struct circular_buffer *buffer;
+        struct PIN *pin;
     };
 } message;
 

@@ -10,6 +10,9 @@
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
+#include <types/mempool.h>
+
+#define LOGTAG "U2"
 
 struct reader;
 struct keypad;
@@ -42,6 +45,8 @@ const int32_t U2_CODE_TIMEOUT = 2500; // ms
 const int32_t U2_CARD_LOCK = 1250;    // ms
 const int32_t U2_CODE_LOCK = 1250;    // ms
 
+const uint32_t U2_POOLSIZE = 16;
+
 typedef struct reader {
     uint64_t data;
     uint8_t count;
@@ -59,6 +64,7 @@ typedef struct keypad {
 struct {
     struct reader readers[4];
     struct keypad keypads[4];
+    mempool pool;
     repeating_timer_t timer;
     mutex_t guard;
 } U2x = {
@@ -110,8 +116,13 @@ const PULLUP U2_PULLUPS[8] = {
     PULLUP_UP, // DI4
 };
 
-void U2_setup() {
-    infof("U2", "setup");
+void U2_init() {
+    infof(LOGTAG, "init");
+
+    // ... initialise mempool
+    if (!mempool_init(&U2x.pool, U2_POOLSIZE, sizeof(PIN))) {
+        set_error(ERR_U2, LOGTAG, "error initialising mempool");
+    }
 
     // ... configure PCAL6408A
     int err;
@@ -376,22 +387,32 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
             debugf("U2", "KEYPAD %d  LOCKED", door);
         } else {
             int N = length + 1;
-            char *keycode;
+            PIN *pin = (PIN *)mempool_alloc(&U2x.pool, 1, sizeof(PIN));
 
-            if ((keycode = calloc(N, 1)) != NULL) {
-                snprintf(keycode, N, "%s", code);
+            if (pin != NULL) {
+                pin->door = door;
+                snprintf(pin->code, sizeof(pin->code), "%s", code);
 
-                // uint32_t msg = MSG_CODE | ((uint32_t)s & 0x0fffffff); // SRAM_BASE is 0x20000000
-                // if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-                //     free(s);
-                // }
+                message msg = {
+                    .message = MSG_PIN,
+                    .tag = MESSAGE_PIN,
+                    .pin = pin,
+                };
 
-                infof("U2", "KEYPAD %d  KEYCODE %s", door, keycode);
-                free(keycode);
+                if (!push(msg)) {
+                    mempool_free(&U2x.pool, pin);
+                }
             }
 
             keypad->locked = U2_CODE_LOCK;
         }
+    }
+}
+
+void U2_pin(PIN *pin) {
+    if (pin != NULL) {
+        infof("U2", "KEYPAD %d  KEYCODE %s", pin->door, pin->code);
+        mempool_free(&U2x.pool, pin);
     }
 }
 

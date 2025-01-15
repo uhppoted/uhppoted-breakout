@@ -38,6 +38,11 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [ ] move error handling to breakout.c
 - [ ] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
 
+### U2
+- [ ] add handler for card swipe
+- [ ] test card swipe
+- [ ] test keycode
+
 ### SSMP
     - GET
       - [x] controller ID

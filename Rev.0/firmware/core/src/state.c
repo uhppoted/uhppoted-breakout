@@ -11,6 +11,7 @@ struct {
         bool memory;
         bool I2C;
         bool RX8900SA;
+        bool U2;
         bool U3;
         bool U4;
         bool watchdog;
@@ -23,6 +24,7 @@ struct {
         .memory = false,
         .I2C = false,
         .RX8900SA = false,
+        .U2 = false,
         .U3 = false,
         .U4 = false,
         .watchdog = false,
@@ -35,9 +37,10 @@ const uint16_t BITMASK_ERR_MEMORY = 0x0001;
 const uint16_t BITMASK_ERR_QUEUE = 0x0002;
 const uint16_t BITMASK_ERR_I2C = 0x0004;
 const uint16_t BITMASK_ERR_RX8900SA = 0x0008;
-const uint16_t BITMASK_ERR_U3 = 0x0010;
-const uint16_t BITMASK_ERR_U4 = 0x0020;
-const uint16_t BITMASK_ERR_WATCHDOG = 0x0040;
+const uint16_t BITMASK_ERR_U2 = 0x0010;
+const uint16_t BITMASK_ERR_U3 = 0x0020;
+const uint16_t BITMASK_ERR_U4 = 0x0040;
+const uint16_t BITMASK_ERR_WATCHDOG = 0x0080;
 const uint16_t BITMASK_ERR_DEBUG = 0x4000;
 const uint16_t BITMASK_ERR_UNKNOWN = 0x8000;
 
@@ -64,6 +67,10 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
 
     case ERR_RX8900SA:
         STATE.errors.RX8900SA = true;
+        break;
+
+    case ERR_U2:
+        STATE.errors.U2 = true;
         break;
 
     case ERR_U3:
@@ -113,6 +120,9 @@ bool get_error(err error) {
     case ERR_RX8900SA:
         return STATE.errors.RX8900SA;
 
+    case ERR_U2:
+        return STATE.errors.U2;
+
     case ERR_U3:
         return STATE.errors.U3;
 
@@ -139,6 +149,7 @@ uint16_t get_errors() {
     bits |= STATE.errors.queue ? BITMASK_ERR_QUEUE : 0x0000;
     bits |= STATE.errors.I2C ? BITMASK_ERR_I2C : 0x0000;
     bits |= STATE.errors.RX8900SA ? BITMASK_ERR_RX8900SA : 0x0000;
+    bits |= STATE.errors.U2 ? BITMASK_ERR_U2 : 0x0000;
     bits |= STATE.errors.U3 ? BITMASK_ERR_U3 : 0x0000;
     bits |= STATE.errors.U4 ? BITMASK_ERR_U4 : 0x0000;
     bits |= STATE.errors.watchdog ? BITMASK_ERR_WATCHDOG : 0x0000;
@@ -149,6 +160,7 @@ uint16_t get_errors() {
     STATE.errors.I2C = false;
     STATE.errors.queue = false;
     STATE.errors.RX8900SA = false;
+    STATE.errors.U2 = false;
     STATE.errors.U3 = false;
     STATE.errors.U4 = false;
     //  STATE.errors.watchdog = false;

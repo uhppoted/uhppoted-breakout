@@ -137,7 +137,7 @@ void on_SSMP() {
     circular_buffer *b = &SSMP.buffer;
     message msg = {
         .message = MSG_RX,
-        .tag = MSG_BUFFER,
+        .tag = MESSAGE_BUFFER,
         .buffer = &SSMP.buffer,
     };
 

@@ -119,8 +119,8 @@ void U3_read(void *data);
 float lpf₁(IIR *iir, float in);
 float lpf₂(IIR *iir, float in);
 
-void U3_setup() {
-    infof("U3", "setup");
+void U3_init() {
+    infof("U3", "init");
 
     // ... configure PCAL6408A
     int err;

@@ -1,6 +1,6 @@
 #pragma once
 
-extern void U3_setup();
+extern void U3_init();
 extern void U3_start();
 extern void U3_process(uint8_t inputs);
 extern bool U3_get_door(uint8_t door);

@@ -9,48 +9,14 @@ const uint32_t SCRATCH_TRACE_IN = 2;
 const uint32_t SCRATCH_TRACE_OUT = 2;
 
 const char *TRACEPOINTS[] = {
-    "unknown",
-    "sys::dispatch",
-    "sys::tick",
-    "U2::tick",
-    "U3_::tick",
-    "U4::tick",
-    "U4::healthcheck",
-    "U4::relays",
-    "U4::leds",
-    "U4::outputs",
-    "U4::calloc",
-    "U4::set_error",
-    "U4::free",
-    "RTC::tick",
-    "SSMP::receive",
-    "ASN.1::decode",
-    "ASN.1::unpack.new",
-    "ASN.1::unpack.int",
-    "ASN.1::unpack.octets",
-    "ASN.1::unpack.null",
-    "ASN.1::unpack.oid",
-    "ASN.1::unpack.seq",
-    "ASN.1::unpack.pdu",
-    "ASN.1::unpack.def",
-    "ASN.1::int",
-    "ASN.1::int_calloc",
-    "ASN.1::int_field",
-    "ASN.1::pdu",
-    "ASN.1::pdu.calloc",
-    "ASN.1::pdu.fields",
-    "SSMP::decode",
-    "SSMP::BER",
-    "SSMP::packet",
-    "SSMP::GET",
-    "SSMP::packet.free",
-    "SSMP::vector.free",
-    "vector::new",
-    "vector::free",
-    "packet::free",
-    "packet::free.oid",
-    "packet::free.response",
-    "packet::free.packet",
+    "unknown",       // 0
+    "sys::dispatch", // 1
+    "sys::tick",     // 2
+    "RTC::tick",     // 3
+    "U2::tick",      // 4
+    "U3::tick",      // 5
+    "U4::tick",      // 6
+    "SSMP::receive", // 7
 };
 
 volatile uint32_t trace_count = 0;

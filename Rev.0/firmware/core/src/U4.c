@@ -9,6 +9,8 @@
 #include <state.h>
 #include <types/mempool.h>
 
+#define LOGTAG "U4"
+
 const uint16_t MASK = 0x07ff;
 
 const uint16_t RELAY1 = 0x0001;
@@ -165,12 +167,12 @@ struct {
     },
 };
 
-void U4_setup() {
-    infof("U4", "setup");
+void U4_init() {
+    infof(LOGTAG, "init");
 
     // ... initialise mempool
     if (!mempool_init(&U4x.pool, U4_POOLSIZE, sizeof(operation))) {
-        set_error(ERR_U4, "U4", "error initialising mempool");
+        set_error(ERR_U4, LOGTAG, "error initialising mempool");
     }
 
     // ... configure PCAL6416A
@@ -239,7 +241,6 @@ bool U4_tick(repeating_timer_t *rt) {
             operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
 
             if (op != NULL) {
-                debugf("U4", ">>> op::healthcheck %p", op); // FIXME remove - debugging only
                 op->tag = U4_HEALTHCHECK;
                 op->healthcheck.outputs = (U4x.outputs ^ U4x.polarity) & MASK;
 
