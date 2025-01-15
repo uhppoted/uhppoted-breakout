@@ -79,6 +79,8 @@ get-card-by-index:
 	python3 main.py --destination $(ADDRESS) --protocol udp get-card-by-index
 	python3 main.py --destination $(ADDRESS) --protocol tcp get-card-by-index
 
-
-
+put-card:
+	python3 main.py put-card
+	python3 main.py --destination $(ADDRESS) --protocol udp put-card
+	python3 main.py --destination $(ADDRESS) --protocol tcp put-card
 

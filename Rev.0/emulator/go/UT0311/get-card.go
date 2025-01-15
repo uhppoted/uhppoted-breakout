@@ -1,8 +1,6 @@
 package UT0311
 
 import (
-	"fmt"
-
 	"github.com/uhppoted/uhppote-core/messages"
 	"github.com/uhppoted/uhppote-core/types"
 
@@ -19,58 +17,17 @@ func (ut0311 *UT0311) getCard(rq *messages.GetCardByIDRequest) (any, error) {
 			SerialNumber: types.SerialNumber(id),
 		}
 
-		if index, err := scmp.GetIndexed[uint32](ut0311.cards, scmp.OID_CARDS_CARD, rq.CardNumber); err != nil {
+		if card, err := scmp.GetIndexed[scmp.Card](ut0311.cards, scmp.OID_CARDS_CARD, rq.CardNumber); err != nil {
 			return nil, err
-		} else if index > 0 {
-			if card, err := scmp.GetIndexed[uint32](ut0311.cards, scmp.OID_CARDS_CARD_NUMBER, index); err != nil {
-				return nil, err
-			} else if card != rq.CardNumber {
-				return nil, fmt.Errorf("error retrieving card %v", rq.CardNumber)
-			} else {
-				response.CardNumber = card
-			}
-
-			if date, err := scmp.GetIndexed[types.Date](ut0311.cards, scmp.OID_CARDS_CARD_START_DATE, index); err != nil {
-				return nil, err
-			} else {
-				response.From = date
-			}
-
-			if date, err := scmp.GetIndexed[types.Date](ut0311.cards, scmp.OID_CARDS_CARD_END_DATE, index); err != nil {
-				return nil, err
-			} else {
-				response.To = date
-			}
-
-			if permission, err := scmp.GetIndexed[uint8](ut0311.cards, scmp.OID_CARDS_CARD_DOOR1, index); err != nil {
-				return nil, err
-			} else {
-				response.Door1 = permission
-			}
-
-			if permission, err := scmp.GetIndexed[uint8](ut0311.cards, scmp.OID_CARDS_CARD_DOOR2, index); err != nil {
-				return nil, err
-			} else {
-				response.Door2 = permission
-			}
-
-			if permission, err := scmp.GetIndexed[uint8](ut0311.cards, scmp.OID_CARDS_CARD_DOOR3, index); err != nil {
-				return nil, err
-			} else {
-				response.Door3 = permission
-			}
-
-			if permission, err := scmp.GetIndexed[uint8](ut0311.cards, scmp.OID_CARDS_CARD_DOOR4, index); err != nil {
-				return nil, err
-			} else {
-				response.Door4 = permission
-			}
-
-			if PIN, err := scmp.GetIndexed[uint32](ut0311.cards, scmp.OID_CARDS_CARD_PIN, index); err != nil {
-				return nil, err
-			} else {
-				response.PIN = types.PIN(PIN)
-			}
+		} else {
+			response.CardNumber = card.Card
+			response.From = card.StartDate
+			response.To = card.EndDate
+			response.Door1 = card.Permissions[1]
+			response.Door2 = card.Permissions[2]
+			response.Door3 = card.Permissions[3]
+			response.Door4 = card.Permissions[4]
+			response.PIN = types.PIN(card.PIN)
 		}
 
 		return response, nil

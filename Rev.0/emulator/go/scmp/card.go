@@ -1,4 +1,4 @@
-package cards
+package scmp
 
 import (
 	"github.com/uhppoted/uhppote-core/types"

@@ -169,7 +169,11 @@ func (c *Config) SetString(oid scmp.OID, val string) (string, error) {
 }
 
 func (c *Config) SetUint32A(oid scmp.OID, val []uint32) ([]uint32, error) {
-	return []uint32{}, fmt.Errorf("unknown OID %v", oid)
+	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c *Config) SetIndexedRecord(oid scmp.OID, index uint32, value any) (any, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
 func (v *IPv4) MarshalJSON() ([]byte, error) {

@@ -24,12 +24,14 @@ type GetI interface {
 	GetIndexedBool(oid OID, index uint32) (bool, error)
 	GetIndexedString(oid OID, index uint32) (string, error)
 	GetIndexedOctets(oid OID, index uint32) ([]byte, error)
+	GetIndexedRecord(oid OID, index uint32) (any, error)
 }
 
 type SetV interface {
 	SetUint8(oid OID, v uint8) (uint8, error)
 	SetUint32A(oid OID, v []uint32) ([]uint32, error)
 	SetString(oid OID, v string) (string, error)
+	SetIndexedRecord(oid OID, index uint32, record any) (any, error)
 }
 
 func Get[T any](scmp GetV, oid OID) (T, error) {
@@ -168,6 +170,15 @@ func GetIndexed[T any](scmp GetI, oid OID, index uint32) (T, error) {
 		} else {
 			return any(date).(T), nil
 		}
+
+	case Card:
+		if v, err := scmp.GetIndexedRecord(oid, index); err != nil {
+			return zero, err
+		} else if card, ok := v.(Card); !ok {
+			return zero, fmt.Errorf("invalid card record (%T)", v)
+		} else {
+			return any(card).(T), nil
+		}
 	}
 
 	return zero, fmt.Errorf("unknown type %T", zero)
@@ -207,6 +218,23 @@ func Set[T any](scmp SetV, oid OID, val T) (T, error) {
 			return zero, err
 		} else {
 			return any(datetime).(T), nil
+		}
+	}
+
+	return zero, fmt.Errorf("unknown type %T", val)
+}
+
+func SetIndexed[T any](scmp SetV, oid OID, index uint32, val T) (T, error) {
+	var zero T
+
+	switch v := any(val).(type) {
+	case Card:
+		if record, err := scmp.SetIndexedRecord(oid, index, v); err != nil {
+			return zero, err
+		} else if card, ok := record.(Card); !ok {
+			return zero, fmt.Errorf("invalid card record (%T)", record)
+		} else {
+			return any(card).(T), nil
 		}
 	}
 

@@ -100,6 +100,10 @@ func (e Events) GetIndexedUint32(oid scmp.OID, index uint32) (uint32, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
+func (e Events) GetIndexedRecord(oid scmp.OID, index uint32) (any, error) {
+	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
 func (e Events) GetBool(oid scmp.OID) (bool, error) {
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_GRANTED) {
 		if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_GRANTED); ok && index == 13579 {

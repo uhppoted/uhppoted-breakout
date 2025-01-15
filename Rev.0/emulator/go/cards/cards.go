@@ -3,11 +3,14 @@ package cards
 import (
 	"fmt"
 
+	"github.com/uhppoted/uhppote-core/types"
+
 	"emulator/log"
 	"emulator/scmp"
 )
 
 type Cards struct {
+	cards []scmp.Card
 }
 
 func (c Cards) GetUint8(oid scmp.OID) (uint8, error) {
@@ -80,6 +83,44 @@ func (c Cards) GetIndexedUint32(oid scmp.OID, index uint32) (uint32, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
+func (c Cards) GetIndexedRecord(oid scmp.OID, index uint32) (any, error) {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD) && index == 10058400 {
+		start, _ := types.ParseDate("2025-01-01")
+		end, _ := types.ParseDate("2025-12-31")
+
+		return scmp.Card{
+			Card:      1058400,
+			StartDate: start,
+			EndDate:   end,
+			Permissions: map[uint8]uint8{
+				1: 1,
+				2: 1,
+				3: 0,
+				4: 29,
+			},
+			PIN: 97531,
+		}, nil
+	} else if scmp.Is(oid, scmp.OID_CARDS_INDEX) && index == 17 {
+		start, _ := types.ParseDate("2025-01-01")
+		end, _ := types.ParseDate("2025-12-31")
+
+		return scmp.Card{
+			Card:      1058400,
+			StartDate: start,
+			EndDate:   end,
+			Permissions: map[uint8]uint8{
+				1: 1,
+				2: 1,
+				3: 0,
+				4: 29,
+			},
+			PIN: 97531,
+		}, nil
+	}
+
+	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
 func (c Cards) GetBool(oid scmp.OID) (bool, error) {
 	return false, fmt.Errorf("unknown OID %v", oid)
 }
@@ -122,6 +163,43 @@ func (c *Cards) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
 
 func (c *Cards) SetString(oid scmp.OID, value string) (string, error) {
 	return "", fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c *Cards) SetUint32A(oid scmp.OID, value []uint32) ([]uint32, error) {
+	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c *Cards) SetIndexedRecord(oid scmp.OID, index uint32, value any) (any, error) {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD) {
+		if card, ok := value.(scmp.Card); ok {
+			clone := scmp.Card{
+				Card:      card.Card,
+				StartDate: card.StartDate,
+				EndDate:   card.EndDate,
+				Permissions: map[uint8]uint8{
+					1: card.Permissions[1],
+					2: card.Permissions[2],
+					3: card.Permissions[3],
+					4: card.Permissions[4],
+				},
+				PIN: card.PIN,
+			}
+
+			for i, v := range c.cards {
+				if v.Card == index {
+					c.cards[i] = clone
+
+					return clone, nil
+				}
+			}
+
+			c.cards = append(c.cards, clone)
+
+			return clone, nil
+		}
+	}
+
+	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
 func debugf(format string, args ...any) {

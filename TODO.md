@@ -68,9 +68,8 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] set-door-passcodes
     - [x] get-cards
     - [x] get-card
-    - [ ] get-card-by-index
-    - [ ] *** rework get-card/get-card-by-index to use record/sequence/map/something
-    - [ ] put-card
+    - [x] get-card-by-index
+    - [x] put-card
     - [ ] delete-card
     - [ ] delete-all-cards
 
@@ -84,9 +83,9 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [ ] RPC
           - https://go.dev/blog/protobuf-opaque
           - [x] go-rpc
-          - [ ] grpc
           - [ ] unix domain sockets
           - [ ] TCP/IP
+          - [ ] grpc
 
     - [ ] monitor
     - [ ] daemonize
