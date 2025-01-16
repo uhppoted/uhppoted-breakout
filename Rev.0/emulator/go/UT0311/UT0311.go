@@ -36,7 +36,7 @@ type UT0311 struct {
 	driver *rpcd.RPC
 	system system.System
 	events events.Events
-	cards  cards.Cards
+	cards  *cards.Cards
 
 	cm   *ConnectionManager
 	udp  *UDP
@@ -62,7 +62,7 @@ func NewUT0311(c config.Config) (*UT0311, error) {
 			driver: rpc,
 			system: system.System{},
 			events: events.Events{},
-			cards:  cards.Cards{},
+			cards:  &cards.Cards{},
 
 			cm:   cm,
 			udp:  makeUDP(cm),
@@ -249,6 +249,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 
 	case *messages.PutCardRequest:
 		return ut0311.putCard(rq)
+
+	case *messages.DeleteCardRequest:
+		return ut0311.deleteCard(rq)
 
 	default:
 		warnf("unknown message type (%T)", request)

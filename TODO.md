@@ -78,7 +78,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] get-card
     - [x] get-card-by-index
     - [x] put-card
-    - [ ] delete-card
+    - [x] delete-card
     - [ ] delete-all-cards
 
     - [ ] RPC

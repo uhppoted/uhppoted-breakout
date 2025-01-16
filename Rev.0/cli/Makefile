@@ -9,7 +9,7 @@ build: format
 
 debug:
 #	python3 main.py --destination $(ADDRESS) debug
-	python3 main.py get-controller
+	python3 main.py delete-card
 
 tls:
 	python3 main.py --destination $(TLS) --protocol tls get-controller
@@ -84,4 +84,9 @@ put-card:
 	python3 main.py put-card
 	python3 main.py --destination $(ADDRESS) --protocol udp put-card
 	python3 main.py --destination $(ADDRESS) --protocol tcp put-card
+
+delete-card:
+	python3 main.py delete-card
+	python3 main.py --destination $(ADDRESS) --protocol udp delete-card
+	python3 main.py --destination $(ADDRESS) --protocol tcp delete-card
 

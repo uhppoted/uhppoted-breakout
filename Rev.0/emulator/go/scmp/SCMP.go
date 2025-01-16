@@ -32,6 +32,7 @@ type SetV interface {
 	SetUint32A(oid OID, v []uint32) ([]uint32, error)
 	SetString(oid OID, v string) (string, error)
 	SetIndexedRecord(oid OID, index uint32, record any) (any, error)
+	DeleteIndexedRecord(oid OID, index uint32) (bool, error)
 }
 
 func Get[T any](scmp GetV, oid OID) (T, error) {
@@ -239,4 +240,8 @@ func SetIndexed[T any](scmp SetV, oid OID, index uint32, val T) (T, error) {
 	}
 
 	return zero, fmt.Errorf("unknown type %T", val)
+}
+
+func DeleteIndexed[T any](scmp SetV, oid OID, index uint32) (bool, error) {
+	return scmp.DeleteIndexedRecord(oid, index)
 }

@@ -187,6 +187,10 @@ func (c *Config) SetIndexedRecord(oid scmp.OID, index uint32, value any) (any, e
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
+func (c *Config) DeleteIndexedRecord(oid scmp.OID, index uint32) (bool, error) {
+	return false, fmt.Errorf("unknown OID %v", oid)
+}
+
 func (v *IPv4) MarshalJSON() ([]byte, error) {
 	ipv4 := struct {
 		Address netip.Addr `json:"address"`

@@ -2,6 +2,7 @@ package cards
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/uhppoted/uhppote-core/types"
 
@@ -200,6 +201,24 @@ func (c *Cards) SetIndexedRecord(oid scmp.OID, index uint32, value any) (any, er
 	}
 
 	return 0, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (c *Cards) DeleteIndexedRecord(oid scmp.OID, index uint32) (bool, error) {
+	if scmp.Is(oid, scmp.OID_CARDS_CARD) {
+		deleted := false
+		if index > 0 {
+			for ix, card := range c.cards {
+				if card.Card == index {
+					c.cards = slices.Delete(c.cards, ix, ix+1)
+					deleted = true
+				}
+			}
+		}
+
+		return deleted, nil
+	}
+
+	return false, fmt.Errorf("unknown OID %v", oid)
 }
 
 func debugf(format string, args ...any) {

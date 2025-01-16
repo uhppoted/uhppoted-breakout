@@ -30,7 +30,7 @@ func (ut0311 *UT0311) putCard(rq *messages.PutCardRequest) (any, error) {
 			PIN: uint32(rq.PIN),
 		}
 
-		if _, err := scmp.SetIndexed[scmp.Card](&ut0311.cards, scmp.OID_CARDS_CARD, rq.CardNumber, card); err != nil {
+		if _, err := scmp.SetIndexed[scmp.Card](ut0311.cards, scmp.OID_CARDS_CARD, rq.CardNumber, card); err != nil {
 			return nil, err
 		} else {
 			response.Succeeded = true

@@ -176,6 +176,10 @@ func (r RPC) SetIndexedRecord(oid scmp.OID, index uint32, value any) (any, error
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
+func (r RPC) DeleteIndexedRecord(oid scmp.OID, index uint32) (bool, error) {
+	return false, fmt.Errorf("unknown OID %v", oid)
+}
+
 func debugf(format string, args ...any) {
 	log.Debugf("RPC", format, args...)
 }
