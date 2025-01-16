@@ -1,3 +1,4 @@
+UDS = unix::/tmp/uhppoted/breakout/rpc.sock
 .DEFAULT_GOAL := build
 
 update:
@@ -13,6 +14,10 @@ build: format
 test: build
 	go test ./...
 
-run: build
-	./bin/rpcd 
+run-tcp: build
+	./bin/rpcd --bind "tcp:::1234"
 
+run-unix: build
+	./bin/rpcd --bind "$(UDS)"
+
+run: run-unix

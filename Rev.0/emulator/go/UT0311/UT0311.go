@@ -33,7 +33,7 @@ type listener interface {
 
 type UT0311 struct {
 	config config.Config
-	driver rpcd.RPC
+	driver *rpcd.RPC
 	system system.System
 	events events.Events
 	cards  cards.Cards
@@ -51,22 +51,29 @@ func (ut0311 *UT0311) SetConfig(c config.Config) {
 	ut0311.config = c
 }
 
-func NewUT0311(c config.Config) UT0311 {
+func NewUT0311(c config.Config) (*UT0311, error) {
 	cm := NewConnectionManager(MAX_CONNECTIONS)
-	return UT0311{
-		config: c,
-		driver: rpcd.RPC{},
-		system: system.System{},
-		events: events.Events{},
-		cards:  cards.Cards{},
 
-		cm:   cm,
-		udp:  makeUDP(cm),
-		tcp:  makeTCP(cm),
-		tls:  makeTLS(c.TLS.Certificate, c.TLS.CA, cm),
-		rate: rate.NewLimiter(REQUEST_RATE_LIMIT, REQUEST_BURST_LIMIT),
+	if rpc, err := rpcd.NewRPC(c.Driver.RPC.Address); err != nil {
+		return nil, err
+	} else {
+		ut0311 := UT0311{
+			config: c,
+			driver: rpc,
+			system: system.System{},
+			events: events.Events{},
+			cards:  cards.Cards{},
 
-		closing: false,
+			cm:   cm,
+			udp:  makeUDP(cm),
+			tcp:  makeTCP(cm),
+			tls:  makeTLS(c.TLS.Certificate, c.TLS.CA, cm),
+			rate: rate.NewLimiter(REQUEST_RATE_LIMIT, REQUEST_BURST_LIMIT),
+
+			closing: false,
+		}
+
+		return &ut0311, nil
 	}
 }
 

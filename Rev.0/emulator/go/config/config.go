@@ -23,6 +23,11 @@ type Config struct {
 
 type driver struct {
 	Driver string `json:"driver"`
+	RPC    rpc    `json:"RPC"`
+}
+
+type rpc struct {
+	Address string `json:"address"`
 }
 
 type network struct {
@@ -50,6 +55,12 @@ type events struct {
 func Load(filepath string) (Config, []byte, error) {
 	config := Config{
 		filepath: filepath,
+		Driver: driver{
+			Driver: "rpc",
+			RPC: rpc{
+				Address: "tcp::0.0.0.0:1234",
+			},
+		},
 		TLS: TLS{
 			Certificate: ".certificate",
 			CA:          ".CA",

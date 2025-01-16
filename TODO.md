@@ -59,6 +59,9 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - (?) queue UART write
     
 ### emulator
+    - [ ] API
+          - [ ] close takes forever if there are no connections
+
     - [x] write config to tmp file and move 
     - [x] Move event listener and interval to controller MIB block
     - [x] get-controller
@@ -78,17 +81,11 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [ ] delete-card
     - [ ] delete-all-cards
 
-    - [x] API
-        - [x] exponential backoff
-        - [x] rate limiting
-        - [x] limit number TCP/IP + TLS connections
-        - [x] limit TCP/IP + TLS connection rate
-        - [x] shutdown active TCP/IP + TLS connections on close
-
     - [ ] RPC
           - https://go.dev/blog/protobuf-opaque
           - [x] go-rpc
-          - [ ] unix domain sockets
+          - [x] unix domain sockets
+                - [ ] remove 'rpc.sock' file on RPCD terminate
           - [ ] TCP/IP
           - [ ] grpc
 

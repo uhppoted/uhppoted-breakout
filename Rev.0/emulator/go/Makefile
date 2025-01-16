@@ -14,8 +14,13 @@ build: format
 test: build
 	go test ./...
 
-run: build
-	./bin/emulator --config .config.rpc
+run-tcp: build
+	./bin/emulator --config .config.localhost
+
+run-unix: build
+	./bin/emulator --config .config.unix
+
+run: run-unix
 
 stub: build
 	./bin/emulator --config .config.stub

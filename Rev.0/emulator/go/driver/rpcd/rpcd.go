@@ -3,17 +3,42 @@ package rpcd
 import (
 	"fmt"
 	"net/rpc"
+	"regexp"
 
 	"emulator/log"
 	"emulator/scmp"
 )
 
 type RPC struct {
+	Network string
+	Address string
 }
 
 type KV struct {
 	OID   string
 	Value any
+}
+
+func NewRPC(address string) (*RPC, error) {
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(address); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid RPC address (%v)", address)
+	} else {
+		network := matches[1]
+		address := matches[2]
+
+		infof("init network:%v  address:%v", network, address)
+
+		rpcd := RPC{
+			Network: network,
+			Address: address,
+		}
+
+		return &rpcd, nil
+	}
+}
+
+func (r RPC) dial() (*rpc.Client, error) {
+	return rpc.DialHTTP(r.Network, r.Address)
 }
 
 func (r RPC) get(oid scmp.OID) (any, error) {
@@ -22,9 +47,27 @@ func (r RPC) get(oid scmp.OID) (any, error) {
 	var key = fmt.Sprintf("%v", oid)
 	var reply any
 
-	if client, err := rpc.DialHTTP("tcp", "127.0.0.1:1234"); err != nil {
+	if client, err := r.dial(); err != nil {
 		return 0, err
 	} else if err := client.Call("RPCD.Get", key, &reply); err != nil {
+		return 0, err
+	} else {
+		return reply, nil
+	}
+}
+
+func (r RPC) set(oid scmp.OID, value any) (any, error) {
+	debugf("set %v", oid)
+
+	var kv = KV{
+		OID:   fmt.Sprintf("%v", oid),
+		Value: value,
+	}
+	var reply any
+
+	if client, err := r.dial(); err != nil {
+		return 0, err
+	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
 		return 0, err
 	} else {
 		return reply, nil
@@ -92,18 +135,9 @@ func (r RPC) GetOctets(oid scmp.OID) ([]byte, error) {
 }
 
 func (r RPC) SetUint8(oid scmp.OID, value uint8) (uint8, error) {
-	debugf("get %v %v", oid, value)
+	debugf("set %v %v", oid, value)
 
-	var kv = KV{
-		OID:   fmt.Sprintf("%v", oid),
-		Value: value,
-	}
-
-	var reply any
-
-	if client, err := rpc.DialHTTP("tcp", "127.0.0.1:1234"); err != nil {
-		return 0, err
-	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
+	if reply, err := r.set(oid, value); err != nil {
 		return 0, err
 	} else if u8, ok := reply.(uint8); !ok {
 		return 0, fmt.Errorf("invalid reply - expected 'uint8', got '%T'", reply)
@@ -113,18 +147,9 @@ func (r RPC) SetUint8(oid scmp.OID, value uint8) (uint8, error) {
 }
 
 func (r RPC) SetString(oid scmp.OID, value string) (string, error) {
-	debugf("get %v %v", oid, value)
+	debugf("set %v %v", oid, value)
 
-	var kv = KV{
-		OID:   fmt.Sprintf("%v", oid),
-		Value: value,
-	}
-
-	var reply any
-
-	if client, err := rpc.DialHTTP("tcp", "127.0.0.1:1234"); err != nil {
-		return "", err
-	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
+	if reply, err := r.set(oid, value); err != nil {
 		return "", err
 	} else if v, ok := reply.(string); !ok {
 		return "", fmt.Errorf("invalid reply - expected 'string', got '%T'", reply)
@@ -134,18 +159,9 @@ func (r RPC) SetString(oid scmp.OID, value string) (string, error) {
 }
 
 func (r RPC) SetUint32A(oid scmp.OID, value []uint32) ([]uint32, error) {
-	debugf("get %v %v", oid, value)
+	debugf("set %v %v", oid, value)
 
-	var kv = KV{
-		OID:   fmt.Sprintf("%v", oid),
-		Value: value,
-	}
-
-	var reply any
-
-	if client, err := rpc.DialHTTP("tcp", "127.0.0.1:1234"); err != nil {
-		return []uint32{}, err
-	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
+	if reply, err := r.set(oid, value); err != nil {
 		return []uint32{}, err
 	} else if v, ok := reply.([]uint32); !ok {
 		return []uint32{}, fmt.Errorf("invalid reply - expected 'uint8', got '%T'", reply)

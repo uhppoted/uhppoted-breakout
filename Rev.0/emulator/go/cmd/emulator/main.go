@@ -31,15 +31,16 @@ func main() {
 	if cfg, hash, err := config.Load(options.config); err != nil {
 		errorf("%v", err)
 		os.Exit(1)
+	} else if ut0311, err := UT0311.NewUT0311(cfg); err != nil {
+		errorf("%v", err)
+		os.Exit(1)
 	} else {
-		ut0311 := UT0311.NewUT0311(cfg)
-
 		go func() {
 			ut0311.Run()
 		}()
 
 		go func() {
-			watch(&ut0311, options.config, hash)
+			watch(ut0311, options.config, hash)
 		}()
 
 		interrupt := make(chan os.Signal, 1)
