@@ -120,7 +120,7 @@ void U2_init() {
     infof(LOGTAG, "init");
 
     // ... initialise mempool
-    if (!mempool_init(&U2x.pool, U2_POOLSIZE, sizeof(PIN))) {
+    if (!mempool_init(&U2x.pool, U2_POOLSIZE, sizeof(swipe))) {
         set_error(ERR_U2, LOGTAG, "error initialising mempool");
     }
 
@@ -341,9 +341,29 @@ void U2_on_card_read(uint8_t door, uint32_t v) {
             uint32_t facility_code = (code >> 16) & 0x000000ff;
             uint32_t card = code & 0x0000ffff;
 
-            reader->locked = U2_CARD_LOCK;
+            if (!ok) {
+                warnf("U2", "READER %d  CARD %-3u%-5u read error", door, facility_code, card);
+            } else {
 
-            infof("U2", "READER %d  CARD %-3u%-5u %s", door, facility_code, card, ok ? "ok" : "error");
+                swipe *swipe = (struct swipe *)mempool_alloc(&U2x.pool, 1, sizeof(struct swipe));
+
+                if (swipe != NULL) {
+                    swipe->door = door;
+                    snprintf(swipe->card, sizeof(swipe->card), "%-03u%-05u", facility_code, card);
+
+                    message msg = {
+                        .message = MSG_SWIPE,
+                        .tag = MESSAGE_SWIPE,
+                        .swipe = swipe,
+                    };
+
+                    if (!push(msg)) {
+                        mempool_free(&U2x.pool, swipe);
+                    }
+                }
+            }
+
+            reader->locked = U2_CARD_LOCK;
         }
     }
 }
@@ -386,21 +406,20 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
         if (keypad->locked > 0) {
             debugf("U2", "KEYPAD %d  LOCKED", door);
         } else {
-            int N = length + 1;
-            PIN *pin = (PIN *)mempool_alloc(&U2x.pool, 1, sizeof(PIN));
+            swipe *swipe = (struct swipe *)mempool_alloc(&U2x.pool, 1, sizeof(struct swipe));
 
-            if (pin != NULL) {
-                pin->door = door;
-                snprintf(pin->code, sizeof(pin->code), "%s", code);
+            if (swipe != NULL) {
+                swipe->door = door;
+                snprintf(swipe->code, sizeof(swipe->code), "%s", code);
 
                 message msg = {
-                    .message = MSG_PIN,
-                    .tag = MESSAGE_PIN,
-                    .pin = pin,
+                    .message = MSG_KEYCODE,
+                    .tag = MESSAGE_SWIPE,
+                    .swipe = swipe,
                 };
 
                 if (!push(msg)) {
-                    mempool_free(&U2x.pool, pin);
+                    mempool_free(&U2x.pool, swipe);
                 }
             }
 
@@ -409,10 +428,9 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
     }
 }
 
-void U2_pin(PIN *pin) {
-    if (pin != NULL) {
-        infof("U2", "KEYPAD %d  KEYCODE %s", pin->door, pin->code);
-        mempool_free(&U2x.pool, pin);
+void U2_free(swipe *swipe) {
+    if (swipe != NULL) {
+        mempool_free(&U2x.pool, swipe);
     }
 }
 

@@ -14,8 +14,8 @@ bool push(message msg) {
         m |= ((uint32_t)msg.buffer & 0x0fffffff);
         break;
 
-    case MESSAGE_PIN:
-        m |= ((uint32_t)msg.pin & 0x0fffffff);
+    case MESSAGE_SWIPE:
+        m |= ((uint32_t)msg.swipe & 0x0fffffff);
         break;
     }
 

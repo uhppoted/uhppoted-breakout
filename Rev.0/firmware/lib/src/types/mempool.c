@@ -12,7 +12,7 @@
 #include <log.h>
 #include <types/mempool.h>
 
-#define MEMPOOL_CHUNKSIZE 64
+#define MEMPOOL_CHUNKSIZE 128
 #define MEMPOOL_SIZE 64
 
 bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {

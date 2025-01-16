@@ -28,9 +28,10 @@ const uint32_t MODE_CLI_TIMEOUT = 15000; // ms
 const uint32_t MSG = 0xf0000000;
 const uint32_t MSG_DEBUG = 0x00000000;
 const uint32_t MSG_WIO = 0x10000000;
-const uint32_t MSG_PIN = 0x20000000;
-const uint32_t MSG_U3 = 0x30000000;
-const uint32_t MSG_RX = 0x40000000;
+const uint32_t MSG_SWIPE = 0x20000000;
+const uint32_t MSG_KEYCODE = 0x30000000;
+const uint32_t MSG_U3 = 0x40000000;
+const uint32_t MSG_RX = 0x50000000;
 const uint32_t MSG_TTY = 0xc0000000;
 const uint32_t MSG_LOG = 0xd0000000;
 const uint32_t MSG_WATCHDOG = 0xe0000000;
@@ -183,10 +184,20 @@ void dispatch(uint32_t v) {
         U2_wio(v & 0x0000ffff);
     }
 
-    if ((v & MSG) == MSG_PIN) {
-        PIN *pin = (PIN *)(SRAM_BASE | (v & 0x0fffffff));
+    if ((v & MSG) == MSG_SWIPE) {
+        swipe *swipe = (struct swipe *)(SRAM_BASE | (v & 0x0fffffff));
 
-        U2_pin(pin);
+        infof("U2", "READER %d  CARD %s", swipe->door, swipe->card);
+
+        U2_free(swipe);
+    }
+
+    if ((v & MSG) == MSG_KEYCODE) {
+        swipe *swipe = (struct swipe *)(SRAM_BASE | (v & 0x0fffffff));
+
+        infof("SYS", "KEYPAD %d  KEYCODE %s", swipe->door, swipe->code);
+
+        U2_free(swipe);
     }
 
     if ((v & MSG) == MSG_U3) {

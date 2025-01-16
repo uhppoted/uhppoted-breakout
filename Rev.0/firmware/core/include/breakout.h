@@ -9,7 +9,8 @@ extern const uint32_t MSG_DEBUG;
 extern const uint32_t MSG_RX;
 extern const uint32_t MSG_TTY;
 extern const uint32_t MSG_WIO;
-extern const uint32_t MSG_PIN;
+extern const uint32_t MSG_SWIPE;
+extern const uint32_t MSG_KEYCODE;
 extern const uint32_t MSG_U3;
 extern const uint32_t MSG_TICK;
 extern const uint32_t MSG_LOG;
@@ -58,7 +59,7 @@ typedef enum {
 typedef enum {
     MESSAGE_UINT32,
     MESSAGE_BUFFER,
-    MESSAGE_PIN,
+    MESSAGE_SWIPE,
     MESSAGE_UNKNOWN,
 } msg_type;
 
@@ -70,7 +71,7 @@ typedef struct message {
     union {
         uint32_t u32;
         struct circular_buffer *buffer;
-        struct PIN *pin;
+        struct swipe *swipe;
     };
 } message;
 
