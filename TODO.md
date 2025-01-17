@@ -79,7 +79,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [x] get-card-by-index
     - [x] put-card
     - [x] delete-card
-    - [ ] delete-all-cards
+    - [x] delete-all-cards
 
     - [ ] RPC
           - https://go.dev/blog/protobuf-opaque

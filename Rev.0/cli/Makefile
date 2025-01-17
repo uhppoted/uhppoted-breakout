@@ -90,3 +90,9 @@ delete-card:
 	python3 main.py --destination $(ADDRESS) --protocol udp delete-card
 	python3 main.py --destination $(ADDRESS) --protocol tcp delete-card
 
+delete-all-cards:
+	python3 main.py delete-all-cards
+	python3 main.py --destination $(ADDRESS) --protocol udp delete-all-cards
+	python3 main.py --destination $(ADDRESS) --protocol tcp delete-all-cards
+
+

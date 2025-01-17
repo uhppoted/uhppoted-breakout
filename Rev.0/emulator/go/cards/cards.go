@@ -206,7 +206,11 @@ func (c *Cards) SetIndexedRecord(oid scmp.OID, index uint32, value any) (any, er
 func (c *Cards) DeleteIndexedRecord(oid scmp.OID, index uint32) (bool, error) {
 	if scmp.Is(oid, scmp.OID_CARDS_CARD) {
 		deleted := false
-		if index > 0 {
+
+		if index == 0xffffffff {
+			c.cards = []scmp.Card{}
+			deleted = true
+		} else if index > 0 {
 			for ix, card := range c.cards {
 				if card.Card == index {
 					c.cards = slices.Delete(c.cards, ix, ix+1)
