@@ -4,8 +4,11 @@
 
 #include <pico/sync.h>
 
+struct mempool;
+
 typedef struct memchunk {
     bool allocated;
+    struct mempool *pool __attribute__((aligned(4)));
     uint8_t data[16] __attribute__((aligned(4)));
 } memchunk;
 

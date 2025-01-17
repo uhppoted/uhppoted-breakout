@@ -187,9 +187,9 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_SWIPE) {
         swipe *swipe = (struct swipe *)(SRAM_BASE | (v & 0x0fffffff));
 
-        infof("U2", "READER %d  CARD %s", swipe->door, swipe->card);
+        infof("SYS", "READER %d  CARD %s", swipe->door, swipe->card);
 
-        U2_free(swipe);
+        swipe_free(swipe);
     }
 
     if ((v & MSG) == MSG_KEYCODE) {
@@ -197,7 +197,7 @@ void dispatch(uint32_t v) {
 
         infof("SYS", "KEYPAD %d  KEYCODE %s", swipe->door, swipe->code);
 
-        U2_free(swipe);
+        swipe_free(swipe);
     }
 
     if ((v & MSG) == MSG_U3) {

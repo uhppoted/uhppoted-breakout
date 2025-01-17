@@ -60,6 +60,7 @@ bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
         memchunk *p = (memchunk *)calloc(1, bytes);
         if (p != NULL) {
             p->allocated = false;
+            p->pool = pool;
             pool->pool[pool->size++] = p;
         }
     }

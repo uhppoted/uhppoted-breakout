@@ -358,7 +358,7 @@ void U2_on_card_read(uint8_t door, uint32_t v) {
                     };
 
                     if (!push(msg)) {
-                        mempool_free(&U2x.pool, swipe);
+                        swipe_free(swipe);
                     }
                 }
             }
@@ -419,7 +419,7 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
                 };
 
                 if (!push(msg)) {
-                    mempool_free(&U2x.pool, swipe);
+                    swipe_free(swipe);
                 }
             }
 
@@ -428,7 +428,7 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
     }
 }
 
-void U2_free(swipe *swipe) {
+void swipe_free(swipe *swipe) {
     if (swipe != NULL) {
         mempool_free(&U2x.pool, swipe);
     }

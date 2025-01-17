@@ -11,4 +11,5 @@ typedef struct swipe {
 extern void U2_init();
 extern void U2_start();
 extern void U2_wio(uint8_t inputs);
-extern void U2_free(swipe *swipe);
+
+extern void swipe_free(swipe *swipe);
