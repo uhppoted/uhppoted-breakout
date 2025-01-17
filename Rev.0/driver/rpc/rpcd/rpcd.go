@@ -1,6 +1,8 @@
 package rpcd
 
 import (
+	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -13,12 +15,65 @@ import (
 )
 
 type RPCD struct {
-	ssmp ssmp.SSMP
+	network string
+	addr    string
+	ssmp    ssmp.SSMP
+	ctx     context.Context
+	cancel  context.CancelFunc
 }
 
 type KV struct {
 	OID   string
 	Value any
+}
+
+func NewRPCD(address string) (*RPCD, error) {
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(address); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid bind address (%v)", address)
+	} else {
+		ctx, cancel := context.WithCancel(context.Background())
+
+		v := RPCD{
+			network: matches[1],
+			addr:    matches[2],
+			ssmp:    ssmp.SSMP{},
+
+			ctx:    ctx,
+			cancel: cancel,
+		}
+
+		return &v, nil
+	}
+}
+
+func (r *RPCD) Run() {
+	rpc.Register(r)
+	rpc.HandleHTTP()
+
+	if r.network == "unix" {
+		folder := filepath.Dir(r.addr)
+		if err := os.MkdirAll(folder, 0766); err != nil {
+			errorf("listen error: %v", err)
+		}
+
+		os.Remove(r.addr)
+	}
+
+	if l, err := net.Listen(r.network, r.addr); err != nil {
+		errorf("listen error: %v", err)
+	} else {
+		go func() {
+			<-r.ctx.Done()
+			l.Close()
+		}()
+
+		infof("listening %v %v", r.network, r.addr)
+		http.Serve(l, nil)
+	}
+}
+
+func (r *RPCD) Stop() {
+	r.cancel()
 }
 
 func (r *RPCD) Get(oid string, reply *any) error {
@@ -40,46 +95,6 @@ func (r *RPCD) Set(kv KV, reply *any) error {
 	} else {
 		*reply = v
 		return nil
-	}
-}
-
-func Run(bind string) {
-	rpcd := RPCD{
-		ssmp: ssmp.SSMP{},
-	}
-
-	rpc.Register(&rpcd)
-	rpc.HandleHTTP()
-
-	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(bind); len(matches) < 3 {
-		errorf("invalid bind address (%v)", bind)
-	} else {
-		network := matches[1]
-		addr := matches[2]
-
-		if network == "unix" {
-			folder := filepath.Dir(addr)
-			if err := os.MkdirAll(folder, 0766); err != nil {
-				errorf("listen error: %v", err)
-			}
-
-			os.Remove(addr)
-		}
-
-		defer func() {
-			if network == "unix" {
-				if err := os.Remove(addr); err != nil {
-					warnf("error removing Unix domain socket '%v' (%v)", addr, err)
-				}
-			}
-		}()
-
-		if l, err := net.Listen(network, addr); err != nil {
-			errorf("listen error: %v", err)
-		} else {
-			infof("listening %v %v", network, addr)
-			http.Serve(l, nil)
-		}
 	}
 }
 

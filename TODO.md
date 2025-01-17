@@ -85,7 +85,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
           - https://go.dev/blog/protobuf-opaque
           - [x] go-rpc
           - [x] unix domain sockets
-                - [ ] remove 'rpc.sock' file on RPCD terminate
+                - [x] remove 'rpc.sock' file on RPCD terminate
           - [ ] TCP/IP
           - [ ] grpc
 
