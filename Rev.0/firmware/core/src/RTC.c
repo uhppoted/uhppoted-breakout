@@ -11,6 +11,11 @@
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
+#include <types/mempool.h>
+
+#define LOGTAG "RTC"
+
+const uint32_t RTC_POOLSIZE = 8;
 
 int64_t RTC_on_setup(alarm_id_t id, void *data);
 void RTC_setup();
@@ -32,6 +37,7 @@ struct {
     uint8_t second;
     uint8_t dow;
 
+    mempool pool;
     repeating_timer_t timer;
     mutex_t guard;
 } RTC = {
@@ -71,11 +77,22 @@ typedef struct datetime {
     };
 } datetime;
 
+void datetime_free(datetime *dt) {
+    if (dt != NULL) {
+        mempool_free(&RTC.pool, dt);
+    }
+}
+
 /*
  * Initialises the RX8900SA.
  */
 void RTC_init() {
     infof("RTC", "init");
+
+    // ... initialise mempool
+    if (!mempool_init(&RTC.pool, RTC_POOLSIZE, sizeof(datetime))) {
+        set_error(ERR_RX8900SA, LOGTAG, "error initialising mempool");
+    }
 
     // ... initialise RX8900SA
     int err;
@@ -166,7 +183,7 @@ bool RTC_on_update(repeating_timer_t *rt) {
     };
 
     if (!I2C0_push(&task)) {
-        set_error(ERR_QUEUE_FULL, "RTC", "update: queue full");
+        set_error(ERR_QUEUE_FULL, LOGTAG, "update: queue full");
     }
 
     return true;
@@ -283,7 +300,7 @@ void RTC_write(void *data) {
         }
     }
 
-    free(data);
+    datetime_free(d);
 }
 
 /*
@@ -321,35 +338,40 @@ void RTC_get_date(char *yymmmdd, int N) {
     }
 }
 
-void RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
+bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
     if (RTC.initialised) {
         uint8_t weekday = dow(year, month, day);
-        datetime *dt = (datetime *)calloc(1, sizeof(datetime));
+        datetime *dt = (struct datetime *)mempool_alloc(&RTC.pool, 1, sizeof(struct datetime));
 
-        dt->tag = RTC_SET_DATE;
-        dt->yyyymmdd.year = year;
-        dt->yyyymmdd.month = month;
-        dt->yyyymmdd.day = day;
-        dt->yyyymmdd.dow = weekday;
+        if (dt != NULL) {
+            dt->tag = RTC_SET_DATE;
+            dt->yyyymmdd.year = year;
+            dt->yyyymmdd.month = month;
+            dt->yyyymmdd.day = day;
+            dt->yyyymmdd.dow = weekday;
 
-        closure write = {
-            .f = RTC_write,
-            .data = dt,
-        };
+            closure write = {
+                .f = RTC_write,
+                .data = dt,
+            };
 
-        closure read = {
-            .f = RTC_read,
-            .data = &RTC,
-        };
+            closure read = {
+                .f = RTC_read,
+                .data = &RTC,
+            };
 
-        if (!I2C0_push(&write)) {
-            set_error(ERR_QUEUE_FULL, "RTC", "set-date: queue full");
-        }
-
-        if (!I2C0_push(&read)) {
-            set_error(ERR_QUEUE_FULL, "RTC", "update: queue full");
+            if (!I2C0_push(&write)) {
+                set_error(ERR_QUEUE_FULL, LOGTAG, "set-date: queue full");
+                datetime_free(dt);
+            } else if (!I2C0_push(&read)) {
+                set_error(ERR_QUEUE_FULL, LOGTAG, "update: queue full");
+            } else {
+                return true;
+            }
         }
     }
+
+    return false;
 }
 
 void RTC_get_time(char *HHmmss, int N) {
@@ -374,33 +396,38 @@ void RTC_get_time(char *HHmmss, int N) {
     }
 }
 
-void RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
+bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
     if (RTC.initialised) {
-        datetime *dt = (datetime *)calloc(1, sizeof(datetime));
+        datetime *dt = (struct datetime *)mempool_alloc(&RTC.pool, 1, sizeof(struct datetime));
 
-        dt->tag = RTC_SET_TIME;
-        dt->HHmmss.hour = hour;
-        dt->HHmmss.minute = minute;
-        dt->HHmmss.second = second;
+        if (dt != NULL) {
+            dt->tag = RTC_SET_TIME;
+            dt->HHmmss.hour = hour;
+            dt->HHmmss.minute = minute;
+            dt->HHmmss.second = second;
 
-        closure write = {
-            .f = RTC_write,
-            .data = dt,
-        };
+            closure write = {
+                .f = RTC_write,
+                .data = dt,
+            };
 
-        closure read = {
-            .f = RTC_read,
-            .data = &RTC,
-        };
+            closure read = {
+                .f = RTC_read,
+                .data = &RTC,
+            };
 
-        if (!I2C0_push(&write)) {
-            set_error(ERR_QUEUE_FULL, "RTC", "set-time: queue full");
-        }
-
-        if (!I2C0_push(&read)) {
-            set_error(ERR_QUEUE_FULL, "RTC", "set-time: queue full");
+            if (!I2C0_push(&write)) {
+                set_error(ERR_QUEUE_FULL, LOGTAG, "set-time: queue full");
+                datetime_free(dt);
+            } else if (!I2C0_push(&read)) {
+                set_error(ERR_QUEUE_FULL, LOGTAG, "set-time: queue full");
+            } else {
+                return true;
+            }
         }
     }
+
+    return false;
 }
 
 void RTC_get_dow(char *weekday, int N) {

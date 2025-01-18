@@ -18,7 +18,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - requires 'double' buffering otherwise pop will block interrupt reads
       - or use queue ?
 
-- [ ] CLI: trace interval
+- [ ] CLI: set trace interval
 - [ ] CLI: poke
       - system error messages
 
@@ -38,10 +38,14 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [ ] move error handling to breakout.c
 - [ ] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
 
-### U2
+### mempool
 - [x] add handler for card swipe
+- [x] RTC
+- [ ] field
+- [ ] packet
 - [ ] test card swipe
 - [ ] test keycode
+- [ ] test set-date/time
 
 ### SSMP
     - GET
