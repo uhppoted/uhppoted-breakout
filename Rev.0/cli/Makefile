@@ -65,6 +65,12 @@ set-door-passcodes:
 	python3 main.py --destination $(ADDRESS) --protocol udp set-door-passcodes
 	python3 main.py --destination $(ADDRESS) --protocol tcp set-door-passcodes
 
+open-door:
+	python3 main.py open-door
+	python3 main.py --destination $(ADDRESS) --protocol udp open-door
+	python3 main.py --destination $(ADDRESS) --protocol tcp open-door
+
+
 get-cards:
 	python3 main.py get-cards
 	python3 main.py --destination $(ADDRESS) --protocol udp get-cards

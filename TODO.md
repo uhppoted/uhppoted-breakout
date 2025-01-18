@@ -41,11 +41,17 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 ### mempool
 - [x] add handler for card swipe
 - [x] RTC
+- [ ] reinstate CLI
+- [ ] U4::operation_free(..)
+- [ ] swipe_alloc
+- [ ] datetime_alloc
+- [ ] operation_alloc
 - [ ] field
 - [ ] packet
 - [ ] test card swipe
 - [ ] test keycode
 - [ ] test set-date/time
+- [ ] basically check everything still works
 
 ### SSMP
     - GET
@@ -63,35 +69,49 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - (?) queue UART write
     
 ### emulator
-    - [ ] API
-          - [ ] close takes forever if there are no connections
+   - [ ] API
+      - [x] get-controller
+      - [x] set-address
+      - [x] get-listener
+      - [x] set-listener
+      - [x] get-time
+      - [x] set-time
+      - [x] get-status
+      - [x] get-door
+      - [x] set-door
+      - [x] set-door-passcodes
+      - [x] get-cards
+      - [x] get-card
+      - [x] get-card-by-index
+      - [x] put-card
+      - [x] delete-card
+      - [x] delete-all-cards
+      - [ ] open-door
+      - [ ] record-special-events
+      - [ ] set-time-profile
+      - [ ] clear-time-profiles
+      - [ ] get-time-profiles
+      - [ ] set-time-profiles
+      - [ ] clear-task-list
+      - [ ] add-task
+      - [ ] refresh-task-list
+      - [ ] set-task-list
+      - [ ] get-events
+      - [ ] get-event
+      - [ ] get-event-index
+      - [ ] set-event-index
+      - [ ] open-door
+      - [ ] set-pc-control
+      - [ ] set-interlock
+      - [ ] activate-keypads
+      - [ ] restore-default-parameters
 
-    - [x] write config to tmp file and move 
-    - [x] Move event listener and interval to controller MIB block
-    - [x] get-controller
-    - [x] set-address
-    - [x] get-listener
-    - [x] set-listener
-    - [x] get-time
-    - [x] set-time
-    - [x] get-status
-    - [x] get-door
-    - [x] set-door
-    - [x] set-door-passcodes
-    - [x] get-cards
-    - [x] get-card
-    - [x] get-card-by-index
-    - [x] put-card
-    - [x] delete-card
-    - [x] delete-all-cards
-
-    - [ ] RPC
-          - https://go.dev/blog/protobuf-opaque
-          - [x] go-rpc
-          - [x] unix domain sockets
-                - [x] remove 'rpc.sock' file on RPCD terminate
-          - [ ] TCP/IP
-          - [ ] grpc
+   - [ ] RPC
+      - https://go.dev/blog/protobuf-opaque
+      - [x] go-rpc
+      - [x] unix domain sockets
+      - [ ] TCP/IP
+      - [ ] grpc
 
     - [ ] monitor
     - [ ] daemonize
