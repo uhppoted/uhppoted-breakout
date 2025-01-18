@@ -165,6 +165,10 @@ func (c *Config) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
+func (c *Config) SetBool(oid scmp.OID, val bool) (bool, error) {
+	return false, fmt.Errorf("unknown OID %v", oid)
+}
+
 func (c *Config) SetString(oid scmp.OID, val string) (string, error) {
 	if scmp.Is(oid, scmp.OID_CONTROLLER_EVENT_LISTENER) {
 		if addrPort, err := netip.ParseAddrPort(val); err != nil {

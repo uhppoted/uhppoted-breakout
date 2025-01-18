@@ -53,7 +53,7 @@ func (s SSMP) Get(oid string) (any, error) {
 		return uint8(5), nil
 	}
 
-	// ... door 1 unlocked
+	// ... door 1 lock
 	if oid == ".1.3.6.1.4.1.65536.3.1.4" {
 		return true, nil
 	}
@@ -78,7 +78,7 @@ func (s SSMP) Get(oid string) (any, error) {
 		return uint8(5), nil
 	}
 
-	// ... door 2 unlocked
+	// ... door 2 lock
 	if oid == ".1.3.6.1.4.1.65536.3.2.4" {
 		return true, nil
 	}
@@ -103,7 +103,7 @@ func (s SSMP) Get(oid string) (any, error) {
 		return uint8(17), nil
 	}
 
-	// ... door 3 unlocked
+	// ... door 3 lock
 	if oid == ".1.3.6.1.4.1.65536.3.3.4" {
 		return true, nil
 	}
@@ -128,7 +128,7 @@ func (s SSMP) Get(oid string) (any, error) {
 		return uint8(5), nil
 	}
 
-	// ... door 4 unlocked
+	// ... door 4 lock
 	if oid == ".1.3.6.1.4.1.65536.3.4.4" {
 		return false, nil
 	}
@@ -165,18 +165,25 @@ func (s SSMP) Set(oid string, value any) (any, error) {
 	}
 
 	// ... door 1 mode
-	if oid == ".1.3.6.1.4.1.65536.3.1.3.1" {
+	if oid == ".1.3.6.1.4.1.65536.3.1.1" {
 		return uint8(1), nil
 	}
 
 	// ... door 1 delay
-	if oid == ".1.3.6.1.4.1.65536.3.1.3.2" {
+	if oid == ".1.3.6.1.4.1.65536.3.1.2" {
 		return uint8(5), nil
 	}
 
 	// ... door 1 passcodes
-	if oid == ".1.3.6.1.4.1.65536.3.1.3.3" {
+	if oid == ".1.3.6.1.4.1.65536.3.1.3" {
 		return []uint32{}, nil
+	}
+
+	// ... door 1 lock
+	if oid == ".1.3.6.1.4.1.65536.3.1.4" {
+		if b, ok := value.(bool); ok {
+			return any(b), nil
+		}
 	}
 
 	// ... door 2 mode
@@ -194,6 +201,13 @@ func (s SSMP) Set(oid string, value any) (any, error) {
 		return []uint32{}, nil
 	}
 
+	// ... door 2 lock
+	if oid == ".1.3.6.1.4.1.65536.3.2.4" {
+		if b, ok := value.(bool); ok {
+			return any(b), nil
+		}
+	}
+
 	// ... door 3 mode
 	if oid == ".1.3.6.1.4.1.65536.3.3.1" {
 		return uint8(3), nil
@@ -209,6 +223,13 @@ func (s SSMP) Set(oid string, value any) (any, error) {
 		return []uint32{12345, 0, 999999, 54321}, nil
 	}
 
+	// ... door 3 lock
+	if oid == ".1.3.6.1.4.1.65536.3.3.4" {
+		if b, ok := value.(bool); ok {
+			return any(b), nil
+		}
+	}
+
 	// ... door 4 mode
 	if oid == ".1.3.6.1.4.1.65536.3.4.1" {
 		return uint8(1), nil
@@ -222,6 +243,13 @@ func (s SSMP) Set(oid string, value any) (any, error) {
 	// ... door 4 passcodes
 	if oid == ".1.3.6.1.4.1.65536.3.4.3" {
 		return []uint32{}, nil
+	}
+
+	// ... door 4 lock
+	if oid == ".1.3.6.1.4.1.65536.3.4.4" {
+		if b, ok := value.(bool); ok {
+			return any(b), nil
+		}
 	}
 
 	return nil, fmt.Errorf("unknown OID %v", oid)

@@ -238,6 +238,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 	case *messages.SetDoorPasscodesRequest:
 		return ut0311.setDoorPasscodes(rq)
 
+	case *messages.OpenDoorRequest:
+		return ut0311.openDoor(rq)
+
 	case *messages.GetCardsRequest:
 		return ut0311.getCards(rq)
 

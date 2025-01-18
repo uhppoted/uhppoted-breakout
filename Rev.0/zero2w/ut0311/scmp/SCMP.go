@@ -30,6 +30,7 @@ type GetI interface {
 type SetV interface {
 	SetUint8(oid OID, v uint8) (uint8, error)
 	SetUint32A(oid OID, v []uint32) ([]uint32, error)
+	SetBool(oid OID, v bool) (bool, error)
 	SetString(oid OID, v string) (string, error)
 	SetIndexedRecord(oid OID, index uint32, record any) (any, error)
 	DeleteIndexedRecord(oid OID, index uint32) (bool, error)
@@ -201,6 +202,13 @@ func Set[T any](scmp SetV, oid OID, val T) (T, error) {
 			return zero, err
 		} else {
 			return any(u32a).(T), nil
+		}
+
+	case bool:
+		if b, err := scmp.SetBool(oid, v); err != nil {
+			return zero, err
+		} else {
+			return any(b).(T), nil
 		}
 
 	case netip.AddrPort:

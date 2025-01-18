@@ -86,7 +86,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - [x] put-card
       - [x] delete-card
       - [x] delete-all-cards
-      - [ ] open-door
+      - [x] open-door
       - [ ] record-special-events
       - [ ] set-time-profile
       - [ ] clear-time-profiles

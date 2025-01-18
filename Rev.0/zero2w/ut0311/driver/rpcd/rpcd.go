@@ -146,6 +146,18 @@ func (r RPC) SetUint8(oid scmp.OID, value uint8) (uint8, error) {
 	}
 }
 
+func (r RPC) SetBool(oid scmp.OID, value bool) (bool, error) {
+	debugf("set %v %v", oid, value)
+
+	if reply, err := r.set(oid, value); err != nil {
+		return false, err
+	} else if b, ok := reply.(bool); !ok {
+		return false, fmt.Errorf("invalid reply - expected 'bool', got '%T'", reply)
+	} else {
+		return b, nil
+	}
+}
+
 func (r RPC) SetString(oid scmp.OID, value string) (string, error) {
 	debugf("set %v %v", oid, value)
 

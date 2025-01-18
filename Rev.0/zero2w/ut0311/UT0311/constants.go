@@ -8,6 +8,7 @@ var lookup = struct {
 	modes     map[uint8]scmp.OID
 	delays    map[uint8]scmp.OID
 	passcodes map[uint8]scmp.OID
+	lock      map[uint8]scmp.OID
 }{
 	modes: map[uint8]scmp.OID{
 		1: scmp.OID_DOORS_1_MODE,
@@ -26,5 +27,11 @@ var lookup = struct {
 		2: scmp.OID_DOORS_2_PASSCODES,
 		3: scmp.OID_DOORS_3_PASSCODES,
 		4: scmp.OID_DOORS_4_PASSCODES,
+	},
+	lock: map[uint8]scmp.OID{
+		1: scmp.OID_DOORS_1_LOCK,
+		2: scmp.OID_DOORS_2_LOCK,
+		3: scmp.OID_DOORS_3_LOCK,
+		4: scmp.OID_DOORS_4_LOCK,
 	},
 }
