@@ -48,11 +48,15 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [ ] operation_alloc
 - [ ] field
 - [ ] packet
-- [ ] retest
+- [ ] check U2/U3/U4/U5
       - [ ] card swipe
       - [ ] keycode
       - [x] set date/time
       - [ ] inputs
+            - `get-doors`
+            - `get-buttons`
+            - `door 4 open`
+            - `button 4 released` ????
       - [ ] outputs
 
 ### SSMP
