@@ -41,7 +41,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 ### mempool
 - [x] add handler for card swipe
 - [x] RTC
-- [ ] reinstate CLI
+- [x] reinstate CLI
 - [ ] U4::operation_free(..)
 - [ ] swipe_alloc
 - [ ] datetime_alloc

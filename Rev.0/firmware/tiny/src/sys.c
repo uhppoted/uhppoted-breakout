@@ -71,8 +71,8 @@ bool sys_init() {
     }
 
     sysinit();
-    // FIXME cli_init();
     log_init();
+    cli_init();
     print(s);
 
     return true;
@@ -104,11 +104,11 @@ void sys_tick() {
             break;
 
         case MODE_CLI:
-            put_rgb(0, 48, 96); // turquoise
+            put_rgb(64, 16, 0); // yellow
             break;
 
         case MODE_UNKNOWN:
-            put_rgb(64, 16, 0); // yellow
+            put_rgb(0, 48, 96); // turquoise
             break;
 
         default:

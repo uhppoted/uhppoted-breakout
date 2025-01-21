@@ -48,7 +48,7 @@ add_executable(breakout
   ${CORE}/src/auth.c
   ${CORE}/src/state.c
   ${CORE}/src/log.c
-# ${CORE}/src/cli.c
+  ${CORE}/src/cli.c
   ${CORE}/src/ANSI.c
 
   ${LIB}/src/I2C.c

@@ -40,8 +40,8 @@ bool sys_init() {
     snprintf(s, sizeof(s), "-----  BREAKOUT   %02x.02x", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
 
     sysinit();
-    cli_init();
     log_init();
+    cli_init();
     print(s);
 
     return true;

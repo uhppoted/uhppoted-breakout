@@ -3,10 +3,10 @@
 #include <pico/time.h>
 
 typedef enum {
-    MODE_UNKNOWN,
     MODE_NONE,
     MODE_LOG,
     MODE_CLI,
+    MODE_UNKNOWN,
 } mode;
 
 extern bool sys_init();

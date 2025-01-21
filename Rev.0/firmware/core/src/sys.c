@@ -72,10 +72,10 @@ void sysinit() {
     mutex_init(&SYSTEM.guard);
     mutex_init(&SYSTEM.queue.lock);
 
-    if (strcasecmp(MODE, "log") == 0) {
-        SYSTEM.mode = MODE_LOG;
-    } else if (strcasecmp(MODE, "cli") == 0 || strcasecmp(MODE, "unknown") == 0) {
+    if (strcasecmp(MODE, "cli") == 0) {
         SYSTEM.mode = MODE_UNKNOWN; // NTS: will be set to MODE_CLI if/when terminal is connected
+    } else if (strcasecmp(MODE, "log") == 0) {
+        SYSTEM.mode = MODE_LOG;
     } else {
         SYSTEM.mode = MODE_NONE;
     }
@@ -213,7 +213,7 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_TTY) {
         struct circular_buffer *b = (struct circular_buffer *)(SRAM_BASE | (v & 0x0fffffff));
 
-        // FIXME cli_rx(b);
+        cli_rx(b);
     }
 
     if ((v & MSG) == MSG_TICK) {
@@ -295,6 +295,10 @@ void _push(const char *msg) {
  *
  */
 void _flush() {
+    if (SYSTEM.mode != MODE_LOG && SYSTEM.mode != MODE_CLI) {
+        return;
+    }
+
     if (SYSTEM.mode != MODE_LOG && SYSTEM.mode != MODE_CLI) {
         return;
     }

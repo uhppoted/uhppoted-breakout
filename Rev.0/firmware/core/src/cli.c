@@ -168,13 +168,12 @@ void cli_callback(void *data) {
 /** Sets the scroll area.
  *
  */
-// FIXME
 void cli_init() {
-    // stdio_set_chars_available_callback(cli_callback, &cli);
-    //
-    // print(TERMINAL_CLEAR);
-    // print(TERMINAL_QUERY_CODE);
-    // print(TERMINAL_QUERY_SIZE);
+    stdio_set_chars_available_callback(cli_callback, &cli);
+
+    print(TERMINAL_CLEAR);
+    print(TERMINAL_QUERY_CODE);
+    print(TERMINAL_QUERY_SIZE);
 }
 
 /** Processes received characters.
