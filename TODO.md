@@ -42,16 +42,18 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [x] add handler for card swipe
 - [x] RTC
 - [x] reinstate CLI
-- [ ] U4::operation_free(..)
+- [x] U4::operation_free(..)
 - [ ] swipe_alloc
 - [ ] datetime_alloc
 - [ ] operation_alloc
 - [ ] field
 - [ ] packet
-- [ ] test card swipe
-- [ ] test keycode
-- [ ] test set-date/time
-- [ ] basically check everything still works
+- [ ] retest
+      - [ ] card swipe
+      - [ ] keycode
+      - [x] set date/time
+      - [ ] inputs
+      - [ ] outputs
 
 ### SSMP
     - GET
