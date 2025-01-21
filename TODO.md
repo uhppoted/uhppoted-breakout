@@ -14,10 +14,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
-- (?) mutex around buffer push/pop
-      - requires 'double' buffering otherwise pop will block interrupt reads
-      - or use queue ?
-
 - [ ] CLI: set trace interval
 - [ ] CLI: poke
       - system error messages
@@ -52,12 +48,8 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - [ ] card swipe
       - [ ] keycode
       - [x] set date/time
-      - [ ] inputs
-            - `get-doors`
-            - `get-buttons`
-            - `door 4 open`
-            - `button 4 released` ????
-      - [ ] outputs
+      - [x] inputs
+      - [x] outputs
 
 ### SSMP
     - GET

@@ -516,7 +516,7 @@ void unlock_door(const char *cmd) {
 
         if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
             U4_set_relay(relay, 5000);
-            display("unlock door: ok");
+            display("door %u unlocked", relay);
         }
     }
 }
@@ -530,7 +530,7 @@ void lock_door(const char *cmd) {
 
         if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
             U4_clear_relay(relay);
-            display("lock-door: ok");
+            display("door %u locked", relay);
         }
     }
 }
@@ -545,41 +545,45 @@ void set_LED(const char *cmd, bool state) {
         if ((rc = sscanf(cmd, "%u", &LED)) == 1) {
             if (state) {
                 U4_set_LED(LED);
+                display("LED %u on", LED);
 
             } else {
                 U4_clear_LED(LED);
+                display("LED %u off", LED);
             }
-            display("set-LED: ok");
             return;
         }
 
         if (strncasecmp(cmd, "ERR", 3) == 0) {
             if (state) {
                 U4_set_ERR();
+                display("ERR LED on");
             } else {
                 U4_clear_ERR();
+                display("ERR LED off");
             }
-            display("set-ERR: ok");
             return;
         }
 
         if (strncasecmp(cmd, "IN", 2) == 0) {
             if (state) {
                 U4_set_IN();
+                display("IN LED on");
             } else {
                 U4_clear_IN();
+                display("IN LED off");
             }
-            display("set-IN: ok");
             return;
         }
 
         if (strncasecmp(cmd, "SYS", 3) == 0) {
             if (state) {
                 U4_set_SYS();
+                display("SYS LED on");
             } else {
                 U4_clear_SYS();
+                display("SYS LED off");
             }
-            display("set-SYS: ok");
             return;
         }
     }
@@ -594,42 +598,56 @@ void blink_LED(const char *cmd) {
 
         if ((rc = sscanf(cmd, "%u", &LED)) == 1) {
             U4_blink_LED(LED, 5, 500);
-            display("blink-LED: ok");
+            display("blinking LED %u", LED);
             return;
         }
 
         if (strncasecmp(cmd, "ERR", 3) == 0) {
             U4_blink_ERR(5, 500);
-            display("blink-ERR: ok");
+            display("blinking ERR LED");
             return;
         }
 
         if (strncasecmp(cmd, "IN", 2) == 0) {
             U4_blink_IN(5, 500);
-            display("blink-IN: ok");
+            display("blinking IN LED");
             return;
         }
 
         if (strncasecmp(cmd, "SYS", 3) == 0) {
             U4_blink_SYS(5, 500);
-            display("blink-SYS: ok");
+            display("blinking SYS LED");
             return;
         }
     }
 }
 
 void get_doors() {
+    char s[64];
+    int ix = 0;
+
+    ix += snprintf(&s[ix], sizeof(s) - ix, "doors ");
     for (uint8_t door = 1; door <= 4; door++) {
         bool open = U3_get_door(door);
-        display("door %u %s", door, open ? "open" : "closed");
+
+        ix += snprintf(&s[ix], sizeof(s) - ix, " %u:%s", door, open ? "open" : "closed");
     };
+
+    display("%s", s);
 }
 
 void get_buttons() {
+    char s[64];
+    int ix = 0;
+
+    ix += snprintf(&s[ix], sizeof(s) - ix, "buttons ");
     for (uint8_t door = 1; door <= 4; door++) {
         bool pressed = U3_get_button(door);
-        display("button %u %s", door, pressed ? "pressed" : "released");
+
+        ix += snprintf(&s[ix], sizeof(s) - ix, " %u:%s", door, pressed ? "pressed" : "released");
     };
+
+    display("%s", s);
 }
 
 void scan() {
