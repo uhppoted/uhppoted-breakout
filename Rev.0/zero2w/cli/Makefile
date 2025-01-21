@@ -101,4 +101,9 @@ delete-all-cards:
 	python3 main.py --destination $(ADDRESS) --protocol udp delete-all-cards
 	python3 main.py --destination $(ADDRESS) --protocol tcp delete-all-cards
 
+record-special-events:
+	python3 main.py record-special-events
+	python3 main.py --destination $(ADDRESS) --protocol udp record-special-events
+	python3 main.py --destination $(ADDRESS) --protocol tcp record-special-events
+
 

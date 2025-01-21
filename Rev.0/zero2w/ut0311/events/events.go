@@ -8,6 +8,13 @@ import (
 )
 
 type Events struct {
+	recordAll bool
+}
+
+func NewEvents() *Events {
+	return &Events{
+		recordAll: false,
+	}
 }
 
 func (e Events) GetUint8(oid scmp.OID) (uint8, error) {
@@ -146,6 +153,28 @@ func (e Events) GetIndexedString(oid scmp.OID, index uint32) (string, error) {
 	}
 
 	return "", fmt.Errorf("unknown OID %v", oid)
+}
+
+func (e *Events) SetBool(oid scmp.OID, val bool) (bool, error) {
+	if scmp.Is(oid, scmp.OID_EVENTS_RECORD_ALL) {
+		e.recordAll = val
+
+		return e.recordAll, nil
+	}
+
+	return false, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (e *Events) SetUint32A(oid scmp.OID, value []uint32) ([]uint32, error) {
+	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (e *Events) SetIndexedRecord(oid scmp.OID, index uint32, value any) (any, error) {
+	return nil, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (e *Events) DeleteIndexedRecord(oid scmp.OID, index uint32) (bool, error) {
+	return false, fmt.Errorf("unknown OID %v", oid)
 }
 
 func (e Events) GetOctets(oid scmp.OID) ([]byte, error) {

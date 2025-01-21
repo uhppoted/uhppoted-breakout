@@ -204,7 +204,7 @@ func (c *Cards) SetIndexedRecord(oid scmp.OID, index uint32, value any) (any, er
 		}
 	}
 
-	return 0, fmt.Errorf("unknown OID %v", oid)
+	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
 func (c *Cards) DeleteIndexedRecord(oid scmp.OID, index uint32) (bool, error) {
