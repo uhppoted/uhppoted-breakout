@@ -410,7 +410,7 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
 
             if (swipe != NULL) {
                 swipe->door = door;
-                snprintf(swipe->code, sizeof(swipe->code), "%s", code);
+                snprintf(swipe->code, length + 1 < sizeof(swipe->code) ? length + 1 : sizeof(swipe->code), "%s", code);
 
                 message msg = {
                     .message = MSG_KEYCODE,

@@ -1,8 +1,6 @@
 # TODO
 
 - [ ] Zero2W serial logging
-- [ ] Zero2W USB UART
-- [ ] MSG_POKE (because absolutely shouldn't call it from interrupt handler)
 - [ ] Rework print queue
       - (?) check USB connected
       - (?) setvbuf
@@ -30,7 +28,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - pico_malloc
       - pico_stdio
 
-- [ ] doors should be unlocked on boot/power-off
+- [ ] doors should be unlocked on boot/power-off but locked otherwise
 - [ ] move error handling to breakout.c
 - [ ] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
 
@@ -45,8 +43,8 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [ ] field
 - [ ] packet
 - [ ] check U2/U3/U4/U5
-      - [ ] card swipe
-      - [ ] keycode
+      - [x] card swipe
+      - [x] keycode
       - [x] set date/time
       - [x] inputs
       - [x] outputs
@@ -85,7 +83,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - [x] delete-card
       - [x] delete-all-cards
       - [x] open-door
-      - [ ] record-special-events
+      - [x] record-special-events
       - [ ] set-time-profile
       - [ ] clear-time-profiles
       - [ ] get-time-profiles
@@ -117,7 +115,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [ ] cache
     - [ ] tinygo
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
-    - [ ] Nerves
 
 ### Driver
     - [ ] breakout-simulator
@@ -150,6 +147,8 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - https://groupgets.com/products/pureconnect
 
 ## R&D
+- Nerves
+- Embassy (Rust)
 - https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 - [ ] Pinout diagram
      - (?) [WireViz] https://github.com/formatc1702/WireViz
