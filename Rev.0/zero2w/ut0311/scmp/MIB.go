@@ -62,6 +62,7 @@ var OID_CARDS_CARD_PIN = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 2, 0xffffffff, 5}
 var OID_EVENTS_RECORD_ALL = OID{1, 3, 6, 1, 4, 1, 65536, 6, 0, 1}
 var OID_EVENTS_FIRST = OID{1, 3, 6, 1, 4, 1, 65536, 6, 0, 2}
 var OID_EVENTS_LAST = OID{1, 3, 6, 1, 4, 1, 65536, 6, 0, 3}
+var OID_EVENTS_INDEX = OID{1, 3, 6, 1, 4, 1, 65536, 6, 0, 4}
 var OID_EVENTS_EVENT = OID{1, 3, 6, 1, 4, 1, 65536, 6}
 var OID_EVENTS_EVENT_EVENT = OID{1, 3, 6, 1, 4, 1, 65536, 6, 0xffffffff, 1}
 var OID_EVENTS_EVENT_GRANTED = OID{1, 3, 6, 1, 4, 1, 65536, 6, 0xffffffff, 2}

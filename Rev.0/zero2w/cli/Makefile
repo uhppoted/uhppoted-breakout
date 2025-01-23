@@ -106,4 +106,11 @@ record-special-events:
 	python3 main.py --destination $(ADDRESS) --protocol udp record-special-events
 	python3 main.py --destination $(ADDRESS) --protocol tcp record-special-events
 
+get-event-index:
+	python3 main.py get-event-index
+	python3 main.py --destination $(ADDRESS) --protocol udp get-event-index
+	python3 main.py --destination $(ADDRESS) --protocol tcp get-event-index
+
+
+
 

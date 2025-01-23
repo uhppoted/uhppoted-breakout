@@ -262,6 +262,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 	case *messages.RecordSpecialEventsRequest:
 		return ut0311.recordSpecialEvents(rq)
 
+	case *messages.GetEventIndexRequest:
+		return ut0311.getEventIndex(rq)
+
 	default:
 		warnf("unknown message type (%T)", request)
 	}

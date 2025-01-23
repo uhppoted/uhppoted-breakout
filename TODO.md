@@ -42,7 +42,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [ ] operation_alloc
 - [ ] field
 - [ ] packet
-- [ ] check U2/U3/U4/U5
+- [x] check U2/U3/U4/U5
       - [x] card swipe
       - [x] keycode
       - [x] set date/time
@@ -84,19 +84,15 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - [x] delete-all-cards
       - [x] open-door
       - [x] record-special-events
-      - [ ] set-time-profile
-      - [ ] clear-time-profiles
-      - [ ] get-time-profiles
-      - [ ] set-time-profiles
-      - [ ] clear-task-list
-      - [ ] add-task
-      - [ ] refresh-task-list
-      - [ ] set-task-list
-      - [ ] get-events
-      - [ ] get-event
       - [ ] get-event-index
       - [ ] set-event-index
-      - [ ] open-door
+      - [ ] get-event
+      - [ ] get-time-profiles
+      - [ ] set-time-profile
+      - [ ] clear-time-profiles
+      - [ ] add-task
+      - [ ] clear-task-list
+      - [ ] refresh-task-list
       - [ ] set-pc-control
       - [ ] set-interlock
       - [ ] activate-keypads

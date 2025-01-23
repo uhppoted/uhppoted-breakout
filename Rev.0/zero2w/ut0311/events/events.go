@@ -86,6 +86,10 @@ func (e Events) GetUint32(oid scmp.OID) (uint32, error) {
 		return 13579, nil
 	}
 
+	if scmp.Is(oid, scmp.OID_EVENTS_INDEX) {
+		return 17, nil
+	}
+
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_CARD) {
 		if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_CARD); ok && index == 13579 {
 			return 10058400, nil
