@@ -3,11 +3,12 @@
 
 #include <I2C0.h>
 #include <PCAL6416A.h>
-#include <U4.h>
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
-#include <types/mempool.h>
+
+#include <U4/U4.h>
+#include <U4/operation.h>
 
 #define LOGTAG "U4"
 
@@ -83,25 +84,6 @@ inline void U4_clear(uint16_t mask);
 inline void U4_toggle(uint16_t mask);
 inline int32_t clamp(int32_t v, int32_t min, int32_t max);
 
-typedef enum {
-    U4_UNKNOWN,
-    U4_WRITE,
-    U4_HEALTHCHECK,
-} U4_TASK;
-
-typedef struct operation {
-    U4_TASK tag;
-    union {
-        struct {
-            uint16_t outputs;
-        } write;
-
-        struct {
-            uint16_t outputs;
-        } healthcheck;
-    };
-} operation;
-
 typedef struct relay {
     int id;
     uint16_t mask;
@@ -166,7 +148,6 @@ struct {
 void U4_write(void *data);
 void U4_healthcheck(void *data);
 bool U4_tick(repeating_timer_t *rt);
-void operation_free(struct operation *op);
 
 void U4_init() {
     infof(LOGTAG, "init");
@@ -239,7 +220,7 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... health check
         U4x.tock -= U4_TICK;
         if (U4x.tock < 0) {
-            operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
+            operation *op = operation_alloc(&U4x.pool);
 
             if (op != NULL) {
                 op->tag = U4_HEALTHCHECK;
@@ -251,7 +232,7 @@ bool U4_tick(repeating_timer_t *rt) {
                 };
 
                 if (!I2C0_push(&task)) {
-                    operation_free(op);
+                    operation_free(&U4x.pool, op);
                     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
                 } else {
                     U4x.tock = U4_TOCK;
@@ -287,7 +268,7 @@ bool U4_tick(repeating_timer_t *rt) {
 
         // ... update outputs
         if (outputs != U4x.outputs || U4x.write) {
-            operation *op = (operation *)mempool_alloc(&U4x.pool, 1, sizeof(operation));
+            operation *op = operation_alloc(&U4x.pool);
 
             if (op != NULL) {
                 outputs = U4x.outputs;
@@ -301,7 +282,7 @@ bool U4_tick(repeating_timer_t *rt) {
                 };
 
                 if (!I2C0_push(&task)) {
-                    operation_free(op);
+                    operation_free(&U4x.pool, op);
                     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
                 } else {
                     U4x.write = false;
@@ -332,7 +313,7 @@ void U4_write(void *data) {
         set_error(ERR_U4, "U4", "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
     }
 
-    operation_free(op);
+    operation_free(&U4x.pool, op);
 }
 
 /*
@@ -354,7 +335,7 @@ void U4_healthcheck(void *data) {
         }
     }
 
-    operation_free(op);
+    operation_free(&U4x.pool, op);
 }
 
 void U4_set_relay(int relay, uint16_t delay) {
@@ -472,12 +453,6 @@ void U4_clear_SYS() {
 
 void U4_blink_SYS(int count, uint16_t interval) {
     U4_blink_LED(ID_SYS, count, interval);
-}
-
-void operation_free(operation *op) {
-    if (op != NULL) {
-        mempool_free(&U4x.pool, op);
-    }
 }
 
 inline void U4_set(uint16_t mask) {

@@ -37,17 +37,13 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [x] RTC
 - [x] reinstate CLI
 - [x] U4::operation_free(..)
+- [x] check U2/U3/U4/U5
+- [x] operation_alloc
 - [ ] swipe_alloc
 - [ ] datetime_alloc
-- [ ] operation_alloc
 - [ ] field
 - [ ] packet
-- [x] check U2/U3/U4/U5
-      - [x] card swipe
-      - [x] keycode
-      - [x] set date/time
-      - [x] inputs
-      - [x] outputs
+
 
 ### SSMP
     - GET
