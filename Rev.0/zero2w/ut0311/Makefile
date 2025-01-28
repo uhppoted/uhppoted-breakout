@@ -20,7 +20,10 @@ run-tcp: build
 run-unix: build
 	./bin/emulator --config .config.unix
 
-run: run-unix
+run-breakout: build
+	./bin/emulator --config .config.zero2w
+
+run: run-breakout
 
 stub: build
 	./bin/emulator --config .config.stub

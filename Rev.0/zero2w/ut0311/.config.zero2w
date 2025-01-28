@@ -1,0 +1,21 @@
+{
+    "driver": {
+        "driver": "rpc",
+        "RPC": {
+            "address": "tcp::10.0.0.106:1234"
+        }
+    },
+    "network": {
+        "interface": "en3",
+        "IPv4": {
+            "address": "192.168.1.123",
+            "netmask": "255.255.255.0",
+            "gateway": "192.168.1.1",
+            "MAC": "00:66:19:39:55:2d"
+        }
+    },
+    "events": {
+        "listener": "192.168.1.100:60001",
+        "interval": 0
+    }
+}
