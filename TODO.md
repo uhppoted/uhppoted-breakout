@@ -113,7 +113,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [ ] cache controller ID
 
 ### CLI
-    - Update on uhppoted-python release 0.8.10
+    - Update on uhppoted-lib-python release 0.8.10
       - [ ] get-listener
       - [ ] set-listener
 
