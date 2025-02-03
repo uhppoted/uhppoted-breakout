@@ -1,258 +1,88 @@
 package ssmp
 
 import (
-	"fmt"
-	"time"
-
 	"ssmp/log"
+	"ssmp/ssmp/stub"
 )
 
 type SSMP struct {
+	queue chan func()
+	stub  stub.Stub
 }
 
-func (s SSMP) Get(oid string) (any, error) {
+type result = struct {
+	value any
+	err   error
+}
+
+func (s *SSMP) Run() error {
+	infof("run::start")
+
+	s.queue = make(chan func())
+
+loop:
+	for {
+		select {
+		case f, ok := <-s.queue:
+			if !ok {
+				break loop
+			} else {
+				f()
+			}
+		}
+	}
+
+	infof("run::exit")
+	return nil
+}
+
+func (s *SSMP) Stop() error {
+	infof("run::stop")
+	close(s.queue)
+
+	return nil
+}
+
+func (s *SSMP) Get(oid string) (any, error) {
 	debugf("get %v", oid)
 
-	// ... controller ID
-	if oid == ".1.3.6.1.4.1.65536.2.1" {
-		return uint32(405419896), nil
+	pipe := make(chan result)
+
+	f := func() {
+		value, err := s.stub.Get(oid)
+
+		pipe <- result{
+			value: value,
+			err:   err,
+		}
 	}
 
-	// ... controller version
-	if oid == ".1.3.6.1.4.1.65536.2.2" {
-		return uint16(0x1234), nil
-	}
+	s.queue <- f
 
-	// ... controller release date
-	if oid == ".1.3.6.1.4.1.65536.2.3" {
-		return "2024-01-15", nil
-	}
+	v := <-pipe
 
-	// ... controller date/time
-	if oid == ".1.3.6.1.4.1.65536.2.8" {
-		return time.Now().Format("2006-01-02 15:04:05"), nil
-	}
-
-	// ... controller error
-	if oid == ".1.3.6.1.4.1.65536.2.9" {
-		return uint8(0x12), nil
-	}
-
-	// ... controller special info
-	if oid == ".1.3.6.1.4.1.65536.2.10" {
-		return uint8(0x23), nil
-	}
-
-	// ... door 1 mode
-	if oid == ".1.3.6.1.4.1.65536.3.1.3.1" {
-		return uint8(1), nil
-	}
-
-	// ... door 1 delay
-	if oid == ".1.3.6.1.4.1.65536.3.1.3.2" {
-		return uint8(5), nil
-	}
-
-	// ... door 1 lock
-	if oid == ".1.3.6.1.4.1.65536.3.1.4" {
-		return true, nil
-	}
-
-	// ... door 1 open
-	if oid == ".1.3.6.1.4.1.65536.3.1.5" {
-		return true, nil
-	}
-
-	// ... door 1 button
-	if oid == ".1.3.6.1.4.1.65536.3.1.6" {
-		return true, nil
-	}
-
-	// ... door 2 mode
-	if oid == ".1.3.6.1.4.1.65536.3.2.1" {
-		return uint8(1), nil
-	}
-
-	// ... door 2 delay
-	if oid == ".1.3.6.1.4.1.65536.3.2.2" {
-		return uint8(5), nil
-	}
-
-	// ... door 2 lock
-	if oid == ".1.3.6.1.4.1.65536.3.2.4" {
-		return true, nil
-	}
-
-	// ... door 2 open
-	if oid == ".1.3.6.1.4.1.65536.3.2.5" {
-		return true, nil
-	}
-
-	// ... door 2 button
-	if oid == ".1.3.6.1.4.1.65536.3.2.6" {
-		return false, nil
-	}
-
-	// ... door 3 mode
-	if oid == ".1.3.6.1.4.1.65536.3.3.1" {
-		return uint8(3), nil
-	}
-
-	// ... door 3 delay
-	if oid == ".1.3.6.1.4.1.65536.3.3.2" {
-		return uint8(17), nil
-	}
-
-	// ... door 3 lock
-	if oid == ".1.3.6.1.4.1.65536.3.3.4" {
-		return true, nil
-	}
-
-	// ... door 3 open
-	if oid == ".1.3.6.1.4.1.65536.3.3.5" {
-		return false, nil
-	}
-
-	// ... door 3 button
-	if oid == ".1.3.6.1.4.1.65536.3.3.6" {
-		return true, nil
-	}
-
-	// ... door 4 mode
-	if oid == ".1.3.6.1.4.1.65536.3.4.1" {
-		return uint8(1), nil
-	}
-
-	// ... door 4 delay
-	if oid == ".1.3.6.1.4.1.65536.3.4.2" {
-		return uint8(5), nil
-	}
-
-	// ... door 4 lock
-	if oid == ".1.3.6.1.4.1.65536.3.4.4" {
-		return false, nil
-	}
-
-	// ... door 4 open
-	if oid == ".1.3.6.1.4.1.65536.3.4.5" {
-		return true, nil
-	}
-
-	// ... door 4 button
-	if oid == ".1.3.6.1.4.1.65536.3.4.6" {
-		return false, nil
-	}
-
-	// ... tamper detect
-	if oid == ".1.3.6.1.4.1.65536.4.1" {
-		return true, nil
-	}
-
-	// ... fire alarm
-	if oid == ".1.3.6.1.4.1.65536.4.2" {
-		return false, nil
-	}
-
-	return nil, fmt.Errorf("unknown OID %v", oid)
+	return v.value, v.err
 }
 
-func (s SSMP) Set(oid string, value any) (any, error) {
+func (s *SSMP) Set(oid string, value any) (any, error) {
 	debugf("set %v %v", oid, value)
 
-	// ... controller date/time
-	if oid == ".1.3.6.1.4.1.65536.2.8" {
-		return time.Now().Format("2006-01-02 15:04:05"), nil
-	}
+	pipe := make(chan result)
 
-	// ... door 1 mode
-	if oid == ".1.3.6.1.4.1.65536.3.1.1" {
-		return uint8(1), nil
-	}
+	f := func() {
+		value, err := s.stub.Set(oid, value)
 
-	// ... door 1 delay
-	if oid == ".1.3.6.1.4.1.65536.3.1.2" {
-		return uint8(5), nil
-	}
-
-	// ... door 1 passcodes
-	if oid == ".1.3.6.1.4.1.65536.3.1.3" {
-		return []uint32{}, nil
-	}
-
-	// ... door 1 lock
-	if oid == ".1.3.6.1.4.1.65536.3.1.4" {
-		if b, ok := value.(bool); ok {
-			return any(b), nil
+		pipe <- result{
+			value: value,
+			err:   err,
 		}
 	}
 
-	// ... door 2 mode
-	if oid == ".1.3.6.1.4.1.65536.3.2.1" {
-		return uint8(1), nil
-	}
+	s.queue <- f
 
-	// ... door 2 delay
-	if oid == ".1.3.6.1.4.1.65536.3.2.2" {
-		return uint8(5), nil
-	}
+	v := <-pipe
 
-	// ... door 2 passcodes
-	if oid == ".1.3.6.1.4.1.65536.3.2.3" {
-		return []uint32{}, nil
-	}
-
-	// ... door 2 lock
-	if oid == ".1.3.6.1.4.1.65536.3.2.4" {
-		if b, ok := value.(bool); ok {
-			return any(b), nil
-		}
-	}
-
-	// ... door 3 mode
-	if oid == ".1.3.6.1.4.1.65536.3.3.1" {
-		return uint8(3), nil
-	}
-
-	// ... door 3 delay
-	if oid == ".1.3.6.1.4.1.65536.3.3.2" {
-		return uint8(17), nil
-	}
-
-	// ... door 3 passcodes
-	if oid == ".1.3.6.1.4.1.65536.3.3.3" {
-		return []uint32{12345, 0, 999999, 54321}, nil
-	}
-
-	// ... door 3 lock
-	if oid == ".1.3.6.1.4.1.65536.3.3.4" {
-		if b, ok := value.(bool); ok {
-			return any(b), nil
-		}
-	}
-
-	// ... door 4 mode
-	if oid == ".1.3.6.1.4.1.65536.3.4.1" {
-		return uint8(1), nil
-	}
-
-	// ... door 4 delay
-	if oid == ".1.3.6.1.4.1.65536.3.4.2" {
-		return uint8(5), nil
-	}
-
-	// ... door 4 passcodes
-	if oid == ".1.3.6.1.4.1.65536.3.4.3" {
-		return []uint32{}, nil
-	}
-
-	// ... door 4 lock
-	if oid == ".1.3.6.1.4.1.65536.3.4.4" {
-		if b, ok := value.(bool); ok {
-			return any(b), nil
-		}
-	}
-
-	return nil, fmt.Errorf("unknown OID %v", oid)
+	return v.value, v.err
 }
 
 func debugf(format string, args ...any) {

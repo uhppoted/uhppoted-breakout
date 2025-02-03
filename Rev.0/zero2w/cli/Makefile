@@ -8,8 +8,7 @@ build: format
 	python3 -m compileall .
 
 debug:
-#	python3 main.py --destination $(ADDRESS) debug
-	python3 main.py delete-card
+	python3 main.py get-controller
 
 tls:
 	python3 main.py --destination $(TLS) --protocol tls get-controller

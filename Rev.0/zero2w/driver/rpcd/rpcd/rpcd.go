@@ -47,6 +47,10 @@ func NewRPCD(address string) (*RPCD, error) {
 }
 
 func (r *RPCD) Run() {
+	go func() {
+		r.ssmp.Run()
+	}()
+
 	rpc.Register(r)
 	rpc.HandleHTTP()
 
@@ -74,6 +78,7 @@ func (r *RPCD) Run() {
 
 func (r *RPCD) Stop() {
 	r.cancel()
+	r.ssmp.Stop()
 }
 
 func (r *RPCD) Get(oid string, reply *any) error {
