@@ -38,7 +38,8 @@ add_executable(breakout
   ${CORE}/src/sys.c
   ${CORE}/src/I2C0.c
   ${CORE}/src/I2C1.c
-  ${CORE}/src/RTC.c
+  ${CORE}/src/RTC/RTC.c
+  ${CORE}/src/RTC/datetime.c
   ${CORE}/src/IOX.c
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c

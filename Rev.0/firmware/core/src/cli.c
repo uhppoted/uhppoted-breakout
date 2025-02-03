@@ -10,7 +10,7 @@
 
 #include <I2C0.h>
 #include <I2C1.h>
-#include <RTC.h>
+#include <RTC/RTC.h>
 #include <U2.h>
 #include <U3.h>
 #include <U4/U4.h>

@@ -79,6 +79,9 @@ const float U4_OUTPUT_DRIVE[16] = {
     0.f, // -- unused --
 };
 
+inline operation *U4_alloc();
+inline void U4_free(operation *op);
+
 inline void U4_set(uint16_t mask);
 inline void U4_clear(uint16_t mask);
 inline void U4_toggle(uint16_t mask);
@@ -220,7 +223,7 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... health check
         U4x.tock -= U4_TICK;
         if (U4x.tock < 0) {
-            operation *op = operation_alloc(&U4x.pool);
+            operation *op = U4_alloc();
 
             if (op != NULL) {
                 op->tag = U4_HEALTHCHECK;
@@ -232,7 +235,7 @@ bool U4_tick(repeating_timer_t *rt) {
                 };
 
                 if (!I2C0_push(&task)) {
-                    operation_free(&U4x.pool, op);
+                    U4_free(op);
                     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
                 } else {
                     U4x.tock = U4_TOCK;
@@ -268,7 +271,7 @@ bool U4_tick(repeating_timer_t *rt) {
 
         // ... update outputs
         if (outputs != U4x.outputs || U4x.write) {
-            operation *op = operation_alloc(&U4x.pool);
+            operation *op = U4_alloc();
 
             if (op != NULL) {
                 outputs = U4x.outputs;
@@ -282,7 +285,7 @@ bool U4_tick(repeating_timer_t *rt) {
                 };
 
                 if (!I2C0_push(&task)) {
-                    operation_free(&U4x.pool, op);
+                    U4_free(op);
                     set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
                 } else {
                     U4x.write = false;
@@ -313,7 +316,7 @@ void U4_write(void *data) {
         set_error(ERR_U4, "U4", "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
     }
 
-    operation_free(&U4x.pool, op);
+    U4_free(op);
 }
 
 /*
@@ -335,7 +338,7 @@ void U4_healthcheck(void *data) {
         }
     }
 
-    operation_free(&U4x.pool, op);
+    U4_free(op);
 }
 
 void U4_set_relay(int relay, uint16_t delay) {
@@ -453,6 +456,14 @@ void U4_clear_SYS() {
 
 void U4_blink_SYS(int count, uint16_t interval) {
     U4_blink_LED(ID_SYS, count, interval);
+}
+
+inline operation *U4_alloc() {
+    return operation_alloc(&U4x.pool);
+}
+
+inline void U4_free(operation *op) {
+    return operation_free(&U4x.pool, op);
 }
 
 inline void U4_set(uint16_t mask) {

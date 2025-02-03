@@ -6,12 +6,12 @@
 #include <pico/sync.h>
 
 #include <I2C0.h>
-#include <RTC.h>
+#include <RTC/RTC.h>
 #include <RX8900SA.h>
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
-#include <types/mempool.h>
+#include <RTC/datetime.h>
 
 #define LOGTAG "RTC"
 
@@ -22,6 +22,8 @@ void RTC_setup();
 void RTC_read(void *data);
 void RTC_write(void *data);
 bool RTC_on_update(repeating_timer_t *rt);
+inline datetime *RTC_alloc();
+inline void RTC_free(datetime *dt);
 uint8_t dow(uint16_t year, uint8_t month, uint8_t day);
 uint8_t weekday2dow(uint8_t weekday);
 
@@ -52,36 +54,6 @@ struct {
     .second = 0,
     .dow = 0x08, // Wednesday
 };
-
-typedef enum {
-    RTC_UNKNOWN,
-    RTC_SET_DATE,
-    RTC_SET_TIME,
-} RTC_TASK;
-
-typedef struct datetime {
-    RTC_TASK tag;
-    union {
-        struct {
-            uint16_t year;
-            uint8_t month;
-            uint8_t day;
-            uint8_t dow;
-        } yyyymmdd;
-
-        struct {
-            uint8_t hour;
-            uint8_t minute;
-            uint8_t second;
-        } HHmmss;
-    };
-} datetime;
-
-void datetime_free(datetime *dt) {
-    if (dt != NULL) {
-        mempool_free(&RTC.pool, dt);
-    }
-}
 
 /*
  * Initialises the RX8900SA.
@@ -260,14 +232,14 @@ void RTC_read(void *data) {
  * I2C0 task to set RX8900SA.
  */
 void RTC_write(void *data) {
-    datetime *d = (datetime *)data;
+    datetime *dt = (datetime *)data;
 
     if (RTC.initialised) {
-        if (d->tag == RTC_SET_DATE) {
-            uint16_t year = d->yyyymmdd.year;
-            uint8_t month = d->yyyymmdd.month;
-            uint8_t day = d->yyyymmdd.day;
-            uint8_t dow = d->yyyymmdd.dow;
+        if (dt->tag == RTC_SET_DATE) {
+            uint16_t year = dt->yyyymmdd.year;
+            uint8_t month = dt->yyyymmdd.month;
+            uint8_t day = dt->yyyymmdd.day;
+            uint8_t dow = dt->yyyymmdd.dow;
             int err;
 
             if ((err = RX8900SA_set_date(U5, year, month, day)) != ERR_OK) {
@@ -283,10 +255,10 @@ void RTC_write(void *data) {
             }
         }
 
-        if (d->tag == RTC_SET_TIME) {
-            uint8_t hour = d->HHmmss.hour;
-            uint8_t minute = d->HHmmss.minute;
-            uint8_t second = d->HHmmss.second;
+        if (dt->tag == RTC_SET_TIME) {
+            uint8_t hour = dt->HHmmss.hour;
+            uint8_t minute = dt->HHmmss.minute;
+            uint8_t second = dt->HHmmss.second;
             int err;
 
             if ((err = RX8900SA_set_time(U5, hour, minute, second)) != ERR_OK) {
@@ -300,7 +272,7 @@ void RTC_write(void *data) {
         }
     }
 
-    datetime_free(d);
+    RTC_free(dt);
 }
 
 /*
@@ -362,7 +334,7 @@ bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
 
             if (!I2C0_push(&write)) {
                 set_error(ERR_QUEUE_FULL, LOGTAG, "set-date: queue full");
-                datetime_free(dt);
+                RTC_free(dt);
             } else if (!I2C0_push(&read)) {
                 set_error(ERR_QUEUE_FULL, LOGTAG, "update: queue full");
             } else {
@@ -398,7 +370,7 @@ void RTC_get_time(char *HHmmss, int N) {
 
 bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
     if (RTC.initialised) {
-        datetime *dt = (struct datetime *)mempool_alloc(&RTC.pool, 1, sizeof(struct datetime));
+        datetime *dt = RTC_alloc();
 
         if (dt != NULL) {
             dt->tag = RTC_SET_TIME;
@@ -418,7 +390,7 @@ bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
 
             if (!I2C0_push(&write)) {
                 set_error(ERR_QUEUE_FULL, LOGTAG, "set-time: queue full");
-                datetime_free(dt);
+                RTC_free(dt);
             } else if (!I2C0_push(&read)) {
                 set_error(ERR_QUEUE_FULL, LOGTAG, "set-time: queue full");
             } else {
@@ -480,6 +452,15 @@ void RTC_get_dow(char *weekday, int N) {
     }
 }
 
+inline datetime *RTC_alloc() {
+        return datetime_alloc(&RTC.pool);
+}
+
+inline void RTC_free(datetime *dt) {
+    return datetime_free(&RTC.pool, dt);
+}
+
+
 // Tøndering's variation of Zeller's congruence
 uint8_t dow(uint16_t year, uint8_t month, uint8_t day) {
     int K = year % 100;
@@ -529,3 +510,4 @@ uint8_t weekday2dow(uint8_t weekday) {
         return 0;
     }
 }
+
