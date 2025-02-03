@@ -20,6 +20,7 @@ add_compile_definitions(MODE="${MODE}")
 add_compile_definitions(CONTROLLER=${CONTROLLER})
 add_compile_definitions(VERSION=${VERSION})
 add_compile_definitions(RELEASED="${RELEASED}")
+add_compile_definitions(TRACE=${TRACE})
 
 add_compile_definitions(PARAM_ASSERTIONS_ENABLE_ALL=1)
 

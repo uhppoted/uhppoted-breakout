@@ -7,7 +7,7 @@
 
 #include <hardware/pio.h>
 #include <hardware/ticks.h>
-#include <hardware/timer.h>
+// #include <hardware/timer.h>
 
 #include <breakout.h>
 #include <cli.h>
@@ -17,18 +17,9 @@
 
 #include "ws2812.pio.h"
 
-extern void sysinit();
-
-// FIXME remove
-extern struct {
-    queue_t queue;
-    mutex_t guard;
-} I2C0;
+extern bool sysinit();
 
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
-uint32_t get_total_heap();
-uint32_t get_free_heap();
-uint32_t counter = 0;
 
 struct {
     struct {
@@ -36,7 +27,6 @@ struct {
         mutex_t guard;
     } LED;
 
-    repeating_timer_t timer;
     absolute_time_t touched;
 } sys = {
     .LED = {
@@ -56,12 +46,15 @@ bool sys_init() {
     ws2812_program_init(pio, sm, offset, 16, 800000, true);
     put_rgb(128, 12, 0);
 
-    // ... system tick
-    if (!add_repeating_timer_ms(1000, sys_on_tick, &sys, &sys.timer)) {
+    // ... initialise
+    if (!sysinit()) {
         return false;
     }
 
-    // ... system stuff
+    log_init();
+    cli_init();
+
+    // ... startup message
     char s[64];
 
     if (!strcmp(WATCHDOG, "disabled") != 0) {
@@ -70,9 +63,6 @@ bool sys_init() {
         snprintf(s, sizeof(s), "-----  BREAKOUT   v%02x.%02x\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
     }
 
-    sysinit();
-    log_init();
-    cli_init();
     print(s);
 
     return true;
@@ -115,23 +105,6 @@ void sys_tick() {
             put_rgb(32, 0, 96); // purple
         }
     }
-
-    uint32_t heap = get_total_heap();
-    uint32_t available = get_free_heap();
-    float used = 1.0 - ((float)available / (float)heap);
-    const char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
-
-    debugf("SYS", "%-5u queue:%u  I2C0:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
-           counter,
-           queue_get_level(&queue),
-           queue_get_level(&I2C0.queue),
-           heap,
-           available,
-           100.0f * used,
-           errors,
-           watchdogged);
-
-    counter++;
 }
 
 /* Resets the internal soft watchdog.

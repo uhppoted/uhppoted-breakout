@@ -10,12 +10,14 @@
 On some boards, the XOSC can take longer than usual to stabilize. On such boards, this is needed to avoid a hard fault on boot/reset. Refer to PICO_XOSC_STARTUP_DELAY_MULTIPLIER in the Pico SDK for additional details.
 ``` 
 
+- [ ] trace interval
+      - [x] compile time variable
+      - [ ] CLI
+      - [ ] `SYSTEM.ticks++; // FIXME - increment in MSG_TICK handler`
+      - [ ] Remove internal soft watchdog
+
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
-- [ ] CLI: set trace interval
-- [ ] CLI: poke
-      - system error messages
-
 - [ ] syserror
       - [x] red LED on any system error 
       - [ ] log once on occurrence

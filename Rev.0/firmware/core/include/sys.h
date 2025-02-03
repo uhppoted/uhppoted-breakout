@@ -10,8 +10,8 @@ typedef enum {
 } mode;
 
 extern bool sys_init();
-extern bool sys_on_tick(repeating_timer_t *t);
 extern void sys_tick();
+extern void sys_trace();
 extern void sys_reboot();
 extern void sys_watchdog_update();
 extern int sys_id(char *ID, int N);

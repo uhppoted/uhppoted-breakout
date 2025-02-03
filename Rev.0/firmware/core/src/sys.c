@@ -32,12 +32,20 @@ const uint32_t MSG_SWIPE = 0x20000000;
 const uint32_t MSG_KEYCODE = 0x30000000;
 const uint32_t MSG_U3 = 0x40000000;
 const uint32_t MSG_RX = 0x50000000;
-const uint32_t MSG_TTY = 0xc0000000;
+const uint32_t MSG_TTY = 0xb0000000;
+const uint32_t MSG_TRACE = 0xc0000000;
 const uint32_t MSG_LOG = 0xd0000000;
 const uint32_t MSG_WATCHDOG = 0xe0000000;
 const uint32_t MSG_TICK = 0xf0000000;
 
+extern struct {
+    queue_t queue;
+    mutex_t guard;
+} I2C0;
+
 struct {
+    repeating_timer_t timer;
+    uint32_t ticks;
     mode mode;
     bool reboot;
 
@@ -49,29 +57,41 @@ struct {
     } queue;
 
     struct {
-        absolute_time_t cli;
-    } touched;
+        absolute_time_t touched;
+    } cli;
+
+    struct {
+        absolute_time_t touched;
+        repeating_timer_t timer;
+    } trace;
 
     mutex_t guard;
 } SYSTEM = {
+    .ticks = 0,
     .mode = MODE_NONE,
     .reboot = false,
     .queue = {
         .head = 0,
         .tail = 0,
     },
-    .touched = {
-        .cli = 0,
+    .cli = {
+        .touched = 0,
+    },
+    .trace = {
+        .touched = 0,
     }};
 
 void _push(const char *);
 void _flush();
 void _print(const char *);
+bool _tick(repeating_timer_t *t);
+bool _trace(repeating_timer_t *t);
 
-void sysinit() {
+bool sysinit() {
     mutex_init(&SYSTEM.guard);
     mutex_init(&SYSTEM.queue.lock);
 
+    // ... USB/UART0 mode
     if (strcasecmp(MODE, "cli") == 0) {
         SYSTEM.mode = MODE_UNKNOWN; // NTS: will be set to MODE_CLI if/when terminal is connected
     } else if (strcasecmp(MODE, "log") == 0) {
@@ -79,6 +99,44 @@ void sysinit() {
     } else {
         SYSTEM.mode = MODE_NONE;
     }
+
+    // ... system tick
+    if (!add_repeating_timer_ms(1000, _tick, &SYSTEM, &SYSTEM.timer)) {
+        return false;
+    }
+
+    // ... tracing
+    if (!add_repeating_timer_ms(250, _trace, &SYSTEM, &SYSTEM.trace.timer)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool _tick(repeating_timer_t *t) {
+    SYSTEM.ticks++; // FIXME - increment in MSG_TICK handler
+
+    message msg = {
+        .message = MSG_TICK,
+        .tag = MESSAGE_UINT32,
+        .u32 = 0,
+    };
+
+    push(msg);
+
+    return true;
+}
+
+bool _trace(repeating_timer_t *t) {
+    message msg = {
+        .message = MSG_TRACE,
+        .tag = MESSAGE_UINT32,
+        .u32 = 0,
+    };
+
+    push(msg);
+
+    return true;
 }
 
 /* Checks memory usage, etc.
@@ -110,16 +168,30 @@ void sys_reboot() {
     SYSTEM.reboot = true;
 }
 
-bool sys_on_tick(repeating_timer_t *t) {
-    message msg = {
-        .message = MSG_TICK,
-        .tag = MESSAGE_UINT32,
-        .u32 = 0,
-    };
+void sys_trace() {
+    int64_t interval = (int64_t)(1000.0 * (float)TRACE);
+    absolute_time_t now = get_absolute_time();
+    int64_t delta = absolute_time_diff_us(SYSTEM.trace.touched, now) / 1000;
 
-    push(msg);
+    if (interval > 0 && delta >= interval) {
+        uint16_t errors = get_errors();
+        uint32_t heap = get_total_heap();
+        uint32_t available = get_free_heap();
+        float used = 1.0 - ((float)available / (float)heap);
+        const char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
 
-    return true;
+        debugf("SYS", "ticks:%-5u queue:%u  I2C0:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
+               SYSTEM.ticks,
+               queue_get_level(&queue),
+               queue_get_level(&I2C0.queue),
+               heap,
+               available,
+               100.0f * used,
+               errors,
+               watchdogged);
+
+        SYSTEM.trace.touched = get_absolute_time();
+    }
 }
 
 int sys_id(char *ID, int N) {
@@ -169,7 +241,7 @@ void set_mode(mode mode) {
 
         // ... unblock queue
         if (mode == MODE_CLI) {
-            SYSTEM.touched.cli = get_absolute_time();
+            SYSTEM.cli.touched = get_absolute_time();
             print("");
         }
     }
@@ -216,13 +288,17 @@ void dispatch(uint32_t v) {
         cli_rx(b);
     }
 
+    if ((v & MSG) == MSG_TRACE) {
+        sys_trace();
+    }
+
     if ((v & MSG) == MSG_TICK) {
         sys_tick();
 
         // ... MODE_CLI timeout?
         if (get_mode() == MODE_CLI || get_mode() == MODE_UNKNOWN) {
             absolute_time_t now = get_absolute_time();
-            int64_t delta = absolute_time_diff_us(SYSTEM.touched.cli, now) / 1000;
+            int64_t delta = absolute_time_diff_us(SYSTEM.cli.touched, now) / 1000;
 
             if (llabs(delta) > MODE_CLI_TIMEOUT) {
                 set_mode(MODE_UNKNOWN);
