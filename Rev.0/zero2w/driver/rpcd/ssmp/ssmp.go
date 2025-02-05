@@ -1,6 +1,7 @@
 package ssmp
 
 import (
+	"ssmp/encoding/BER"
 	"ssmp/log"
 	"ssmp/ssmp/stub"
 )
@@ -46,22 +47,36 @@ func (s *SSMP) Stop() error {
 func (s *SSMP) Get(oid string) (any, error) {
 	debugf("get %v", oid)
 
-	pipe := make(chan result)
+	if o, err := BER.ParseOID(oid); err != nil {
+		return nil, err
+	} else {
+		rq := BER.GetRequest{
+			OID: o,
+		}
 
-	f := func() {
-		value, err := s.stub.Get(oid)
+		if encoded, err := BER.Encode(rq); err != nil {
+			return nil, err
+		} else {
+			debugf(">>>>> GET REQUEST: %v", encoded)
 
-		pipe <- result{
-			value: value,
-			err:   err,
+			pipe := make(chan result)
+
+			f := func() {
+				value, err := s.stub.Get(oid)
+
+				pipe <- result{
+					value: value,
+					err:   err,
+				}
+			}
+
+			s.queue <- f
+
+			v := <-pipe
+
+			return v.value, v.err
 		}
 	}
-
-	s.queue <- f
-
-	v := <-pipe
-
-	return v.value, v.err
 }
 
 func (s *SSMP) Set(oid string, value any) (any, error) {

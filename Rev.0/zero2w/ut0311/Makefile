@@ -23,7 +23,7 @@ run-unix: build
 run-breakout: build
 	./bin/emulator --config .config.zero2w
 
-run: run-breakout
+run: run-unix
 
 stub: build
 	./bin/emulator --config .config.stub
