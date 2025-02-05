@@ -20,8 +20,9 @@ extern void syscheck();
 extern void dispatch(uint32_t);
 
 extern void print(const char *);
-extern void set_mode(mode);
 extern mode get_mode();
+extern void set_mode(mode);
+extern void set_trace(float interval);
 
 extern uint32_t get_total_heap();
 extern uint32_t get_free_heap();

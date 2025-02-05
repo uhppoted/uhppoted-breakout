@@ -12,7 +12,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 
 - [ ] trace interval
       - [x] compile time variable
-      - [ ] CLI
+      - [x] CLI
       - [ ] `SYSTEM.ticks++; // FIXME - increment in MSG_TICK handler`
       - [ ] Remove internal soft watchdog
 

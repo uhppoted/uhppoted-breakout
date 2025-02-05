@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -57,6 +58,7 @@ void get_buttons();
 
 void state();
 void scan();
+void trace(const char *interval);
 void reboot();
 
 void clear();
@@ -137,6 +139,7 @@ const char *HELP[] = {
     "",
     "  state",
     "  scan",
+    "  trace <off|on|[0-300]>",
     "  reboot",
     "",
     "  clear",
@@ -376,6 +379,8 @@ void exec(char *cmd) {
         state();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
         scan();
+    } else if (strncasecmp(cmd, "trace ", 6) == 0) {
+        trace(&cmd[6]);
     } else if (strncasecmp(cmd, "reboot", 6) == 0) {
         reboot();
     } else if (strncasecmp(cmd, "clear", 5) == 0) {
@@ -653,6 +658,35 @@ void get_buttons() {
 void scan() {
     I2C0_scan();
     I2C1_scan();
+}
+
+/* Sets the trace interval:
+ * - off:      trace disabled
+ * - on:       trace interval set to the compile time TRACE value
+ * - [0..300]: trace interval in seconds (float). Rounded to the nearest 0.25.
+ */
+void trace(const char *arg) {
+    int rc;
+    float interval;
+
+    if (strcasecmp(arg, "off") == 0) {
+        set_trace(0.0);
+        display("trace off");
+    } else if (strcasecmp(arg, "on") == 0) {
+        set_trace(TRACE);
+        display("trace %.2fs", roundf(4.0 * (float)TRACE) / 4.0);
+    } else if (((rc = sscanf(arg, "%f", &interval)) == 1) && (interval >= 0.0)) {
+        if (interval > 0.0) {
+            interval = roundf(4.0 * interval) / 4.0;
+            interval = interval < 0.25 ? 0.25 : interval;
+            interval = interval > 300. ? 300.0 : interval;
+            set_trace(interval);
+            display("trace %.2fs", interval);
+        } else {
+            set_trace(0.0);
+            display("trace off");
+        }
+    }
 }
 
 /* Tight loop until watchdog reboots the system.

@@ -19,6 +19,7 @@
 #include <state.h>
 #include <sys.h>
 
+#define LOGTAG "SYS"
 #define PRINT_QUEUE_SIZE 64
 
 extern const char *TERMINAL_QUERY_STATUS;
@@ -61,6 +62,7 @@ struct {
     } cli;
 
     struct {
+        float interval;
         absolute_time_t touched;
         repeating_timer_t timer;
     } trace;
@@ -78,6 +80,7 @@ struct {
         .touched = 0,
     },
     .trace = {
+        .interval = (float)TRACE,
         .touched = 0,
     }};
 
@@ -149,14 +152,14 @@ void syscheck() {
     float used = 1.0 - ((float)available / (float)heap);
 
     if (used > 0.5 && !get_error(ERR_MEMORY)) {
-        set_error(ERR_MEMORY, "SYS", "memory usage %.1f%", 100.0 * used);
+        set_error(ERR_MEMORY, LOGTAG, "memory usage %.1f%", 100.0 * used);
     }
 
     // ... kick watchdog
     if (!SYSTEM.reboot) {
         uint32_t msg = MSG_WATCHDOG;
         if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            set_error(ERR_QUEUE_FULL, "SYS", "watchdog: queue full");
+            set_error(ERR_QUEUE_FULL, LOGTAG, "watchdog: queue full");
         }
     }
 }
@@ -169,7 +172,7 @@ void sys_reboot() {
 }
 
 void sys_trace() {
-    int64_t interval = (int64_t)(1000.0 * (float)TRACE);
+    int64_t interval = (int64_t)(1000.0 * SYSTEM.trace.interval);
     absolute_time_t now = get_absolute_time();
     int64_t delta = absolute_time_diff_us(SYSTEM.trace.touched, now) / 1000;
 
@@ -180,7 +183,7 @@ void sys_trace() {
         float used = 1.0 - ((float)available / (float)heap);
         const char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
 
-        debugf("SYS", "ticks:%-5u queue:%u  I2C0:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
+        debugf(LOGTAG, "ticks:%-5u queue:%u  I2C0:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
                SYSTEM.ticks,
                queue_get_level(&queue),
                queue_get_level(&I2C0.queue),
@@ -247,9 +250,15 @@ void set_mode(mode mode) {
     }
 }
 
+void set_trace(float interval) {
+    if (interval >= 0.0 && interval <= 300.0) {
+        SYSTEM.trace.interval = interval;
+    }
+}
+
 void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_DEBUG) {
-        debugf("SYS", "... debug??");
+        debugf(LOGTAG, "... debug??");
     }
 
     if ((v & MSG) == MSG_WIO) {
@@ -259,7 +268,7 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_SWIPE) {
         swipe *swipe = (struct swipe *)(SRAM_BASE | (v & 0x0fffffff));
 
-        infof("SYS", "READER %d  CARD %s", swipe->door, swipe->card);
+        infof(LOGTAG, "READER %d  CARD %s", swipe->door, swipe->card);
 
         swipe_free(swipe);
     }
@@ -267,7 +276,7 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_KEYCODE) {
         swipe *swipe = (struct swipe *)(SRAM_BASE | (v & 0x0fffffff));
 
-        infof("SYS", "KEYPAD %d  KEYCODE %s", swipe->door, swipe->code);
+        infof(LOGTAG, "KEYPAD %d  KEYCODE %s", swipe->door, swipe->code);
 
         swipe_free(swipe);
     }
@@ -314,7 +323,7 @@ void dispatch(uint32_t v) {
         // ... bump log queue
         uint32_t m = MSG_LOG;
         if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
-            set_error(ERR_QUEUE_FULL, "SYS", "log: queue full");
+            set_error(ERR_QUEUE_FULL, LOGTAG, "log: queue full");
         }
     }
 
@@ -363,7 +372,7 @@ void _push(const char *msg) {
 
     uint32_t m = MSG_LOG;
     if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
-        set_error(ERR_QUEUE_FULL, "SYS", "log: queue full");
+        set_error(ERR_QUEUE_FULL, LOGTAG, "log: queue full");
     }
 }
 
