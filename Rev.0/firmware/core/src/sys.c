@@ -117,7 +117,7 @@ bool sysinit() {
 }
 
 bool _tick(repeating_timer_t *t) {
-    SYSTEM.ticks++; // FIXME - increment in MSG_TICK handler
+    SYSTEM.ticks++;
 
     message msg = {
         .message = MSG_TICK,
@@ -333,7 +333,6 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_WATCHDOG) {
         watchdog_update();
-        sys_watchdog_update();
     }
 }
 

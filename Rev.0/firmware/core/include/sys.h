@@ -13,7 +13,6 @@ extern bool sys_init();
 extern void sys_tick();
 extern void sys_trace();
 extern void sys_reboot();
-extern void sys_watchdog_update();
 extern int sys_id(char *ID, int N);
 
 extern void syscheck();

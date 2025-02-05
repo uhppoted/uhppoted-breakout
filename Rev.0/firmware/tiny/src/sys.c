@@ -7,7 +7,6 @@
 
 #include <hardware/pio.h>
 #include <hardware/ticks.h>
-// #include <hardware/timer.h>
 
 #include <breakout.h>
 #include <cli.h>
@@ -27,12 +26,10 @@ struct {
         mutex_t guard;
     } LED;
 
-    absolute_time_t touched;
 } sys = {
     .LED = {
         .LED = false,
     },
-    .touched = 0,
 };
 
 bool sys_init() {
@@ -105,13 +102,6 @@ void sys_tick() {
             put_rgb(32, 0, 96); // purple
         }
     }
-}
-
-/* Resets the internal soft watchdog.
- *
- */
-void sys_watchdog_update() {
-    sys.touched = get_absolute_time();
 }
 
 void sys_debug() {
