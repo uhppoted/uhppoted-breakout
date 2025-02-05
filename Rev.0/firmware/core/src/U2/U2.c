@@ -6,7 +6,7 @@
 
 #include <I2C1.h>
 #include <PCAL6408A.h>
-#include <U2.h>
+#include <U2/U2.h>
 #include <breakout.h>
 #include <log.h>
 #include <state.h>
@@ -25,6 +25,7 @@ void U2_on_keycode(uint8_t door, const char *code, int length);
 bool U2_tick(repeating_timer_t *rt);
 void U2_tick_reader(uint8_t door, struct reader *reader);
 void U2_tick_keypad(uint8_t door, struct keypad *keypad);
+inline swipe *U2_alloc();
 int U2_bits(uint32_t v);
 
 const uint8_t tRST = 1;    // tRST (µs) for PCAL6408A interrupt line
@@ -345,7 +346,7 @@ void U2_on_card_read(uint8_t door, uint32_t v) {
                 warnf("U2", "READER %d  CARD %-3u%-5u read error", door, facility_code, card);
             } else {
 
-                swipe *swipe = (struct swipe *)mempool_alloc(&U2x.pool, 1, sizeof(struct swipe));
+                swipe *swipe = U2_alloc();
 
                 if (swipe != NULL) {
                     swipe->door = door;
@@ -358,7 +359,7 @@ void U2_on_card_read(uint8_t door, uint32_t v) {
                     };
 
                     if (!push(msg)) {
-                        swipe_free(swipe);
+                        U2_free(swipe);
                     }
                 }
             }
@@ -406,7 +407,7 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
         if (keypad->locked > 0) {
             debugf("U2", "KEYPAD %d  LOCKED", door);
         } else {
-            swipe *swipe = (struct swipe *)mempool_alloc(&U2x.pool, 1, sizeof(struct swipe));
+            swipe *swipe = U2_alloc();
 
             if (swipe != NULL) {
                 swipe->door = door;
@@ -419,7 +420,7 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
                 };
 
                 if (!push(msg)) {
-                    swipe_free(swipe);
+                    U2_free(swipe);
                 }
             }
 
@@ -428,9 +429,13 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
     }
 }
 
-void swipe_free(swipe *swipe) {
+inline swipe *U2_alloc() {
+    return swipe_alloc(&U2x.pool);
+}
+
+inline void U2_free(swipe *swipe) {
     if (swipe != NULL) {
-        mempool_free(&U2x.pool, swipe);
+        swipe_free(&U2x.pool, swipe);
     }
 }
 

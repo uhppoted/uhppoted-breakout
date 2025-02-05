@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <types/mempool.h>
 
 typedef struct swipe {
     uint8_t door;
@@ -8,8 +8,5 @@ typedef struct swipe {
     char code[16] __attribute__((aligned(4)));
 } swipe;
 
-extern void U2_init();
-extern void U2_start();
-extern void U2_wio(uint8_t inputs);
-
-extern void swipe_free(swipe *swipe);
+swipe *swipe_alloc(mempool *);
+void swipe_free(mempool *pool, swipe *swipe);

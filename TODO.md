@@ -1,14 +1,13 @@
 # TODO
 
-- [ ] Zero2W serial logging
-- [ ] Rework print queue
-      - (?) check USB connected
-      - (?) setvbuf
-
 - [ ] https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
 ```
 On some boards, the XOSC can take longer than usual to stabilize. On such boards, this is needed to avoid a hard fault on boot/reset. Refer to PICO_XOSC_STARTUP_DELAY_MULTIPLIER in the Pico SDK for additional details.
 ``` 
+
+- [ ] Rework print queue
+      - (?) check USB connected
+      - (?) setvbuf
 
 - [x] trace interval
       - [x] compile time variable
@@ -40,12 +39,13 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [x] reinstate CLI
 - [x] U4::operation_free(..)
 - [x] check U2/U3/U4/U5
-- [x] operation_alloc
-- [x] datetime_alloc
-- [ ] swipe_alloc
+- [x] operation_alloc/free
+- [x] datetime_alloc/free
+- [x] swipe_alloc/free
+- [ ] Move mempools out of U2, U4, etc
+      - mempool::init
 - [ ] field
 - [ ] packet
-
 
 ### SSMP
     - GET
@@ -61,8 +61,16 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
        - [ ] field pool
 
     - (?) queue UART write
+
+## Zero2W
+- [ ] serial logger
+
+### CLI
+    - Update on uhppoted-lib-python release 0.8.10
+      - [ ] get-listener
+      - [ ] set-listener
     
-### emulator
+### UT0311
    - [ ] API
       - [x] get-controller
       - [x] set-address
@@ -113,11 +121,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 ### Driver
     - [ ] breakout-simulator
     - [ ] cache controller ID
-
-### CLI
-    - Update on uhppoted-lib-python release 0.8.10
-      - [ ] get-listener
-      - [ ] set-listener
 
 ### MIB
     - [x] controller ID

@@ -42,7 +42,8 @@ add_executable(breakout
   ${CORE}/src/RTC/RTC.c
   ${CORE}/src/RTC/datetime.c
   ${CORE}/src/IOX.c
-  ${CORE}/src/U2.c
+  ${CORE}/src/U2/U2.c
+  ${CORE}/src/U2/swipe.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4/U4.c
   ${CORE}/src/U4/operation.c
