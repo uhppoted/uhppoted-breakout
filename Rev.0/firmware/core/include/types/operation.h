@@ -1,7 +1,5 @@
 #pragma once
 
-#include <types/mempool.h>
-
 typedef enum {
     U4_UNKNOWN,
     U4_WRITE,
@@ -20,6 +18,3 @@ typedef struct operation {
         } healthcheck;
     };
 } operation;
-
-operation *operation_alloc(mempool *);
-void operation_free(mempool *pool, operation *op);

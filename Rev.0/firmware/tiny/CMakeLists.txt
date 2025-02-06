@@ -39,14 +39,11 @@ add_executable(breakout
   ${CORE}/src/sys.c
   ${CORE}/src/I2C0.c
   ${CORE}/src/I2C1.c
-  ${CORE}/src/RTC/RTC.c
-  ${CORE}/src/RTC/datetime.c
+  ${CORE}/src/RTC.c
   ${CORE}/src/IOX.c
-  ${CORE}/src/U2/U2.c
-  ${CORE}/src/U2/swipe.c
+  ${CORE}/src/U2.c
   ${CORE}/src/U3.c
-  ${CORE}/src/U4/U4.c
-  ${CORE}/src/U4/operation.c
+  ${CORE}/src/U4.c
   ${CORE}/src/SSMP.c
   ${CORE}/src/MIB.c
   ${CORE}/src/auth.c
@@ -54,6 +51,7 @@ add_executable(breakout
   ${CORE}/src/log.c
   ${CORE}/src/cli.c
   ${CORE}/src/ANSI.c
+  ${CORE}/src/mempool.c
 
   ${LIB}/src/I2C.c
   ${LIB}/src/RX8900SA.c
@@ -64,7 +62,6 @@ add_executable(breakout
   ${LIB}/src/types/packet.c
   ${LIB}/src/types/fields.c
   ${LIB}/src/types/buffer.c
-  ${LIB}/src/types/mempool.c
 
   ${LIB}/src/encoding/bisync/bisync.c
   ${LIB}/src/encoding/bisync/crc.c

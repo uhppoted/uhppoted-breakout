@@ -32,7 +32,7 @@ clean:
 format: 
 	clang-format -i src/*.c
 	clang-format -i ../core/src/*.c                ../core/include/*.h
-	clang-format -i ../core/src/U4/*.c             ../core/include/U4/*.h
+	clang-format -i ../core/src/*.c                ../core/include/*.h
 	clang-format -i ../lib/src/*.c                 ../lib/include/*.h
 	clang-format -i ../lib/src/types/*.c           ../lib/include/types/*.h
 	clang-format -i ../lib/src/encoding/ASN.1/*.c  ../lib/include/encoding/ASN.1/*.h

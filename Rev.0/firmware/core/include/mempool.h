@@ -4,6 +4,10 @@
 
 #include <pico/sync.h>
 
+#include <types/datetime.h>
+#include <types/operation.h>
+#include <types/swipe.h>
+
 struct mempool;
 
 typedef struct memchunk {
@@ -20,6 +24,12 @@ typedef struct mempool {
     struct memchunk **pool __attribute__((aligned(4)));
 } mempool;
 
-extern bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize);
-extern void *mempool_alloc(mempool *pool, size_t N, size_t size);
-extern void mempool_free(mempool *pool, void *p);
+bool mempool_init();
+
+struct operation *operation_alloc();
+struct swipe *swipe_alloc();
+struct datetime *datetime_alloc();
+
+void operation_free(struct operation *op);
+void swipe_free(struct swipe *swipe);
+void datetime_free(datetime *dt);

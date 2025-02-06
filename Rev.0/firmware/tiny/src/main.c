@@ -11,10 +11,11 @@
 #include <I2C0.h>
 #include <I2C1.h>
 #include <IOX.h>
-#include <RTC/RTC.h>
+#include <RTC.h>
 #include <SSMP.h>
 #include <breakout.h>
 #include <log.h>
+#include <mempool.h>
 #include <state.h>
 #include <sys.h>
 
@@ -55,9 +56,14 @@ int main() {
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
 
+    if (!mempool_init()) {
+        warnf("SYS", "*** ERROR INITIALISING MEMPOOL");
+        return -1;
+    }
+
     // ... initialise system
     if (!sys_init()) {
-        warnf("SYS", "ERROR INITIALISING SYSTEM");
+        warnf("SYS", "*** ERROR INITIALISING SYSTEM");
         return -1;
     }
 

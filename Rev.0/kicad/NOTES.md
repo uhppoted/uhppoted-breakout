@@ -55,6 +55,9 @@
     - (?) maybe route additional connector to spare GPIO mux for
         - fire alarm
         - tamper detect
+44. External watchdog (?)
+    - Jumper to disable
+    - https://www.ganssle.com/watchdogs.htm
 
 (?) RS-485 for serial I/O (multidrop)
 (?) Maybe put GND on pin 1 of UART/SPI header

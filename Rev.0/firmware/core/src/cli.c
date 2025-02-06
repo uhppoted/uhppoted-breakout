@@ -11,10 +11,10 @@
 
 #include <I2C0.h>
 #include <I2C1.h>
-#include <RTC/RTC.h>
-#include <U2/U2.h>
+#include <RTC.h>
+#include <U2.h>
 #include <U3.h>
-#include <U4/U4.h>
+#include <U4.h>
 #include <cli.h>
 #include <log.h>
 #include <state.h>

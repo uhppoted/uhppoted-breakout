@@ -1,21 +1,62 @@
-#include <stdio.h>
 #include <stdlib.h>
-
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 
-#include <pico/stdlib.h>
-#include <pico/sync.h>
-
-#include <log.h>
-#include <types/mempool.h>
+#include <mempool.h>
 
 #define MEMPOOL_CHUNKSIZE 128
 #define MEMPOOL_SIZE 64
 
-bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
+bool pool_init(mempool *pool, uint32_t size, uint32_t chunksize);
+void *pool_alloc(mempool *pool, size_t N, size_t size);
+void pool_free(mempool *pool, void *p);
+
+struct {
+    mempool operation;
+    mempool swipe;
+    mempool datetime;
+} pools;
+
+bool mempool_init() {
+    if (!pool_init(&pools.operation, 32, sizeof(operation))) {
+        return false;
+    }
+
+    if (!pool_init(&pools.swipe, 16, sizeof(swipe))) {
+        return false;
+    }
+
+    if (!pool_init(&pools.datetime, 8, sizeof(swipe))) {
+        return false;
+    }
+
+    return true;
+}
+
+operation *operation_alloc() {
+    return (operation *)pool_alloc(&pools.operation, 1, sizeof(operation));
+}
+
+void operation_free(operation *op) {
+    pool_free(&pools.operation, op);
+}
+
+swipe *swipe_alloc(mempool *pool) {
+    return (swipe *)pool_alloc(&pools.swipe, 1, sizeof(swipe));
+}
+
+void swipe_free(swipe *swipe) {
+    pool_free(&pools.swipe, swipe);
+}
+
+datetime *datetime_alloc(mempool *pool) {
+    return (datetime *)pool_alloc(&pools.datetime, 1, sizeof(datetime));
+}
+
+void datetime_free(datetime *dt) {
+    pool_free(&pools.datetime, dt);
+}
+
+bool pool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
     assert(pool != NULL);
     assert(offsetof(memchunk, data) % 4 == 0);
     assert(size <= MEMPOOL_SIZE);
@@ -69,7 +110,7 @@ bool mempool_init(mempool *pool, uint32_t size, uint32_t chunksize) {
     return true;
 }
 
-void *mempool_alloc(mempool *pool, size_t N, size_t size) {
+void *pool_alloc(mempool *pool, size_t N, size_t size) {
     assert(pool != NULL);
 
     const uint32_t poolsize = pool->size;
@@ -102,7 +143,7 @@ void *mempool_alloc(mempool *pool, size_t N, size_t size) {
     return chunk ? chunk->data : NULL;
 }
 
-void mempool_free(mempool *pool, void *p) {
+void pool_free(mempool *pool, void *p) {
     assert(pool != NULL);
 
     const uint32_t poolsize = pool->size;

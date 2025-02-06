@@ -1,7 +1,5 @@
 #pragma once
 
-#include <types/mempool.h>
-
 typedef enum {
     RTC_UNKNOWN,
     RTC_SET_DATE,
@@ -25,8 +23,3 @@ typedef struct datetime {
         } HHmmss;
     };
 } datetime;
-
-
-datetime *datetime_alloc(mempool *);
-void datetime_free(mempool *,datetime * dt);
-

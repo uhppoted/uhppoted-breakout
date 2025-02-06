@@ -1,5 +1,31 @@
 # TODO
 
+## breakout
+
+### mempool
+- [x] add handler for card swipe
+- [x] RTC
+- [x] reinstate CLI
+- [x] U4::operation_free(..)
+- [x] check U2/U3/U4/U5
+- [x] operation_alloc/free
+- [x] datetime_alloc/free
+- [x] swipe_alloc/free
+- [x] Move mempools out of U2, U4, etc
+- [ ] field
+- [ ] packet
+
+### other
+- [ ] Rework throughout to use queue::push
+      - [x] core/sys
+      - [ ] core/cli
+      - [ ] I2C0
+      - [ ] U2
+      - [ ] U3
+      - [x] U4
+      - [ ] uart
+      - [ ] usb
+
 - [ ] https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
 ```
 On some boards, the XOSC can take longer than usual to stabilize. On such boards, this is needed to avoid a hard fault on boot/reset. Refer to PICO_XOSC_STARTUP_DELAY_MULTIPLIER in the Pico SDK for additional details.
@@ -8,12 +34,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - [ ] Rework print queue
       - (?) check USB connected
       - (?) setvbuf
-
-- [x] trace interval
-      - [x] compile time variable
-      - [x] CLI
-      - [x] Remove internal soft watchdog
-      - [x] `SYSTEM.ticks++; // FIXME - increment in MSG_TICK handler`
 
 - [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
@@ -29,38 +49,9 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - pico_malloc
       - pico_stdio
 
-- [ ] Rework throughout to use queue::push
-      - [x] core/sys
-      - [ ] core/cli
-      - [ ] I2C0
-      - [ ] U2
-      - [ ] U3
-      - [x] U4
-      - [ ] uart
-      - [ ] usb
-
 - [ ] doors should be unlocked on boot/power-off but locked otherwise
 - [ ] move error handling to breakout.c
 - [ ] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
-
-### CLI
-    - Update on uhppoted-lib-python release 0.8.10
-      - [x] get-listener
-      - [x] set-listener
-
-### mempool
-- [x] add handler for card swipe
-- [x] RTC
-- [x] reinstate CLI
-- [x] U4::operation_free(..)
-- [x] check U2/U3/U4/U5
-- [x] operation_alloc/free
-- [x] datetime_alloc/free
-- [x] swipe_alloc/free
-- [ ] Move mempools out of U2, U4, etc
-      - mempool::init
-- [ ] field
-- [ ] packet
 
 ### SSMP
     - GET
@@ -128,7 +119,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
     - [ ] tinygo
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
 
-### Driver
+### RPCD
     - [ ] breakout-simulator
     - [ ] cache controller ID
 

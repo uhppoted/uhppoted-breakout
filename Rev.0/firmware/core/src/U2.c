@@ -6,11 +6,11 @@
 
 #include <I2C1.h>
 #include <PCAL6408A.h>
-#include <U2/U2.h>
+#include <U2.h>
 #include <breakout.h>
 #include <log.h>
+#include <mempool.h>
 #include <state.h>
-#include <types/mempool.h>
 
 #define LOGTAG "U2"
 
@@ -25,7 +25,6 @@ void U2_on_keycode(uint8_t door, const char *code, int length);
 bool U2_tick(repeating_timer_t *rt);
 void U2_tick_reader(uint8_t door, struct reader *reader);
 void U2_tick_keypad(uint8_t door, struct keypad *keypad);
-inline swipe *U2_alloc();
 int U2_bits(uint32_t v);
 
 const uint8_t tRST = 1;    // tRST (µs) for PCAL6408A interrupt line
@@ -46,8 +45,6 @@ const int32_t U2_CODE_TIMEOUT = 2500; // ms
 const int32_t U2_CARD_LOCK = 1250;    // ms
 const int32_t U2_CODE_LOCK = 1250;    // ms
 
-const uint32_t U2_POOLSIZE = 16;
-
 typedef struct reader {
     uint64_t data;
     uint8_t count;
@@ -65,7 +62,6 @@ typedef struct keypad {
 struct {
     struct reader readers[4];
     struct keypad keypads[4];
-    mempool pool;
     repeating_timer_t timer;
     mutex_t guard;
 } U2x = {
@@ -119,11 +115,6 @@ const PULLUP U2_PULLUPS[8] = {
 
 void U2_init() {
     infof(LOGTAG, "init");
-
-    // ... initialise mempool
-    if (!mempool_init(&U2x.pool, U2_POOLSIZE, sizeof(swipe))) {
-        set_error(ERR_U2, LOGTAG, "error initialising mempool");
-    }
 
     // ... configure PCAL6408A
     int err;
@@ -346,7 +337,7 @@ void U2_on_card_read(uint8_t door, uint32_t v) {
                 warnf("U2", "READER %d  CARD %-3u%-5u read error", door, facility_code, card);
             } else {
 
-                swipe *swipe = U2_alloc();
+                swipe *swipe = swipe_alloc();
 
                 if (swipe != NULL) {
                     swipe->door = door;
@@ -359,7 +350,7 @@ void U2_on_card_read(uint8_t door, uint32_t v) {
                     };
 
                     if (!push(msg)) {
-                        U2_free(swipe);
+                        swipe_free(swipe);
                     }
                 }
             }
@@ -407,7 +398,7 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
         if (keypad->locked > 0) {
             debugf("U2", "KEYPAD %d  LOCKED", door);
         } else {
-            swipe *swipe = U2_alloc();
+            swipe *swipe = swipe_alloc();
 
             if (swipe != NULL) {
                 swipe->door = door;
@@ -420,22 +411,12 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
                 };
 
                 if (!push(msg)) {
-                    U2_free(swipe);
+                    swipe_free(swipe);
                 }
             }
 
             keypad->locked = U2_CODE_LOCK;
         }
-    }
-}
-
-inline swipe *U2_alloc() {
-    return swipe_alloc(&U2x.pool);
-}
-
-inline void U2_free(swipe *swipe) {
-    if (swipe != NULL) {
-        swipe_free(&U2x.pool, swipe);
     }
 }
 

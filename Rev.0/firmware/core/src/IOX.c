@@ -3,9 +3,9 @@
 #include <I2C0.h>
 #include <I2C1.h>
 #include <IOX.h>
-#include <U2/U2.h>
+#include <U2.h>
 #include <U3.h>
-#include <U4/U4.h>
+#include <U4.h>
 #include <breakout.h>
 #include <log.h>
 

@@ -11,11 +11,12 @@
 #include <pico/unique_id.h>
 
 #include <SSMP.h>
-#include <U2/U2.h>
+#include <U2.h>
 #include <U3.h>
 #include <breakout.h>
 #include <cli.h>
 #include <log.h>
+#include <mempool.h>
 #include <state.h>
 #include <sys.h>
 
@@ -270,7 +271,7 @@ void dispatch(uint32_t v) {
 
         infof(LOGTAG, "READER %d  CARD %s", swipe->door, swipe->card);
 
-        U2_free(swipe);
+        swipe_free(swipe);
     }
 
     if ((v & MSG) == MSG_KEYCODE) {
@@ -278,7 +279,7 @@ void dispatch(uint32_t v) {
 
         infof(LOGTAG, "KEYPAD %d  KEYCODE %s", swipe->door, swipe->code);
 
-        U2_free(swipe);
+        swipe_free(swipe);
     }
 
     if ((v & MSG) == MSG_U3) {
