@@ -18,7 +18,7 @@
 ### other
 - [ ] Rework throughout to use queue::push
       - [x] core/sys
-      - [ ] core/cli
+      - [x] core/cli
       - [ ] I2C0
       - [ ] U2
       - [ ] U3

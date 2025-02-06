@@ -160,11 +160,14 @@ void cli_callback(void *data) {
 
     if (count > 0) {
         circular_buffer *b = &cli.rx;
-        uint32_t msg = MSG_TTY | ((uint32_t)b & 0x0fffffff); // SRAM_BASE is 0x20000000
 
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            set_error(ERR_QUEUE_FULL, "CLI", "rx: queue full");
-        }
+        message qmsg = {
+            .message = MSG_TTY,
+            .tag = MESSAGE_BUFFER,
+            .buffer = b,
+        };
+
+        push(qmsg);
     }
 }
 
