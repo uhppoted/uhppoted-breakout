@@ -58,6 +58,7 @@ typedef enum {
 } err;
 
 typedef enum {
+    MESSAGE_NONE,
     MESSAGE_UINT32,
     MESSAGE_BUFFER,
     MESSAGE_SWIPE,
@@ -70,6 +71,7 @@ typedef struct message {
     uint32_t message;
     msg_type tag;
     union {
+        uint32_t none;
         uint32_t u32;
         struct circular_buffer *buffer;
         struct swipe *swipe;

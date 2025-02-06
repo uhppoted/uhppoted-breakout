@@ -29,9 +29,24 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - pico_malloc
       - pico_stdio
 
+- [ ] Rework throughout to use queue::push
+      - [x] core/sys
+      - [ ] core/cli
+      - [ ] I2C0
+      - [ ] U2
+      - [ ] U3
+      - [x] U4
+      - [ ] uart
+      - [ ] usb
+
 - [ ] doors should be unlocked on boot/power-off but locked otherwise
 - [ ] move error handling to breakout.c
 - [ ] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
+
+### CLI
+    - Update on uhppoted-lib-python release 0.8.10
+      - [ ] get-listener
+      - [ ] set-listener
 
 ### mempool
 - [x] add handler for card swipe
@@ -65,11 +80,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 ## Zero2W
 - [ ] serial logger
 
-### CLI
-    - Update on uhppoted-lib-python release 0.8.10
-      - [ ] get-listener
-      - [ ] set-listener
-    
 ### UT0311
    - [ ] API
       - [x] get-controller

@@ -6,6 +6,10 @@ bool push(message msg) {
     uint32_t m = msg.message;
 
     switch (msg.tag) {
+    case MESSAGE_NONE:
+        m |= msg.none & 0x0fffffff;
+        break;
+
     case MESSAGE_UINT32:
         m |= msg.u32 & 0x0fffffff;
         break;

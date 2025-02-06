@@ -119,25 +119,23 @@ bool sysinit() {
 bool _tick(repeating_timer_t *t) {
     SYSTEM.ticks++;
 
-    message msg = {
+    message qmsg = {
         .message = MSG_TICK,
-        .tag = MESSAGE_UINT32,
-        .u32 = 0,
+        .tag = MESSAGE_NONE,
     };
 
-    push(msg);
+    push(qmsg);
 
     return true;
 }
 
 bool _trace(repeating_timer_t *t) {
-    message msg = {
+    message m = {
         .message = MSG_TRACE,
-        .tag = MESSAGE_UINT32,
-        .u32 = 0,
+        .tag = MESSAGE_NONE,
     };
 
-    push(msg);
+    push(m);
 
     return true;
 }
@@ -157,10 +155,12 @@ void syscheck() {
 
     // ... kick watchdog
     if (!SYSTEM.reboot) {
-        uint32_t msg = MSG_WATCHDOG;
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            set_error(ERR_QUEUE_FULL, LOGTAG, "watchdog: queue full");
-        }
+        message qmsg = {
+            .message = MSG_WATCHDOG,
+            .tag = MESSAGE_NONE,
+        };
+
+        push(qmsg);
     }
 }
 
@@ -321,10 +321,12 @@ void dispatch(uint32_t v) {
         }
 
         // ... bump log queue
-        uint32_t m = MSG_LOG;
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
-            set_error(ERR_QUEUE_FULL, LOGTAG, "log: queue full");
-        }
+        message qmsg = {
+            .message = MSG_LOG,
+            .tag = MESSAGE_NONE,
+        };
+
+        push(qmsg);
     }
 
     if ((v & MSG) == MSG_LOG) {
@@ -369,10 +371,12 @@ void _push(const char *msg) {
         mutex_exit(&SYSTEM.queue.lock);
     }
 
-    uint32_t m = MSG_LOG;
-    if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
-        set_error(ERR_QUEUE_FULL, LOGTAG, "log: queue full");
-    }
+    message qmsg = {
+        .message = MSG_LOG,
+        .tag = MESSAGE_NONE,
+    };
+
+    push(qmsg);
 }
 
 /* Flushes all pending messages to stdout.
