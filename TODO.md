@@ -45,8 +45,8 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 
 ### CLI
     - Update on uhppoted-lib-python release 0.8.10
-      - [ ] get-listener
-      - [ ] set-listener
+      - [x] get-listener
+      - [x] set-listener
 
 ### mempool
 - [x] add handler for card swipe

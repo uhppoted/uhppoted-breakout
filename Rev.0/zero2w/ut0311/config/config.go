@@ -78,7 +78,7 @@ func Load(filepath string) (Config, []byte, error) {
 	}
 }
 
-func Save(c Config) error {
+func Save(c *Config) error {
 	filepath := c.filepath
 
 	if bytes, err := json.MarshalIndent(c, "", "    "); err != nil {
@@ -101,7 +101,7 @@ func Save(c Config) error {
 	return nil
 }
 
-func (c Config) GetUint8(oid scmp.OID) (uint8, error) {
+func (c *Config) GetUint8(oid scmp.OID) (uint8, error) {
 	if scmp.Is(oid, scmp.OID_CONTROLLER_UPLOAD_INTERVAL) {
 		return c.Events.Interval, nil
 	}
@@ -109,19 +109,19 @@ func (c Config) GetUint8(oid scmp.OID) (uint8, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (c Config) GetUint16(oid scmp.OID) (uint16, error) {
+func (c *Config) GetUint16(oid scmp.OID) (uint16, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (c Config) GetUint32(oid scmp.OID) (uint32, error) {
+func (c *Config) GetUint32(oid scmp.OID) (uint32, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (c Config) GetBool(oid scmp.OID) (bool, error) {
+func (c *Config) GetBool(oid scmp.OID) (bool, error) {
 	return false, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (c Config) GetString(oid scmp.OID) (string, error) {
+func (c *Config) GetString(oid scmp.OID) (string, error) {
 	if scmp.Is(oid, scmp.OID_CONTROLLER_EVENT_LISTENER) {
 		return fmt.Sprintf("%v", c.Events.Listener), nil
 	}
@@ -129,7 +129,7 @@ func (c Config) GetString(oid scmp.OID) (string, error) {
 	return "", fmt.Errorf("unknown OID %v", oid)
 }
 
-func (c Config) GetOctets(oid scmp.OID) ([]byte, error) {
+func (c *Config) GetOctets(oid scmp.OID) ([]byte, error) {
 	if scmp.Is(oid, scmp.OID_CONTROLLER_ADDRESS) {
 		addr := c.Network.IPv4.Address.As4()
 

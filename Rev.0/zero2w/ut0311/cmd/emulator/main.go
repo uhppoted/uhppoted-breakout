@@ -31,7 +31,7 @@ func main() {
 	if cfg, hash, err := config.Load(options.config); err != nil {
 		errorf("%v", err)
 		os.Exit(1)
-	} else if ut0311, err := UT0311.NewUT0311(cfg); err != nil {
+	} else if ut0311, err := UT0311.NewUT0311(&cfg); err != nil {
 		errorf("%v", err)
 		os.Exit(1)
 	} else {
@@ -66,7 +66,7 @@ func watch(ut0311 *UT0311.UT0311, filepath string, hash []byte) {
 				if cfg, _, err := config.Load(filepath); err != nil {
 					warnf("%v", err)
 				} else {
-					ut0311.SetConfig(cfg)
+					ut0311.SetConfig(&cfg)
 				}
 
 				signature = sha224[:]

@@ -2,7 +2,7 @@
     "driver": {
         "driver": "rpc",
         "RPC": {
-           "address": "unix::/tmp/uhppoted/breakout/rpc.sock"
+            "address": "unix::/tmp/uhppoted/breakout/rpc.sock"
         }
     },
     "network": {
@@ -16,6 +16,10 @@
     },
     "events": {
         "listener": "192.168.1.100:60001",
-        "interval": 0
+        "interval": 15
+    },
+    "TLS": {
+        "certificate": ".certificate",
+        "CA": ".CA"
     }
 }

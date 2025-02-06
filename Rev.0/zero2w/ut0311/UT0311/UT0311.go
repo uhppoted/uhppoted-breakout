@@ -32,7 +32,7 @@ type listener interface {
 }
 
 type UT0311 struct {
-	config config.Config
+	config *config.Config
 	driver *rpcd.RPC
 	system system.System
 	events *events.Events
@@ -47,11 +47,11 @@ type UT0311 struct {
 	closing bool
 }
 
-func (ut0311 *UT0311) SetConfig(c config.Config) {
+func (ut0311 *UT0311) SetConfig(c *config.Config) {
 	ut0311.config = c
 }
 
-func NewUT0311(c config.Config) (*UT0311, error) {
+func NewUT0311(c *config.Config) (*UT0311, error) {
 	cm := NewConnectionManager(MAX_CONNECTIONS)
 
 	if rpc, err := rpcd.NewRPC(c.Driver.RPC.Address); err != nil {

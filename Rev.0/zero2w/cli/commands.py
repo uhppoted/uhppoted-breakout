@@ -165,8 +165,7 @@ def set_listener(u, dest, timeout, args, protocol='udp'):
     (address, port) = LISTENER
     interval = AUTO_SEND
 
-    # return u.set_listener(controller, address, port, interval, timeout=timeout)
-    return u.set_listener(controller, address, port, timeout=timeout)
+    return u.set_listener(controller, address, port, interval, timeout=timeout)
 
 
 def get_door(u, dest, timeout, args, protocol='udp'):
