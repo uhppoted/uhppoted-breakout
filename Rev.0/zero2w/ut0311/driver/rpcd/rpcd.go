@@ -146,6 +146,18 @@ func (r RPC) SetUint8(oid scmp.OID, value uint8) (uint8, error) {
 	}
 }
 
+func (r RPC) SetUint32(oid scmp.OID, value uint32) (uint32, error) {
+	debugf("set %v %v", oid, value)
+
+	if reply, err := r.set(oid, value); err != nil {
+		return 0, err
+	} else if u32, ok := reply.(uint32); !ok {
+		return 0, fmt.Errorf("invalid reply - expected 'uint32', got '%T'", reply)
+	} else {
+		return u32, nil
+	}
+}
+
 func (r RPC) SetBool(oid scmp.OID, value bool) (bool, error) {
 	debugf("set %v %v", oid, value)
 

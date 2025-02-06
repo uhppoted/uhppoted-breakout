@@ -29,6 +29,7 @@ type GetI interface {
 
 type SetV interface {
 	SetUint8(oid OID, v uint8) (uint8, error)
+	SetUint32(oid OID, v uint32) (uint32, error)
 	SetUint32A(oid OID, v []uint32) ([]uint32, error)
 	SetBool(oid OID, v bool) (bool, error)
 	SetString(oid OID, v string) (string, error)
@@ -195,6 +196,13 @@ func Set[T any](scmp SetV, oid OID, val T) (T, error) {
 			return zero, err
 		} else {
 			return any(u8).(T), nil
+		}
+
+	case uint32:
+		if u32, err := scmp.SetUint32(oid, v); err != nil {
+			return zero, err
+		} else {
+			return any(u32).(T), nil
 		}
 
 	case []uint32:

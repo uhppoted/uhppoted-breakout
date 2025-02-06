@@ -9,6 +9,7 @@ import (
 
 type Events struct {
 	recordAll bool
+	index     uint32
 }
 
 func NewEvents() *Events {
@@ -17,7 +18,7 @@ func NewEvents() *Events {
 	}
 }
 
-func (e Events) GetUint8(oid scmp.OID) (uint8, error) {
+func (e *Events) GetUint8(oid scmp.OID) (uint8, error) {
 	if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_EVENT); ok && index == 13579 {
 		return 6, nil
 	}
@@ -37,7 +38,7 @@ func (e Events) GetUint8(oid scmp.OID) (uint8, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetIndexedUint8(oid scmp.OID, index uint32) (uint8, error) {
+func (e *Events) GetIndexedUint8(oid scmp.OID, index uint32) (uint8, error) {
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_EVENT) {
 		if index == 13579 {
 			return 6, nil
@@ -73,21 +74,21 @@ func (e Events) GetIndexedUint8(oid scmp.OID, index uint32) (uint8, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetUint16(oid scmp.OID) (uint16, error) {
+func (e *Events) GetUint16(oid scmp.OID) (uint16, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetIndexedUint16(oid scmp.OID, index uint32) (uint16, error) {
+func (e *Events) GetIndexedUint16(oid scmp.OID, index uint32) (uint16, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetUint32(oid scmp.OID) (uint32, error) {
+func (e *Events) GetUint32(oid scmp.OID) (uint32, error) {
 	if scmp.Is(oid, scmp.OID_EVENTS_LAST) {
 		return 13579, nil
 	}
 
 	if scmp.Is(oid, scmp.OID_EVENTS_INDEX) {
-		return 17, nil
+		return e.index, nil
 	}
 
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_CARD) {
@@ -99,7 +100,7 @@ func (e Events) GetUint32(oid scmp.OID) (uint32, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetIndexedUint32(oid scmp.OID, index uint32) (uint32, error) {
+func (e *Events) GetIndexedUint32(oid scmp.OID, index uint32) (uint32, error) {
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_CARD) {
 		if index == 13579 {
 			return 10058400, nil
@@ -111,11 +112,11 @@ func (e Events) GetIndexedUint32(oid scmp.OID, index uint32) (uint32, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetIndexedRecord(oid scmp.OID, index uint32) (any, error) {
+func (e *Events) GetIndexedRecord(oid scmp.OID, index uint32) (any, error) {
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetBool(oid scmp.OID) (bool, error) {
+func (e *Events) GetBool(oid scmp.OID) (bool, error) {
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_GRANTED) {
 		if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_GRANTED); ok && index == 13579 {
 			return true, nil
@@ -125,7 +126,7 @@ func (e Events) GetBool(oid scmp.OID) (bool, error) {
 	return false, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetIndexedBool(oid scmp.OID, index uint32) (bool, error) {
+func (e *Events) GetIndexedBool(oid scmp.OID, index uint32) (bool, error) {
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_GRANTED) {
 		if index == 13579 {
 			return true, nil
@@ -137,7 +138,7 @@ func (e Events) GetIndexedBool(oid scmp.OID, index uint32) (bool, error) {
 	return false, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetString(oid scmp.OID) (string, error) {
+func (e *Events) GetString(oid scmp.OID) (string, error) {
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_TIMESTAMP) {
 		if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_TIMESTAMP); ok && index == 13579 {
 			return "2024-12-17 15:52:45", nil
@@ -147,7 +148,7 @@ func (e Events) GetString(oid scmp.OID) (string, error) {
 	return "", fmt.Errorf("unknown OID %v", oid)
 }
 
-func (e Events) GetIndexedString(oid scmp.OID, index uint32) (string, error) {
+func (e *Events) GetIndexedString(oid scmp.OID, index uint32) (string, error) {
 	if scmp.Is(oid, scmp.OID_EVENTS_EVENT_TIMESTAMP) {
 		if index == 13579 {
 			return "2024-12-17 15:52:45", nil
@@ -190,6 +191,15 @@ func (e Events) GetIndexedOctets(oid scmp.OID, index uint32) ([]byte, error) {
 }
 
 func (e *Events) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
+
+func (e *Events) SetUint32(oid scmp.OID, val uint32) (uint32, error) {
+	if scmp.Is(oid, scmp.OID_EVENTS_INDEX) {
+		e.index = val
+		return e.index, nil
+	}
+
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 

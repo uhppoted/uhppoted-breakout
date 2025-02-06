@@ -100,8 +100,8 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - [x] delete-all-cards
       - [x] open-door
       - [x] record-special-events
-      - [ ] get-event-index
-      - [ ] set-event-index
+      - [x] get-event-index
+      - [x] set-event-index
       - [ ] get-event
       - [ ] get-time-profiles
       - [ ] set-time-profile

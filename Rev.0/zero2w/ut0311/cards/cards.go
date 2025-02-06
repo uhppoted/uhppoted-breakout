@@ -162,6 +162,10 @@ func (c *Cards) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
+func (c *Cards) SetUint32(oid scmp.OID, val uint32) (uint32, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
+
 func (c *Cards) SetBool(oid scmp.OID, val bool) (bool, error) {
 	return false, fmt.Errorf("unknown OID %v", oid)
 }

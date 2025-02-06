@@ -165,6 +165,10 @@ func (c *Config) SetUint8(oid scmp.OID, val uint8) (uint8, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 
+func (c *Config) SetUint32(oid scmp.OID, val uint32) (uint32, error) {
+	return 0, fmt.Errorf("unknown OID %v", oid)
+}
+
 func (c *Config) SetBool(oid scmp.OID, val bool) (bool, error) {
 	return false, fmt.Errorf("unknown OID %v", oid)
 }
