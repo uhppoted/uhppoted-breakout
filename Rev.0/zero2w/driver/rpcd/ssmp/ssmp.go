@@ -1,7 +1,7 @@
 package ssmp
 
 import (
-	"ssmp/encoding/BER"
+	"ssmp/encoding/ASN.1"
 	"ssmp/log"
 	"ssmp/ssmp/stub"
 )

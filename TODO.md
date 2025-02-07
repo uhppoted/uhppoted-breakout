@@ -16,6 +16,9 @@
 - [ ] packet
 
 ### other
+- [ ] ASN.1
+      - [ ] pack_integer length should be reversed
+
 - [ ] Rework throughout to use queue::push
       - [x] core/sys
       - [x] core/cli
@@ -120,8 +123,11 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
 
 ### RPCD
-    - [ ] breakout-simulator
+    - [ ] encoding
     - [ ] cache controller ID
+    - [ ] monitor
+    - [ ] daemonize
+    - [ ] breakout-simulator
 
 ### MIB
     - [x] controller ID
