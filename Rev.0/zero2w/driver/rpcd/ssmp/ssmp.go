@@ -2,6 +2,7 @@ package ssmp
 
 import (
 	"ssmp/encoding/ASN.1"
+	"ssmp/encoding/bisync"
 	"ssmp/log"
 	"ssmp/ssmp/stub"
 )
@@ -47,35 +48,40 @@ func (s *SSMP) Stop() error {
 func (s *SSMP) Get(oid string) (any, error) {
 	debugf("get %v", oid)
 
-	if _, err := BER.ParseOID(oid); err != nil {
+	if o, err := BER.ParseOID(oid); err != nil {
 		return nil, err
 	} else {
-		// rq := BER.GetRequest{
-		// 	OID: o,
-		// }
-
-		// 	if encoded, err := BER.Encode(rq); err != nil {
-		// 		return nil, err
-		// 	} else {
-		// debugf(">>>>> GET REQUEST: %v", encoded)
-
-		pipe := make(chan result)
-
-		f := func() {
-			value, err := s.stub.Get(oid)
-
-			pipe <- result{
-				value: value,
-				err:   err,
-			}
+		rq := BER.GetRequest{
+			Version:    0,
+			Community:  "public",
+			RequestID:  12345,
+			Error:      0,
+			ErrorIndex: 0,
+			OID:        o,
 		}
 
-		s.queue <- f
+		if packet, err := BER.Encode(rq); err != nil {
+			return nil, err
+		} else if _, err := bisync.Encode(nil, packet); err != nil {
+			return nil, err
+		} else {
+			pipe := make(chan result)
 
-		v := <-pipe
+			f := func() {
+				value, err := s.stub.Get(oid)
 
-		return v.value, v.err
-		// }
+				pipe <- result{
+					value: value,
+					err:   err,
+				}
+			}
+
+			s.queue <- f
+
+			v := <-pipe
+
+			return v.value, v.err
+		}
 	}
 }
 

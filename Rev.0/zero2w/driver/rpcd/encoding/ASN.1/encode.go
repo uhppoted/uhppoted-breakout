@@ -7,6 +7,8 @@ import (
 
 const tagInteger byte = 2
 const tagString byte = 4
+const tagNull byte = 5
+const tagOID byte = 6
 const tagSequence byte = 48
 const tagPDU byte = 160
 
@@ -47,6 +49,18 @@ func Encode(rq GetRequest) ([]byte, error) {
 
 	varbindlist := [][]byte{}
 	varbind := [][]byte{}
+
+	if v, err := pack_oid(rq.OID); err != nil {
+		return nil, err
+	} else {
+		varbind = append(varbind, v)
+	}
+
+	if v, err := pack_null(); err != nil {
+		return nil, err
+	} else {
+		varbind = append(varbind, v)
+	}
 
 	if v, err := pack_sequence(varbind...); err != nil {
 		return nil, err
@@ -140,6 +154,59 @@ func pack_string(s string) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
+func pack_null() ([]byte, error) {
+	return []byte{tagNull, 0}, nil
+}
+
+func pack_oid(oid OID) ([]byte, error) {
+	var b bytes.Buffer
+	var ix = 0
+
+	// ... skip root '0'
+	if ix < len(oid) && oid[ix] == 0 {
+		ix++
+	}
+
+	// ... special encoding for first byte (.1.3)
+	if ix < len(oid) {
+		v := uint8(40 * oid[ix])
+		ix++
+
+		if ix < len(oid) {
+			v += uint8(oid[ix])
+			ix++
+		}
+
+		if err := b.WriteByte(v); err != nil {
+			return nil, err
+		}
+	}
+
+	// ... remaining sub-OIDs
+	for ix < len(oid) {
+		v := oid[ix]
+
+		if slice, err := pack_varuint(v); err != nil {
+			return nil, err
+		} else if _, err := b.Write(slice); err != nil {
+			return nil, err
+		}
+
+		ix++
+	}
+
+	// ... copy to slice
+
+	if length, err := pack_varuint(uint32(b.Len())); err != nil {
+		return nil, err
+	} else {
+		slice := append([]byte{tagOID}, length...)
+		slice = append(slice, b.Bytes()...)
+
+		return slice, nil
+	}
+}
+
 func pack_pdu(pdu [][]byte) ([]byte, error) {
 	var b bytes.Buffer
 
@@ -190,19 +257,28 @@ func pack_sequence(fields ...[]byte) ([]byte, error) {
 			return nil, err
 		}
 	}
+
 	return b.Bytes(), nil
 }
 
 // Encodes a uint32 varint as a big-endian varint
-func pack_varuint(length uint32) ([]byte, error) {
+func pack_varuint(u32 uint32) ([]byte, error) {
 	var b bytes.Buffer
 
-	v := length
+	v := u32
 
 	if err := b.WriteByte(byte(v & 0x7f)); err != nil {
 		return nil, err
 	} else {
 		v >>= 7
+	}
+
+	for v != 0 {
+		if err := b.WriteByte(0x80 | uint8(v&0x7f)); err != nil {
+			return nil, err
+		} else {
+			v >>= 7
+		}
 	}
 
 	// ... reverse

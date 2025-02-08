@@ -124,7 +124,8 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
 
 ### RPCD
-    - [ ] encoding
+    - [x] encoding
+    - [ ] decoding
     - [ ] cache controller ID
     - [ ] monitor
     - [ ] daemonize
