@@ -25,7 +25,7 @@ bool mempool_init() {
         return false;
     }
 
-    if (!pool_init(&pools.datetime, 8, sizeof(swipe))) {
+    if (!pool_init(&pools.datetime, 8, sizeof(datetime))) {
         return false;
     }
 
@@ -40,7 +40,7 @@ void operation_free(operation *op) {
     pool_free(&pools.operation, op);
 }
 
-swipe *swipe_alloc(mempool *pool) {
+swipe *swipe_alloc() {
     return (swipe *)pool_alloc(&pools.swipe, 1, sizeof(swipe));
 }
 
@@ -48,7 +48,7 @@ void swipe_free(swipe *swipe) {
     pool_free(&pools.swipe, swipe);
 }
 
-datetime *datetime_alloc(mempool *pool) {
+datetime *datetime_alloc() {
     return (datetime *)pool_alloc(&pools.datetime, 1, sizeof(datetime));
 }
 

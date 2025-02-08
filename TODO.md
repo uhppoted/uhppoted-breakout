@@ -12,22 +12,23 @@
 - [x] datetime_alloc/free
 - [x] swipe_alloc/free
 - [x] Move mempools out of U2, U4, etc
-- [ ] field
-- [ ] packet
+- [x] ~~field~~
+- [x] ~~packet~~
 
 ### other
-- [ ] ASN.1
-      - [ ] pack_integer length should be reversed
+- [x] ASN.1
+      - [x] ~~pack_integer length should be reversed~~
 
 - [ ] Rework throughout to use queue::push
       - [x] core/sys
       - [x] core/cli
-      - [ ] I2C0
-      - [ ] U2
-      - [ ] U3
+      - [x] ~~I2C0~~
+      - [x] U2
+      - [x] U3
       - [x] U4
-      - [ ] uart
-      - [ ] usb
+      - [x] uart
+      - [x] usb
+      - [ ] recheck I/O and swipe/keypad
 
 - [ ] https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
 ```

@@ -281,12 +281,13 @@ void U2_read() {
     if ((err = PCAL6408A_read(U2, &inputs)) != ERR_OK) {
         warnf("U2", "error reading PCAL6408A inputs (%d)", err);
     } else {
-        uint32_t v = inputs & isr;
-        uint32_t msg = MSG_WIO | (v & 0x0fffffff);
+        message qmsg = {
+            .message = MSG_WIO,
+            .tag = MESSAGE_UINT32,
+            .u32 = inputs & isr,
+        };
 
-        if (queue_is_full(&queue) || !queue_try_add(&queue, &msg)) {
-            set_error(ERR_QUEUE_FULL, "U2", "interrupt: queue full");
-        }
+        push(qmsg);
     }
 }
 

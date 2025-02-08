@@ -78,7 +78,7 @@ slice pack_integer(const field *f) {
 
     slice length = pack_varint(ix);
 
-    slice_append(&s, length); // FIXME length should be reversed ??
+    slice_append(&s, length); // NTS: should be reversed but only ever 1 byte
     slice_free(&length);
 
     for (int i = 0; i < ix; i++) {
