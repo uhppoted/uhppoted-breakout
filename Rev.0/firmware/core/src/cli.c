@@ -25,6 +25,8 @@
 #include <MIB.h>
 #include <auth.h>
 
+#define TAG "CLI"
+
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
 uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
 
@@ -398,16 +400,16 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    debugf("CLI", ">>> sizeof(vector) %lu", sizeof(vector));
+    debugf(TAG, ">>> sizeof(vector) %lu", sizeof(vector));
 }
 
 void state() {
-    debugf("CLI", ">>> I2C   %s", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
-    debugf("CLI", ">>> queue %s", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
-    debugf("CLI", ">>> RTC   %s", get_error(ERR_RX8900SA) ? "error" : "ok");
-    debugf("CLI", ">>> U3    %s", get_error(ERR_U3) ? "error" : "ok");
-    debugf("CLI", ">>> U4    %s", get_error(ERR_U4) ? "error" : "ok");
-    debugf("CLI", ">>> other %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
+    debugf(TAG, ">>> I2C   %s", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
+    debugf(TAG, ">>> queue %s", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
+    debugf(TAG, ">>> RTC   %s", get_error(ERR_RX8900SA) ? "error" : "ok");
+    debugf(TAG, ">>> U3    %s", get_error(ERR_U3) ? "error" : "ok");
+    debugf(TAG, ">>> U4    %s", get_error(ERR_U4) ? "error" : "ok");
+    debugf(TAG, ">>> other %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
 }
 
 void get_ID() {

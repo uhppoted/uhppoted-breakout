@@ -11,7 +11,7 @@
 #include <U4.h>
 #include <types/operation.h>
 
-#define LOGTAG "U4"
+#define TAG "U4"
 
 const uint16_t MASK = 0x07ff;
 
@@ -152,57 +152,57 @@ void U4_healthcheck(void *data);
 bool U4_tick(repeating_timer_t *rt);
 
 void U4_init() {
-    infof(LOGTAG, "init");
+    infof(TAG, "init");
 
     // ... configure PCAL6416A
     int err;
 
     if ((err = PCAL6416A_init(U4)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error initialising (%d)", err);
+        set_error(ERR_U4, TAG, "error initialising (%d)", err);
     }
 
     if ((err = PCAL6416A_set_open_drain(U4, false, false)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error configuring PCAL6416A open drain outputs (%d)", err);
+        set_error(ERR_U4, TAG, "error configuring PCAL6416A open drain outputs (%d)", err);
     }
 
     if ((err = PCAL6416A_set_polarity(U4, 0x0000)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PCAL6416A polarity (%d)", err);
+        set_error(ERR_U4, TAG, "error setting PCAL6416A polarity (%d)", err);
     }
 
     if ((err = PCAL6416A_set_latched(U4, 0x0000)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PCAL6416A latches (%d)", err);
+        set_error(ERR_U4, TAG, "error setting PCAL6416A latches (%d)", err);
     }
 
     if ((err = PCAL6416A_set_pullups(U4, U4_PULLUPS)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PCAL6416A pullups (%d)", err);
+        set_error(ERR_U4, TAG, "error setting PCAL6416A pullups (%d)", err);
     }
 
     if ((err = PCAL6416A_write(U4, (U4x.outputs ^ U4x.polarity) & MASK)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PCAL6416A outputs (%d)", err);
+        set_error(ERR_U4, TAG, "error setting PCAL6416A outputs (%d)", err);
     }
 
     if ((err = PCAL6416A_set_output_drive(U4, U4_OUTPUT_DRIVE)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error setting PCAL6416A outputs (%d)", err);
+        set_error(ERR_U4, TAG, "error setting PCAL6416A outputs (%d)", err);
     }
 
     if ((err = PCAL6416A_set_configuration(U4, 0xf800)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error configuring PCAL6416A (%d)", err);
+        set_error(ERR_U4, TAG, "error configuring PCAL6416A (%d)", err);
     }
 
     uint16_t outputs;
     if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error reading PCAL6416A outputs (%d)", err);
+        set_error(ERR_U4, TAG, "error reading PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != ((U4x.outputs ^ U4x.polarity) & MASK)) {
-        set_error(ERR_U4, "U4", "invalid PCAL6416A output state - expected:%04x, got:%04x", U4x.outputs, outputs);
+        set_error(ERR_U4, TAG, "invalid PCAL6416A output state - expected:%04x, got:%04x", U4x.outputs, outputs);
     }
 
     mutex_init(&U4x.guard);
 
-    debugf("U4", "initialised state %04x %011b", outputs ^ U4x.polarity, outputs ^ U4x.polarity);
+    debugf(TAG, "initialised state %04x %011b", outputs ^ U4x.polarity, outputs ^ U4x.polarity);
 }
 
 void U4_start() {
-    infof("U4", "start");
+    infof(TAG, "start");
 
     add_repeating_timer_ms(U4_TICK, U4_tick, NULL, &U4x.timer);
 }
@@ -230,7 +230,7 @@ bool U4_tick(repeating_timer_t *rt) {
 
                 if (!I2C0_push(&task)) {
                     operation_free(op);
-                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                    set_error(ERR_QUEUE_FULL, TAG, "tick: queue full");
                 } else {
                     U4x.tock = U4_TOCK;
                 }
@@ -280,7 +280,7 @@ bool U4_tick(repeating_timer_t *rt) {
 
                 if (!I2C0_push(&task)) {
                     operation_free(op);
-                    set_error(ERR_QUEUE_FULL, "U4", "tick: queue full");
+                    set_error(ERR_QUEUE_FULL, TAG, "tick: queue full");
                 } else {
                     U4x.write = false;
                 }
@@ -303,11 +303,11 @@ void U4_write(void *data) {
     int err;
 
     if ((err = PCAL6416A_write(U4, outputs & MASK)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error writing PCAL6416A outputs (%d)", err);
+        set_error(ERR_U4, TAG, "error writing PCAL6416A outputs (%d)", err);
     } else if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error reading back PCAL6416A outputs (%d)", err);
+        set_error(ERR_U4, TAG, "error reading back PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != (op->write.outputs & MASK)) {
-        set_error(ERR_U4, "U4", "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
+        set_error(ERR_U4, TAG, "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
     }
 
     operation_free(op);
@@ -322,9 +322,9 @@ void U4_healthcheck(void *data) {
     int err;
 
     if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, "U4", "error reading back PCAL6416A outputs (%d)", err);
+        set_error(ERR_U4, TAG, "error reading back PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != (op->healthcheck.outputs & MASK)) {
-        set_error(ERR_U4, "U4", "PCAL6416A healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
+        set_error(ERR_U4, TAG, "PCAL6416A healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
 
         if (mutex_try_enter(&U4x.guard, NULL)) {
             U4x.write = true;

@@ -2,23 +2,7 @@
 
 ## breakout
 
-### mempool
-- [x] add handler for card swipe
-- [x] RTC
-- [x] reinstate CLI
-- [x] U4::operation_free(..)
-- [x] check U2/U3/U4/U5
-- [x] operation_alloc/free
-- [x] datetime_alloc/free
-- [x] swipe_alloc/free
-- [x] Move mempools out of U2, U4, etc
-- [x] ~~field~~
-- [x] ~~packet~~
-
 ### other
-- [x] ASN.1
-      - [x] ~~pack_integer length should be reversed~~
-
 - [ ] Rework throughout to use queue::push
       - [x] core/sys
       - [x] core/cli
@@ -29,12 +13,20 @@
       - [x] uart
       - [x] usb
       - [ ] recheck I/O and swipe/keypad
+            - [x] RTC
+            - [x] inputs
+            - [x] SYS, ERR, IN
+            - [x] relays
+            - [x] door LEDs
+            - [ ] swipe
+            - [ ] keypad
 
 - [ ] https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
 ```
 On some boards, the XOSC can take longer than usual to stabilize. On such boards, this is needed to avoid a hard fault on boot/reset. Refer to PICO_XOSC_STARTUP_DELAY_MULTIPLIER in the Pico SDK for additional details.
 ``` 
 
+- [ ] move error handling to breakout.c
 - [ ] Rework print queue
       - (?) check USB connected
       - (?) setvbuf
@@ -54,7 +46,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
       - pico_stdio
 
 - [ ] doors should be unlocked on boot/power-off but locked otherwise
-- [ ] move error handling to breakout.c
 - [ ] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
 
 ### SSMP
