@@ -4,13 +4,58 @@ import (
 	"fmt"
 	"time"
 
+	"ssmp/encoding/bisync"
 	"ssmp/log"
 )
 
+const TAG = "STUB"
+
 type Stub struct {
+	codec *bisync.Bisync
 }
 
-func (s Stub) Get(oid string) (any, error) {
+func NewStub() *Stub {
+	stub := Stub{
+		codec: bisync.NewBisync(),
+	}
+
+	return &stub
+}
+
+func (s *Stub) Get(packet []byte) (any, error) {
+	oid := ""
+
+	h := handler{
+		onENQ: func() {
+			debugf("ENQ")
+		},
+
+		onACK: func() {
+			debugf("ACK")
+		},
+
+		onMessage: func(header []uint8, content []uint8) {
+			debugf("MESSAGE %v\n", header)
+			debugf("MESSAGE %v\n", content)
+			// 		if packet, err := BER.Decode(content); err != nil {
+			// 			warnf("%v", err)
+			// 		} else if packet == nil {
+			// 			warnf("invalid packet (%v)", packet)
+			// 		} else {
+			// 			packets = append(packets, *packet)
+			// 			println(">>>>>>>>> received/gotcha", len(packets))
+			// 		}
+		},
+	}
+
+	if err := s.codec.Decode(packet, h); err != nil {
+		warnf("%v", err)
+	}
+
+	return s.get(oid)
+}
+
+func (s Stub) get(oid string) (any, error) {
 	debugf("get %v", oid)
 
 	// ... controller ID
@@ -256,17 +301,17 @@ func (s Stub) Set(oid string, value any) (any, error) {
 }
 
 func debugf(format string, args ...any) {
-	log.Debugf("STUB", format, args...)
+	log.Debugf(TAG, format, args...)
 }
 
 func infof(format string, args ...any) {
-	log.Infof("STUB", format, args...)
+	log.Infof(TAG, format, args...)
 }
 
 func warnf(format string, args ...any) {
-	log.Warnf("STUB", format, args...)
+	log.Warnf(TAG, format, args...)
 }
 
 func errorf(format string, args ...any) {
-	log.Errorf("STUB", format, args...)
+	log.Errorf(TAG, format, args...)
 }

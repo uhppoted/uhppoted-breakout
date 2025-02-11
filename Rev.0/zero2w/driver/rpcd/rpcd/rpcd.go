@@ -17,7 +17,7 @@ import (
 type RPCD struct {
 	network string
 	addr    string
-	ssmp    ssmp.SSMP
+	ssmp    *ssmp.SSMP
 	ctx     context.Context
 	cancel  context.CancelFunc
 }
@@ -36,7 +36,7 @@ func NewRPCD(address string) (*RPCD, error) {
 		v := RPCD{
 			network: matches[1],
 			addr:    matches[2],
-			ssmp:    ssmp.SSMP{},
+			ssmp:    ssmp.NewSSMP(),
 
 			ctx:    ctx,
 			cancel: cancel,

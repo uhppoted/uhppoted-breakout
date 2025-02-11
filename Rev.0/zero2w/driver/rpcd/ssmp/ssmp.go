@@ -9,7 +9,7 @@ import (
 
 type SSMP struct {
 	queue chan func()
-	stub  stub.Stub
+	stub  *stub.Stub
 }
 
 type result = struct {
@@ -17,10 +17,17 @@ type result = struct {
 	err   error
 }
 
+func NewSSMP() *SSMP {
+	ssmp := SSMP{
+		queue: make(chan func()),
+		stub:  stub.NewStub(),
+	}
+
+	return &ssmp
+}
+
 func (s *SSMP) Run() error {
 	infof("run::start")
-
-	s.queue = make(chan func())
 
 loop:
 	for {
@@ -62,13 +69,13 @@ func (s *SSMP) Get(oid string) (any, error) {
 
 		if packet, err := BER.Encode(rq); err != nil {
 			return nil, err
-		} else if _, err := bisync.Encode(nil, packet); err != nil {
+		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
 		} else {
 			pipe := make(chan result)
 
 			f := func() {
-				value, err := s.stub.Get(oid)
+				value, err := s.stub.Get(encoded)
 
 				pipe <- result{
 					value: value,
