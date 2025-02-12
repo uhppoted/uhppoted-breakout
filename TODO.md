@@ -18,8 +18,11 @@
             - [x] SYS, ERR, IN
             - [x] relays
             - [x] door LEDs
-            - [ ] swipe
-            - [ ] keypad
+            - [x] swipe
+            - [x] keypad
+      - [ ] LED weirdness
+            - SYS, IN and ERR only work intermittently
+            - D1/2/3/4 are driven by door relays!!!
 
 - [ ] https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
 ```

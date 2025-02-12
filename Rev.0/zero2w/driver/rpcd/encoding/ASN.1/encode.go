@@ -5,13 +5,6 @@ import (
 	"slices"
 )
 
-const tagInteger byte = 2
-const tagString byte = 4
-const tagNull byte = 5
-const tagOID byte = 6
-const tagSequence byte = 48
-const tagPDU byte = 160
-
 func Encode(rq GetRequest) ([]byte, error) {
 	packet := [][]byte{}
 

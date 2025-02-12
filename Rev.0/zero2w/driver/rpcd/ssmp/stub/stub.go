@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"ssmp/encoding/ASN.1"
 	"ssmp/encoding/bisync"
 	"ssmp/log"
 )
@@ -37,14 +38,15 @@ func (s *Stub) Get(packet []byte) (any, error) {
 		onMessage: func(header []uint8, content []uint8) {
 			debugf("MESSAGE %v\n", header)
 			debugf("MESSAGE %v\n", content)
-			// 		if packet, err := BER.Decode(content); err != nil {
-			// 			warnf("%v", err)
-			// 		} else if packet == nil {
-			// 			warnf("invalid packet (%v)", packet)
-			// 		} else {
-			// 			packets = append(packets, *packet)
-			// 			println(">>>>>>>>> received/gotcha", len(packets))
-			// 		}
+			if packet, err := BER.Decode(content); err != nil {
+				warnf("%v", err)
+			} else if packet == nil {
+				warnf("invalid packet (%v)", packet)
+			} else {
+				warnf(">>>> gotcha packet (%v)", packet)
+				// 			packets = append(packets, *packet)
+				// 			println(">>>>>>>>> received/gotcha", len(packets))
+			}
 		},
 	}
 
