@@ -130,7 +130,7 @@ func pack_integer(ival int64) ([]byte, error) {
 func pack_string(s string) ([]byte, error) {
 	var b bytes.Buffer
 
-	if err := b.WriteByte(tagString); err != nil {
+	if err := b.WriteByte(tagOctetString); err != nil {
 		return nil, err
 	}
 
