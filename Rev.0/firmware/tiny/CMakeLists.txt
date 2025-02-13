@@ -75,11 +75,6 @@ add_executable(breakout
   ${LIB}/src/crypt/otp/hotp.c
 )
 
-target_include_directories(breakout 
-   PRIVATE ${CORE}/include
-   PRIVATE ${LIB}/include
-)
-
 pico_generate_pio_header(
     breakout
     ${CMAKE_CURRENT_LIST_DIR}/src/ws2812.pio
@@ -91,6 +86,16 @@ pico_set_program_version(breakout "0.0")
 pico_enable_stdio_usb (breakout 1)
 pico_enable_stdio_uart(breakout 0)
 pico_add_extra_outputs(breakout)
+
+# Ref. https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
+target_compile_definitions(breakout PRIVATE
+  PICO_XOSC_STARTUP_DELAY_MULTIPLIER=64
+)
+
+target_include_directories(breakout 
+   PRIVATE ${CORE}/include
+   PRIVATE ${LIB}/include
+)
 
 target_link_libraries(
     breakout 

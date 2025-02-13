@@ -33,6 +33,12 @@
     - https://forum.golangbridge.org/t/get-set-network-interface-in-pure-go-code/9075/3
 22. [Memory usage](https://forums.raspberrypi.com/viewtopic.php?t=347638)
 
+## WaveShare RP2040-Tiny
+1. https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero
+```
+On some boards, the XOSC can take longer than usual to stabilize. On such boards, this is needed to avoid a hard fault on boot/reset. Refer to PICO_XOSC_STARTUP_DELAY_MULTIPLIER in the Pico SDK for additional details.
+``` 
+
 ## malloc/free
 - https://forums.raspberrypi.com/viewtopic.php?t=361131
 - https://github.com/raspberrypi/pico-sdk/issues/426
