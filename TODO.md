@@ -20,9 +20,12 @@
             - [x] door LEDs
             - [x] swipe
             - [x] keypad
+      - [ ] D1/2/3/4 are possibly inputs driven by door relays
+      - [ ] check whether SYS, IN and ERR are inverted
       - [ ] LED weirdness
-            - SYS, IN and ERR only work intermittently
-            - D1/2/3/4 are driven by door relays!!!
+            - [x] SYS, IN and ERR only work intermittently
+                  - weirdness around health check
+                  - works ok if `U4x.tock = U4_TOCK;` is not conditional on success
 
 - [ ] https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
 ```

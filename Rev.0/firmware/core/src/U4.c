@@ -217,6 +217,7 @@ bool U4_tick(repeating_timer_t *rt) {
         // ... health check
         U4x.tock -= U4_TICK;
         if (U4x.tock < 0) {
+            U4x.tock = U4_TOCK;
             operation *op = operation_alloc();
 
             if (op != NULL) {
@@ -231,8 +232,6 @@ bool U4_tick(repeating_timer_t *rt) {
                 if (!I2C0_push(&task)) {
                     operation_free(op);
                     set_error(ERR_QUEUE_FULL, TAG, "tick: queue full");
-                } else {
-                    U4x.tock = U4_TOCK;
                 }
             }
         }
