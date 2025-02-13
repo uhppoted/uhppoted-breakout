@@ -80,4 +80,7 @@ typedef struct message {
 
 extern queue_t queue;
 
-extern bool push(message m);
+bool push(message m);
+void set_error(err e, const char *tag, const char *fmt, ...);
+bool get_error(err e);
+uint16_t get_errors();

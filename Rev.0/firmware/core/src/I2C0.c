@@ -8,7 +8,6 @@
 #include <I2C.h>
 #include <I2C0.h>
 #include <breakout.h>
-#include <state.h>
 
 struct {
     queue_t queue;

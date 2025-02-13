@@ -6,7 +6,6 @@
 #include <breakout.h>
 #include <log.h>
 #include <mempool.h>
-#include <state.h>
 
 #include <U4.h>
 #include <types/operation.h>

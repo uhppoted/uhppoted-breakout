@@ -24,7 +24,7 @@
 On some boards, the XOSC can take longer than usual to stabilize. On such boards, this is needed to avoid a hard fault on boot/reset. Refer to PICO_XOSC_STARTUP_DELAY_MULTIPLIER in the Pico SDK for additional details.
 ``` 
 
-- [ ] move error handling to breakout.c
+- [x] move error handling to breakout.c
 - [ ] Rework print queue
       - (?) check USB connected
       - (?) setvbuf

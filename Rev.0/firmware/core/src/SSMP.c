@@ -14,7 +14,6 @@
 #include <encoding/bisync/bisync.h>
 #include <encoding/ssmp/ssmp.h>
 #include <log.h>
-#include <state.h>
 #include <sys.h>
 #include <types/buffer.h>
 

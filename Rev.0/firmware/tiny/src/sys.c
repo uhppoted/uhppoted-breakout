@@ -11,7 +11,6 @@
 #include <breakout.h>
 #include <cli.h>
 #include <log.h>
-#include <state.h>
 #include <sys.h>
 
 #include "ws2812.pio.h"

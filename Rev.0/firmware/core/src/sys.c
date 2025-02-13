@@ -17,7 +17,6 @@
 #include <cli.h>
 #include <log.h>
 #include <mempool.h>
-#include <state.h>
 #include <sys.h>
 
 #define LOGTAG "SYS"

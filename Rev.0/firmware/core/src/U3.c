@@ -7,7 +7,6 @@
 #include <U3.h>
 #include <breakout.h>
 #include <log.h>
-#include <state.h>
 
 typedef struct IIR {
     float x₁;

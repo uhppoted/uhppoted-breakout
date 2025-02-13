@@ -47,7 +47,6 @@ add_executable(breakout
   ${CORE}/src/SSMP.c
   ${CORE}/src/MIB.c
   ${CORE}/src/auth.c
-  ${CORE}/src/state.c
   ${CORE}/src/log.c
   ${CORE}/src/cli.c
   ${CORE}/src/ANSI.c

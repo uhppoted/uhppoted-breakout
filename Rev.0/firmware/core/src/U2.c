@@ -10,7 +10,6 @@
 #include <breakout.h>
 #include <log.h>
 #include <mempool.h>
-#include <state.h>
 
 #define LOGTAG "U2"
 
