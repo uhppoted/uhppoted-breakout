@@ -24,54 +24,65 @@ func NewStub() *Stub {
 }
 
 func (s *Stub) Get(packet []byte) (any, error) {
-	oid := ""
+	pipe := make(chan any)
 
-	h := handler{
-		onENQ: func() {
-			debugf("ENQ")
-		},
+	go func() {
+		h := handler{
+			onENQ: func() {
+				infof("ENQ")
+			},
 
-		onACK: func() {
-			debugf("ACK")
-		},
+			onACK: func() {
+				infof("ACK")
+			},
 
-		onMessage: func(header []uint8, content []uint8) {
-			debugf("MESSAGE %v\n", header)
-			debugf("MESSAGE %v\n", content)
-			if packet, err := BER.Decode(content); err != nil {
-				warnf("%v", err)
-			} else if packet == nil {
-				warnf("invalid packet (%v)", packet)
-			} else {
-				warnf(">>>> gotcha packet (%v)", packet)
-				// 			packets = append(packets, *packet)
-				// 			println(">>>>>>>>> received/gotcha", len(packets))
-			}
-		},
+			onMessage: func(header []uint8, content []uint8) {
+				if packet, err := BER.Decode(content); err != nil {
+					warnf("%v", err)
+				} else if packet == nil {
+					warnf("invalid packet (%v)", packet)
+				} else if rq, ok := packet.(BER.GetRequest); !ok {
+					warnf("unhandled packet type (%T)", packet)
+				} else {
+					oid := fmt.Sprintf("%v", rq.OID)
+
+					if v, err := s.get(oid); err != nil {
+						warnf("error fulfilling GET request (%v)", err)
+					} else {
+						pipe <- v
+					}
+				}
+			},
+		}
+
+		if err := s.codec.Decode(packet, h); err != nil {
+			warnf("error %v", err)
+		}
+	}()
+
+	select {
+	case v := <-pipe:
+		return v, nil
+	case <-time.After(2500 * time.Millisecond):
+		return nil, fmt.Errorf("timeout")
 	}
-
-	if err := s.codec.Decode(packet, h); err != nil {
-		warnf("%v", err)
-	}
-
-	return s.get(oid)
 }
 
 func (s Stub) get(oid string) (any, error) {
 	debugf("get %v", oid)
 
 	// ... controller ID
-	if oid == ".1.3.6.1.4.1.65536.2.1" {
+	if oid == "0.1.3.6.1.4.1.65536.2.1" {
 		return uint32(405419896), nil
 	}
 
 	// ... controller version
-	if oid == ".1.3.6.1.4.1.65536.2.2" {
+	if oid == "0.1.3.6.1.4.1.65536.2.2" {
 		return uint16(0x1234), nil
 	}
 
 	// ... controller release date
-	if oid == ".1.3.6.1.4.1.65536.2.3" {
+	if oid == "0.1.3.6.1.4.1.65536.2.3" {
 		return "2024-01-15", nil
 	}
 
