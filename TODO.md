@@ -3,28 +3,12 @@
 ## breakout
 
 ### other
-- [ ] Rework throughout to use queue::push
-      - [x] core/sys
-      - [x] core/cli
-      - [x] ~~I2C0~~
-      - [x] U2
-      - [x] U3
-      - [x] U4
-      - [x] uart
-      - [x] usb
-      - [x] recheck I/O and swipe/keypad
-      - [ ] D1/2/3/4 are possibly inputs driven by door relays
-      - [ ] check whether SYS, IN and ERR are inverted
-      - [x] SYS, IN and ERR only work intermittently
-            - investigate weirdness around health check
-            - works ok if `U4x.tock = U4_TOCK;` is not conditional on success
+- [ ] D1/2/3/4 are possibly inputs driven by door relays
+- [ ] check whether SYS, IN and ERR are inverted
+- [x] SYS, IN and ERR only work intermittently
+      - investigate weirdness around health check
+      - (??) works ok if `U4x.tock = U4_TOCK;` is not conditional on success
 
-- [x] https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
-```
-On some boards, the XOSC can take longer than usual to stabilize. On such boards, this is needed to avoid a hard fault on boot/reset. Refer to PICO_XOSC_STARTUP_DELAY_MULTIPLIER in the Pico SDK for additional details.
-``` 
-
-- [x] move error handling to breakout.c
 - [ ] Rework print queue
       - (?) check USB connected
       - (?) setvbuf

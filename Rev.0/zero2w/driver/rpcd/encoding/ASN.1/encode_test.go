@@ -24,7 +24,7 @@ func TestEncodeGetRequest(t *testing.T) {
 	//        2 1 0                                INTEGER error index:0
 	//        48 16                                SEQUENCE
 	//           48 14                             SEQUENCE
-	//              6 10 43 6 1 4 1 132 128 0 2 1  OID ".1.3.6.1.4.1.65536.2.1"
+	//              6 10 43 6 1 4 1 132 128 0 2 1  OID "0.1.3.6.1.4.1.65536.2.1"
 	//              5 0                            NULL
 	expected := []byte{
 		48, 41,
