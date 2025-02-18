@@ -78,9 +78,6 @@ const float U4_OUTPUT_DRIVE[16] = {
     0.f, // -- unused --
 };
 
-// inline operation *U4_alloc();
-// inline void U4_free(operation *op);
-
 inline void U4_set(uint16_t mask);
 inline void U4_clear(uint16_t mask);
 inline void U4_toggle(uint16_t mask);

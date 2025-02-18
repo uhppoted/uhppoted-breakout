@@ -3,11 +3,12 @@
 ## breakout
 
 ### other
-- [ ] D1/2/3/4 are possibly inputs driven by door relays
-- [ ] check whether SYS, IN and ERR are inverted
+- [x] ~~D1/2/3/4 are possibly inputs driven by door relays~~
+- [x] check whether SYS, IN and ERR are inverted
 - [x] SYS, IN and ERR only work intermittently
       - investigate weirdness around health check
       - (??) works ok if `U4x.tock = U4_TOCK;` is not conditional on success
+      - (?) maybe increase drive current
 
 - [ ] Rework print queue
       - (?) check USB connected
@@ -27,7 +28,7 @@
       - pico_malloc
       - pico_stdio
 
-- [ ] doors should be unlocked on boot/power-off but locked otherwise
+- (?) doors should be unlocked on boot/power-off but locked otherwise
 - [ ] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
 
 ### SSMP

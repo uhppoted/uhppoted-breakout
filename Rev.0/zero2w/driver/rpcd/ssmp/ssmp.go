@@ -1,6 +1,8 @@
 package ssmp
 
 import (
+	"fmt"
+
 	"ssmp/encoding/ASN.1"
 	"ssmp/encoding/bisync"
 	"ssmp/log"
@@ -75,19 +77,36 @@ func (s *SSMP) Get(oid string) (any, error) {
 			pipe := make(chan result)
 
 			f := func() {
-				value, err := s.stub.Get(encoded)
-
-				pipe <- result{
-					value: value,
-					err:   err,
+				if response, err := s.stub.Get(encoded); err != nil {
+					pipe <- result{
+						value: nil,
+						err:   err,
+					}
+				} else if response.RequestID != rq.RequestID {
+					pipe <- result{
+						value: nil,
+						err:   fmt.Errorf("invalid response ID (%v)", response.RequestID),
+					}
+				} else if response.Error != 0 {
+					pipe <- result{
+						value: nil,
+						err:   fmt.Errorf("error code %v at index $v", response.Error, response.ErrorIndex),
+					}
+				} else {
+					pipe <- result{
+						value: response.Value,
+						err:   nil,
+					}
 				}
 			}
 
 			s.queue <- f
 
-			v := <-pipe
-
-			return v.value, v.err
+			if v := <-pipe; v.err != nil {
+				return nil, err
+			} else {
+				return v.value, nil
+			}
 		}
 	}
 }
