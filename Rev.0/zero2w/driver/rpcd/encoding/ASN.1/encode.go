@@ -5,7 +5,7 @@ import (
 	"slices"
 )
 
-func Encode(rq GetRequest) ([]byte, error) {
+func EncodeGetRequest(rq GetRequest) ([]byte, error) {
 	packet := [][]byte{}
 
 	if v, err := pack_integer(int64(rq.Version)); err != nil {
@@ -67,7 +67,89 @@ func Encode(rq GetRequest) ([]byte, error) {
 		pdu = append(pdu, v)
 	}
 
-	if v, err := pack_pdu(pdu); err != nil {
+	if v, err := pack_pdu(tagGetRequest, pdu); err != nil {
+		return nil, err
+	} else {
+		packet = append(packet, v)
+	}
+
+	return pack_sequence(packet...)
+}
+
+func EncodeGetResponse(response GetResponse) ([]byte, error) {
+	packet := [][]byte{}
+
+	if v, err := pack_integer(int64(response.Version)); err != nil {
+		return nil, err
+	} else {
+		packet = append(packet, v)
+	}
+
+	if v, err := pack_string(response.Community); err != nil {
+		return nil, err
+	} else {
+		packet = append(packet, v)
+	}
+
+	pdu := [][]byte{}
+
+	if v, err := pack_integer(int64(response.RequestID)); err != nil {
+		return nil, err
+	} else {
+		pdu = append(pdu, v)
+	}
+
+	if v, err := pack_integer(response.Error); err != nil {
+		return nil, err
+	} else {
+		pdu = append(pdu, v)
+	}
+
+	if v, err := pack_integer(response.ErrorIndex); err != nil {
+		return nil, err
+	} else {
+		pdu = append(pdu, v)
+	}
+
+	varbindlist := [][]byte{}
+	varbind := [][]byte{}
+
+	if v, err := pack_oid(response.OID); err != nil {
+		return nil, err
+	} else {
+		varbind = append(varbind, v)
+	}
+
+	// ... value
+	switch val := response.Value.(type) {
+	case uint32:
+		if v, err := pack_integer(int64(val)); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+
+	default:
+		if v, err := pack_null(); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+	}
+
+	if v, err := pack_sequence(varbind...); err != nil {
+		return nil, err
+	} else {
+		varbindlist = append(varbindlist, v)
+	}
+
+	if v, err := pack_sequence(varbindlist...); err != nil {
+		return nil, err
+	} else {
+		pdu = append(pdu, v)
+	}
+
+	if v, err := pack_pdu(tagGetResponse, pdu); err != nil {
 		return nil, err
 	} else {
 		packet = append(packet, v)
@@ -200,7 +282,7 @@ func pack_oid(oid OID) ([]byte, error) {
 	}
 }
 
-func pack_pdu(pdu [][]byte) ([]byte, error) {
+func pack_pdu(tag byte, pdu [][]byte) ([]byte, error) {
 	var b bytes.Buffer
 
 	var length uint32 = 0
@@ -208,7 +290,7 @@ func pack_pdu(pdu [][]byte) ([]byte, error) {
 		length += uint32(len(v))
 	}
 
-	if err := b.WriteByte(tagPDU); err != nil {
+	if err := b.WriteByte(tag); err != nil {
 		return nil, err
 	}
 

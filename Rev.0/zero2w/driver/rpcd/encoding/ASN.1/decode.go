@@ -67,7 +67,7 @@ func unpack(bytes []byte) (any, []byte, error) {
 		case tagOID:
 			return unpack_OID(bytes)
 
-		case tagPDU:
+		case tagGetRequest:
 			return unpack_PDU(bytes)
 
 		case tagSequence:

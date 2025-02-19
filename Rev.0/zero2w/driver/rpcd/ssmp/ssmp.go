@@ -69,7 +69,7 @@ func (s *SSMP) Get(oid string) (any, error) {
 			OID:        o,
 		}
 
-		if packet, err := BER.Encode(rq); err != nil {
+		if packet, err := BER.EncodeGetRequest(rq); err != nil {
 			return nil, err
 		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
@@ -90,7 +90,7 @@ func (s *SSMP) Get(oid string) (any, error) {
 				} else if response.Error != 0 {
 					pipe <- result{
 						value: nil,
-						err:   fmt.Errorf("error code %v at index $v", response.Error, response.ErrorIndex),
+						err:   fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex),
 					}
 				} else {
 					pipe <- result{
