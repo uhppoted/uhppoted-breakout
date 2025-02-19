@@ -30,6 +30,14 @@ void I2C0_init() {
     gpio_pull_up(I2C0_SDA);
     gpio_pull_up(I2C0_SCL);
 
+    // ... not strictly necessary
+    gpio_set_slew_rate(I2C0_SDA, GPIO_SLEW_RATE_SLOW);
+    gpio_set_slew_rate(I2C0_SCL, GPIO_SLEW_RATE_SLOW);
+
+    gpio_set_drive_strength(I2C0_SDA, GPIO_DRIVE_STRENGTH_2MA);
+    gpio_set_drive_strength(I2C0_SCL, GPIO_DRIVE_STRENGTH_2MA);
+
+    // ... init struct
     queue_init(&I2C0.queue, sizeof(closure), 32);
     mutex_init(&I2C0.guard);
 }

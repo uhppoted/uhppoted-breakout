@@ -21,11 +21,23 @@ void I2C1_init() {
         i2c_init(i2c1, 400 * 1000); // 400kHz
     }
 
+    gpio_init(I2C1_SCL);
+    gpio_init(I2C1_SDA);
+
     gpio_set_function(I2C1_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C1_SCL, GPIO_FUNC_I2C);
+
     gpio_pull_up(I2C1_SDA);
     gpio_pull_up(I2C1_SCL);
 
+    // ... not strictly necessary
+    gpio_set_slew_rate(I2C1_SDA, GPIO_SLEW_RATE_SLOW);
+    gpio_set_slew_rate(I2C1_SCL, GPIO_SLEW_RATE_SLOW);
+
+    gpio_set_drive_strength(I2C0_SDA, GPIO_DRIVE_STRENGTH_2MA);
+    gpio_set_drive_strength(I2C0_SCL, GPIO_DRIVE_STRENGTH_2MA);
+
+    // ... init struct
     mutex_init(&I2C1.guard);
 }
 
