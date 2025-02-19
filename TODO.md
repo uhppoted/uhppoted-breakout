@@ -1,10 +1,11 @@
 # TODO
 
 ## breakout
+- [x] Update to SDK 2.1.1
 
 ### other
-- [x] ~~D1/2/3/4 are possibly inputs driven by door relays~~
-- [x] check whether SYS, IN and ERR are inverted
+- [ ] set I2C GPIO slew rates and drive for 100kHz
+
 - [x] SYS, IN and ERR only work intermittently
       - investigate weirdness around health check
       - (??) works ok if `U4x.tock = U4_TOCK;` is not conditional on success
@@ -14,7 +15,6 @@
       - (?) check USB connected
       - (?) setvbuf
 
-- [ ] set I2C GPIO slew rates and drive for 100kHz
 - [ ] Commonalise sys implementation into core::sys
 - [ ] syserror
       - [x] red LED on any system error 
