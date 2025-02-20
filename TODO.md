@@ -2,9 +2,9 @@
 
 ## breakout
 - [x] Update to SDK 2.1.1
+- [x] set I2C GPIO slew rates and drive for 100kHz
 
 ### other
-- [x] set I2C GPIO slew rates and drive for 100kHz
 
 - [x] SYS, IN and ERR only work intermittently
       - investigate weirdness around health check

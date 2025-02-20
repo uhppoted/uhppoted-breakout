@@ -9,5 +9,17 @@ const tagGetRequest byte = 160
 const tagGetResponse byte = 162
 
 type sequence []any
-type pdu []any
+type variable struct {
+	oid   OID
+	value any
+}
+
+type pdu struct {
+	tag        byte
+	requestId  uint32
+	errorCode  int64
+	errorIndex int64
+	vars       []variable
+}
+
 type null struct{}

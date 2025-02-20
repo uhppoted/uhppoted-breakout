@@ -47,6 +47,18 @@ func TestEncodeGetRequest(t *testing.T) {
 	}
 }
 
+// 48 41                                       SEQUENCE
+//
+//	2 1 0                                    INTEGER 0
+//	4 6 112 117 98 108 105 99                STRING  public
+//	162 28                                   PDU     GET
+//	    2 2 48 57                            INTEGER
+//	    2 1 0                                INTEGER error:0
+//	    2 1 0                                INTEGER error index:0
+//	    48 16                                SEQUENCE
+//	       48 14                             SEQUENCE
+//	          6 10 43 6 1 4 1 132 128 0 2 1  OID "0.1.3.6.1.4.1.65536.2.1"
+//	          2 4 24 42 55 120               INTEGER 405419896
 func TestEncodeGetResponse(t *testing.T) {
 	response := GetResponse{
 		Version:    0,
@@ -58,17 +70,6 @@ func TestEncodeGetResponse(t *testing.T) {
 		Value:      uint32(405419896),
 	}
 
-	// 48 41                                       SEQUENCE
-	//    2 1 0                                    INTEGER 0
-	//    4 6 112 117 98 108 105 99                STRING  public
-	//    162 28                                   PDU     GET
-	//        2 2 48 57                            INTEGER
-	//        2 1 0                                INTEGER error:0
-	//        2 1 0                                INTEGER error index:0
-	//        48 16                                SEQUENCE
-	//           48 14                             SEQUENCE
-	//              6 10 43 6 1 4 1 132 128 0 2 1  OID "0.1.3.6.1.4.1.65536.2.1"
-	//              2 4 24 42 55 120               INTEGER 405419896
 	expected := []byte{
 		48, 45,
 		2, 1, 0,

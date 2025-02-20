@@ -17,31 +17,42 @@ func Decode(bytes []byte) (any, error) {
 		return nil, fmt.Errorf("invalid packet version")
 	} else if community, ok := seq[1].(string); !ok {
 		return nil, fmt.Errorf("invalid packet community")
-	} else if PDU, ok := seq[2].(pdu); !ok || len(PDU) < 4 {
+	} else if PDU, ok := seq[2].(pdu); !ok || len(PDU.vars) < 1 {
 		return nil, fmt.Errorf("invalid packet PDU")
-	} else if requestID, ok := PDU[0].(int64); !ok {
-		return nil, fmt.Errorf("invalid packet request ID")
-	} else if errCode, ok := PDU[1].(int64); !ok {
-		return nil, fmt.Errorf("invalid packet error field")
-	} else if errIndex, ok := PDU[2].(int64); !ok {
-		return nil, fmt.Errorf("invalid packet error index")
-	} else if varbindlist, ok := PDU[3].(sequence); !ok || len(varbindlist) < 1 {
+	} else if vars := PDU.vars; len(vars) < 1 {
 		return nil, fmt.Errorf("invalid packet variable bind list")
-	} else if vars, ok := varbindlist[0].(sequence); !ok || len(vars) < 2 {
-		return nil, fmt.Errorf("invalid packet variable list")
-	} else if oid, ok := vars[0].(OID); !ok {
-		return nil, fmt.Errorf("invalid packet variable OID")
-	} else if _, ok := vars[1].(null); !ok {
-		return nil, fmt.Errorf("invalid packet variable value")
+		// } else if v := vars[0]; len(v) < 2 {
+		// 	return nil, fmt.Errorf("invalid packet variable list %v", len(v))
+		// } else if oid, ok := v[0].(OID); !ok {
+		// 	return nil, fmt.Errorf("invalid packet variable OID")
 	} else {
-		return GetRequest{
-			Version:    uint8(version),
-			Community:  community,
-			RequestID:  uint32(requestID),
-			Error:      errCode,
-			ErrorIndex: errIndex,
-			OID:        oid,
-		}, nil
+		v := vars[0]
+
+		switch PDU.tag {
+		case tagGetRequest:
+			return GetRequest{
+				Version:    uint8(version),
+				Community:  community,
+				RequestID:  PDU.requestId,
+				Error:      PDU.errorCode,
+				ErrorIndex: PDU.errorIndex,
+				OID:        v.oid,
+			}, nil
+
+		case tagGetResponse:
+			return GetResponse{
+				Version:    uint8(version),
+				Community:  community,
+				RequestID:  PDU.requestId,
+				Error:      PDU.errorCode,
+				ErrorIndex: PDU.errorIndex,
+				OID:        v.oid,
+				Value:      v.value,
+			}, nil
+
+		default:
+			return nil, fmt.Errorf("unknown PDU type (%v)", PDU.tag)
+		}
 	}
 }
 
@@ -68,7 +79,10 @@ func unpack(bytes []byte) (any, []byte, error) {
 			return unpack_OID(bytes)
 
 		case tagGetRequest:
-			return unpack_PDU(bytes)
+			return unpack_PDU(tagGetRequest, bytes)
+
+		case tagGetResponse:
+			return unpack_PDU(tagGetResponse, bytes)
 
 		case tagSequence:
 			return unpack_sequence(bytes)
@@ -198,22 +212,72 @@ func unpack_OID(bytes []byte) (OID, []byte, error) {
 	}
 }
 
-func unpack_PDU(bytes []byte) (pdu, []byte, error) {
+func unpack_PDU(tag byte, bytes []byte) (pdu, []byte, error) {
 	if N, bytes, err := unpack_length(bytes); err != nil {
-		return nil, bytes, err
+		return pdu{}, bytes, err
 	} else if N > uint32(len(bytes)) {
-		return nil, nil, fmt.Errorf("invalid PDU")
+		return pdu{}, nil, fmt.Errorf("invalid PDU")
 	} else {
-		PDU := pdu{}
+		PDU := pdu{
+			tag: tag,
+		}
 		chunk := bytes[:N]
 
-		for len(chunk) > 0 {
-			if field, remaining, err := unpack(chunk); err != nil {
-				return nil, bytes[N:], err
+		if len(chunk) > 0 {
+			if v, remaining, err := unpack(chunk); err != nil {
+				return pdu{}, bytes[N:], err
+			} else if u32, ok := v.(int64); !ok {
+				return pdu{}, nil, fmt.Errorf("invalid packet request ID")
 			} else {
-				PDU = append(PDU, field)
+				PDU.requestId = uint32(u32)
 				chunk = remaining
 			}
+
+			if len(chunk) > 0 {
+				if v, remaining, err := unpack(chunk); err != nil {
+					return pdu{}, bytes[N:], err
+				} else if i64, ok := v.(int64); !ok {
+					return pdu{}, nil, fmt.Errorf("invalid packet error code")
+				} else {
+					PDU.errorCode = i64
+					chunk = remaining
+				}
+			}
+
+			if len(chunk) > 0 {
+				if v, remaining, err := unpack(chunk); err != nil {
+					return pdu{}, bytes[N:], err
+				} else if i64, ok := v.(int64); !ok {
+					return pdu{}, nil, fmt.Errorf("invalid packet error index")
+				} else {
+					PDU.errorIndex = i64
+					chunk = remaining
+				}
+			}
+
+			if len(chunk) > 0 {
+				if v, remaining, err := unpack(chunk); err != nil {
+					return pdu{}, bytes[N:], err
+				} else if seq, ok := v.(sequence); !ok {
+					return pdu{}, nil, fmt.Errorf("invalid packet varbindlist")
+				} else {
+					chunk = remaining
+
+					for _, e := range seq {
+						if v, ok := e.(sequence); !ok || len(v) < 2 {
+							return pdu{}, nil, fmt.Errorf("invalid packet var")
+						} else if oid, ok := v[0].(OID); !ok {
+							return pdu{}, nil, fmt.Errorf("invalid packet variable OID")
+						} else {
+							PDU.vars = append(PDU.vars, variable{
+								oid:   oid,
+								value: v[1],
+							})
+						}
+					}
+				}
+			}
+
 		}
 
 		return PDU, bytes[N:], nil

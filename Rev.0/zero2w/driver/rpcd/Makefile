@@ -18,6 +18,9 @@ tinygo-build:
 test: build
 	go test ./...
 
+debug: build
+	go test ./... -run TestDecodeGetResponse
+
 run-tcp: build
 	./bin/rpcd --bind "tcp:::1234"
 
