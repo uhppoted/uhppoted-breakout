@@ -57,19 +57,19 @@ const PULLUP U4_PULLUPS[16] = {
 };
 
 const float U4_OUTPUT_DRIVE[16] = {
-    0.25f, // relay 1
-    0.25f, // LED 1
-    0.25f, // relay 2
-    0.25f, // LED 2
+    0.25f, // relay 1 (drives 5V/(1k || 10.470k) = 4.5mA)
+    0.25f, // LED 1   (TTL/high impedance input)
+    0.25f, // relay 2 (drives 5V/(1k || 10.470k) = 4.5mA)
+    0.25f, // LED 2   (TTL/high impedance input)
 
-    0.25f, // relay 3
-    0.25f, // LED 3
-    0.25f, // relay 4
-    0.25f, // LED 4
+    0.25f, // relay 3 (drives 5V/(1k || 10.470k) = 4.5mA)
+    0.25f, // LED 3   (TTL/high impedance input)
+    0.25f, // relay 4 (drives 5V/(1k || 10.470k) = 4.5mA)
+    0.25f, // LED 4   (TTL/high impedance input)
 
-    0.25f, // LED ERR
-    0.5f,  // LED IN
-    0.75f, // LED SYS
+    0.25f, // LED ERR (sinks 5V/1k = 5mA)
+    0.25f, // LED IN  (sinks 5V/1k = 5mA)
+    0.25f, // LED SYS (sinks 5V/1k = 5mA)
     0.f,   // -- unused --
 
     0.f, // -- unused --

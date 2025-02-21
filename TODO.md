@@ -1,15 +1,13 @@
 # TODO
 
 ## breakout
-- [x] Update to SDK 2.1.1
-- [x] set I2C GPIO slew rates and drive for 100kHz
 
 ### other
 
 - [x] SYS, IN and ERR only work intermittently
+      - [x] set drive current
       - investigate weirdness around health check
       - (??) works ok if `U4x.tock = U4_TOCK;` is not conditional on success
-      - (?) maybe increase drive current
 
 - [ ] Rework print queue
       - (?) check USB connected
