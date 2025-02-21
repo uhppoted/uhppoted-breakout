@@ -77,10 +77,20 @@ func (s *SSMP) Get(oid string) (any, error) {
 			pipe := make(chan result)
 
 			f := func() {
-				if response, err := s.stub.Get(encoded); err != nil {
+				if reply, err := s.stub.Get(encoded); err != nil {
 					pipe <- result{
 						value: nil,
 						err:   err,
+					}
+				} else if packet, err := BER.Decode(reply); err != nil {
+					pipe <- result{
+						value: nil,
+						err:   err,
+					}
+				} else if response, ok := packet.(BER.GetResponse); !ok {
+					pipe <- result{
+						value: nil,
+						err:   fmt.Errorf("invalid reply type (%T)", packet),
 					}
 				} else if response.RequestID != rq.RequestID {
 					pipe <- result{

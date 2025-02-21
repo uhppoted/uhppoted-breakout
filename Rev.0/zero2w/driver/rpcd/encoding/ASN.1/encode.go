@@ -14,7 +14,7 @@ func EncodeGetRequest(rq GetRequest) ([]byte, error) {
 		packet = append(packet, v)
 	}
 
-	if v, err := pack_string(rq.Community); err != nil {
+	if v, err := pack_octets(rq.Community); err != nil {
 		return nil, err
 	} else {
 		packet = append(packet, v)
@@ -85,7 +85,7 @@ func EncodeGetResponse(response GetResponse) ([]byte, error) {
 		packet = append(packet, v)
 	}
 
-	if v, err := pack_string(response.Community); err != nil {
+	if v, err := pack_octets(response.Community); err != nil {
 		return nil, err
 	} else {
 		packet = append(packet, v)
@@ -124,6 +124,20 @@ func EncodeGetResponse(response GetResponse) ([]byte, error) {
 	switch val := response.Value.(type) {
 	case uint32:
 		if v, err := pack_integer(int64(val)); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+
+	case uint16:
+		if v, err := pack_integer(int64(val)); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+
+	case string:
+		if v, err := pack_octets(string(val)); err != nil {
 			return nil, err
 		} else {
 			varbind = append(varbind, v)
@@ -209,7 +223,7 @@ func pack_integer(ival int64) ([]byte, error) {
 	return slice, nil
 }
 
-func pack_string(s string) ([]byte, error) {
+func pack_octets(s string) ([]byte, error) {
 	var b bytes.Buffer
 
 	if err := b.WriteByte(tagOctetString); err != nil {

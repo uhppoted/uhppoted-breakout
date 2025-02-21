@@ -87,20 +87,24 @@ func (r RPC) GetUint8(oid scmp.OID) (uint8, error) {
 func (r RPC) GetUint16(oid scmp.OID) (uint16, error) {
 	if v, err := r.get(oid); err != nil {
 		return 0, err
-	} else if u16, ok := v.(uint16); !ok {
-		return 0, fmt.Errorf("invalid uint16 value (%T)", v)
-	} else {
+	} else if u16, ok := v.(uint16); ok {
 		return u16, nil
+	} else if i64, ok := v.(int64); ok {
+		return uint16(i64), nil
+	} else {
+		return 0, fmt.Errorf("invalid uint16 value (%T)", v)
 	}
 }
 
 func (r RPC) GetUint32(oid scmp.OID) (uint32, error) {
 	if v, err := r.get(oid); err != nil {
 		return 0, err
-	} else if u32, ok := v.(uint32); !ok {
-		return 0, fmt.Errorf("invalid uint32 value (%T)", v)
-	} else {
+	} else if u32, ok := v.(uint32); ok {
 		return u32, nil
+	} else if i64, ok := v.(int64); ok {
+		return uint32(i64), nil
+	} else {
+		return 0, fmt.Errorf("invalid uint32 value (%T)", v)
 	}
 }
 

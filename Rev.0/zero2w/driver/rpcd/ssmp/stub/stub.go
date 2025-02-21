@@ -23,8 +23,8 @@ func NewStub() *Stub {
 	return &stub
 }
 
-func (s *Stub) Get(packet []byte) (BER.GetResponse, error) {
-	pipe := make(chan BER.GetResponse)
+func (s *Stub) Get(packet []byte) ([]byte, error) {
+	pipe := make(chan []byte)
 
 	go func() {
 		h := handler{
@@ -49,7 +49,7 @@ func (s *Stub) Get(packet []byte) (BER.GetResponse, error) {
 					if v, err := s.get(oid); err != nil {
 						warnf("error fulfilling GET request (%v)", err)
 					} else {
-						pipe <- BER.GetResponse{
+						response := BER.GetResponse{
 							Version:    0,
 							Community:  "public",
 							RequestID:  rq.RequestID,
@@ -57,6 +57,12 @@ func (s *Stub) Get(packet []byte) (BER.GetResponse, error) {
 							ErrorIndex: 0,
 							OID:        rq.OID,
 							Value:      v,
+						}
+
+						if reply, err := BER.EncodeGetResponse(response); err != nil {
+							warnf("%v", err)
+						} else {
+							pipe <- reply
 						}
 					}
 				}
@@ -72,7 +78,7 @@ func (s *Stub) Get(packet []byte) (BER.GetResponse, error) {
 	case v := <-pipe:
 		return v, nil
 	case <-time.After(2500 * time.Millisecond):
-		return BER.GetResponse{}, fmt.Errorf("timeout")
+		return nil, fmt.Errorf("timeout")
 	}
 }
 
