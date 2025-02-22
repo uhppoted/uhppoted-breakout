@@ -19,7 +19,7 @@ test: build
 	go test ./...
 
 debug: build
-	go test ./... -run TestDecodeGetResponse
+	go test -v -timeout 500ms ./... -run TestDecodeGetRequest
 
 run-tcp: build
 	./bin/rpcd --bind "tcp:::1234"

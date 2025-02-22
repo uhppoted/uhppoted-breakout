@@ -2,6 +2,7 @@ package ssmp
 
 import (
 	"fmt"
+	"time"
 
 	"ssmp/encoding/ASN.1"
 	"ssmp/encoding/bisync"
@@ -17,6 +18,23 @@ type SSMP struct {
 type result = struct {
 	value any
 	err   error
+}
+
+type callback struct {
+	pipe chan []uint8
+}
+
+func (c callback) OnENQ() {
+}
+
+func (c callback) OnACK() {
+}
+
+func (c callback) OnMessage(header []uint8, content []uint8) {
+	select {
+	case c.pipe <- content:
+	default:
+	}
 }
 
 func NewSSMP() *SSMP {
@@ -74,7 +92,11 @@ func (s *SSMP) Get(oid string) (any, error) {
 		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
 		} else {
+			codec := bisync.NewBisync()
 			pipe := make(chan result)
+			h := callback{
+				pipe: make(chan []uint8, 1),
+			}
 
 			f := func() {
 				if reply, err := s.stub.Get(encoded); err != nil {
@@ -82,30 +104,46 @@ func (s *SSMP) Get(oid string) (any, error) {
 						value: nil,
 						err:   err,
 					}
-				} else if packet, err := BER.Decode(reply); err != nil {
+				} else if err := codec.Decode(reply, h); err != nil {
 					pipe <- result{
 						value: nil,
 						err:   err,
 					}
-				} else if response, ok := packet.(BER.GetResponse); !ok {
-					pipe <- result{
-						value: nil,
-						err:   fmt.Errorf("invalid reply type (%T)", packet),
-					}
-				} else if response.RequestID != rq.RequestID {
-					pipe <- result{
-						value: nil,
-						err:   fmt.Errorf("invalid response ID (%v)", response.RequestID),
-					}
-				} else if response.Error != 0 {
-					pipe <- result{
-						value: nil,
-						err:   fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex),
-					}
 				} else {
-					pipe <- result{
-						value: response.Value,
-						err:   nil,
+					select {
+					case <-time.After(100 * time.Millisecond):
+						pipe <- result{
+							value: nil,
+							err:   fmt.Errorf("timeout decoding response"),
+						}
+
+					case decoded := <-h.pipe:
+						if packet, err := BER.Decode(decoded); err != nil {
+							pipe <- result{
+								value: nil,
+								err:   err,
+							}
+						} else if response, ok := packet.(BER.GetResponse); !ok {
+							pipe <- result{
+								value: nil,
+								err:   fmt.Errorf("invalid reply type (%T)", packet),
+							}
+						} else if response.RequestID != rq.RequestID {
+							pipe <- result{
+								value: nil,
+								err:   fmt.Errorf("invalid response ID (%v)", response.RequestID),
+							}
+						} else if response.Error != 0 {
+							pipe <- result{
+								value: nil,
+								err:   fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex),
+							}
+						} else {
+							pipe <- result{
+								value: response.Value,
+								err:   nil,
+							}
+						}
 					}
 				}
 			}

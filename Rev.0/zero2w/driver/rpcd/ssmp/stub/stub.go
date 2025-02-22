@@ -24,7 +24,7 @@ func NewStub() *Stub {
 }
 
 func (s *Stub) Get(packet []byte) ([]byte, error) {
-	pipe := make(chan []byte)
+	pipe := make(chan []byte, 1)
 
 	go func() {
 		h := handler{
@@ -59,7 +59,9 @@ func (s *Stub) Get(packet []byte) ([]byte, error) {
 							Value:      v,
 						}
 
-						if reply, err := BER.EncodeGetResponse(response); err != nil {
+						if packet, err := BER.EncodeGetResponse(response); err != nil {
+							warnf("%v", err)
+						} else if reply, err := bisync.Encode(nil, packet); err != nil {
 							warnf("%v", err)
 						} else {
 							pipe <- reply
