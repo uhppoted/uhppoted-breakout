@@ -5,8 +5,7 @@
 ### other
 
 - [x] SYS, IN and ERR only work intermittently
-      - investigate weirdness around health check
-      - (??) works ok if `U4x.tock = U4_TOCK;` is not conditional on success
+      - [x] investigate weirdness around health check
 
 - [ ] Rework print queue
       - (?) check USB connected
