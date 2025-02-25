@@ -12,76 +12,84 @@ import (
 const TAG = "STUB"
 
 type Stub struct {
+	requests <-chan []byte
+	replies  chan<- []byte
+
 	codec *bisync.Bisync
 }
 
-func NewStub() *Stub {
+func NewStub(requests <-chan []byte, replies chan<- []byte) *Stub {
 	stub := Stub{
-		codec: bisync.NewBisync(),
+		codec:    bisync.NewBisync(),
+		requests: requests,
+		replies:  replies,
 	}
 
 	return &stub
 }
 
-func (s *Stub) Get(packet []byte) ([]byte, error) {
-	pipe := make(chan []byte, 1)
+func (s *Stub) Run() {
+	infof("run::start %v", s.requests)
 
-	go func() {
-		h := handler{
-			onENQ: func() {
-				infof("ENQ")
-			},
+	h := handler{
+		onENQ: func() {
+			infof("ENQ")
+		},
 
-			onACK: func() {
-				infof("ACK")
-			},
+		onACK: func() {
+			infof("ACK")
+		},
 
-			onMessage: func(header []uint8, content []uint8) {
-				if packet, err := BER.Decode(content); err != nil {
-					warnf("%v", err)
-				} else if packet == nil {
-					warnf("invalid packet (%v)", packet)
-				} else if rq, ok := packet.(BER.GetRequest); !ok {
-					warnf("unhandled packet type (%T)", packet)
+		onMessage: func(header []uint8, content []uint8) {
+			if packet, err := BER.Decode(content); err != nil {
+				warnf("%v", err)
+			} else if packet == nil {
+				warnf("invalid packet (%v)", packet)
+			} else if rq, ok := packet.(BER.GetRequest); !ok {
+				warnf("unhandled packet type (%T)", packet)
+			} else {
+				oid := fmt.Sprintf("%v", rq.OID)
+
+				if v, err := s.get(oid); err != nil {
+					warnf("error fulfilling GET request (%v)", err)
 				} else {
-					oid := fmt.Sprintf("%v", rq.OID)
+					response := BER.GetResponse{
+						Version:    0,
+						Community:  "public",
+						RequestID:  rq.RequestID,
+						Error:      0,
+						ErrorIndex: 0,
+						OID:        rq.OID,
+						Value:      v,
+					}
 
-					if v, err := s.get(oid); err != nil {
-						warnf("error fulfilling GET request (%v)", err)
+					if packet, err := BER.EncodeGetResponse(response); err != nil {
+						warnf("%v", err)
+					} else if reply, err := bisync.Encode(nil, packet); err != nil {
+						warnf("%v", err)
 					} else {
-						response := BER.GetResponse{
-							Version:    0,
-							Community:  "public",
-							RequestID:  rq.RequestID,
-							Error:      0,
-							ErrorIndex: 0,
-							OID:        rq.OID,
-							Value:      v,
-						}
-
-						if packet, err := BER.EncodeGetResponse(response); err != nil {
-							warnf("%v", err)
-						} else if reply, err := bisync.Encode(nil, packet); err != nil {
-							warnf("%v", err)
-						} else {
-							pipe <- reply
-						}
+						s.replies <- reply
 					}
 				}
-			},
-		}
-
-		if err := s.codec.Decode(packet, h); err != nil {
-			warnf("error %v", err)
-		}
-	}()
-
-	select {
-	case v := <-pipe:
-		return v, nil
-	case <-time.After(2500 * time.Millisecond):
-		return nil, fmt.Errorf("timeout")
+			}
+		},
 	}
+
+loop:
+	for {
+		select {
+		case bytes, ok := <-s.requests:
+			if ok {
+				if err := s.codec.Decode(bytes, h); err != nil {
+					warnf("error %v", err)
+				}
+			} else {
+				break loop
+			}
+		}
+	}
+
+	infof("run::exit")
 }
 
 func (s Stub) get(oid string) (any, error) {

@@ -2,6 +2,7 @@ package ssmp
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"ssmp/encoding/ASN.1"
@@ -11,8 +12,11 @@ import (
 )
 
 type SSMP struct {
-	queue chan func()
-	stub  *stub.Stub
+	queue    chan func()
+	requests chan []byte
+	replies  chan []byte
+	wg       sync.WaitGroup
+	stub     *stub.Stub
 }
 
 type result = struct {
@@ -38,9 +42,14 @@ func (c callback) OnMessage(header []uint8, content []uint8) {
 }
 
 func NewSSMP() *SSMP {
+	requests := make(chan []byte, 1)
+	replies := make(chan []byte, 1)
 	ssmp := SSMP{
-		queue: make(chan func()),
-		stub:  stub.NewStub(),
+		queue:    make(chan func()),
+		requests: requests,
+		replies:  replies,
+		wg:       sync.WaitGroup{},
+		stub:     stub.NewStub(requests, replies),
 	}
 
 	return &ssmp
@@ -49,27 +58,61 @@ func NewSSMP() *SSMP {
 func (s *SSMP) Run() error {
 	infof("run::start")
 
+	// ... stub
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+		s.stub.Run()
+	}()
+
+	// ... dequeue
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+		s.dequeue()
+	}()
+
+	infof("run::exit")
+
+	return nil
+}
+
+func (s *SSMP) dequeue() {
 loop:
 	for {
 		select {
 		case f, ok := <-s.queue:
-			if !ok {
-				break loop
-			} else {
+			if ok {
 				f()
+			} else {
+				break loop
 			}
 		}
 	}
-
-	infof("run::exit")
-	return nil
 }
 
 func (s *SSMP) Stop() error {
 	infof("run::stop")
-	close(s.queue)
 
-	return nil
+	c := make(chan struct{})
+
+	go func() {
+		close(s.requests)
+		close(s.replies)
+		close(s.queue)
+
+		s.wg.Wait()
+
+		c <- struct{}{}
+	}()
+
+	select {
+	case <-c:
+		return nil
+
+	case <-time.After(2500 * time.Millisecond):
+		return nil
+	}
 }
 
 func (s *SSMP) Get(oid string) (any, error) {
@@ -99,53 +142,60 @@ func (s *SSMP) Get(oid string) (any, error) {
 			}
 
 			f := func() {
-				if reply, err := s.stub.Get(encoded); err != nil {
-					pipe <- result{
-						value: nil,
-						err:   err,
-					}
-				} else if err := codec.Decode(reply, h); err != nil {
-					pipe <- result{
-						value: nil,
-						err:   err,
-					}
-				} else {
-					select {
-					case <-time.After(100 * time.Millisecond):
+				s.requests <- encoded
+
+				select {
+				case reply := <-s.replies:
+					if err := codec.Decode(reply, h); err != nil {
 						pipe <- result{
 							value: nil,
-							err:   fmt.Errorf("timeout decoding response"),
+							err:   err,
 						}
+					} else {
+						select {
+						case <-time.After(100 * time.Millisecond):
+							pipe <- result{
+								value: nil,
+								err:   fmt.Errorf("timeout decoding response"),
+							}
 
-					case decoded := <-h.pipe:
-						if packet, err := BER.Decode(decoded); err != nil {
-							pipe <- result{
-								value: nil,
-								err:   err,
-							}
-						} else if response, ok := packet.(BER.GetResponse); !ok {
-							pipe <- result{
-								value: nil,
-								err:   fmt.Errorf("invalid reply type (%T)", packet),
-							}
-						} else if response.RequestID != rq.RequestID {
-							pipe <- result{
-								value: nil,
-								err:   fmt.Errorf("invalid response ID (%v)", response.RequestID),
-							}
-						} else if response.Error != 0 {
-							pipe <- result{
-								value: nil,
-								err:   fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex),
-							}
-						} else {
-							pipe <- result{
-								value: response.Value,
-								err:   nil,
+						case decoded := <-h.pipe:
+							if packet, err := BER.Decode(decoded); err != nil {
+								pipe <- result{
+									value: nil,
+									err:   err,
+								}
+							} else if response, ok := packet.(BER.GetResponse); !ok {
+								pipe <- result{
+									value: nil,
+									err:   fmt.Errorf("invalid reply type (%T)", packet),
+								}
+							} else if response.RequestID != rq.RequestID {
+								pipe <- result{
+									value: nil,
+									err:   fmt.Errorf("invalid response ID (%v)", response.RequestID),
+								}
+							} else if response.Error != 0 {
+								pipe <- result{
+									value: nil,
+									err:   fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex),
+								}
+							} else {
+								pipe <- result{
+									value: response.Value,
+									err:   nil,
+								}
 							}
 						}
 					}
+
+				case <-time.After(2500 * time.Millisecond):
+					pipe <- result{
+						value: nil,
+						err:   fmt.Errorf("timeout"),
+					}
 				}
+				// }
 			}
 
 			s.queue <- f

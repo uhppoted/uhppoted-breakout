@@ -5,7 +5,6 @@
 ### other
 
 - [x] SYS, IN and ERR only work intermittently
-      - [x] set drive current
       - investigate weirdness around health check
       - (??) works ok if `U4x.tock = U4_TOCK;` is not conditional on success
 
