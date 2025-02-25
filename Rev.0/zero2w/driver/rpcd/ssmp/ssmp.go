@@ -3,6 +3,7 @@ package ssmp
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"ssmp/encoding/ASN.1"
@@ -17,8 +18,38 @@ type SSMP struct {
 	rx       chan []byte
 	wg       sync.WaitGroup
 
-	pending map[uint32]func(packet BER.GetResponse)
+	pending pending
 	stub    *stub.Stub
+}
+
+type pending struct {
+	m     map[uint32]func(packet BER.GetResponse)
+	guard sync.RWMutex
+}
+
+func (p *pending) put(id uint32, f func(packet BER.GetResponse)) {
+	p.guard.Lock()
+	defer p.guard.Unlock()
+
+	p.m[id] = f
+}
+
+func (p *pending) delete(id uint32) {
+	p.guard.Lock()
+	defer p.guard.Unlock()
+
+	delete(p.m, id)
+}
+
+func (p *pending) get(id uint32) func(packet BER.GetResponse) {
+	p.guard.RLock()
+	defer p.guard.RUnlock()
+
+	if f, ok := p.m[id]; ok {
+		return f
+	}
+
+	return nil
 }
 
 type callback struct {
@@ -40,6 +71,8 @@ func (c callback) OnMessage(header []uint8, content []uint8) {
 	}
 }
 
+var ID atomic.Uint32
+
 func NewSSMP() *SSMP {
 	requests := make(chan []byte, 1)
 	rx := make(chan []byte, 1)
@@ -48,8 +81,10 @@ func NewSSMP() *SSMP {
 		requests: requests,
 		rx:       rx,
 		wg:       sync.WaitGroup{},
-		pending:  map[uint32]func(packet BER.GetResponse){},
-		stub:     stub.NewStub(requests, rx),
+		pending: pending{
+			m: map[uint32]func(packet BER.GetResponse){},
+		},
+		stub: stub.NewStub(requests, rx),
 	}
 
 	return &ssmp
@@ -117,7 +152,7 @@ func (s *SSMP) dequeue() {
 func (s *SSMP) dispatch(packet any) {
 	switch v := packet.(type) {
 	case BER.GetResponse:
-		if h, ok := s.pending[v.RequestID]; ok && h != nil {
+		if h := s.pending.get(v.RequestID); h != nil {
 			h(v)
 		} else {
 			warnf("no handler for GET response %v", v.RequestID)
@@ -162,7 +197,7 @@ func (s *SSMP) Get(oid string) (any, error) {
 		rq := BER.GetRequest{
 			Version:    0,
 			Community:  "public",
-			RequestID:  12345,
+			RequestID:  ID.Add(1),
 			Error:      0,
 			ErrorIndex: 0,
 			OID:        o,
@@ -176,11 +211,12 @@ func (s *SSMP) Get(oid string) (any, error) {
 			pipe := make(chan BER.GetResponse, 1)
 
 			defer close(pipe)
+			defer s.pending.delete(rq.RequestID)
 
 			s.queue <- func() {
-				s.pending[rq.RequestID] = func(packet BER.GetResponse) {
+				s.pending.put(rq.RequestID, func(packet BER.GetResponse) {
 					pipe <- packet
-				}
+				})
 
 				s.requests <- encoded
 			}

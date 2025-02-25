@@ -1,8 +1,22 @@
 # TODO
 
+## RPCD
+    - [x] breakout-simulator
+    - [x] encoding
+    - [x] decoding
+    - [x] auto-increment request ID
+    - [x] guard around SSMP.pending
+    - [ ] serialize request-responses again
+    - [ ] expire SSMP.pending entries
+    - [x] GET
+    - [ ] SET
+    - [ ] cache controller ID
+    - [ ] monitor
+    - [ ] daemonize
+
 ## breakout
 
-### other
+### misc
 
 - [x] SYS, IN and ERR only work intermittently
       - [x] investigate weirdness around health check
@@ -94,16 +108,6 @@
     - [ ] cache
     - [ ] tinygo
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
-
-### RPCD
-    - [x] breakout-simulator
-    - [x] encoding
-    - [x] decoding
-    - [x] GET
-    - [ ] SET
-    - [ ] cache controller ID
-    - [ ] monitor
-    - [ ] daemonize
 
 ### MIB
     - [x] controller ID
