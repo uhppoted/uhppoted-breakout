@@ -1,6 +1,7 @@
 SDK ?= $(HOME)/Development/tools/pico/pico-sdk
 RPI ?= phil
 PORT ?= /dev/tty.usbmodem14201
+BUILD ?= Debug
 
 RX8900SA_VDET ?= disabled
 RX8900SA_SWOFF ?= switch
@@ -14,11 +15,12 @@ TRACE ?= 10
 .PHONY: format
 
 clean: 
+	@echo "--- $(BUILD) build ---" | tr '[:lower:]' '[:upper:]'
 	rm -rf build
 	mkdir -p build
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
-	       cmake -DCMAKE_BUILD_TYPE=Debug \
+	       cmake -DCMAKE_BUILD_TYPE=$(BUILD) \
 	             -DMODE="log" \
 	             -DWATCHDOG="enabled" \
 	             -DI2C0_CLOCK="100kHz" -DI2C1_CLOCK="400kHz" \
@@ -43,6 +45,9 @@ format:
 
 build: format
 	export PICO_SDK_PATH=$(SDK) && cd build && make
+
+release: BUILD=Release
+release: clean build
 
 run-local: build
 	picotool load -v build/breakout.uf2 -f
