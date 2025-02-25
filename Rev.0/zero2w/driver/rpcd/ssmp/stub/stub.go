@@ -75,17 +75,9 @@ func (s *Stub) Run() {
 		},
 	}
 
-loop:
-	for {
-		select {
-		case bytes, ok := <-s.requests:
-			if ok {
-				if err := s.codec.Decode(bytes, h); err != nil {
-					warnf("error %v", err)
-				}
-			} else {
-				break loop
-			}
+	for bytes := range s.requests {
+		if err := s.codec.Decode(bytes, h); err != nil {
+			warnf("error %v", err)
 		}
 	}
 

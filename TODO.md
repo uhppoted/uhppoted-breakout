@@ -6,6 +6,7 @@
 
 - [x] SYS, IN and ERR only work intermittently
       - [x] investigate weirdness around health check
+      - [ ] Check health check weirdness with active SSMP
 
 - [x] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
 - [ ] Commonalise sys implementation into core::sys
@@ -95,12 +96,14 @@
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
 
 ### RPCD
+    - [x] breakout-simulator
     - [x] encoding
-    - [ ] decoding
+    - [x] decoding
+    - [x] GET
+    - [ ] SET
     - [ ] cache controller ID
     - [ ] monitor
     - [ ] daemonize
-    - [ ] breakout-simulator
 
 ### MIB
     - [x] controller ID

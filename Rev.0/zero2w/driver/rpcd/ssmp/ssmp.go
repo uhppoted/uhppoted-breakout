@@ -14,18 +14,16 @@ import (
 type SSMP struct {
 	queue    chan func()
 	requests chan []byte
-	replies  chan []byte
+	rx       chan []byte
 	wg       sync.WaitGroup
-	stub     *stub.Stub
-}
 
-type result = struct {
-	value any
-	err   error
+	pending map[uint32]func(packet BER.GetResponse)
+	stub    *stub.Stub
 }
 
 type callback struct {
-	pipe chan []uint8
+	error    func(err error)
+	dispatch func(packet any)
 }
 
 func (c callback) OnENQ() {
@@ -35,21 +33,23 @@ func (c callback) OnACK() {
 }
 
 func (c callback) OnMessage(header []uint8, content []uint8) {
-	select {
-	case c.pipe <- content:
-	default:
+	if packet, err := BER.Decode(content); err != nil {
+		c.error(err)
+	} else {
+		c.dispatch(packet)
 	}
 }
 
 func NewSSMP() *SSMP {
 	requests := make(chan []byte, 1)
-	replies := make(chan []byte, 1)
+	rx := make(chan []byte, 1)
 	ssmp := SSMP{
 		queue:    make(chan func()),
 		requests: requests,
-		replies:  replies,
+		rx:       rx,
 		wg:       sync.WaitGroup{},
-		stub:     stub.NewStub(requests, replies),
+		pending:  map[uint32]func(packet BER.GetResponse){},
+		stub:     stub.NewStub(requests, rx),
 	}
 
 	return &ssmp
@@ -58,6 +58,20 @@ func NewSSMP() *SSMP {
 func (s *SSMP) Run() error {
 	infof("run::start")
 
+	// ... RX queue
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+		s.receive()
+	}()
+
+	// ... TX queue
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+		s.dequeue()
+	}()
+
 	// ... stub
 	s.wg.Add(1)
 	go func() {
@@ -65,30 +79,54 @@ func (s *SSMP) Run() error {
 		s.stub.Run()
 	}()
 
-	// ... dequeue
-	s.wg.Add(1)
-	go func() {
-		defer s.wg.Done()
-		s.dequeue()
-	}()
-
 	infof("run::exit")
 
 	return nil
 }
 
-func (s *SSMP) dequeue() {
-loop:
-	for {
-		select {
-		case f, ok := <-s.queue:
-			if ok {
-				f()
-			} else {
-				break loop
-			}
+func (s *SSMP) receive() {
+	codec := bisync.NewBisync()
+
+	h := callback{
+		error: func(err error) {
+			errorf("%v", err)
+		},
+
+		dispatch: func(packet any) {
+			s.dispatch(packet)
+		},
+	}
+
+	for packet := range s.rx {
+		if err := codec.Decode(packet, h); err != nil {
+			warnf("%v", err)
 		}
 	}
+
+	infof("rx::exit")
+}
+
+func (s *SSMP) dequeue() {
+	for f := range s.queue {
+		f()
+	}
+
+	infof("tx::exit")
+}
+
+func (s *SSMP) dispatch(packet any) {
+	switch v := packet.(type) {
+	case BER.GetResponse:
+		if h, ok := s.pending[v.RequestID]; ok && h != nil {
+			h(v)
+		} else {
+			warnf("no handler for GET response %v", v.RequestID)
+		}
+
+	default:
+		errorf("unknown packet type (%T)", packet)
+	}
+
 }
 
 func (s *SSMP) Stop() error {
@@ -98,7 +136,7 @@ func (s *SSMP) Stop() error {
 
 	go func() {
 		close(s.requests)
-		close(s.replies)
+		close(s.rx)
 		close(s.queue)
 
 		s.wg.Wait()
@@ -135,75 +173,28 @@ func (s *SSMP) Get(oid string) (any, error) {
 		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
 		} else {
-			codec := bisync.NewBisync()
-			pipe := make(chan result)
-			h := callback{
-				pipe: make(chan []uint8, 1),
-			}
+			pipe := make(chan BER.GetResponse, 1)
 
-			f := func() {
-				s.requests <- encoded
+			defer close(pipe)
 
-				select {
-				case reply := <-s.replies:
-					if err := codec.Decode(reply, h); err != nil {
-						pipe <- result{
-							value: nil,
-							err:   err,
-						}
-					} else {
-						select {
-						case <-time.After(100 * time.Millisecond):
-							pipe <- result{
-								value: nil,
-								err:   fmt.Errorf("timeout decoding response"),
-							}
-
-						case decoded := <-h.pipe:
-							if packet, err := BER.Decode(decoded); err != nil {
-								pipe <- result{
-									value: nil,
-									err:   err,
-								}
-							} else if response, ok := packet.(BER.GetResponse); !ok {
-								pipe <- result{
-									value: nil,
-									err:   fmt.Errorf("invalid reply type (%T)", packet),
-								}
-							} else if response.RequestID != rq.RequestID {
-								pipe <- result{
-									value: nil,
-									err:   fmt.Errorf("invalid response ID (%v)", response.RequestID),
-								}
-							} else if response.Error != 0 {
-								pipe <- result{
-									value: nil,
-									err:   fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex),
-								}
-							} else {
-								pipe <- result{
-									value: response.Value,
-									err:   nil,
-								}
-							}
-						}
-					}
-
-				case <-time.After(2500 * time.Millisecond):
-					pipe <- result{
-						value: nil,
-						err:   fmt.Errorf("timeout"),
-					}
+			s.queue <- func() {
+				s.pending[rq.RequestID] = func(packet BER.GetResponse) {
+					pipe <- packet
 				}
-				// }
+
+				s.requests <- encoded
 			}
 
-			s.queue <- f
+			select {
+			case <-time.After(2500 * time.Millisecond):
+				return nil, fmt.Errorf("timeout")
 
-			if v := <-pipe; v.err != nil {
-				return nil, err
-			} else {
-				return v.value, nil
+			case response := <-pipe:
+				if response.Error != 0 {
+					return nil, fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex)
+				} else {
+					return response.Value, nil
+				}
 			}
 		}
 	}
@@ -212,22 +203,24 @@ func (s *SSMP) Get(oid string) (any, error) {
 func (s *SSMP) Set(oid string, value any) (any, error) {
 	debugf("set %v %v", oid, value)
 
-	pipe := make(chan result)
+	// pipe := make(chan result)
+	//
+	// f := func() {
+	// 	value, err := s.stub.Set(oid, value)
+	//
+	// 	pipe <- result{
+	// 		value: value,
+	// 		err:   err,
+	// 	}
+	// }
+	//
+	// s.queue <- f
+	//
+	// v := <-pipe
+	//
+	// return v.value, v.err
 
-	f := func() {
-		value, err := s.stub.Set(oid, value)
-
-		pipe <- result{
-			value: value,
-			err:   err,
-		}
-	}
-
-	s.queue <- f
-
-	v := <-pipe
-
-	return v.value, v.err
+	return nil, fmt.Errorf("NOT IMPLEMENTED")
 }
 
 func debugf(format string, args ...any) {
