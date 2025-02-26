@@ -17,9 +17,9 @@ type SSMP struct {
 	requests chan []byte
 	rx       chan []byte
 	wg       sync.WaitGroup
+	pending  pending[BER.GetResponse]
 
-	pending pending
-	stub    *stub.Stub
+	stub *stub.Stub
 }
 
 type callback struct {
@@ -51,8 +51,8 @@ func NewSSMP() *SSMP {
 		requests: requests,
 		rx:       rx,
 		wg:       sync.WaitGroup{},
-		pending: pending{
-			m: map[uint32]e{},
+		pending: pending[BER.GetResponse]{
+			m: map[uint32]e[BER.GetResponse]{},
 		},
 		stub: stub.NewStub(requests, rx),
 	}
@@ -173,12 +173,10 @@ func (s *SSMP) Get(oid string) (any, error) {
 		return nil, err
 	} else {
 		rq := BER.GetRequest{
-			Version:    0,
-			Community:  "public",
-			RequestID:  ID.Add(1),
-			Error:      0,
-			ErrorIndex: 0,
-			OID:        o,
+			Version:   0,
+			Community: "public",
+			RequestID: ID.Add(1),
+			OID:       o,
 		}
 
 		if packet, err := BER.EncodeGetRequest(rq); err != nil {
@@ -221,24 +219,52 @@ func (s *SSMP) Get(oid string) (any, error) {
 func (s *SSMP) Set(oid string, value any) (any, error) {
 	debugf("set %v %v", oid, value)
 
-	// pipe := make(chan result)
-	//
-	// f := func() {
-	// 	value, err := s.stub.Set(oid, value)
-	//
-	// 	pipe <- result{
-	// 		value: value,
-	// 		err:   err,
-	// 	}
-	// }
-	//
-	// s.queue <- f
-	//
-	// v := <-pipe
-	//
-	// return v.value, v.err
+	if o, err := BER.ParseOID(oid); err != nil {
+		return nil, err
+	} else {
+		rq := BER.SetRequest{
+			Version:   0,
+			Community: "public",
+			RequestID: ID.Add(1),
+			OID:       o,
+			Value:     value,
+		}
 
-	return nil, fmt.Errorf("NOT IMPLEMENTED")
+		if packet, err := BER.EncodeSetRequest(rq); err != nil {
+			return nil, err
+		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
+			return nil, err
+		} else {
+			pipe := make(chan BER.GetResponse, 1)
+			done := make(chan struct{})
+
+			defer close(pipe)
+			defer close(done)
+			defer s.pending.delete(rq.RequestID)
+
+			s.queue <- func() {
+				s.pending.put(rq.RequestID, func(packet BER.GetResponse) {
+					pipe <- packet
+				})
+
+				s.requests <- encoded
+
+				<-done
+			}
+
+			select {
+			case <-time.After(2500 * time.Millisecond):
+				return nil, fmt.Errorf("timeout")
+
+			case response := <-pipe:
+				if response.Error != 0 {
+					return nil, fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex)
+				} else {
+					return response.Value, nil
+				}
+			}
+		}
+	}
 }
 
 func debugf(format string, args ...any) {

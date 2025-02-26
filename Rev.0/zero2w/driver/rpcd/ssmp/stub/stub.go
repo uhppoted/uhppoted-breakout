@@ -45,9 +45,7 @@ func (s *Stub) Run() {
 				warnf("%v", err)
 			} else if packet == nil {
 				warnf("invalid packet (%v)", packet)
-			} else if rq, ok := packet.(BER.GetRequest); !ok {
-				warnf("unhandled packet type (%T)", packet)
-			} else {
+			} else if rq, ok := packet.(BER.GetRequest); ok {
 				oid := fmt.Sprintf("%v", rq.OID)
 
 				if v, err := s.get(oid); err != nil {
@@ -71,6 +69,33 @@ func (s *Stub) Run() {
 						s.replies <- reply
 					}
 				}
+			} else if rq, ok := packet.(BER.SetRequest); ok {
+				oid := fmt.Sprintf("%v", rq.OID)
+				value := rq.Value
+
+				if v, err := s.set(oid, value); err != nil {
+					warnf("error fulfilling SET request (%v)", err)
+				} else {
+					response := BER.GetResponse{
+						Version:    0,
+						Community:  "public",
+						RequestID:  rq.RequestID,
+						Error:      0,
+						ErrorIndex: 0,
+						OID:        rq.OID,
+						Value:      v,
+					}
+
+					if packet, err := BER.EncodeGetResponse(response); err != nil {
+						warnf("%v", err)
+					} else if reply, err := bisync.Encode(nil, packet); err != nil {
+						warnf("%v", err)
+					} else {
+						s.replies <- reply
+					}
+				}
+			} else {
+				warnf("unhandled packet type (%T)", packet)
 			}
 		},
 	}
@@ -103,7 +128,7 @@ func (s Stub) get(oid string) (any, error) {
 	}
 
 	// ... controller date/time
-	if oid == ".1.3.6.1.4.1.65536.2.8" {
+	if oid == "0.1.3.6.1.4.1.65536.2.8" {
 		return time.Now().Format("2006-01-02 15:04:05"), nil
 	}
 
@@ -230,11 +255,11 @@ func (s Stub) get(oid string) (any, error) {
 	return nil, fmt.Errorf("unknown OID %v", oid)
 }
 
-func (s Stub) Set(oid string, value any) (any, error) {
+func (s Stub) set(oid string, value any) (any, error) {
 	debugf("set %v %v", oid, value)
 
 	// ... controller date/time
-	if oid == ".1.3.6.1.4.1.65536.2.8" {
+	if oid == "0.1.3.6.1.4.1.65536.2.8" {
 		return time.Now().Format("2006-01-02 15:04:05"), nil
 	}
 

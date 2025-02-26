@@ -28,13 +28,15 @@ func EncodeGetRequest(rq GetRequest) ([]byte, error) {
 		pdu = append(pdu, v)
 	}
 
-	if v, err := pack_integer(rq.Error); err != nil {
+	// ... error
+	if v, err := pack_integer(0); err != nil {
 		return nil, err
 	} else {
 		pdu = append(pdu, v)
 	}
 
-	if v, err := pack_integer(rq.ErrorIndex); err != nil {
+	// ... error index
+	if v, err := pack_integer(0); err != nil {
 		return nil, err
 	} else {
 		pdu = append(pdu, v)
@@ -164,6 +166,104 @@ func EncodeGetResponse(response GetResponse) ([]byte, error) {
 	}
 
 	if v, err := pack_pdu(tagGetResponse, pdu); err != nil {
+		return nil, err
+	} else {
+		packet = append(packet, v)
+	}
+
+	return pack_sequence(packet...)
+}
+
+func EncodeSetRequest(rq SetRequest) ([]byte, error) {
+	packet := [][]byte{}
+
+	if v, err := pack_integer(int64(rq.Version)); err != nil {
+		return nil, err
+	} else {
+		packet = append(packet, v)
+	}
+
+	if v, err := pack_octets(rq.Community); err != nil {
+		return nil, err
+	} else {
+		packet = append(packet, v)
+	}
+
+	pdu := [][]byte{}
+
+	if v, err := pack_integer(int64(rq.RequestID)); err != nil {
+		return nil, err
+	} else {
+		pdu = append(pdu, v)
+	}
+
+	// ... error
+	if v, err := pack_integer(0); err != nil {
+		return nil, err
+	} else {
+		pdu = append(pdu, v)
+	}
+
+	// ... error index
+	if v, err := pack_integer(0); err != nil {
+		return nil, err
+	} else {
+		pdu = append(pdu, v)
+	}
+
+	varbindlist := [][]byte{}
+	varbind := [][]byte{}
+
+	if v, err := pack_oid(rq.OID); err != nil {
+		return nil, err
+	} else {
+		varbind = append(varbind, v)
+	}
+
+	// ... value
+	switch val := rq.Value.(type) {
+	case uint32:
+		if v, err := pack_integer(int64(val)); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+
+	case uint16:
+		if v, err := pack_integer(int64(val)); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+
+	case string:
+		if v, err := pack_octets(string(val)); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+
+	default:
+		if v, err := pack_null(); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+	}
+
+	if v, err := pack_sequence(varbind...); err != nil {
+		return nil, err
+	} else {
+		varbindlist = append(varbindlist, v)
+	}
+
+	if v, err := pack_sequence(varbindlist...); err != nil {
+		return nil, err
+	} else {
+		pdu = append(pdu, v)
+	}
+
+	if v, err := pack_pdu(tagSetRequest, pdu); err != nil {
 		return nil, err
 	} else {
 		packet = append(packet, v)

@@ -43,12 +43,10 @@ func TestDecodeGetRequest(t *testing.T) {
 	}
 
 	expected := GetRequest{
-		Version:    0,
-		Community:  "public",
-		RequestID:  12345,
-		Error:      0,
-		ErrorIndex: 0,
-		OID:        OID{0, 1, 3, 6, 1, 4, 1, 65536, 2, 1},
+		Version:   0,
+		Community: "public",
+		RequestID: 12345,
+		OID:       OID{0, 1, 3, 6, 1, 4, 1, 65536, 2, 1},
 	}
 
 	if rq, err := Decode(packet); err != nil {
@@ -99,5 +97,47 @@ func TestDecodeGetResponse(t *testing.T) {
 		t.Errorf("error decoding GET response (%v)", err)
 	} else if !reflect.DeepEqual(rq, expected) {
 		t.Errorf("incorrectly decoded GET response\n   expected:%#v\n   got:     %#v", expected, rq)
+	}
+}
+
+// 48 60                                     SEQUENCE
+//
+//	2 1 0                                    INTEGER 0
+//	4 6 112 117 98 108 105 99                STRING  public
+//	163 47                                   PDU     SET-REQUEST
+//	    2 2 48 57                            INTEGER
+//	    2 1 0                                INTEGER error:0
+//	    2 1 0                                INTEGER error index:0
+//	    48 35                                SEQUENCE
+//	       48 33                             SEQUENCE
+//	          6 10 43 6 1 4 1 132 128 0 2 1  OID "0.1.3.6.1.4.1.65536.2.1"
+//	          4 19 "2025-02-26 14:13:48"     STRING "2025-02-26 14:13:48"
+func TestDecodeSetRequest(t *testing.T) {
+	packet := []byte{
+		48, 60,
+		2, 1, 0,
+		4, 6, 112, 117, 98, 108, 105, 99,
+		163, 47,
+		2, 2, 48, 57,
+		2, 1, 0,
+		2, 1, 0,
+		48, 35,
+		48, 33,
+		6, 10, 43, 6, 1, 4, 1, 132, 128, 0, 2, 8,
+		4, 19, 50, 48, 50, 53, 45, 48, 50, 45, 50, 54, 32, 49, 52, 58, 49, 51, 58, 52, 56,
+	}
+
+	expected := SetRequest{
+		Version:   0,
+		Community: "public",
+		RequestID: 12345,
+		OID:       OID{0, 1, 3, 6, 1, 4, 1, 65536, 2, 8},
+		Value:     "2025-02-26 14:13:48",
+	}
+
+	if rq, err := Decode(packet); err != nil {
+		t.Errorf("error decoding SET request (%v)", err)
+	} else if !reflect.DeepEqual(rq, expected) {
+		t.Errorf("incorrectly decoded SET request\n   expected:%#v\n   got:     %#v", expected, rq)
 	}
 }

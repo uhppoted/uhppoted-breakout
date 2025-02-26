@@ -21,22 +21,16 @@ func Decode(bytes []byte) (any, error) {
 		return nil, fmt.Errorf("invalid packet PDU")
 	} else if vars := PDU.vars; len(vars) < 1 {
 		return nil, fmt.Errorf("invalid packet variable bind list")
-		// } else if v := vars[0]; len(v) < 2 {
-		// 	return nil, fmt.Errorf("invalid packet variable list %v", len(v))
-		// } else if oid, ok := v[0].(OID); !ok {
-		// 	return nil, fmt.Errorf("invalid packet variable OID")
 	} else {
 		v := vars[0]
 
 		switch PDU.tag {
 		case tagGetRequest:
 			return GetRequest{
-				Version:    uint8(version),
-				Community:  community,
-				RequestID:  PDU.requestId,
-				Error:      PDU.errorCode,
-				ErrorIndex: PDU.errorIndex,
-				OID:        v.oid,
+				Version:   uint8(version),
+				Community: community,
+				RequestID: PDU.requestId,
+				OID:       v.oid,
 			}, nil
 
 		case tagGetResponse:
@@ -48,6 +42,15 @@ func Decode(bytes []byte) (any, error) {
 				ErrorIndex: PDU.errorIndex,
 				OID:        v.oid,
 				Value:      v.value,
+			}, nil
+
+		case tagSetRequest:
+			return SetRequest{
+				Version:   uint8(version),
+				Community: community,
+				RequestID: PDU.requestId,
+				OID:       v.oid,
+				Value:     v.value,
 			}, nil
 
 		default:
@@ -83,6 +86,9 @@ func unpack(bytes []byte) (any, []byte, error) {
 
 		case tagGetResponse:
 			return unpack_PDU(tagGetResponse, bytes)
+
+		case tagSetRequest:
+			return unpack_PDU(tagSetRequest, bytes)
 
 		case tagSequence:
 			return unpack_sequence(bytes)

@@ -9,7 +9,7 @@
     - [x] serialize request-responses again
     - [x] expire SSMP.pending entries
     - [x] GET
-    - [ ] SET
+    - [x] SET
     - [ ] UART
     - [ ] cache controller ID
     - [ ] monitor
