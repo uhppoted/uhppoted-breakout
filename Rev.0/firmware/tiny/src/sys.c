@@ -47,9 +47,6 @@ bool sys_init() {
         return false;
     }
 
-    log_init();
-    cli_init();
-
     // ... startup message
     char s[64];
 
@@ -64,13 +61,10 @@ bool sys_init() {
     return true;
 }
 
-/* Blinks SYSLED and resets watchdog.
+/* Blinks SYSLED.
  *
  */
 void sys_tick() {
-    syscheck();
-
-    // ... flash LED
     uint16_t errors = get_errors();
 
     sys.LED.LED = !sys.LED.LED;
@@ -103,17 +97,7 @@ void sys_tick() {
     }
 }
 
-void sys_debug() {
-    absolute_time_t now = get_absolute_time();
-    bool watchdog_tick = tick_is_running(TICK_WATCHDOG);
-    uint64_t timer_time = time_us_64();
-
-    printf(">> now: %llu\n", now);
-    printf(">> watchdog tick: %s\n", watchdog_tick ? "ok" : "stopped");
-    printf(">> timer time (us): %llu\n", timer_time);
-    printf("-------\n");
-}
-
+// NTS: mutex because the LED was occasionally used for debugging
 void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {
     if (mutex_try_enter(&sys.LED.guard, NULL)) {
         uint32_t rgb = (red << 16u) | (green << 8u) | (blue / 16 << 0u);

@@ -113,6 +113,10 @@ bool sysinit() {
         return false;
     }
 
+    // ... other stuff
+    log_init();
+    cli_init();
+
     return true;
 }
 
@@ -302,6 +306,7 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_TICK) {
+        syscheck();
         sys_tick();
 
         // ... MODE_CLI timeout?

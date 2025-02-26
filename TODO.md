@@ -21,14 +21,11 @@
 
 - [x] SYS, IN and ERR only work intermittently
       - [x] investigate weirdness around health check
-      - [ ] Check health check weirdness with active SSMP
+      - [x] Recheck health check weirdness with active SSMP
 
-- [x] release build without `cmake -DCMAKE_BUILD_TYPE=Debug`
-- [ ] Commonalise sys implementation into core::sys
+- [x] Commonalise sys implementation into core::sys
 
-- [ ] Rework print queue
-      - (?) check USB connected
-      - (?) setvbuf
+- (?) doors should be unlocked on boot/power-off but locked otherwise
 
 - [ ] syserror
       - [x] red LED on any system error 
@@ -36,13 +33,15 @@
       - (?) count up/down to auto-clear
       - (?) display in 'poke'
 
+- [ ] Rework print queue
+      - (?) check USB connected
+      - (?) setvbuf
+
 - [ ] Use Pico optimized libraries
       - pico_mem_ops
       - pico_printf
       - pico_malloc
       - pico_stdio
-
-- (?) doors should be unlocked on boot/power-off but locked otherwise
 
 ### SSMP
     - GET

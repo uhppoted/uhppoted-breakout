@@ -32,7 +32,6 @@ void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
 void on_SSMP();
 
-extern void sys_debug();
 extern void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
 
 const uint8_t EXPECTED[] = {48, 16, 48, 14, 6, 10, 43, 6, 1, 4, 1, 132, 128, 0, 2, 1, 5, 0};
