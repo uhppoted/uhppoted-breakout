@@ -6,10 +6,11 @@
     - [x] decoding
     - [x] auto-increment request ID
     - [x] guard around SSMP.pending
-    - [ ] serialize request-responses again
-    - [ ] expire SSMP.pending entries
+    - [x] serialize request-responses again
+    - [x] expire SSMP.pending entries
     - [x] GET
     - [ ] SET
+    - [ ] UART
     - [ ] cache controller ID
     - [ ] monitor
     - [ ] daemonize

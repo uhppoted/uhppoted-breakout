@@ -22,36 +22,6 @@ type SSMP struct {
 	stub    *stub.Stub
 }
 
-type pending struct {
-	m     map[uint32]func(packet BER.GetResponse)
-	guard sync.RWMutex
-}
-
-func (p *pending) put(id uint32, f func(packet BER.GetResponse)) {
-	p.guard.Lock()
-	defer p.guard.Unlock()
-
-	p.m[id] = f
-}
-
-func (p *pending) delete(id uint32) {
-	p.guard.Lock()
-	defer p.guard.Unlock()
-
-	delete(p.m, id)
-}
-
-func (p *pending) get(id uint32) func(packet BER.GetResponse) {
-	p.guard.RLock()
-	defer p.guard.RUnlock()
-
-	if f, ok := p.m[id]; ok {
-		return f
-	}
-
-	return nil
-}
-
 type callback struct {
 	error    func(err error)
 	dispatch func(packet any)
@@ -82,7 +52,7 @@ func NewSSMP() *SSMP {
 		rx:       rx,
 		wg:       sync.WaitGroup{},
 		pending: pending{
-			m: map[uint32]func(packet BER.GetResponse){},
+			m: map[uint32]e{},
 		},
 		stub: stub.NewStub(requests, rx),
 	}
@@ -105,6 +75,14 @@ func (s *SSMP) Run() error {
 	go func() {
 		defer s.wg.Done()
 		s.dequeue()
+	}()
+
+	// ... housekeeping
+	go func() {
+		tick := time.Tick(5 * time.Second)
+		for range tick {
+			s.pending.sweep()
+		}
 	}()
 
 	// ... stub
@@ -209,8 +187,10 @@ func (s *SSMP) Get(oid string) (any, error) {
 			return nil, err
 		} else {
 			pipe := make(chan BER.GetResponse, 1)
+			done := make(chan struct{})
 
 			defer close(pipe)
+			defer close(done)
 			defer s.pending.delete(rq.RequestID)
 
 			s.queue <- func() {
@@ -219,6 +199,8 @@ func (s *SSMP) Get(oid string) (any, error) {
 				})
 
 				s.requests <- encoded
+
+				<-done
 			}
 
 			select {
