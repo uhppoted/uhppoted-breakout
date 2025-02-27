@@ -9,6 +9,8 @@
 #include <I2C0.h>
 #include <breakout.h>
 
+#define LOGTAG "I2C0"
+
 struct {
     queue_t queue;
     mutex_t guard;
@@ -56,7 +58,7 @@ void I2C0_run() {
 
 bool I2C0_push(const closure *v) {
     if (queue_is_full(&I2C0.queue) || !queue_try_add(&I2C0.queue, v)) {
-        set_error(ERR_QUEUE_FULL, "I2C0", "push: queue full");
+        set_error(ERR_QUEUE_FULL, LOGTAG, "push: queue full");
         return false;
     }
 

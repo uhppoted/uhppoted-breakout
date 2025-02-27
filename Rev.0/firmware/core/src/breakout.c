@@ -1,5 +1,7 @@
 #include <breakout.h>
 
+#define LOGTAG "SYS"
+
 struct {
     struct {
         bool queue;
@@ -62,7 +64,7 @@ bool push(message msg) {
     }
 
     if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
-        set_error(ERR_QUEUE_FULL, "SYS", "queue full");
+        set_error(ERR_QUEUE_FULL, LOGTAG, "queue full");
         return false;
     }
 

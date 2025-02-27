@@ -54,7 +54,7 @@ struct {
  * Initialises the RX8900SA.
  */
 void RTC_init() {
-    infof("RTC", "init");
+    infof(LOGTAG, "init");
 
     // ... initialise RX8900SA
     int err;
@@ -86,7 +86,7 @@ void RTC_init() {
     sleep_us(64);
     rtc_set_datetime(&t);
 
-    infof("RTC", "initialised %p", &RTC);
+    infof(LOGTAG, "initialised %p", &RTC);
 }
 
 /*
@@ -98,9 +98,7 @@ int64_t RTC_on_setup(alarm_id_t id, void *data) {
         .data = &RTC,
     };
 
-    if (!I2C0_push(&task)) {
-        set_error(ERR_QUEUE_FULL, "RTC", "setup: queue full");
-    }
+    I2C0_push(&task);
 
     return 0;
 }
@@ -114,9 +112,9 @@ void RTC_setup() {
     if ((err = RX8900SA_setup(U5)) == ERR_OK) {
         RTC.initialised = true;
         RTC.ready = false;
-        infof("RTC", "ready");
+        infof(LOGTAG, "ready");
     } else {
-        warnf("RTC", "setup failed");
+        warnf(LOGTAG, "setup failed");
     }
 }
 
@@ -124,16 +122,14 @@ void RTC_setup() {
  * Synchronizes on-board RTC to RX8900SA every 60s.
  */
 void RTC_start() {
-    infof("RTC", "start");
+    infof(LOGTAG, "start");
 
     closure task = {
         .f = RTC_read,
         .data = &RTC,
     };
 
-    if (!I2C0_push(&task)) {
-        set_error(ERR_QUEUE_FULL, "RTC", "update: queue full");
-    }
+    I2C0_push(&task);
 
     add_repeating_timer_ms(60000, RTC_on_update, NULL, &RTC.timer);
 }
@@ -144,9 +140,7 @@ bool RTC_on_update(repeating_timer_t *rt) {
         .data = &RTC,
     };
 
-    if (!I2C0_push(&task)) {
-        set_error(ERR_QUEUE_FULL, LOGTAG, "update: queue full");
-    }
+    I2C0_push(&task);
 
     return true;
 }
@@ -169,7 +163,7 @@ void RTC_read(void *data) {
         if (mutex_try_enter(&RTC.guard, NULL)) {
 
             if ((err = RX8900SA_get_date(U5, &year, &month, &day)) != ERR_OK) {
-                set_error(ERR_RX8900SA, "RTC", "get-date error %d", err);
+                set_error(ERR_RX8900SA, LOGTAG, "get-date error %d", err);
                 ok = false;
             } else {
                 RTC.year = year;
@@ -178,7 +172,7 @@ void RTC_read(void *data) {
             }
 
             if ((err = RX8900SA_get_time(U5, &hour, &minute, &second)) != ERR_OK) {
-                set_error(ERR_RX8900SA, "RTC", "get-time error %d", err);
+                set_error(ERR_RX8900SA, LOGTAG, "get-time error %d", err);
                 ok = false;
             } else {
                 RTC.hour = hour;
@@ -187,7 +181,7 @@ void RTC_read(void *data) {
             }
 
             if ((err = RX8900SA_get_dow(U5, &weekday)) != ERR_OK) {
-                set_error(ERR_RX8900SA, "RTC", "get-dow error %d", err);
+                set_error(ERR_RX8900SA, LOGTAG, "get-dow error %d", err);
                 ok = false;
             } else {
                 RTC.dow = weekday;
@@ -195,7 +189,7 @@ void RTC_read(void *data) {
 
             if (!RTC.ready && ok) {
                 RTC.ready = true;
-                infof("RTC", "READY %04d-%02d-%02d %02d:%02d:%02d", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
+                infof(LOGTAG, "READY %04d-%02d-%02d %02d:%02d:%02d", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
             }
 
             // // ... update onboard RTC
@@ -233,9 +227,9 @@ void RTC_write(void *data) {
             int err;
 
             if ((err = RX8900SA_set_date(U5, year, month, day)) != ERR_OK) {
-                warnf("RTC", "set-date error %d", err);
+                warnf(LOGTAG, "set-date error %d", err);
             } else if ((err = RX8900SA_set_dow(U5, dow)) != ERR_OK) {
-                warnf("RTC", "set-date error %d", err);
+                warnf(LOGTAG, "set-date error %d", err);
             } else if (mutex_try_enter(&RTC.guard, NULL)) {
                 RTC.year = year;
                 RTC.month = month;
@@ -252,7 +246,7 @@ void RTC_write(void *data) {
             int err;
 
             if ((err = RX8900SA_set_time(U5, hour, minute, second)) != ERR_OK) {
-                warnf("RTC", "set-time error %d", err);
+                warnf(LOGTAG, "set-time error %d", err);
             } else if (mutex_try_enter(&RTC.guard, NULL)) {
                 RTC.hour = hour;
                 RTC.minute = minute;
@@ -269,7 +263,7 @@ void RTC_write(void *data) {
  * Resets the RTC.
  */
 void RTC_reset() {
-    infof("RTC", "reset");
+    infof(LOGTAG, "reset");
 
     RTC.initialised = false;
     RTC.ready = false;
@@ -322,12 +316,9 @@ bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
                 .data = &RTC,
             };
 
-            if (!I2C0_push(&write)) {
-                set_error(ERR_QUEUE_FULL, LOGTAG, "set-date: queue full");
+            if (I2C0_push(&write)) {
                 datetime_free(dt);
-            } else if (!I2C0_push(&read)) {
-                set_error(ERR_QUEUE_FULL, LOGTAG, "update: queue full");
-            } else {
+            } else if (I2C0_push(&read)) {
                 return true;
             }
         }
@@ -379,11 +370,8 @@ bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
             };
 
             if (!I2C0_push(&write)) {
-                set_error(ERR_QUEUE_FULL, LOGTAG, "set-time: queue full");
                 datetime_free(dt);
-            } else if (!I2C0_push(&read)) {
-                set_error(ERR_QUEUE_FULL, LOGTAG, "set-time: queue full");
-            } else {
+            } else if (I2C0_push(&read)) {
                 return true;
             }
         }

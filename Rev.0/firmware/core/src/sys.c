@@ -154,7 +154,7 @@ void syscheck() {
     float used = 1.0 - ((float)available / (float)heap);
 
     if (used > 0.5 && !get_error(ERR_MEMORY)) {
-        set_error(ERR_MEMORY, LOGTAG, "memory usage %.1f%", 100.0 * used);
+        set_error(ERR_MEMORY, LOGTAG, "memory usage %d%%", (int)(100.0 * used));
     }
 
     // ... kick watchdog

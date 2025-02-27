@@ -18,6 +18,7 @@
 #include <mempool.h>
 #include <sys.h>
 
+#define LOGTAG "SYS"
 #define _VERSION "v0.0"
 #define _I2C0SDA 12
 #define _I2C0SCL 13
@@ -37,7 +38,7 @@ int main() {
     stdio_init_all();
 
     if (watchdog_caused_reboot()) {
-        set_error(ERR_WATCHDOG, "SYS", "watchdog reboot");
+        set_error(ERR_WATCHDOG, LOGTAG, "watchdog reboot");
 
         // FIXME remove - debugging
         printf(">>>> WATCHDOG REBOOT\n");

@@ -19,19 +19,14 @@
 
 ### misc
 
-- [x] SYS, IN and ERR only work intermittently
-      - [x] investigate weirdness around health check
-      - [x] Recheck health check weirdness with active SSMP
-
-- [x] Commonalise sys implementation into core::sys
-
-- (?) doors should be unlocked on boot/power-off but locked otherwise
-
 - [ ] syserror
       - [x] red LED on any system error 
+      - [ ] make debugf, infof, etc interrupt safe
       - [ ] log once on occurrence
+      - [ ] CLI show errors
       - (?) count up/down to auto-clear
-      - (?) display in 'poke'
+
+- [ ] configurable door unlock inverted/normal
 
 - [ ] Rework print queue
       - (?) check USB connected

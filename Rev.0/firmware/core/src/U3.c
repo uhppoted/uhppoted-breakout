@@ -8,6 +8,8 @@
 #include <breakout.h>
 #include <log.h>
 
+#define LOGTAG "U3"
+
 typedef struct IIR {
     float x₁;
     float y₁;
@@ -119,45 +121,45 @@ float lpf₁(IIR *iir, float in);
 float lpf₂(IIR *iir, float in);
 
 void U3_init() {
-    infof("U3", "init");
+    infof(LOGTAG, "init");
 
     // ... configure PCAL6408A
     int err;
 
     if ((err = PCAL6408A_init(U3)) != ERR_OK) {
-        warnf("U3", "error initialising PCAL6408A (%d)", err);
+        warnf(LOGTAG, "error initialising PCAL6408A (%d)", err);
     }
 
     if ((err = PCAL6408A_set_configuration(U3, 0xff)) != ERR_OK) {
-        warnf("U3", "error configuring PCAL6408A (%d)", err);
+        warnf(LOGTAG, "error configuring PCAL6408A (%d)", err);
     }
 
     if ((err = PCAL6408A_set_polarity(U3, PB1 | PB2 | PB3 | PB4)) != ERR_OK) {
-        warnf("U3", "error setting PCAL6408A polarity (%d)", err);
+        warnf(LOGTAG, "error setting PCAL6408A polarity (%d)", err);
     }
 
     if ((err = PCAL6408A_set_pullups(U3, U3_PULLUPS)) != ERR_OK) {
-        warnf("U3", "error setting PCAL6408A pullups (%d)", err);
+        warnf(LOGTAG, "error setting PCAL6408A pullups (%d)", err);
     }
 
     if ((err = PCAL6408A_set_latched(U3, 0x00)) != ERR_OK) {
-        warnf("U3", "error setting PCAL6408A latches (%d)", err);
+        warnf(LOGTAG, "error setting PCAL6408A latches (%d)", err);
     }
 
     if ((err = PCAL6408A_set_interrupts(U3, 0xff)) != ERR_OK) {
-        warnf("U3", "error disabling PCAL6408A interrupts (%d)", err);
+        warnf(LOGTAG, "error disabling PCAL6408A interrupts (%d)", err);
     }
 
     uint8_t inputs;
     PCAL6408A_read(U3, &inputs); // clear any existing interrupts
 
-    debugf("U3", "initial state %02x %08b", inputs, inputs);
-    infof("U3", "initialised");
+    debugf(LOGTAG, "initial state %02x %08b", inputs, inputs);
+    infof(LOGTAG, "initialised");
 }
 
 // Starts the 1kHz input sampling
 void U3_start() {
-    infof("U3", "start");
+    infof(LOGTAG, "start");
 
     add_repeating_timer_us(1000 * U3_TICK, U3_on_update, NULL, &U3x.timer);
 }
@@ -168,9 +170,7 @@ bool U3_on_update(repeating_timer_t *rt) {
         .data = &U3x,
     };
 
-    if (!I2C0_push(&task)) {
-        set_error(ERR_QUEUE_FULL, "U3", "update: queue full");
-    }
+    I2C0_push(&task);
 
     return true;
 }
@@ -183,7 +183,7 @@ void U3_read(void *data) {
     int err;
 
     if ((err = PCAL6408A_read(U3, &inputs)) != ERR_OK) {
-        set_error(ERR_U3, "U3", "error reading PCAL6408A inputs (%d)", err);
+        set_error(ERR_U3, LOGTAG, "error reading PCAL6408A inputs (%d)", err);
     } else {
         message qmsg = {
             .message = MSG_U3,
@@ -230,13 +230,13 @@ void U3_process(uint8_t data) {
     if (inputs != U3x.inputs.state) {
         U3x.inputs.state = inputs;
 
-        debugf("U3", "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
+        debugf(LOGTAG, "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
     }
 
     if (stable != U3x.stable.state) {
         U3x.stable.state = stable;
 
-        debugf("U3", "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
+        debugf(LOGTAG, "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
     }
 }
 
