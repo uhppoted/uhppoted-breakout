@@ -22,6 +22,8 @@
 - [ ] syserror
       - [x] red LED on any system error 
       - [ ] make debugf, infof, etc interrupt safe
+            - use arg index
+            - predeclared int/float/etc args
       - [ ] log once on occurrence
       - [ ] CLI show errors
       - (?) count up/down to auto-clear

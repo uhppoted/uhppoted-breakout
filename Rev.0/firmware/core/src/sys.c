@@ -22,6 +22,8 @@
 #define LOGTAG "SYS"
 #define PRINT_QUEUE_SIZE 64
 
+extern queue_t queue;
+
 extern const char *TERMINAL_QUERY_STATUS;
 const int32_t FLUSH = 1000;              // ms
 const uint32_t MODE_CLI_TIMEOUT = 15000; // ms

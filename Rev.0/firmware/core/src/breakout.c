@@ -2,6 +2,8 @@
 
 #define LOGTAG "SYS"
 
+extern queue_t queue;
+
 struct {
     struct {
         bool queue;

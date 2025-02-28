@@ -1,6 +1,5 @@
 #pragma once
 
-#include <I2C.h>
 #include <hardware/uart.h>
 #include <pico/util/queue.h>
 
@@ -17,15 +16,6 @@ extern const uint32_t MSG_TRACE;
 extern const uint32_t MSG_LOG;
 extern const uint32_t MSG_WATCHDOG;
 
-extern const uint I2C0_SDA;
-extern const uint I2C0_SCL;
-extern const uint I2C1_SDA;
-extern const uint I2C1_SCL;
-
-extern const uint IOX_RESET;
-extern const uint IOX_INT0;
-extern const uint IOX_INT1;
-
 extern uart_inst_t *CLI_UART;
 extern const uint CLI_IRQ;
 extern const uint CLI_TX;
@@ -35,11 +25,6 @@ extern uart_inst_t *SSMP_UART;
 extern const uint SSMP_IRQ;
 extern const uint SSMP_TX;
 extern const uint SSMP_RX;
-
-extern const struct I2C U2;
-extern const struct I2C U3;
-extern const struct I2C U4;
-extern const struct I2C U5;
 
 typedef enum {
     ERR_OK,
@@ -79,6 +64,3 @@ typedef struct message {
 } message;
 
 bool push(message m);
-void set_error(err e, const char *tag, const char *fmt, ...);
-bool get_error(err e);
-uint16_t get_errors();
