@@ -1,3 +1,4 @@
+#include <I2C.h>
 #include <hardware/uart.h>
 #include <pico/types.h>
 
@@ -47,3 +48,27 @@ const uart_inst_t *SSMP_UART = uart1;
 const uint SSMP_IRQ = UART1_IRQ;
 const uint SSMP_TX = GPIO_4;
 const uint SSMP_RX = GPIO_5;
+
+// U2 PCAL6408A
+const struct I2C U2 = {
+    .bus = i2c1,
+    .addr = 0x40,
+};
+
+// U3 PCAL6408A
+const struct I2C U3 = {
+    .bus = i2c0,
+    .addr = 0x42,
+};
+
+// U4 PCAL6416A
+const struct I2C U4 = {
+    .bus = i2c0,
+    .addr = 0x40,
+};
+
+// U5 RX8900SA
+const struct I2C U5 = {
+    .bus = i2c0,
+    .addr = 0x64,
+};

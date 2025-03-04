@@ -18,6 +18,7 @@
 #include <log.h>
 #include <mempool.h>
 #include <sys.h>
+#include <types/buffer.h>
 
 #define LOGTAG "SYS"
 #define PRINT_QUEUE_SIZE 64
@@ -114,10 +115,6 @@ bool sysinit() {
     if (!add_repeating_timer_ms(250, _trace, &SYSTEM, &SYSTEM.trace.timer)) {
         return false;
     }
-
-    // ... other stuff
-    log_init();
-    cli_init();
 
     return true;
 }
@@ -293,8 +290,9 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_RX) {
         struct circular_buffer *b = (struct circular_buffer *)(SRAM_BASE | (v & 0x0fffffff));
-
-        SSMP_rx(b);
+        //
+        // SSMP_rx(b);
+        buffer_flush(b, NULL);
     }
 
     if ((v & MSG) == MSG_TTY) {

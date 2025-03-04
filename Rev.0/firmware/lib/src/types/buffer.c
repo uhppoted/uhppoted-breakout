@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include <types/buffer.h>
 
 bool buffer_push(circular_buffer *buffer, uint8_t ch) {
@@ -39,7 +41,9 @@ void buffer_flush(circular_buffer *buffer, void (*f)(uint8_t)) {
         ch = buffer->bytes[tail++];
         tail %= sizeof(buffer->bytes);
 
-        f(ch);
+        if (f != NULL) {
+            f(ch);
+        }
     }
 
     buffer->tail = tail;

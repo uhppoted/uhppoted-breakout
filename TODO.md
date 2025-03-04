@@ -10,10 +10,14 @@
     - [x] expire SSMP.pending entries
     - [x] GET
     - [x] SET
+    - (?) Context.WithTimeout 
+    - (?) https://go.dev/blog/synctest
     - [ ] UART
     - [ ] cache controller ID
     - [ ] monitor
     - [ ] daemonize
+    - https://github.com/hathach/tinyusb/blob/master/examples/device/cdc_dual_ports/CMakeLists.txt
+    - https://gist.github.com/9names/3936d1a1254f15a7ee6c6fa03d94cfa3
 
 ## breakout
 

@@ -17,6 +17,7 @@
 #include <sys.h>
 #include <types/buffer.h>
 
+#define LOGTAG "SSMP"
 #define BAUD_RATE 115200
 #define DATA_BITS 8
 #define STOP_BITS 1
@@ -73,7 +74,7 @@ struct {
 };
 
 void SSMP_init() {
-    debugf("SSMP", "init");
+    debugf(LOGTAG, "init");
 
     gpio_pull_up(SSMP_TX);
     gpio_pull_up(SSMP_RX);
@@ -95,7 +96,7 @@ void SSMP_init() {
 
 // Enables UART IRQ
 void SSMP_start() {
-    debugf("SSMP", "start");
+    debugf(LOGTAG, "start");
 
     irq_set_exclusive_handler(SSMP_IRQ, on_SSMP);
     uart_set_irq_enables(SSMP_UART, true, false);

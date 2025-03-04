@@ -1,3 +1,5 @@
 #pragma once
 
-extern void usb_init();
+#include <stdbool.h>
+
+extern bool usb_init();

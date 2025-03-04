@@ -46,14 +46,17 @@ bool sys_init() {
     if (!sysinit()) {
         return false;
     }
+    
+    log_init();
+    // cli_init();
 
     // ... startup message
     char s[64];
 
     if (!strcmp(WATCHDOG, "disabled") != 0) {
-        snprintf(s, sizeof(s), "-----  BREAKOUT   v%02x.%02x   <<< NO WATCHDOG >>>\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+        snprintf(s, sizeof(s), "-----  BREAKOUT/USB   v%02x.%02x   <<< NO WATCHDOG >>>\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
     } else {
-        snprintf(s, sizeof(s), "-----  BREAKOUT   v%02x.%02x\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+        snprintf(s, sizeof(s), "-----  BREAKOUT/USB   v%02x.%02x\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
     }
 
     print(s);
