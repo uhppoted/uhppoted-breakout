@@ -60,10 +60,10 @@ remote-run: build
 run: remote-run
 
 reboot-local: 
-	ssh $(RPI) "picotool reboot"
+	picotool reboot -f
 
 reboot-remote: 
-	picotool reboot -f
+	ssh $(RPI) "picotool reboot -f"
 
 reboot: reboot-remote
 

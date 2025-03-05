@@ -115,11 +115,11 @@ void tud_cdc_rx_cb(uint8_t itf) {
 }
 
 // bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request) {
+//     debugf(LOGTAG, "tud_vendor_control_xfer_cb %02x %02x", request->bmRequestType, request->bRequest);
+//
 //     if (stage != CONTROL_STAGE_SETUP) {
 //         return true;
 //     }
-//
-//     debugf(LOGTAG, "tud_vendor_control_xfer_cb %02x %02x", request->bmRequestType, request->bRequest);
 //
 //     // // BOOTSEL reboot command (0x92) ?
 //     // if ((request->bmRequestType == 0x40) && (request->bRequest == 0x92)) {

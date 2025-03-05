@@ -47,11 +47,13 @@ enum {
     ITF_NUM_CDC_0_DATA,
     ITF_NUM_CDC_1,
     ITF_NUM_CDC_1_DATA,
+    ITF_NUM_VENDOR,
     ITF_NUM_TOTAL
 };
 
 // total length of configuration descriptor
-#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
+// #define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
+#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN + TUD_VENDOR_DESC_LEN)
 
 // define endpoint numbers
 #define EPNUM_CDC_0_NOTIF 0x81 // notification endpoint for CDC 0
@@ -61,6 +63,9 @@ enum {
 #define EPNUM_CDC_1_NOTIF 0x84 // notification endpoint for CDC 1
 #define EPNUM_CDC_1_OUT 0x05   // out endpoint for CDC 1
 #define EPNUM_CDC_1_IN 0x85    // in endpoint for CDC 1
+
+#define EPNUM_VENDOR_OUT 0x07
+#define EPNUM_VENDOR_IN 0x87
 
 // configure descriptor (for 2 CDC interfaces)
 uint8_t const desc_configuration[] = {
@@ -76,6 +81,8 @@ uint8_t const desc_configuration[] = {
     TUD_CDC_DESCRIPTOR(ITF_NUM_CDC_1, 4, EPNUM_CDC_1_NOTIF, 8, EPNUM_CDC_1_OUT, EPNUM_CDC_1_IN, 64),
     // CDC 1: Data Interface
     // TUD_CDC_DESCRIPTOR(ITF_NUM_CDC_1_DATA, 4, 0x03, 0x04),
+
+    TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 5, EPNUM_VENDOR_OUT, EPNUM_VENDOR_IN, 64),
 };
 
 // called when host requests to get configuration descriptor
@@ -194,3 +201,28 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
 
     return _desc_str;
 }
+
+bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request) {
+    printf(">>>>>>>>>>>>>> AWOOGAH");
+    // debugf(LOGTAG, "tud_vendor_control_xfer_cb %02x %02x", request->bmRequestType, request->bRequest);
+
+    if (stage != CONTROL_STAGE_SETUP) {
+        return true;
+    }
+
+    // // BOOTSEL reboot command (0x92) ?
+    // if ((request->bmRequestType == 0x40) && (request->bRequest == 0x92)) {
+    //     watchdog_reboot(0, 0, 0);
+    //     *((uint32_t *)0x20041FFC) = 0x64738219;  // Magic value for BOOTSEL mode
+    //     scb_hw->aircr = (0x5FA << 16) | (1 << 2);
+    //     while (1);
+    // }
+
+    return false;
+}
+
+// usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count) {
+//     printf(">>>>>>>>>>>>>> EEEK");
+//     *driver_count = 1;
+//     return &_resetd_driver;
+// }

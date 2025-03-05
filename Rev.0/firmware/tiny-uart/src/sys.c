@@ -46,7 +46,7 @@ bool sys_init() {
     if (!sysinit()) {
         return false;
     }
-    
+
     log_init();
     // cli_init();
 

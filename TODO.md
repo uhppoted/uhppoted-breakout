@@ -17,7 +17,9 @@
     - [ ] monitor
     - [ ] daemonize
     - https://github.com/hathach/tinyusb/blob/master/examples/device/cdc_dual_ports/CMakeLists.txt
-    - https://gist.github.com/9names/3936d1a1254f15a7ee6c6fa03d94cfa3
+    - https://forums.raspberrypi.com/viewtopic.php?t=366208
+    - https://github.com/raspberrypi/picotool/issues/88
+    - https://github.com/tomas-pecserke/pico_tusb_reset_interface
 
 ## breakout
 
