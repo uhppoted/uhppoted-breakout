@@ -49,11 +49,11 @@ int main() {
     // ... kernel
     stdio_init_all();
 
-    // if (watchdog_caused_reboot()) {
-    //     set_error(ERR_WATCHDOG, LOGTAG, "watchdog reboot");
-    // } else if (strcmp(WATCHDOG, "disabled") != 0) {
-    //     watchdog_enable(WATCHDOG_TIMEOUT, true);
-    // }
+    if (watchdog_caused_reboot()) {
+        set_error(ERR_WATCHDOG, LOGTAG, "watchdog reboot");
+    } else if (strcmp(WATCHDOG, "disabled") != 0) {
+        watchdog_enable(WATCHDOG_TIMEOUT, true);
+    }
 
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
@@ -83,14 +83,14 @@ int main() {
     // ... initialise RTC, IO expanders and serial port
     RTC_init();
     IOX_init();
-    // SSMP_init();
+    SSMP_init();
 
     sleep_ms(2500); // FIXME remove - delay to let USB initialise
 
     // ... good to go, start RTC, IO expanders and serial port
     RTC_start();
     IOX_start();
-    // SSMP_start();
+    SSMP_start();
 
     // ... run loop
     while (true) {

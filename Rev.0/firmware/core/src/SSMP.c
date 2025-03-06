@@ -76,18 +76,19 @@ struct {
 void SSMP_init() {
     debugf(LOGTAG, "init");
 
-    gpio_pull_up(SSMP_TX);
-    gpio_pull_up(SSMP_RX);
-
-    gpio_set_function(SSMP_TX, GPIO_FUNC_UART);
-    gpio_set_function(SSMP_RX, GPIO_FUNC_UART);
-
-    uart_init(SSMP_UART, BAUD_RATE);
-    uart_set_baudrate(SSMP_UART, BAUD_RATE);
-    uart_set_format(SSMP_UART, DATA_BITS, STOP_BITS, PARITY);
-    uart_set_hw_flow(SSMP_UART, false, false);
-    uart_set_fifo_enabled(SSMP_UART, true);
-    uart_set_translate_crlf(SSMP_UART, false);
+    // FIXME
+    // gpio_pull_up(SSMP_TX);
+    // gpio_pull_up(SSMP_RX);
+    //
+    // gpio_set_function(SSMP_TX, GPIO_FUNC_UART);
+    // gpio_set_function(SSMP_RX, GPIO_FUNC_UART);
+    //
+    // uart_init(SSMP_UART, BAUD_RATE);
+    // uart_set_baudrate(SSMP_UART, BAUD_RATE);
+    // uart_set_format(SSMP_UART, DATA_BITS, STOP_BITS, PARITY);
+    // uart_set_hw_flow(SSMP_UART, false, false);
+    // uart_set_fifo_enabled(SSMP_UART, true);
+    // uart_set_translate_crlf(SSMP_UART, false);
 
     SSMP_touched();
 
@@ -98,9 +99,10 @@ void SSMP_init() {
 void SSMP_start() {
     debugf(LOGTAG, "start");
 
-    irq_set_exclusive_handler(SSMP_IRQ, on_SSMP);
-    uart_set_irq_enables(SSMP_UART, true, false);
-    irq_set_enabled(SSMP_IRQ, true);
+    // FIXME
+    // irq_set_exclusive_handler(SSMP_IRQ, on_SSMP);
+    // uart_set_irq_enables(SSMP_UART, true, false);
+    // irq_set_enabled(SSMP_IRQ, true);
 }
 
 void SSMP_reset() {
@@ -126,22 +128,22 @@ void SSMP_ping() {
     //     }
 }
 
-void on_SSMP() {
-    while (uart_is_readable(SSMP_UART)) {
-        uint8_t ch = uart_getc(SSMP_UART);
-
-        buffer_push(&SSMP.buffer, ch);
-    }
-
-    circular_buffer *b = &SSMP.buffer;
-    message msg = {
-        .message = MSG_RX,
-        .tag = MESSAGE_BUFFER,
-        .buffer = &SSMP.buffer,
-    };
-
-    push(msg);
-}
+// void on_SSMP() {
+//     while (uart_is_readable(SSMP_UART)) {
+//         uint8_t ch = uart_getc(SSMP_UART);
+//
+//         buffer_push(&SSMP.buffer, ch);
+//     }
+//
+//     circular_buffer *b = &SSMP.buffer;
+//     message msg = {
+//         .message = MSG_RX,
+//         .tag = MESSAGE_BUFFER,
+//         .buffer = &SSMP.buffer,
+//     };
+//
+//     push(msg);
+// }
 
 void SSMP_rx(circular_buffer *buffer) {
     buffer_flush(buffer, SSMP_rxchar);
@@ -155,7 +157,7 @@ void SSMP_enq() {
     debugf("SSMP", "ENQ");
 
     SSMP_touched();
-    uart_write_blocking(SSMP_UART, SYN_SYN_ACK, 3);
+    // FIXME uart_write_blocking(SSMP_UART, SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
@@ -220,7 +222,7 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     slice packed = ssmp_encode(reply);
     slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
-    uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
+    // FIXME uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
 
     slice_free(&encoded);
     slice_free(&packed);

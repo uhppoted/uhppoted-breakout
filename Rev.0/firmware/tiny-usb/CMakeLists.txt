@@ -29,13 +29,13 @@ add_compile_definitions(TRACE=${TRACE})
 
 add_compile_definitions(PARAM_ASSERTIONS_ENABLE_ALL=1)
 
+pico_sdk_init()
 
+set(TARGET_NAME "breakout")
 set(CORE "../core")
 set(LIB  "../lib")
 
-pico_sdk_init()
-
-add_executable(breakout
+add_executable(${TARGET_NAME}
   src/main.c
   src/sys.c
   src/hwconfig.c
@@ -50,7 +50,7 @@ add_executable(breakout
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
-# ${CORE}/src/SSMP.c
+  ${CORE}/src/SSMP.c
   ${CORE}/src/MIB.c
   ${CORE}/src/auth.c
   ${CORE}/src/log.c
@@ -81,11 +81,11 @@ add_executable(breakout
 )
 
 pico_generate_pio_header(
-    breakout
+    ${TARGET_NAME}
     ${CMAKE_CURRENT_LIST_DIR}/src/ws2812.pio
 )
 
-pico_set_program_name(breakout "uhppoted-breakout-usb")
+pico_set_program_name(${TARGET_NAME} "uhppoted-breakout-usb")
 pico_set_program_version(breakout "0.0")
 
 pico_enable_stdio_usb (breakout 1)
@@ -93,18 +93,18 @@ pico_enable_stdio_uart(breakout 0)
 pico_add_extra_outputs(breakout)
 
 # Ref. https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/
-target_compile_definitions(breakout PRIVATE
+target_compile_definitions(${TARGET_NAME} PRIVATE
   PICO_XOSC_STARTUP_DELAY_MULTIPLIER=64
 )
 
-target_include_directories(breakout 
+target_include_directories(${TARGET_NAME} 
    PRIVATE include
    PRIVATE ${CORE}/include
    PRIVATE ${LIB}/include
 )
 
 target_link_libraries(
-    breakout 
+    ${TARGET_NAME} 
 
     pico_stdlib
     pico_multicore

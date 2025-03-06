@@ -16,12 +16,21 @@
     - [ ] cache controller ID
     - [ ] monitor
     - [ ] daemonize
-    - https://github.com/hathach/tinyusb/blob/master/examples/device/cdc_dual_ports/CMakeLists.txt
-    - https://forums.raspberrypi.com/viewtopic.php?t=366208
-    - https://github.com/raspberrypi/picotool/issues/88
-    - https://github.com/tomas-pecserke/pico_tusb_reset_interface
 
 ## breakout
+
+- [ ] USB
+    - [x] dual CDC interfaces
+    - [x] RX
+    - [ ] TX
+        - https://github.com/hathach/tinyusb/blob/master/examples/device/cdc_dual_ports/CMakeLists.txt
+        - https://forums.raspberrypi.com/viewtopic.php?t=366208
+        - https://github.com/raspberrypi/picotool/issues/88
+        - https://github.com/tomas-pecserke/pico_tusb_reset_interface
+        - https://github.com/raspberrypi/picotool/pull/83
+        - https://github.com/earlephilhower/arduino-pico/issues/2078
+        - https://github.com/raspberrypi/picotool/blob/f6fe6b7c321a2def8950d2a440335dfba19e2eab/picoboot_connection/picoboot_connection.c#L58-L82
+        - https://github.com/raspberrypi/picotool/pull/177
 
 ### misc
 

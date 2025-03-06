@@ -1,27 +1,24 @@
-// #include <stdlib.h>
-
-#include <pico/time.h>
 #include <tusb.h>
 
-// #include <breakout.h>
+#include <breakout.h>
 #include <log.h>
+#include <types/buffer.h>
 #include <usb.h>
-// #include <types/buffer.h>
 
 #define LOGTAG "USB"
 
 struct {
     repeating_timer_t usb_timer;
-    //     circular_buffer buffer;
+    circular_buffer buffer;
     struct {
         bool usb0;
         bool usb1;
     } connected;
 } USB = {
-    //     .buffer = {
-    //         .head = 0,
-    //         .tail = 0,
-    //     },
+    .buffer = {
+        .head = 0,
+        .tail = 0,
+    },
 
     .connected = {
         .usb0 = false,
@@ -103,14 +100,26 @@ void tud_cdc_rx_cb(uint8_t itf) {
     uint32_t count = tud_cdc_n_read(itf, buf, sizeof(buf));
 
     // USB.1 ?
-    if (itf == 1) {
-        buf[count] = 0; // null-terminate the string
-        // now echo data back to the console on CDC 0
-        debugf(LOGTAG, "rx: %s", buf);
+    if (itf == 1 && count > 0) {
+        // buf[count] = 0; // null-terminate the string
+        // // now echo data back to the console on CDC 0
+        // debugf(LOGTAG, "rx: %s", buf);
+        //
+        // // and echo back OK on CDC 1
+        // tud_cdc_n_write(itf, (uint8_t const *)"ok\r\n", 4);
+        // tud_cdc_n_write_flush(itf);
 
-        // and echo back OK on CDC 1
-        tud_cdc_n_write(itf, (uint8_t const *)"ok\r\n", 4);
-        tud_cdc_n_write_flush(itf);
+        for (int i = 0; i < count; i++) {
+            buffer_push(&USB.buffer, buf[i]);
+        }
+
+        message qmsg = {
+            .message = MSG_RX,
+            .tag = MESSAGE_BUFFER,
+            .buffer = &USB.buffer,
+        };
+
+        push(qmsg);
     }
 }
 
