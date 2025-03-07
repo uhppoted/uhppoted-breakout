@@ -48,7 +48,7 @@ bool sys_init() {
     }
 
     log_init();
-    // cli_init();
+    cli_init();
 
     // ... startup message
     char s[64];

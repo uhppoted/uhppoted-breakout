@@ -13,6 +13,7 @@
 #include <log.h>
 #include <sys.h>
 #include <types/buffer.h>
+#include <usb.h>
 
 #include "ws2812.pio.h"
 
@@ -32,10 +33,6 @@ struct {
     },
 };
 
-// DUMMY IMPLEMENTATION
-void cli_rx(circular_buffer *buffer) {
-}
-
 bool sys_init() {
     mutex_init(&sys.LED.guard);
 
@@ -52,7 +49,12 @@ bool sys_init() {
         return false;
     }
 
+    if (!usb_init()) {
+        return false;
+    }
+
     log_init();
+    cli_init();
 
     // ... startup message
     char s[64];

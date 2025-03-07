@@ -16,6 +16,7 @@
 #include <log.h>
 #include <sys.h>
 #include <types/buffer.h>
+#include <usb.h>
 
 #define LOGTAG "SSMP"
 #define BAUD_RATE 115200
@@ -31,17 +32,15 @@ void SSMP_enq();
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
+void SSMP_write(const uint8_t *buffer, int N);
 void on_SSMP();
-
-extern void put_rgb(uint8_t red, uint8_t green, uint8_t blue);
-
-const uint8_t EXPECTED[] = {48, 16, 48, 14, 6, 10, 43, 6, 1, 4, 1, 132, 128, 0, 2, 1, 5, 0};
 
 struct {
     circular_buffer buffer;
     bisync codec;
+    bool USB;
     absolute_time_t touched;
-} SSMP = {
+} ssmp = {
     .buffer = {
         .head = 0,
         .tail = 0,
@@ -70,11 +69,18 @@ struct {
         .received = SSMP_received,
     },
 
+    .USB = false,
     .touched = 0,
 };
 
 void SSMP_init() {
     debugf(LOGTAG, "init");
+
+    if (strcasecmp(SSMP, "USB") == 0) {
+        ssmp.USB = true;
+    } else {
+        ssmp.USB = false;
+    }
 
     // FIXME
     // gpio_pull_up(SSMP_TX);
@@ -115,7 +121,7 @@ void SSMP_reset() {
  *
  */
 void SSMP_touched() {
-    SSMP.touched = get_absolute_time();
+    ssmp.touched = get_absolute_time();
 }
 
 void SSMP_ping() {
@@ -150,13 +156,14 @@ void SSMP_rx(circular_buffer *buffer) {
 }
 
 void SSMP_rxchar(uint8_t ch) {
-    bisync_decode(&SSMP.codec, ch);
+    bisync_decode(&ssmp.codec, ch);
 }
 
 void SSMP_enq() {
     debugf("SSMP", "ENQ");
 
     SSMP_touched();
+    SSMP_write(SYN_SYN_ACK, 3);
     // FIXME uart_write_blocking(SSMP_UART, SYN_SYN_ACK, 3);
 }
 
@@ -198,8 +205,6 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
 void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     value v = MIB_get(OID);
 
-    put_rgb(32, 0, 96);
-
     packet reply = {
         .tag = PACKET_GET_RESPONSE,
         .version = 0,
@@ -222,9 +227,20 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     slice packed = ssmp_encode(reply);
     slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
-    // FIXME uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
+    SSMP_write(encoded.bytes, encoded.length);
 
     slice_free(&encoded);
     slice_free(&packed);
     packet_free(&reply);
+}
+
+/* SSMP write
+ *
+ */
+void SSMP_write(const uint8_t *buffer, int N) {
+    if (ssmp.USB) {
+        usb_write(buffer, N);
+    } else {
+        // FIXME uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
+    }
 }

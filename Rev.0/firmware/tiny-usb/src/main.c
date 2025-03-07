@@ -28,9 +28,9 @@
 #define _I2C1SDA 26
 #define _I2C1SCL 27
 
-queue_t queue;
-
 const uint32_t WATCHDOG_TIMEOUT = 5000; // ms
+
+queue_t queue;
 
 int main() {
     bi_decl(bi_program_description("uhppoted-breakout"));
@@ -66,11 +66,6 @@ int main() {
     // ... initialise system
     if (!sys_init()) {
         warnf(LOGTAG, "*** ERROR INITIALISING SYSTEM");
-        return -1;
-    }
-
-    if (!usb_init()) {
-        printf("%-5s *** ERROR INITIALISING USB\n", LOGTAG);
         return -1;
     }
 

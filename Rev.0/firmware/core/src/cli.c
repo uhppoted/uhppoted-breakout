@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "hardware/rtc.h"
+#include "pico/bootrom.h"
 #include "pico/stdlib.h"
 #include "pico/util/datetime.h"
 
@@ -61,7 +62,7 @@ void get_buttons();
 void state();
 void scan();
 void trace(const char *interval);
-void reboot();
+void reboot(bool);
 
 void clear();
 void help();
@@ -143,6 +144,7 @@ const char *HELP[] = {
     "  scan",
     "  trace <off|on|[0-300]>",
     "  reboot",
+    "  bootsel",
     "",
     "  clear",
     "  help",
@@ -387,7 +389,9 @@ void exec(char *cmd) {
     } else if (strncasecmp(cmd, "trace ", 6) == 0) {
         trace(&cmd[6]);
     } else if (strncasecmp(cmd, "reboot", 6) == 0) {
-        reboot();
+        reboot(false);
+    } else if (strncasecmp(cmd, "bootsel", 7) == 0) {
+        reboot(true);
     } else if (strncasecmp(cmd, "clear", 5) == 0) {
         clear();
     } else if (strncasecmp(cmd, "help", 4) == 0) {
@@ -697,9 +701,14 @@ void trace(const char *arg) {
 /* Tight loop until watchdog reboots the system.
  *
  */
-void reboot() {
-    display("... rebooting ... ");
-    sys_reboot();
+void reboot(bool bootsel) {
+    if (bootsel) {
+        display("... rebooting to BOOTSEL... ");
+        reset_usb_boot(0, 0);
+    } else {
+        display("... rebooting ... ");
+        sys_reboot();
+    }
 }
 
 void help() {

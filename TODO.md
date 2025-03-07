@@ -22,8 +22,10 @@
 - [ ] USB
     - [x] dual CDC interfaces
     - [x] RX
-    - [ ] TX
-        - https://github.com/hathach/tinyusb/blob/master/examples/device/cdc_dual_ports/CMakeLists.txt
+    - [x] TX
+    - [x] bootsel
+    - [ ] `connected` for log/CLI
+    - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88
         - https://github.com/tomas-pecserke/pico_tusb_reset_interface

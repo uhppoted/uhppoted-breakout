@@ -9,10 +9,8 @@ set(CMAKE_C_STANDARD   11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
-# add_compile_definitions(CFG_TUD_CDC=2)
-# add_compile_definitions(PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE=1)
-# add_compile_definitions(PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE=1)
-# add_compile_definitions(PICO_ENTER_USB_BOOT_ON_EXIT=1)
+add_compile_definitions(PICO_ENTER_USB_BOOT_ON_EXIT=1)
+add_compile_definitions(PARAM_ASSERTIONS_ENABLE_ALL=1)
 
 add_compile_definitions(RX8900SA_VDET="${RX8900SA_VDET}")
 add_compile_definitions(RX8900SA_SWOFF="${RX8900SA_SWOFF}")
@@ -21,13 +19,12 @@ add_compile_definitions(I2C0_CLOCK="${I2C0_CLOCK}")
 add_compile_definitions(I2C1_CLOCK="${I2C1_CLOCK}")
 add_compile_definitions(WATCHDOG="${WATCHDOG}")
 add_compile_definitions(MODE="${MODE}")
+add_compile_definitions(SSMP="${SSMP}")
 
 add_compile_definitions(CONTROLLER=${CONTROLLER})
 add_compile_definitions(VERSION=${VERSION})
 add_compile_definitions(RELEASED="${RELEASED}")
 add_compile_definitions(TRACE=${TRACE})
-
-add_compile_definitions(PARAM_ASSERTIONS_ENABLE_ALL=1)
 
 pico_sdk_init()
 
@@ -46,6 +43,7 @@ add_executable(${TARGET_NAME}
   ${CORE}/src/I2C0.c
   ${CORE}/src/I2C1.c
   ${CORE}/src/RTC.c
+  ${CORE}/src/cli.c
   ${CORE}/src/IOX.c
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c

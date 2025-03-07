@@ -153,7 +153,7 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
     return _desc_str;
 }
 
-// FIXME move to usb.c
+// FIXME move to usb.c ?
 bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request) {
     printf(">>> tud_vendor_control_xfer_cb %02x %02x\n", request->bmRequestType, request->bRequest);
 
