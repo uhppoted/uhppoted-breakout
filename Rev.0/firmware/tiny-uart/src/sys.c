@@ -109,3 +109,6 @@ void put_rgb(uint8_t red, uint8_t green, uint8_t blue) {
         mutex_exit(&sys.LED.guard);
     }
 }
+
+void usb_write(const uint8_t *bytes, int N) {
+}
