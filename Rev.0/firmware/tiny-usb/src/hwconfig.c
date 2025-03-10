@@ -39,15 +39,11 @@ const uint IOX_RESET = GPIO_14;
 const uint IOX_INT0 = GPIO_15;
 const uint IOX_INT1 = GPIO_9;
 
-const uart_inst_t *CLI_UART = uart0;
-const uint CLI_IRQ = UART0_IRQ;
-const uint CLI_TX = GPIO_0;
-const uint CLI_RX = GPIO_1;
+const uint UART0_TX = GPIO_0;
+const uint UART0_RX = GPIO_1;
 
-const uart_inst_t *SSMP_UART = uart1;
-const uint SSMP_IRQ = UART1_IRQ;
-const uint SSMP_TX = GPIO_4;
-const uint SSMP_RX = GPIO_5;
+const uint UART1_TX = GPIO_4;
+const uint UART1_RX = GPIO_5;
 
 // U2 PCAL6408A
 const struct I2C U2 = {

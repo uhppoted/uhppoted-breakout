@@ -21,7 +21,7 @@ clean:
 	export PICO_SDK_PATH=$(SDK) && \
 	       cd build && \
 	       cmake -DCMAKE_BUILD_TYPE=$(BUILD) \
-	             -DMODE="log" \
+	             -DMODE="CLI" \
 	             -DSSMP="UART" \
 	             -DWATCHDOG="enabled" \
 	             -DI2C0_CLOCK="100kHz" -DI2C1_CLOCK="400kHz" \

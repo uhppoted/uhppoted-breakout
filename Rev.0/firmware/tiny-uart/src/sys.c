@@ -12,6 +12,7 @@
 #include <cli.h>
 #include <log.h>
 #include <sys.h>
+#include <uart1.h>
 
 #include "ws2812.pio.h"
 
@@ -47,6 +48,10 @@ bool sys_init() {
         return false;
     }
 
+    if (!uart1_init()) {
+        return false;
+    }
+
     log_init();
     cli_init();
 
@@ -54,9 +59,9 @@ bool sys_init() {
     char s[64];
 
     if (!strcmp(WATCHDOG, "disabled") != 0) {
-        snprintf(s, sizeof(s), "-----  BREAKOUT/USB   v%02x.%02x   <<< NO WATCHDOG >>>\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+        snprintf(s, sizeof(s), "-----  BREAKOUT/UART  v%02x.%02x   <<< NO WATCHDOG >>>\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
     } else {
-        snprintf(s, sizeof(s), "-----  BREAKOUT/USB   v%02x.%02x\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
+        snprintf(s, sizeof(s), "-----  BREAKOUT/UART  v%02x.%02x\n", (VERSION >> 8) & 0x00ff, (VERSION >> 0) & 0x00ff);
     }
 
     print(s);

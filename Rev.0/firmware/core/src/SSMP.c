@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <hardware/uart.h>
-#include <pico/stdlib.h>
 #include <pico/time.h>
 
 #include <MIB.h>
@@ -16,13 +14,10 @@
 #include <log.h>
 #include <sys.h>
 #include <types/buffer.h>
+#include <uart1.h>
 #include <usb.h>
 
 #define LOGTAG "SSMP"
-#define BAUD_RATE 115200
-#define DATA_BITS 8
-#define STOP_BITS 1
-#define PARITY UART_PARITY_NONE
 
 const int64_t SSMP_IDLE = 5000; // ms
 const int64_t SSMP_ERROR_NO_SUCH_OBJECT = 0x02;
@@ -33,7 +28,6 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
 void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
 void SSMP_write(const uint8_t *buffer, int N);
-void on_SSMP();
 
 struct {
     circular_buffer buffer;
@@ -74,41 +68,19 @@ struct {
 };
 
 void SSMP_init() {
-    debugf(LOGTAG, "init");
-
     if (strcasecmp(SSMP, "USB") == 0) {
         ssmp.USB = true;
     } else {
         ssmp.USB = false;
     }
 
-    // FIXME
-    // gpio_pull_up(SSMP_TX);
-    // gpio_pull_up(SSMP_RX);
-    //
-    // gpio_set_function(SSMP_TX, GPIO_FUNC_UART);
-    // gpio_set_function(SSMP_RX, GPIO_FUNC_UART);
-    //
-    // uart_init(SSMP_UART, BAUD_RATE);
-    // uart_set_baudrate(SSMP_UART, BAUD_RATE);
-    // uart_set_format(SSMP_UART, DATA_BITS, STOP_BITS, PARITY);
-    // uart_set_hw_flow(SSMP_UART, false, false);
-    // uart_set_fifo_enabled(SSMP_UART, true);
-    // uart_set_translate_crlf(SSMP_UART, false);
-
     SSMP_touched();
 
     infof("SSMP", "initialised");
 }
 
-// Enables UART IRQ
 void SSMP_start() {
     debugf(LOGTAG, "start");
-
-    // FIXME
-    // irq_set_exclusive_handler(SSMP_IRQ, on_SSMP);
-    // uart_set_irq_enables(SSMP_UART, true, false);
-    // irq_set_enabled(SSMP_IRQ, true);
 }
 
 void SSMP_reset() {
@@ -133,23 +105,6 @@ void SSMP_ping() {
     //     if (llabs(delta) > SSMP_IDLE) {
     //     }
 }
-
-// void on_SSMP() {
-//     while (uart_is_readable(SSMP_UART)) {
-//         uint8_t ch = uart_getc(SSMP_UART);
-//
-//         buffer_push(&SSMP.buffer, ch);
-//     }
-//
-//     circular_buffer *b = &SSMP.buffer;
-//     message msg = {
-//         .message = MSG_RX,
-//         .tag = MESSAGE_BUFFER,
-//         .buffer = &SSMP.buffer,
-//     };
-//
-//     push(msg);
-// }
 
 void SSMP_rx(circular_buffer *buffer) {
     buffer_flush(buffer, SSMP_rxchar);
@@ -241,6 +196,6 @@ void SSMP_write(const uint8_t *buffer, int N) {
     if (ssmp.USB) {
         usb_write(buffer, N);
     } else {
-        // FIXME uart_write_blocking(SSMP_UART, encoded.bytes, encoded.length);
+        uart1_write(buffer, N);
     }
 }

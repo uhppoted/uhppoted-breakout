@@ -52,3 +52,9 @@ Initial proof of concept, designed to be relatively easy to hand solder and debu
 
 3. The breakout board uses the correct footprints for the J10 and J12 socket headers that connect the
    board to the base board.
+
+## License
+
+Hardware is licensed under the CERN-OHL-S-2.0-S license, software is licensed under the MIT license.
+
+   

@@ -1,5 +1,7 @@
 # TODO
 
+- [x] Change license
+      
 ## RPCD
     - [x] breakout-simulator
     - [x] encoding
