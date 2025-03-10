@@ -16,18 +16,24 @@ import (
 const VERSION = "v0.0.0"
 
 var options = struct {
-	bind string
+	device string
+	bind   string
 }{
-	bind: "tcp:::1234",
+	device: "",
+	bind:   "tcp:::1234",
 }
 
 func main() {
 	fmt.Printf("SSMP RPC DRIVER %v\n", VERSION)
 
+	flag.StringVar(&options.device, "device", options.device, "serial device ID")
 	flag.StringVar(&options.bind, "bind", options.bind, "bind address (in the format network::address:port e.g. tcp::0.0.0.0:12345")
 	flag.Parse()
 
-	if r, err := rpcd.NewRPCD(options.bind); err != nil {
+	if options.device == "" {
+		errorf("missing --device arg")
+		os.Exit(1)
+	} else if r, err := rpcd.NewRPCD(options.device, options.bind); err != nil {
 		errorf("%v", err)
 		os.Exit(1)
 	} else if r == nil {

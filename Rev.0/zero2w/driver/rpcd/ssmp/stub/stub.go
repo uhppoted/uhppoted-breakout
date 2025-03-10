@@ -18,7 +18,7 @@ type Stub struct {
 	codec *bisync.Bisync
 }
 
-func NewStub(requests <-chan []byte, replies chan<- []byte) *Stub {
+func New(requests <-chan []byte, replies chan<- []byte) *Stub {
 	stub := Stub{
 		codec:    bisync.NewBisync(),
 		requests: requests,
@@ -28,7 +28,7 @@ func NewStub(requests <-chan []byte, replies chan<- []byte) *Stub {
 	return &stub
 }
 
-func (s *Stub) Run() {
+func (s *Stub) Run() error {
 	infof("run::start %v", s.requests)
 
 	h := handler{
@@ -107,6 +107,8 @@ func (s *Stub) Run() {
 	}
 
 	infof("run::exit")
+
+	return nil
 }
 
 func (s Stub) get(oid string) (any, error) {

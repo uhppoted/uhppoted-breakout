@@ -9,7 +9,7 @@ build: format
 
 debug:
 	python3 main.py get-controller
-	python3 main.py set-time
+#	python3 main.py set-time
 
 get-controller:
 	python3 main.py get-controller

@@ -27,22 +27,26 @@ type KV struct {
 	Value any
 }
 
-func NewRPCD(address string) (*RPCD, error) {
+func NewRPCD(deviceId string, address string) (*RPCD, error) {
 	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(address); len(matches) < 3 {
 		return nil, fmt.Errorf("invalid bind address (%v)", address)
 	} else {
 		ctx, cancel := context.WithCancel(context.Background())
 
-		v := RPCD{
-			network: matches[1],
-			addr:    matches[2],
-			ssmp:    ssmp.NewSSMP(),
+		if d, err := ssmp.NewSSMP(deviceId); err != nil {
+			return nil, err
+		} else {
+			v := RPCD{
+				network: matches[1],
+				addr:    matches[2],
+				ssmp:    d,
 
-			ctx:    ctx,
-			cancel: cancel,
+				ctx:    ctx,
+				cancel: cancel,
+			}
+
+			return &v, nil
 		}
-
-		return &v, nil
 	}
 }
 

@@ -125,3 +125,44 @@ func TestDecodeGetResponse(t *testing.T) {
 		}
 	}
 }
+
+func TestDecodeBreakoutResponse(t *testing.T) {
+	bytes := []byte{
+		22, 22, 2, 48, 44, 16, 2, 16, 1, 0, 4, 16, 6, 112, 117,
+		98, 108, 105, 99, 162, 31, 16, 2, 16, 1, 16, 1, 16, 2, 16,
+		1, 0, 16, 2, 16, 1, 0, 48, 20, 48, 18, 16, 6, 10, 43,
+		16, 6, 16, 1, 4, 16, 1, 132, 128, 0, 16, 2, 16, 1, 16, 2, 4, 24, 42,
+	}
+
+	expected := []byte{
+		48, 45,
+		2, 1, 0,
+		4, 6, 112, 117, 98, 108, 105, 99,
+		162, 32,
+		2, 2, 48, 57,
+		2, 1, 0,
+		2, 1, 0,
+		48, 20,
+		48, 18,
+		6, 10, 43, 6, 1, 4, 1, 132, 128, 0, 2, 1,
+		2, 4, 24, 42, 55, 120,
+	}
+
+	codec := NewBisync()
+	f := callback{
+		pipe: make(chan []uint8, 1),
+	}
+
+	if err := codec.Decode(bytes, f); err != nil {
+		t.Errorf("error decoding GET response (%v)", err)
+	} else {
+		select {
+		case packet := <-f.pipe:
+			if !slices.Equal(packet, expected) {
+				t.Errorf("incorrectly decoded GET response:\n   expected:%#v\n   got:     %#v", expected, packet)
+			}
+		case <-time.After(100 * time.Millisecond):
+			t.Errorf("timeout decoding GET request")
+		}
+	}
+}

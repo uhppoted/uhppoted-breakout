@@ -9,17 +9,22 @@ import (
 	"ssmp/encoding/ASN.1"
 	"ssmp/encoding/bisync"
 	"ssmp/log"
+	"ssmp/ssmp/serial"
 	"ssmp/ssmp/stub"
 )
 
 type SSMP struct {
+	codec *bisync.Bisync
+
 	queue    chan func()
 	requests chan []byte
 	rx       chan []byte
 	wg       sync.WaitGroup
 	pending  pending[BER.GetResponse]
 
-	stub *stub.Stub
+	driver interface {
+		Run() error
+	}
 }
 
 type callback struct {
@@ -43,10 +48,12 @@ func (c callback) OnMessage(header []uint8, content []uint8) {
 
 var ID atomic.Uint32
 
-func NewSSMP() *SSMP {
+func NewSSMP(deviceId string) (*SSMP, error) {
 	requests := make(chan []byte, 1)
 	rx := make(chan []byte, 1)
+
 	ssmp := SSMP{
+		codec:    bisync.NewBisync(),
 		queue:    make(chan func()),
 		requests: requests,
 		rx:       rx,
@@ -54,10 +61,17 @@ func NewSSMP() *SSMP {
 		pending: pending[BER.GetResponse]{
 			m: map[uint32]e[BER.GetResponse]{},
 		},
-		stub: stub.NewStub(requests, rx),
 	}
 
-	return &ssmp
+	if deviceId == "stub" {
+		ssmp.driver = stub.New(requests, rx)
+	} else if d, err := serial.New(deviceId, requests, rx); err != nil {
+		return nil, err
+	} else {
+		ssmp.driver = d
+	}
+
+	return &ssmp, nil
 }
 
 func (s *SSMP) Run() error {
@@ -85,11 +99,14 @@ func (s *SSMP) Run() error {
 		}
 	}()
 
-	// ... stub
+	// ... interface
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
-		s.stub.Run()
+
+		if err := s.driver.Run(); err != nil {
+			warnf("%v", err)
+		}
 	}()
 
 	infof("run::exit")
@@ -98,8 +115,6 @@ func (s *SSMP) Run() error {
 }
 
 func (s *SSMP) receive() {
-	codec := bisync.NewBisync()
-
 	h := callback{
 		error: func(err error) {
 			errorf("%v", err)
@@ -111,7 +126,7 @@ func (s *SSMP) receive() {
 	}
 
 	for packet := range s.rx {
-		if err := codec.Decode(packet, h); err != nil {
+		if err := s.codec.Decode(packet, h); err != nil {
 			warnf("%v", err)
 		}
 	}

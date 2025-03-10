@@ -27,3 +27,6 @@ run: run-unix
 
 stub: build
 	./bin/emulator --config .config.stub
+
+rpi3: build
+	./bin/emulator --config .config.rpi3
