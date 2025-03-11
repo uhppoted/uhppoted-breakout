@@ -1,6 +1,8 @@
 package serial
 
 import (
+	"fmt"
+
 	"github.com/pkg/term"
 
 	"ssmp/encoding/bisync"
@@ -29,7 +31,9 @@ func New(deviceId string, requests <-chan []byte, replies chan<- []byte) (*Seria
 }
 
 func (s *Serial) Run() error {
-	infof("run::start %v", s.requests)
+	infof("run::start")
+
+	eof := make(chan bool)
 
 	if t, err := term.Open(s.deviceId, term.Speed(115200), term.RawMode); err != nil {
 		return err
@@ -44,23 +48,32 @@ func (s *Serial) Run() error {
 
 				if N, err := t.Read(buffer); err != nil {
 					warnf("%v", err)
+					break
 				} else if N > 0 {
 					debugf("received %v bytes", N)
 
 					s.replies <- buffer[0:N]
 				}
 			}
+
+			eof <- true
 		}()
 
-		for rq := range s.requests {
-			if N, err := t.Write(rq); err != nil {
-				warnf("%v", err)
-			} else {
-				debugf("sent %v bytes", N)
+		for {
+			select {
+			case rq := <-s.requests:
+				if rq == nil {
+					return nil
+				} else if N, err := t.Write(rq); err != nil {
+					warnf("%v", err)
+				} else if N < len(rq) {
+					warnf("sent %v of %v bytes", N, len(rq))
+				}
+
+			case <-eof:
+				return fmt.Errorf("EOF")
 			}
 		}
-
-		infof("run::exit")
 	}
 
 	return nil

@@ -53,8 +53,21 @@ bool usb_init() {
     return true;
 }
 
-void usb_write(const uint8_t *bytes, int N) {
-    tud_cdc_n_write(CDC1, bytes, N);
+void usb_write(const uint8_t *bytes, int len) {
+    int ix = 0;
+
+    while (ix < len) {
+        uint32_t N = tud_cdc_n_write(CDC1, &bytes[ix], len - ix);
+
+        if (N == 0) {
+            warnf(LOGTAG, "*** write error %u of %d", ix, len);
+            break;
+        } else {
+            debugf(LOGTAG, "write %u of %d", N, len - ix);
+            ix += N;
+        }
+    }
+
     tud_cdc_n_write_flush(CDC1);
 }
 

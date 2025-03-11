@@ -77,6 +77,8 @@ func NewSSMP(deviceId string) (*SSMP, error) {
 func (s *SSMP) Run() error {
 	infof("run::start")
 
+	delay := 2500 * time.Millisecond
+
 	// ... RX queue
 	s.wg.Add(1)
 	go func() {
@@ -104,8 +106,15 @@ func (s *SSMP) Run() error {
 	go func() {
 		defer s.wg.Done()
 
-		if err := s.driver.Run(); err != nil {
-			warnf("%v", err)
+		for {
+			if err := s.driver.Run(); err == nil {
+				break
+			} else {
+				warnf("%v", err)
+				infof("disconected .. reconnecting in %v", delay)
+
+				time.Sleep(delay)
+			}
 		}
 	}()
 

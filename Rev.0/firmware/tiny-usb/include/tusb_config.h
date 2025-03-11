@@ -11,6 +11,7 @@
  extern "C" {
 #endif
 
+// #define CFG_TUSB_DEBUG          (2)
 #define CFG_TUD_ENABLED         (1)
 
 // Legacy RHPORT configuration
