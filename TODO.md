@@ -12,12 +12,14 @@
     - [x] expire SSMP.pending entries
     - [x] GET
     - [x] SET
-    - (?) Context.WithTimeout 
-    - (?) https://go.dev/blog/synctest
-    - [ ] UART
+    - [x] UART
     - [ ] cache controller ID
     - [ ] monitor
     - [ ] daemonize
+    - [ ] don't flood logs with 'disconnected' errors
+    - (?) exponential backoff
+    - (?) Context.WithTimeout 
+    - (?) https://go.dev/blog/synctest
 
 ## breakout
 
@@ -78,7 +80,9 @@
 - [ ] serial logger
 
 ### UT0311
-   - [ ] API
+    - [ ] rework with text tags
+
+    - [ ] API
       - [x] get-controller
       - [x] set-address
       - [x] get-listener
@@ -110,6 +114,8 @@
       - [ ] set-interlock
       - [ ] activate-keypads
       - [ ] restore-default-parameters
+      - [ ] get-anti-passback
+      - [ ] set-anti-passback
 
    - [ ] RPC
       - https://go.dev/blog/protobuf-opaque
