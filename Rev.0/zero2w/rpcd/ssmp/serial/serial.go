@@ -40,7 +40,12 @@ func (s *Serial) Run() error {
 	} else if err := t.SetRaw(); err != nil {
 		return err
 	} else {
-		infof("using %v", s.deviceId)
+		infof("connected %v", s.deviceId)
+
+		defer func() {
+			warnf("closing %v", s.deviceId)
+			t.Close()
+		}()
 
 		go func() {
 			for {

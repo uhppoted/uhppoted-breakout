@@ -13,11 +13,10 @@
     - [x] GET
     - [x] SET
     - [x] UART
+    - [x] exponential backoff
     - [ ] cache controller ID
     - [ ] monitor
     - [ ] daemonize
-    - [ ] don't flood logs with 'disconnected' errors
-    - (?) exponential backoff
     - (?) Context.WithTimeout 
     - (?) https://go.dev/blog/synctest
 
@@ -27,7 +26,7 @@
     - [x] dual CDC interfaces
     - [x] RX
     - [x] TX
-    - [x] bootsel
+    - [x] CLI bootsel
     - [ ] `connected` for log/CLI
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208

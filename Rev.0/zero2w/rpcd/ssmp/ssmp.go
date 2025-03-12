@@ -13,6 +13,9 @@ import (
 	"ssmp/ssmp/stub"
 )
 
+const DELAY = 10 * time.Second
+const RESET = 15 * time.Second
+
 type SSMP struct {
 	codec *bisync.Bisync
 
@@ -77,8 +80,6 @@ func NewSSMP(deviceId string) (*SSMP, error) {
 func (s *SSMP) Run() error {
 	infof("run::start")
 
-	delay := 2500 * time.Millisecond
-
 	// ... RX queue
 	s.wg.Add(1)
 	go func() {
@@ -106,14 +107,26 @@ func (s *SSMP) Run() error {
 	go func() {
 		defer s.wg.Done()
 
+		delay := 500 * time.Millisecond
+
 		for {
+			reset := time.AfterFunc(RESET, func() {
+				delay = 500 * time.Millisecond
+			})
+
 			if err := s.driver.Run(); err == nil {
 				break
 			} else {
 				warnf("%v", err)
 				infof("disconected .. reconnecting in %v", delay)
 
+				reset.Stop()
 				time.Sleep(delay)
+
+				delay = 2 * delay
+				if delay > DELAY {
+					delay = DELAY
+				}
 			}
 		}
 	}()
