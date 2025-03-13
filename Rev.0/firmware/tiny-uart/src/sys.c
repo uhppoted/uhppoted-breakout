@@ -54,6 +54,7 @@ bool sys_init() {
 
     log_init();
     cli_init();
+    stdout_connected(true);
 
     // ... startup message
     char s[64];

@@ -55,6 +55,7 @@ struct {
 
     struct {
         mutex_t lock;
+        bool connected;
         int head;
         int tail;
         char list[PRINT_QUEUE_SIZE][128];
@@ -253,6 +254,15 @@ void set_mode(mode mode) {
     }
 }
 
+void stdout_connected(bool connected) {
+    if (connected != SYSTEM.queue.connected) {
+        SYSTEM.queue.connected = connected;
+        if (connected) {
+            print("");
+        }
+    }
+}
+
 void set_trace(float interval) {
     if (interval >= 0.0 && interval <= 300.0) {
         SYSTEM.trace.interval = interval;
@@ -392,6 +402,10 @@ void _flush() {
     }
 
     if (SYSTEM.mode != MODE_LOG && SYSTEM.mode != MODE_CLI) {
+        return;
+    }
+
+    if (!SYSTEM.queue.connected) {
         return;
     }
 

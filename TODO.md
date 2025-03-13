@@ -27,7 +27,7 @@
     - [x] RX
     - [x] TX
     - [x] CLI bootsel
-    - [ ] `connected` for log/CLI
+    - [x] `connected` for log/CLI
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88

@@ -21,6 +21,7 @@ extern void dispatch(uint32_t);
 extern void print(const char *);
 extern mode get_mode();
 extern void set_mode(mode);
+extern void stdout_connected(bool);
 extern void set_trace(float interval);
 
 extern uint32_t get_total_heap();

@@ -2,6 +2,7 @@
 
 #include <breakout.h>
 #include <log.h>
+#include <sys.h>
 #include <types/buffer.h>
 #include <usb.h>
 
@@ -76,10 +77,12 @@ bool on_usb_rx(repeating_timer_t *rt) {
         USB.connected.usb0 = true;
 
         infof(LOGTAG, "USB.0 connected");
+        stdout_connected(true);
     } else if (!tud_cdc_n_connected(0) && USB.connected.usb0) {
         USB.connected.usb0 = false;
 
         infof(LOGTAG, "USB.0 disconnected");
+        stdout_connected(false);
     }
 
     if (tud_cdc_n_connected(1) && !USB.connected.usb1) {
