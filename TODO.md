@@ -36,6 +36,10 @@
         - https://github.com/earlephilhower/arduino-pico/issues/2078
         - https://github.com/raspberrypi/picotool/blob/f6fe6b7c321a2def8950d2a440335dfba19e2eab/picoboot_connection/picoboot_connection.c#L58-L82
         - https://github.com/raspberrypi/picotool/pull/177
+        - https://github.com/illusiaDecafish/bootselBoot
+        - https://github.com/raspberrypi/pico-sdk/blob/master/src/rp2_common/pico_stdio_usb/reset_interface.c
+        - https://github.com/ithinuel/usbd-picotool-reset
+        - https://github.com/dsi-modchip/firmware
 
 ### misc
 
@@ -47,8 +51,6 @@
       - [ ] log once on occurrence
       - [ ] CLI show errors
       - (?) count up/down to auto-clear
-
-- [ ] configurable door unlock inverted/normal
 
 - [ ] Rework print queue
       - (?) check USB connected
@@ -64,14 +66,18 @@
     - GET
       - [x] controller ID
       - [x] version
-      - [ ] released
+      - [x] released
+      - [ ] datetime
 
-    - [ ] ASN.1
+    - SET
+      - [ ] datetime
+
+    - [x] ASN.1
        - [x] packet_free: dynamic
        - [x] vector_free
        - [x] check field_free
        - [x] check slice_free
-       - [ ] field pool
+       - [x] ~~field pool~~
 
     - (?) queue UART write
 

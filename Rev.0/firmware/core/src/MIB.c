@@ -31,17 +31,20 @@ value MIB_get(const char *OID) {
     }
 
     if (strcmp(OID, MIB_CONTROLLER_VERSION) == 0) {
-        slice octets = {
-            .capacity = 16,
-            .length = 2,
-            .bytes = (char *)calloc(16, sizeof(uint8_t)),
-        };
+        v.tag = VALUE_UINT16;
+        v.integer = VERSION;
 
-        octets.bytes[0] = (VERSION >> 8) & 0x00ff;
-        octets.bytes[1] = (VERSION >> 0) & 0x00ff;
-
-        v.tag = VALUE_OCTET_STRING;
-        v.octets = octets;
+        // slice octets = {
+        //     .capacity = 16,
+        //     .length = 2,
+        //     .bytes = (char *)calloc(16, sizeof(uint8_t)),
+        // };
+        //
+        // octets.bytes[0] = (VERSION >> 8) & 0x00ff;
+        // octets.bytes[1] = (VERSION >> 0) & 0x00ff;
+        //
+        // v.tag = VALUE_OCTET_STRING;
+        // v.octets = octets;
     }
 
     if (strcmp(OID, MIB_CONTROLLER_RELEASED) == 0) {

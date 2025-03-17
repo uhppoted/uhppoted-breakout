@@ -9,7 +9,7 @@ RX8900SA_BKSMP ?= 2ms
 
 CONTROLLER ?= 405419896
 VERSION ?= 0x0001
-RELEASED ?= "2024-10-01"
+RELEASED ?= "$(shell date '+%Y-%m-%d')"
 TRACE ?= 10
 
 .PHONY: format
