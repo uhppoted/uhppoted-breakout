@@ -3,16 +3,16 @@
 
 #define _PID_MAP(itf, n) ((CFG_TUD_##itf) << (n))
 
-#define USB_VID 0xCafe
-#define USB_PID (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(VENDOR, 4))
+#define USB_VID 0xcafe
+// #define USB_PID (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(VENDOR, 4))
+#define USB_PID (0x4000 | _PID_MAP(CDC, 0))
 #define USB_BCD 0x0200
 
 uint8_t const *tud_descriptor_device_qualifier_cb(void);
 uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid);
 
 enum {
-    ITF_NUM_VENDOR = 0,
-    ITF_NUM_CDC_0,
+    ITF_NUM_CDC_0 = 0,
     ITF_NUM_CDC_0_DATA,
     ITF_NUM_CDC_1,
     ITF_NUM_CDC_1_DATA,
@@ -24,19 +24,19 @@ enum {
     STRID_MANUFACTURER, // 1: manufacturer
     STRID_PRODUCT,      // 2: product
     STRID_SERIAL,       // 3: serial number
-    STRID_RESET,        // 6: reset interface
     STRID_CDC_0,        // 4: CDC 0 interface
     STRID_CDC_1,        // 5: CDC 1 interface
+    STRID_RESET,        // 6: reset interface
 };
 
 char const *string_desc_arr[] = {
     (const char[]){0x09, 0x04}, // 0: supported language is English (0x0409)
     "uhppoted",                 // 1: manufacturer
     "breakout",                 // 2: product
-    NULL,                       // 3: serial number (null so it uses unique ID if available)
-    "reset",                    // 4: reset interface
-    "log"                       // 5: CDC 0 interface
-    "SSMP",                     // 6: CDC 1 interface
+    NULL,                       // 3: serial number (null, uses unique ID)
+    "log"                       // 4: CDC 0 interface
+    "SSMP",                     // 5: CDC 1 interface
+    "reset",                    // 6: reset interface
 };
 
 // USB device descriptor
@@ -61,23 +61,22 @@ tusb_desc_device_t const desc_device = {
     .bNumConfigurations = 0x01 // 1 configuration
 };
 
-#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + TUD_VENDOR_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
+// #define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + TUD_VENDOR_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
+#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
 
-#define EPNUM_CDC_0_NOTIFY 0x81 // CDC 0 interface notification endpoint
-#define EPNUM_CDC_0_OUT 0x02    // CDC 0 interface OUT endpoint
-#define EPNUM_CDC_0_IN 0x82     // CDC 0 interface IN endpoint
+// CDC 0 interface notification, OUT and IN endpoints
+#define EPNUM_CDC_0_NOTIFY (0x81)
+#define EPNUM_CDC_0_OUT (0x02)
+#define EPNUM_CDC_0_IN (0x82)
 
-#define EPNUM_CDC_1_NOTIFY 0x84 // CDC 1 interface notification endpoint
-#define EPNUM_CDC_1_OUT 0x05    // CDC 1 interface OUT endpoint
-#define EPNUM_CDC_1_IN 0x85     // CDC 1 interface IN endpoint
-
-#define EPNUM_VENDOR_OUT 0x07 // vendor interface OUT endpoint
-#define EPNUM_VENDOR_IN 0x87  // vendor interface IN endpoint
+// CDC 1 interface notification, OUT and IN endpoints
+#define EPNUM_CDC_1_NOTIFY (0x84)
+#define EPNUM_CDC_1_OUT (0x05)
+#define EPNUM_CDC_1_IN (0x85)
 
 // configuration descriptors
 uint8_t const desc_configuration[] = {
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, 0x80, 100),
-    TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 5, EPNUM_VENDOR_OUT, EPNUM_VENDOR_IN, 64),
     TUD_CDC_DESCRIPTOR(ITF_NUM_CDC_0, 4, EPNUM_CDC_0_NOTIFY, 8, EPNUM_CDC_0_OUT, EPNUM_CDC_0_IN, 64),
     TUD_CDC_DESCRIPTOR(ITF_NUM_CDC_1, 4, EPNUM_CDC_1_NOTIFY, 8, EPNUM_CDC_1_OUT, EPNUM_CDC_1_IN, 64),
 };
@@ -147,27 +146,27 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
         break;
     }
 
-    // First byte is the length (including header), second byte is string type
+    // first byte is the length (including header), second byte is string type
     _desc_str[0] = (uint16_t)((TUSB_DESC_STRING << 8) | (char_count * 2 + 2));
 
     return _desc_str;
 }
 
-// FIXME move to usb.c ?
-bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request) {
-    printf(">>> tud_vendor_control_xfer_cb %02x %02x\n", request->bmRequestType, request->bRequest);
-
-    if (stage != CONTROL_STAGE_SETUP) {
-        return true;
-    }
-
-    // // BOOTSEL reboot command (0x92) ?
-    // if ((request->bmRequestType == 0x40) && (request->bRequest == 0x92)) {
-    //     watchdog_reboot(0, 0, 0);
-    //     *((uint32_t *)0x20041FFC) = 0x64738219;  // Magic value for BOOTSEL mode
-    //     scb_hw->aircr = (0x5FA << 16) | (1 << 2);
-    //     while (1);
-    // }
-
-    return false;
-}
+// // FIXME move to usb.c ?
+// bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request) {
+//     printf(">>> tud_vendor_control_xfer_cb %02x %02x\n", request->bmRequestType, request->bRequest);
+//
+//     if (stage != CONTROL_STAGE_SETUP) {
+//         return true;
+//     }
+//
+//     // // BOOTSEL reboot command (0x92) ?
+//     // if ((request->bmRequestType == 0x40) && (request->bRequest == 0x92)) {
+//     //     watchdog_reboot(0, 0, 0);
+//     //     *((uint32_t *)0x20041FFC) = 0x64738219;  // Magic value for BOOTSEL mode
+//     //     scb_hw->aircr = (0x5FA << 16) | (1 << 2);
+//     //     while (1);
+//     // }
+//
+//     return false;
+// }

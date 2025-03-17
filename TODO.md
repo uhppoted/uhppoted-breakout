@@ -28,10 +28,10 @@
     - [x] TX
     - [x] CLI bootsel
     - [x] `connected` for log/CLI
+    - [x] increase TX/RX CDC buffer size
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88
-        - https://github.com/tomas-pecserke/pico_tusb_reset_interface
         - https://github.com/raspberrypi/picotool/pull/83
         - https://github.com/earlephilhower/arduino-pico/issues/2078
         - https://github.com/raspberrypi/picotool/blob/f6fe6b7c321a2def8950d2a440335dfba19e2eab/picoboot_connection/picoboot_connection.c#L58-L82
@@ -40,6 +40,7 @@
         - https://github.com/raspberrypi/pico-sdk/blob/master/src/rp2_common/pico_stdio_usb/reset_interface.c
         - https://github.com/ithinuel/usbd-picotool-reset
         - https://github.com/dsi-modchip/firmware
+        - https://github.com/tomas-pecserke/pico_tusb_reset_interface
 
 ### misc
 

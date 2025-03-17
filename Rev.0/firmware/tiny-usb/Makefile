@@ -64,9 +64,15 @@ reboot-local:
 	picotool reboot --vid 0x2e8a --pid 0x0003 -f
 
 reboot-remote: 
-	ssh $(RPI) "picotool reboot --vid 0x2e8a --pid 0x0003 -f -u"
+	ssh $(RPI) "picotool reboot --vid 0xcafe --pid 0x4002 -f -u"
 
 reboot: reboot-remote
+
+reset:
+	ssh $(RPI) "sudo usbreset cafe:4002"
+
+info:
+	ssh $(RPI) "picotool info --debug --all --vid 0xcafe --pid 0x4002"
 
 tty:
 	 minicom -b 115200 -o -D $(PORT)
