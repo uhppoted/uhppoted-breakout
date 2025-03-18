@@ -15,6 +15,7 @@ const char *PUBLIC[] = {
     MIB_CONTROLLER_ID,
     MIB_CONTROLLER_VERSION,
     MIB_CONTROLLER_RELEASED,
+    MIB_CONTROLLER_DATETIME,
 };
 
 community public = {

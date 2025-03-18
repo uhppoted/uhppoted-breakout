@@ -29,6 +29,7 @@
     - [x] CLI bootsel
     - [x] `connected` for log/CLI
     - [x] increase TX/RX CDC buffer size
+    - [ ] weirdness around a message size of 64 bytes
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88
@@ -41,6 +42,8 @@
         - https://github.com/ithinuel/usbd-picotool-reset
         - https://github.com/dsi-modchip/firmware
         - https://github.com/tomas-pecserke/pico_tusb_reset_interface
+        - https://github.com/hathach/tinyusb/discussions/664
+        - https://github.com/piersfinlayson/tinyusb-vendor-example
 
 ### misc
 
@@ -54,7 +57,7 @@
       - (?) count up/down to auto-clear
 
 - [ ] Rework print queue
-      - (?) check USB connected
+      - [x] check USB connected
       - (?) setvbuf
 
 - [ ] Use Pico optimized libraries
@@ -64,22 +67,11 @@
       - pico_stdio
 
 ### SSMP
-    - GET
-      - [x] controller ID
-      - [x] version
-      - [x] released
-      - [ ] datetime
-
-    - SET
-      - [ ] datetime
-
-    - [x] ASN.1
-       - [x] packet_free: dynamic
-       - [x] vector_free
-       - [x] check field_free
-       - [x] check slice_free
-       - [x] ~~field pool~~
-
+    - [x] get-controller-id
+    - [x] get-version
+    - [x] get-released
+    - [x] get-datetime
+    - [ ] set-datetime
     - (?) queue UART write
 
 ## Zero2W

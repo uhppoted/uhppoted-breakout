@@ -11,7 +11,6 @@
 #endif
 // end legacy RHPORT
 
-// device configuration
 #define CFG_TUD_CDC    (2)
 // #define CFG_TUD_VENDOR (1)
 // #define CFG_TUD_VENDOR    (0)
@@ -21,11 +20,13 @@
 // #define CFG_TUD_ECM_RNDIS (0)
 // #define CFG_TUD_DFU       (1)
 
-// CDC FIFO buffer sizes
-#define CFG_TUD_CDC_RX_BUFSIZE  (512)
-#define CFG_TUD_CDC_TX_BUFSIZE  (512)
-#define CFG_TUD_CDC_EP_BUFSIZE  (512)
-
 #ifndef CFG_TUD_ENDPOINT0_SIZE
 #define CFG_TUD_ENDPOINT0_SIZE  (64)
 #endif
+
+// CDC FIFO buffer sizes
+// NTS: **must** be 64 or USB just doesn't work (presumably CFG_TUD_ENDPOINT0_SIZE ?)
+//      <64: minicom and RPCD just hang
+//      >64: messages of exactly 64 bytes disappear
+#define CFG_TUD_CDC_RX_BUFSIZE  (64)
+#define CFG_TUD_CDC_TX_BUFSIZE  (64)

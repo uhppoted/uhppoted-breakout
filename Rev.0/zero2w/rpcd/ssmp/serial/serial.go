@@ -67,12 +67,15 @@ func (s *Serial) Run() error {
 		for {
 			select {
 			case rq := <-s.requests:
+				debugf("sending  %v bytes", len(rq))
 				if rq == nil {
 					return nil
 				} else if N, err := t.Write(rq); err != nil {
 					warnf("%v", err)
 				} else if N < len(rq) {
 					warnf("sent %v of %v bytes", N, len(rq))
+				} else if err := t.Flush(); err != nil {
+					warnf("%v", err)
 				}
 
 			case <-eof:

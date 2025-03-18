@@ -96,16 +96,6 @@ void SSMP_touched() {
     ssmp.touched = get_absolute_time();
 }
 
-void SSMP_ping() {
-    debugf("SSMP", "ping");
-
-    //     absolute_time_t now = get_absolute_time();
-    //     int64_t delta = absolute_time_diff_us(SSMP.touched, now) / 1000;
-    //
-    //     if (llabs(delta) > SSMP_IDLE) {
-    //     }
-}
-
 void SSMP_rx(circular_buffer *buffer) {
     buffer_flush(buffer, SSMP_rxchar);
 }
@@ -119,7 +109,6 @@ void SSMP_enq() {
 
     SSMP_touched();
     SSMP_write(SYN_SYN_ACK, 3);
-    // FIXME uart_write_blocking(SSMP_UART, SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {

@@ -61,7 +61,6 @@ tusb_desc_device_t const desc_device = {
     .bNumConfigurations = 0x01 // 1 configuration
 };
 
-// #define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + TUD_VENDOR_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
 #define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
 
 // CDC 0 interface notification, OUT and IN endpoints

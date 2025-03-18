@@ -204,8 +204,6 @@ func (s *SSMP) Stop() error {
 }
 
 func (s *SSMP) Get(oid string) (any, error) {
-	debugf("get %v", oid)
-
 	if o, err := BER.ParseOID(oid); err != nil {
 		return nil, err
 	} else {
@@ -215,6 +213,8 @@ func (s *SSMP) Get(oid string) (any, error) {
 			RequestID: ID.Add(1),
 			OID:       o,
 		}
+
+		debugf("get %-3v %v", rq.RequestID, rq.OID)
 
 		if packet, err := BER.EncodeGetRequest(rq); err != nil {
 			return nil, err
@@ -243,6 +243,7 @@ func (s *SSMP) Get(oid string) (any, error) {
 				return nil, fmt.Errorf("timeout")
 
 			case response := <-pipe:
+				debugf("response %v", response)
 				if response.Error != 0 {
 					return nil, fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex)
 				} else {
