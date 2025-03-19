@@ -12,8 +12,8 @@ typedef enum {
     FIELD_SEQUENCE = 0x30,
     FIELD_PDU_GET = 0xa0,
     // FIELD_PDU_GET_NEXT = 0xA1,
-    FIELD_PDU_GET_RESPONSE = 0xa2,
-    // FIELD_PDU_SET: 0xA3,
+    FIELD_PDU_RESPONSE = 0xa2,
+    FIELD_PDU_SET = 0xA3,
     // FIELD_PDU_TRAP: 0xA4,
 } FIELD;
 

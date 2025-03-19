@@ -12,8 +12,12 @@ void packet_free(packet *p) {
             free(p->get.OID);
             break;
 
-        case PACKET_GET_RESPONSE:
-            free(p->get_response.OID);
+        case PACKET_SET:
+            free(p->get.OID);
+            break;
+
+        case PACKET_RESPONSE:
+            free(p->response.OID);
             break;
         }
 

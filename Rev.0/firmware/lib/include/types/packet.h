@@ -8,7 +8,8 @@
 typedef enum {
     PACKET_UNKNOWN,
     PACKET_GET,
-    PACKET_GET_RESPONSE,
+    PACKET_SET,
+    PACKET_RESPONSE,
 } PACKET;
 
 typedef enum {
@@ -46,7 +47,15 @@ typedef struct packet {
             int64_t error_index;
             char *OID;
             value value;
-        } get_response;
+        } set;
+
+        struct {
+            uint32_t request_id;
+            int64_t error;
+            int64_t error_index;
+            char *OID;
+            value value;
+        } response;
     };
 
     bool dynamic;

@@ -12,6 +12,7 @@ field *unpack_null       (const uint8_t *, int, int *);
 field *unpack_OID        (const uint8_t *, int, int *);
 field *unpack_sequence   (const uint8_t *, int, int *);
 field *unpack_get_request(const uint8_t *, int, int *);
+field *unpack_set_request(const uint8_t *, int, int *);
 // clang-format on
 
 const int MAX_FIELDS = 16;
@@ -71,8 +72,14 @@ vector *unpack(const uint8_t *bytes, int N) {
                 }
                 break;
 
+            case FIELD_PDU_SET:
+                if ((f = unpack_set_request(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
             default:
-                debugf("ASN.1", "decode::unknown:%2d  N:%d  ix:%d\n", tag, N, ix);
+                debugf("ASN.1", "decode::unknown:%2d  N:%d  ix:%d", tag, N, ix);
                 ix = N;
             }
         }
@@ -224,6 +231,23 @@ field *unpack_get_request(const uint8_t *message, int N, int *ix) {
 
         f->dynamic = true;
         f->tag = FIELD_PDU_GET;
+        f->pdu.fields = fields;
+    }
+
+    *ix += length;
+
+    return f;
+}
+
+field *unpack_set_request(const uint8_t *message, int N, int *ix) {
+    uint32_t length = unpack_length(message, N, ix);
+    field *f = (field *)calloc(1, sizeof(field));
+
+    if (f != NULL) {
+        vector *fields = unpack(&message[*ix], length);
+
+        f->dynamic = true;
+        f->tag = FIELD_PDU_SET;
         f->pdu.fields = fields;
     }
 

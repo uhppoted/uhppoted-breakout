@@ -4,7 +4,7 @@
 #include <encoding/ASN.1/BER.h>
 #include <encoding/ssmp/ssmp.h>
 
-slice ssmp_encode_get_response(packet p) {
+slice ssmp_encode_response(packet p) {
     field version = {
         .tag = FIELD_INTEGER,
         .integer = {
@@ -23,28 +23,28 @@ slice ssmp_encode_get_response(packet p) {
     field rqid = {
         .tag = FIELD_INTEGER,
         .integer = {
-            .value = p.get_response.request_id,
+            .value = p.response.request_id,
         },
     };
 
     field error = {
         .tag = FIELD_INTEGER,
         .integer = {
-            .value = p.get_response.error,
+            .value = p.response.error,
         },
     };
 
     field error_index = {
         .tag = FIELD_INTEGER,
         .integer = {
-            .value = p.get_response.error_index,
+            .value = p.response.error_index,
         },
     };
 
     field oid = {
         .tag = FIELD_OID,
         .OID = {
-            .OID = strdup(p.get_response.OID),
+            .OID = strdup(p.response.OID),
         },
     };
 
@@ -52,21 +52,21 @@ slice ssmp_encode_get_response(packet p) {
         .tag = FIELD_NULL,
     };
 
-    switch (p.get_response.value.tag) {
+    switch (p.response.value.tag) {
     case VALUE_UINT16:
         value.tag = FIELD_INTEGER;
-        value.integer.value = p.get_response.value.integer;
+        value.integer.value = p.response.value.integer;
         break;
 
     case VALUE_UINT32:
         value.tag = FIELD_INTEGER;
-        value.integer.value = p.get_response.value.integer;
+        value.integer.value = p.response.value.integer;
         break;
 
     case VALUE_OCTET_STRING:
         value.tag = FIELD_OCTET_STRING;
-        value.octets.length = p.get_response.value.octets.length;
-        value.octets.octets = strdup(p.get_response.value.octets.bytes);
+        value.octets.length = p.response.value.octets.length;
+        value.octets.octets = strdup(p.response.value.octets.bytes);
         break;
     };
 
@@ -90,7 +90,7 @@ slice ssmp_encode_get_response(packet p) {
     list.sequence.fields = vector_add(list.sequence.fields, &item);
 
     field pdu = {
-        .tag = FIELD_PDU_GET_RESPONSE,
+        .tag = FIELD_PDU_RESPONSE,
         .sequence = {
             .fields = vector_new(),
         },

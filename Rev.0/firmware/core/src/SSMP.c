@@ -139,6 +139,51 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         }
     }
 
+    // ... SET request?
+    if (request != NULL && request->tag == PACKET_SET) {
+        char val[64] = {0};
+
+        switch (request->set.value.tag) {
+        case VALUE_UINT16:
+            snprintf(val, sizeof(val), "%d", request->set.value.integer);
+            break;
+
+        case VALUE_UINT32:
+            snprintf(val, sizeof(val), "%d", request->set.value.integer);
+            break;
+
+        case VALUE_OCTET_STRING:
+            snprintf(val, (request->set.value.octets.length + 1) < sizeof(val) ? sizeof(val) : request->set.value.octets.length + 1, "%s", request->set.value.octets.bytes);
+            break;
+
+        case VALUE_NULL:
+            snprintf(val, sizeof(val), "NULL");
+            break;
+
+        default:
+            snprintf(val, sizeof(val), "???? <%d>", request->set.value.tag);
+        }
+
+        debugf("SSMP", "SET %lld %lld %lld %s %s %s",
+               request->get.request_id,
+               request->get.error,
+               request->get.error_index,
+               request->community,
+               request->get.OID,
+               val);
+
+        // const char *community = request->community;
+        // const char *oid = request->get.OID;
+        // uint32_t rqid = request->get.request_id;
+        //
+        // if (auth_authorised(community, oid)) {
+        //     if (auth_validate(community, rqid)) {
+        //         SSMP_touched();
+        //         SSMP_get(community, rqid, oid);
+        //     }
+        // }
+    }
+
     packet_free(request);
     vector_free(fields);
 }
@@ -150,10 +195,10 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     value v = MIB_get(OID);
 
     packet reply = {
-        .tag = PACKET_GET_RESPONSE,
+        .tag = PACKET_RESPONSE,
         .version = 0,
         .community = strdup(community),
-        .get_response = {
+        .response = {
             .request_id = rqid,
             .error = 0,
             .error_index = 0,
@@ -163,8 +208,8 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
     };
 
     if (v.tag == VALUE_UNKNOWN) {
-        reply.get_response.error = SSMP_ERROR_NO_SUCH_OBJECT;
-        reply.get_response.error_index = 1;
+        reply.response.error = SSMP_ERROR_NO_SUCH_OBJECT;
+        reply.response.error_index = 1;
     }
 
     // ... encode

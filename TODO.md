@@ -1,7 +1,5 @@
 # TODO
 
-- [x] Change license
-      
 ## RPCD
     - [x] breakout-simulator
     - [x] encoding
@@ -29,7 +27,7 @@
     - [x] CLI bootsel
     - [x] `connected` for log/CLI
     - [x] increase TX/RX CDC buffer size
-    - [ ] weirdness around a message size of 64 bytes
+    - [x] weirdness around a message size of 64 bytes
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88
@@ -72,6 +70,7 @@
     - [x] get-released
     - [x] get-datetime
     - [ ] set-datetime
+    - [ ] free set.value.octets
     - (?) queue UART write
 
 ## Zero2W

@@ -41,7 +41,7 @@ slice BER_encode(const struct field f) {
         s = pack_sequence(&f);
         break;
 
-    case FIELD_PDU_GET_RESPONSE:
+    case FIELD_PDU_RESPONSE:
         s = pack_pdu(&f);
         break;
     }
@@ -256,7 +256,7 @@ slice pack_pdu(const field *f) {
         s.bytes[s.length++] = 0xA0;
         break;
 
-    case FIELD_PDU_GET_RESPONSE:
+    case FIELD_PDU_RESPONSE:
         s.bytes[s.length++] = 0xA2;
         break;
     }
