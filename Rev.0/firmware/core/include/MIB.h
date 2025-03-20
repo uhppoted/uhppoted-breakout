@@ -9,3 +9,4 @@
 #define MIB_CONTROLLER_DATETIME "0.1.3.6.1.4.1.65536.2.8"
 
 value MIB_get(const char *OID);
+int64_t MIB_set(const char *OID, const value u, value *v);

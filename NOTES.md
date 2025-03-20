@@ -104,6 +104,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - https://forums.raspberrypi.com/viewtopic.php?t=302960
 - https://www.baeldung.com/cs/bisync
 - [PPP](https://datatracker.ietf.org/doc/html/rfc1661)
+- https://learn.microsoft.com/en-us/windows/win32/snmp/snmp-error-codes
 
 ### Serial I/O
 - https://stackoverflow.com/questions/51609813/serial-communication-in-c-for-raspberry-pi

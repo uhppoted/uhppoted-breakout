@@ -20,13 +20,17 @@
 #define LOGTAG "SSMP"
 
 const int64_t SSMP_IDLE = 5000; // ms
-const int64_t SSMP_ERROR_NO_SUCH_OBJECT = 0x02;
+const int64_t SSMP_ERROR_NONE = 0;
+const int64_t SSMP_ERROR_NO_SUCH_OBJECT = 2;
+const int64_t SSMP_ERROR_BAD_VALUE = 3;
+const int64_t SSMP_ERROR_COMMIT_FAILED = 14;
 
 void SSMP_rxchar(uint8_t ch);
 void SSMP_enq();
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
+void SSMP_set(const char *community, int64_t rqid, const char *OID, const value val);
 void SSMP_write(const uint8_t *buffer, int N);
 
 struct {
@@ -76,7 +80,7 @@ void SSMP_init() {
 
     SSMP_touched();
 
-    infof("SSMP", "initialised");
+    infof(LOGTAG, "initialised");
 }
 
 void SSMP_start() {
@@ -84,7 +88,7 @@ void SSMP_start() {
 }
 
 void SSMP_reset() {
-    debugf("SSMP", "reset");
+    debugf(LOGTAG, "reset");
 
     SSMP_touched();
 }
@@ -105,14 +109,14 @@ void SSMP_rxchar(uint8_t ch) {
 }
 
 void SSMP_enq() {
-    debugf("SSMP", "ENQ");
+    debugf(LOGTAG, "ENQ");
 
     SSMP_touched();
     SSMP_write(SYN_SYN_ACK, 3);
 }
 
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len) {
-    debugf("SSMP", "received (%d bytes)", data_len);
+    debugf(LOGTAG, "received (%d bytes)", data_len);
 
     // ... decode packet
     vector *fields = BER_decode(data, data_len);
@@ -120,7 +124,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
 
     // ... GET request?
     if (request != NULL && request->tag == PACKET_GET) {
-        debugf("SSMP", "GET %lld %lld %lld %s %s",
+        debugf(LOGTAG, "GET %lld %lld %lld %s %s",
                request->get.request_id,
                request->get.error,
                request->get.error_index,
@@ -164,7 +168,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
             snprintf(val, sizeof(val), "???? <%d>", request->set.value.tag);
         }
 
-        debugf("SSMP", "SET %lld %lld %lld %s %s %s",
+        debugf(LOGTAG, "SET %lld %lld %lld %s %s %s",
                request->get.request_id,
                request->get.error,
                request->get.error_index,
@@ -172,23 +176,23 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
                request->get.OID,
                val);
 
-        // const char *community = request->community;
-        // const char *oid = request->get.OID;
-        // uint32_t rqid = request->get.request_id;
-        //
-        // if (auth_authorised(community, oid)) {
-        //     if (auth_validate(community, rqid)) {
-        //         SSMP_touched();
-        //         SSMP_get(community, rqid, oid);
-        //     }
-        // }
+        const char *community = request->community;
+        const char *oid = request->get.OID;
+        uint32_t rqid = request->get.request_id;
+
+        if (auth_authorised(community, oid)) {
+            if (auth_validate(community, rqid)) {
+                SSMP_touched();
+                SSMP_set(community, rqid, oid, request->set.value);
+            }
+        }
     }
 
     packet_free(request);
     vector_free(fields);
 }
 
-/* SSMP GET response
+/* SSMP GET implementation.
  *
  */
 void SSMP_get(const char *community, int64_t rqid, const char *OID) {
@@ -209,6 +213,42 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
 
     if (v.tag == VALUE_UNKNOWN) {
         reply.response.error = SSMP_ERROR_NO_SUCH_OBJECT;
+        reply.response.error_index = 1;
+    }
+
+    // ... encode
+    slice packed = ssmp_encode(reply);
+    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+
+    SSMP_write(encoded.bytes, encoded.length);
+
+    slice_free(&encoded);
+    slice_free(&packed);
+    packet_free(&reply);
+}
+
+/* SSMP SET implementation.
+ *
+ */
+void SSMP_set(const char *community, int64_t rqid, const char *OID, const value val) {
+    value v;
+    int64_t err = MIB_set(OID, val, &v);
+
+    packet reply = {
+        .tag = PACKET_RESPONSE,
+        .version = 0,
+        .community = strdup(community),
+        .response = {
+            .request_id = rqid,
+            .error = 0,
+            .error_index = 0,
+            .OID = strdup(OID),
+            .value = v,
+        },
+    };
+
+    if (err != SSMP_ERROR_NONE) {
+        reply.response.error = err;
         reply.response.error_index = 1;
     }
 

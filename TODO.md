@@ -70,6 +70,14 @@
     - [x] get-released
     - [x] get-datetime
     - [ ] set-datetime
+          - (?) RTC set-datetime (atomic)
+          - [ ] Figure out RTC set/get delay thing
+    - [ ] include SET/GET in auth rq
+    - [ ] SSMP_ERROR_AUTHORIZATIONERROR (16)
+    - [ ] SSMP_ERROR_NOTWRITABLE (17)
+    - [ ] SSMP_ERROR_WRONGTYPE (7)
+    - [ ] SSMP_ERROR_NOACCESS (6)
+    - [ ] SSMP_ERROR_READONLY (4)
     - [ ] free set.value.octets
     - (?) queue UART write
 

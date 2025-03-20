@@ -295,6 +295,8 @@ void RTC_get_date(char *yymmmdd, int N) {
 }
 
 bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
+    debugf(LOGTAG, "set-date %04d-%02d-%02d  %s", year, month, day, RTC.initialised ? "" : "-- not initialised --");
+
     if (RTC.initialised) {
         uint8_t weekday = dow(year, month, day);
         datetime *dt = datetime_alloc();
@@ -316,7 +318,7 @@ bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
                 .data = &RTC,
             };
 
-            if (I2C0_push(&write)) {
+            if (!I2C0_push(&write)) {
                 datetime_free(dt);
             } else if (I2C0_push(&read)) {
                 return true;
@@ -350,6 +352,8 @@ void RTC_get_time(char *HHmmss, int N) {
 }
 
 bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
+    debugf(LOGTAG, "set-time %02d-%02d-%02d  %s", hour, minute, second, RTC.initialised ? "" : "-- not initialised --");
+
     if (RTC.initialised) {
         datetime *dt = datetime_alloc();
 
