@@ -32,6 +32,7 @@
     - https://gist.github.com/jftuga/18409ced62f9a59ecbc047800ab8e810
     - https://forum.golangbridge.org/t/get-set-network-interface-in-pure-go-code/9075/3
 22. [Memory usage](https://forums.raspberrypi.com/viewtopic.php?t=347638)
+23. https://electronics.stackexchange.com/questions/742062/robust-communication-between-%c2%b5p-board-and-i-o-expander-over-3-5-meters
 
 ## WaveShare RP2040-Tiny
 1. https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero

@@ -26,6 +26,10 @@ void field_free(field *f) {
             vector_free(f->pdu.fields);
             break;
 
+        case FIELD_PDU_SET:
+            vector_free(f->pdu.fields);
+            break;
+
         case FIELD_PDU_RESPONSE:
             vector_free(f->pdu.fields);
             break;

@@ -135,7 +135,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         const char *oid = request->get.OID;
         uint32_t rqid = request->get.request_id;
 
-        if (auth_authorised(community, oid)) {
+        if (auth_authorised(community, oid, OP_GET)) {
             if (auth_validate(community, rqid)) {
                 SSMP_touched();
                 SSMP_get(community, rqid, oid);
@@ -180,7 +180,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         const char *oid = request->get.OID;
         uint32_t rqid = request->get.request_id;
 
-        if (auth_authorised(community, oid)) {
+        if (auth_authorised(community, oid, OP_SET)) {
             if (auth_validate(community, rqid)) {
                 SSMP_touched();
                 SSMP_set(community, rqid, oid, request->set.value);

@@ -1,17 +1,6 @@
 # TODO
 
 ## RPCD
-    - [x] breakout-simulator
-    - [x] encoding
-    - [x] decoding
-    - [x] auto-increment request ID
-    - [x] guard around SSMP.pending
-    - [x] serialize request-responses again
-    - [x] expire SSMP.pending entries
-    - [x] GET
-    - [x] SET
-    - [x] UART
-    - [x] exponential backoff
     - [ ] cache controller ID
     - [ ] monitor
     - [ ] daemonize
@@ -21,13 +10,6 @@
 ## breakout
 
 - [ ] USB
-    - [x] dual CDC interfaces
-    - [x] RX
-    - [x] TX
-    - [x] CLI bootsel
-    - [x] `connected` for log/CLI
-    - [x] increase TX/RX CDC buffer size
-    - [x] weirdness around a message size of 64 bytes
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88
@@ -46,7 +28,6 @@
 ### misc
 
 - [ ] syserror
-      - [x] red LED on any system error 
       - [ ] make debugf, infof, etc interrupt safe
             - use arg index
             - predeclared int/float/etc args
@@ -55,7 +36,6 @@
       - (?) count up/down to auto-clear
 
 - [ ] Rework print queue
-      - [x] check USB connected
       - (?) setvbuf
 
 - [ ] Use Pico optimized libraries
@@ -65,6 +45,9 @@
       - pico_stdio
 
 ### SSMP
+    - [x] include SET/GET in auth rq
+          - [ ] SSMP_ERROR_AUTHORIZATIONERROR (16)
+    - [x] free set.value.octets
     - [x] get-controller-id
     - [x] get-version
     - [x] get-released
@@ -72,13 +55,12 @@
     - [ ] set-datetime
           - (?) RTC set-datetime (atomic)
           - [ ] Figure out RTC set/get delay thing
-    - [ ] include SET/GET in auth rq
-    - [ ] SSMP_ERROR_AUTHORIZATIONERROR (16)
+    - [ ] get-status
+          - [ ] syserror: .1.3.6.1.4.1.65536.2.9
     - [ ] SSMP_ERROR_NOTWRITABLE (17)
     - [ ] SSMP_ERROR_WRONGTYPE (7)
     - [ ] SSMP_ERROR_NOACCESS (6)
     - [ ] SSMP_ERROR_READONLY (4)
-    - [ ] free set.value.octets
     - (?) queue UART write
 
 ## Zero2W
@@ -126,6 +108,7 @@
       - https://go.dev/blog/protobuf-opaque
       - [x] go-rpc
       - [x] unix domain sockets
+      - [ ] TLS
       - [ ] TCP/IP
       - [ ] grpc
 
@@ -137,7 +120,6 @@
           - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
 
 ### MIB
-    - [x] controller ID
     - [ ] RP2040 ID
           - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
     - [ ] system errors

@@ -13,11 +13,17 @@ void packet_free(packet *p) {
             break;
 
         case PACKET_SET:
-            free(p->get.OID);
+            free(p->set.OID);
+            if (p->set.value.tag == VALUE_OCTET_STRING) {
+                slice_free(&p->set.value.octets);
+            }
             break;
 
         case PACKET_RESPONSE:
             free(p->response.OID);
+            if (p->response.value.tag == VALUE_OCTET_STRING) {
+                slice_free(&p->response.value.octets);
+            }
             break;
         }
 

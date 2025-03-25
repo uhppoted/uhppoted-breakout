@@ -11,11 +11,23 @@ typedef struct community {
     uint8_t *key;
 } community;
 
-const char *PUBLIC[] = {
-    MIB_CONTROLLER_ID,
-    MIB_CONTROLLER_VERSION,
-    MIB_CONTROLLER_RELEASED,
-    MIB_CONTROLLER_DATETIME,
+const struct {
+    char *get[4];
+    char *set[4];
+} PUBLIC = {
+    .get = {
+        MIB_CONTROLLER_ID,
+        MIB_CONTROLLER_VERSION,
+        MIB_CONTROLLER_RELEASED,
+        MIB_CONTROLLER_DATETIME,
+    },
+
+    .set = {
+        MIB_CONTROLLER_ID,
+        MIB_CONTROLLER_VERSION,
+        MIB_CONTROLLER_RELEASED,
+        MIB_CONTROLLER_DATETIME,
+    },
 };
 
 community public = {
@@ -30,12 +42,20 @@ community private = {
     .key = NULL,
 };
 
-bool auth_authorised(const char *community, const char *oid) {
-    if (strcmp(community, "public") == 0) {
-        int N = sizeof(PUBLIC) / sizeof(const char *);
-
+bool auth_authorised(const char *community, const char *oid, OP op) {
+    if (strcmp(community, "public") == 0 && op == OP_GET) {
+        int N = sizeof(PUBLIC.get) / sizeof(const char *);
         for (int i = 0; i < N; i++) {
-            if (strcmp(oid, PUBLIC[i]) == 0) {
+            if (strcmp(oid, PUBLIC.get[i]) == 0) {
+                return true;
+            }
+        }
+    }
+
+    if (strcmp(community, "public") == 0 && op == OP_SET) {
+        int N = sizeof(PUBLIC.set) / sizeof(const char *);
+        for (int i = 0; i < N; i++) {
+            if (strcmp(oid, PUBLIC.set[i]) == 0) {
                 return true;
             }
         }
