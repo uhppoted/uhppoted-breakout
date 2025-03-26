@@ -1,7 +1,7 @@
 # TODO
 
 ## RPCD
-    - [ ] cache controller ID
+    - [x] GET cache
     - [ ] monitor
     - [ ] daemonize
     - (?) Context.WithTimeout 
@@ -45,6 +45,7 @@
       - pico_stdio
 
 ### SSMP
+    - [ ] TRAP
     - [x] include SET/GET in auth rq
           - [ ] SSMP_ERROR_AUTHORIZATIONERROR (16)
     - [x] free set.value.octets
@@ -132,6 +133,7 @@
           - https://kittenlabs.de/blog/2024/09/01/extreme-pi-boot-optimization
     - [ ] NB: 24/7 operation - Cam said to ask him
     - (?) Use Nerves
+    - https://hackaday.com/2025/03/26/build-customized-raspberry-pi-os-images-with-rpi-image-gen/
 
 ### OTA
     - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
