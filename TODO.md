@@ -2,8 +2,8 @@
 
 ## RPCD
     - [x] GET cache
-    - [ ] monitor
     - [ ] daemonize
+    - [ ] monitor
     - (?) Context.WithTimeout 
     - (?) https://go.dev/blog/synctest
 
@@ -57,7 +57,10 @@
           - (?) RTC set-datetime (atomic)
           - [ ] Figure out RTC set/get delay thing
     - [ ] get-status
-          - [ ] syserror: .1.3.6.1.4.1.65536.2.9
+          - [x] syserror: .1.3.6.1.4.1.65536.2.9
+          - [x] sysinfo: .1.3.6.1.4.1.65536.2.10
+          - [ ] door locks .1.3.6.1.4.1.65536.3.1-4.4
+          - [ ] ut0311: remap uint16 to uint8
     - [ ] SSMP_ERROR_NOTWRITABLE (17)
     - [ ] SSMP_ERROR_WRONGTYPE (7)
     - [ ] SSMP_ERROR_NOACCESS (6)

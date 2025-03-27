@@ -7,6 +7,8 @@
 #define MIB_CONTROLLER_VERSION "0.1.3.6.1.4.1.65536.2.2"
 #define MIB_CONTROLLER_RELEASED "0.1.3.6.1.4.1.65536.2.3"
 #define MIB_CONTROLLER_DATETIME "0.1.3.6.1.4.1.65536.2.8"
+#define MIB_CONTROLLER_SYSERROR "0.1.3.6.1.4.1.65536.2.9"
+#define MIB_CONTROLLER_SYSINFO "0.1.3.6.1.4.1.65536.2.10"
 
 value MIB_get(const char *OID);
 int64_t MIB_set(const char *OID, const value u, value *v);

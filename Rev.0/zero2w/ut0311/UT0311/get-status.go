@@ -26,13 +26,13 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			response.SystemTime = types.SystemTime(datetime)
 		}
 
-		if v, err := scmp.Get[uint8](ut0311.driver, scmp.OID_CONTROLLER_ERROR); err != nil {
+		if v, err := scmp.Get[uint8](ut0311.driver, scmp.OID_CONTROLLER_SYSERR); err != nil {
 			return nil, err
 		} else {
 			response.SystemError = v
 		}
 
-		if v, err := scmp.Get[uint8](ut0311.driver, scmp.OID_CONTROLLER_SPECIAL_INFO); err != nil {
+		if v, err := scmp.Get[uint8](ut0311.driver, scmp.OID_CONTROLLER_SYSINFO); err != nil {
 			return nil, err
 		} else {
 			response.SpecialInfo = v

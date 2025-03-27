@@ -77,10 +77,12 @@ func (r RPC) set(oid scmp.OID, value any) (any, error) {
 func (r RPC) GetUint8(oid scmp.OID) (uint8, error) {
 	if v, err := r.get(oid); err != nil {
 		return 0, err
-	} else if u8, ok := v.(uint8); !ok {
-		return 0, fmt.Errorf("invalid uint8 value (%T)", v)
-	} else {
+	} else if u8, ok := v.(uint8); ok {
 		return u8, nil
+	} else if i64, ok := v.(int64); ok {
+		return uint8(i64), nil
+	} else {
+		return 0, fmt.Errorf("invalid uint8 value (%T)", v)
 	}
 }
 

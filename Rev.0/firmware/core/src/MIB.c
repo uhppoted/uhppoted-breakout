@@ -5,6 +5,7 @@
 #include <MIB.h>
 #include <RTC.h>
 #include <SSMP.h>
+#include <breakout.h>
 #include <log.h>
 #include <sys.h>
 
@@ -81,6 +82,16 @@ value MIB_get(const char *OID) {
 
         v.tag = VALUE_OCTET_STRING;
         v.octets = octets;
+    }
+
+    if (strcmp(OID, MIB_CONTROLLER_SYSERROR) == 0) {
+        v.tag = VALUE_UINT8;
+        v.integer = (uint8_t)get_errors();
+    }
+
+    if (strcmp(OID, MIB_CONTROLLER_SYSINFO) == 0) {
+        v.tag = VALUE_UINT8;
+        v.integer = 0;
     }
 
     return v;

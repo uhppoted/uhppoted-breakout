@@ -12,20 +12,19 @@ typedef struct community {
 } community;
 
 const struct {
-    char *get[4];
-    char *set[4];
+    char *get[6];
+    char *set[1];
 } PUBLIC = {
     .get = {
         MIB_CONTROLLER_ID,
         MIB_CONTROLLER_VERSION,
         MIB_CONTROLLER_RELEASED,
         MIB_CONTROLLER_DATETIME,
+        MIB_CONTROLLER_SYSERROR,
+        MIB_CONTROLLER_SYSINFO,
     },
 
     .set = {
-        MIB_CONTROLLER_ID,
-        MIB_CONTROLLER_VERSION,
-        MIB_CONTROLLER_RELEASED,
         MIB_CONTROLLER_DATETIME,
     },
 };
