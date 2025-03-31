@@ -29,9 +29,9 @@ var lookup = struct {
 		4: scmp.OID_DOORS_4_PASSCODES,
 	},
 	lock: map[uint8]scmp.OID{
-		1: scmp.OID_DOORS_1_LOCK,
-		2: scmp.OID_DOORS_2_LOCK,
-		3: scmp.OID_DOORS_3_LOCK,
-		4: scmp.OID_DOORS_4_LOCK,
+		1: scmp.OID_DOORS_1_UNLOCKED,
+		2: scmp.OID_DOORS_2_UNLOCKED,
+		3: scmp.OID_DOORS_3_UNLOCKED,
+		4: scmp.OID_DOORS_4_UNLOCKED,
 	},
 }

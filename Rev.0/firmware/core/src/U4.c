@@ -329,6 +329,16 @@ void U4_healthcheck(void *data) {
     operation_free(op);
 }
 
+bool U4_get_relay(int relay) {
+    for (struct relay *r = U4x.relays.relays; r < U4x.relays.relays + U4x.relays.N; r++) {
+        if (r->id == relay) {
+            return r->mask & U4x.outputs != 0;
+        }
+    }
+
+    return false;
+}
+
 void U4_set_relay(int relay, uint16_t delay) {
     mutex_enter_blocking(&U4x.guard);
 

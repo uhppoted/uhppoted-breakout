@@ -5,11 +5,14 @@
 #include <MIB.h>
 #include <RTC.h>
 #include <SSMP.h>
+#include <U4.h>
 #include <breakout.h>
 #include <log.h>
 #include <sys.h>
 
 #define LOGTAG "MIB"
+
+value MIB_get_boolean(const char *OID);
 
 int64_t MIB_set_string(const char *OID, const char *s, int length, value *v);
 
@@ -94,19 +97,55 @@ value MIB_get(const char *OID) {
         v.integer = 0;
     }
 
+    if (strcmp(OID, MIB_DOORS_1_UNLOCKED) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_2_UNLOCKED) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_3_UNLOCKED) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_4_UNLOCKED) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    return v;
+}
+
+value MIB_get_boolean(const char *OID) {
+    value v = {
+        .tag = VALUE_NULL,
+    };
+
+    if (strcmp(OID, MIB_DOORS_1_UNLOCKED) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U4_get_relay(1);
+    }
+
+    if (strcmp(OID, MIB_DOORS_2_UNLOCKED) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U4_get_relay(2);
+    }
+
+    if (strcmp(OID, MIB_DOORS_3_UNLOCKED) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U4_get_relay(3);
+    }
+
+    if (strcmp(OID, MIB_DOORS_4_UNLOCKED) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U4_get_relay(4);
+    }
+
     return v;
 }
 
 int64_t MIB_set(const char *OID, const value u, value *v) {
     switch (u.tag) {
-        // case VALUE_UINT16:
-        //     snprintf(val, sizeof(val), "%d", request->set.value.integer);
-        //     break;
-
-        // case VALUE_UINT32:
-        //     snprintf(val, sizeof(val), "%d", request->set.value.integer);
-        //     break;
-
     case VALUE_OCTET_STRING:
         return MIB_set_string(OID, u.octets.bytes, u.octets.length, v);
         break;

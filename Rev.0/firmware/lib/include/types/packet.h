@@ -14,6 +14,7 @@ typedef enum {
 
 typedef enum {
     VALUE_UNKNOWN,
+    VALUE_BOOLEAN,
     VALUE_UINT8,
     VALUE_UINT16,
     VALUE_UINT32,
@@ -25,6 +26,7 @@ typedef struct value {
     VALUE tag;
 
     union {
+        bool boolean;
         int64_t integer;
         slice octets;
     };

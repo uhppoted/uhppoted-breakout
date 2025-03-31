@@ -8,8 +8,7 @@ build: format
 	python3 -m compileall .
 
 debug:
-	python3 main.py set-time
-	python3 main.py get-time
+	python3 main.py get-status
 
 get-controller:
 	python3 main.py get-controller

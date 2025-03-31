@@ -1,5 +1,6 @@
 package BER
 
+const tagBoolean byte = 1
 const tagInteger byte = 2
 const tagOctetString byte = 4
 const tagNull byte = 5

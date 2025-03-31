@@ -69,6 +69,9 @@ func unpack(bytes []byte) (any, []byte, error) {
 		bytes = bytes[1:]
 
 		switch tag {
+		case tagBoolean:
+			return unpack_boolean(bytes)
+
 		case tagInteger:
 			return unpack_integer(bytes)
 
@@ -125,6 +128,30 @@ func unpack_length(bytes []byte) (uint32, []byte, error) {
 	}
 
 	return 0, bytes, fmt.Errorf("invalid field length")
+}
+
+func unpack_boolean(bytes []byte) (bool, []byte, error) {
+	if N, bytes, err := unpack_length(bytes); err != nil {
+		return false, nil, err
+	} else if N > uint32(len(bytes)) || N > 8 {
+		return false, nil, fmt.Errorf("invalid boolean field")
+	} else {
+		chunk := bytes[:N]
+
+		if len(chunk) > 0 {
+			u8 := uint8(chunk[0])
+
+			if u8 == 0x00 {
+				return false, bytes[N:], nil
+			} else if u8 == 0xff {
+				return true, bytes[N:], nil
+			}
+
+			return false, nil, fmt.Errorf("invalid boolean value")
+		}
+
+		return false, nil, fmt.Errorf("invalid boolean field")
+	}
 }
 
 func unpack_integer(bytes []byte) (int64, []byte, error) {

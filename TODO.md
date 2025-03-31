@@ -46,6 +46,7 @@
 
 ### SSMP
     - [ ] TRAP
+    - [ ] hash OIDs for faster lookup
     - [x] include SET/GET in auth rq
           - [ ] SSMP_ERROR_AUTHORIZATIONERROR (16)
     - [x] free set.value.octets
@@ -59,7 +60,8 @@
     - [ ] get-status
           - [x] syserror: .1.3.6.1.4.1.65536.2.9
           - [x] sysinfo: .1.3.6.1.4.1.65536.2.10
-          - [ ] door locks .1.3.6.1.4.1.65536.3.1-4.4
+          - [x] door locks (.1.3.6.1.4.1.65536.3.1.4 to .1.3.6.1.4.1.65536.3.4.4)
+          - [ ] door open (.1.3.6.1.4.1.65536.3.1.5 to .1.3.6.1.4.1.65536.3.4.5)
           - [ ] ut0311: remap uint16 to uint8
     - [ ] SSMP_ERROR_NOTWRITABLE (17)
     - [ ] SSMP_ERROR_WRONGTYPE (7)

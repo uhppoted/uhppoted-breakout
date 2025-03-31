@@ -45,7 +45,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 1
-		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_1_LOCK); err != nil {
+		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_1_UNLOCKED); err != nil {
 			return nil, err
 		} else if !locked {
 			response.RelayState |= 0x01
@@ -64,7 +64,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 2
-		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_2_LOCK); err != nil {
+		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_2_UNLOCKED); err != nil {
 			return nil, err
 		} else if !locked {
 			response.RelayState |= 0x02
@@ -83,7 +83,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 3
-		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_3_LOCK); err != nil {
+		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_3_UNLOCKED); err != nil {
 			return nil, err
 		} else if !locked {
 			response.RelayState |= 0x04
@@ -102,7 +102,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 4
-		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_4_LOCK); err != nil {
+		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_4_UNLOCKED); err != nil {
 			return nil, err
 		} else if !locked {
 			response.RelayState |= 0x08

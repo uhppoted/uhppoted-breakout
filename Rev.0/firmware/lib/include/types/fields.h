@@ -21,6 +21,10 @@ typedef struct field {
     FIELD tag;
     union {
         struct {
+            bool value;
+        } boolean;
+
+        struct {
             int64_t value;
         } integer;
 

@@ -5,6 +5,7 @@
 #include <encoding/ASN.1/BER.h>
 #include <types/slice.h>
 
+slice pack_boolean(const field *f);
 slice pack_integer(const field *f);
 slice pack_octets(const field *f);
 slice pack_null(const field *f);
@@ -21,6 +22,10 @@ slice BER_encode(const struct field f) {
     };
 
     switch (f.tag) {
+    case FIELD_BOOLEAN:
+        s = pack_boolean(&f);
+        break;
+
     case FIELD_INTEGER:
         s = pack_integer(&f);
         break;
@@ -45,6 +50,20 @@ slice BER_encode(const struct field f) {
         s = pack_pdu(&f);
         break;
     }
+
+    return s;
+}
+
+slice pack_boolean(const field *f) {
+    slice s = {
+        .capacity = 8,
+        .length = 3,
+        .bytes = (uint8_t *)calloc(8, sizeof(uint8_t)),
+    };
+
+    s.bytes[0] = 0x01;
+    s.bytes[1] = 0x01;
+    s.bytes[2] = f->boolean.value ? 0xff : 0x00;
 
     return s;
 }

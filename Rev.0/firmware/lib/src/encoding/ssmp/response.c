@@ -53,6 +53,11 @@ slice ssmp_encode_response(packet p) {
     };
 
     switch (p.response.value.tag) {
+    case VALUE_BOOLEAN:
+        value.tag = FIELD_BOOLEAN;
+        value.boolean.value = p.response.value.boolean;
+        break;
+
     case VALUE_UINT8:
         value.tag = FIELD_INTEGER;
         value.integer.value = p.response.value.integer;
