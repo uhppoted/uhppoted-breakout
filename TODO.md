@@ -47,6 +47,7 @@
 ### SSMP
     - [ ] TRAP
     - [ ] hash OIDs for faster lookup
+    - [ ] return error if MIB `get` fails
     - [x] include SET/GET in auth rq
           - [ ] SSMP_ERROR_AUTHORIZATIONERROR (16)
     - [x] free set.value.octets
@@ -58,10 +59,13 @@
           - (?) RTC set-datetime (atomic)
           - [ ] Figure out RTC set/get delay thing
     - [ ] get-status
-          - [x] syserror: .1.3.6.1.4.1.65536.2.9
-          - [x] sysinfo: .1.3.6.1.4.1.65536.2.10
-          - [x] door locks (.1.3.6.1.4.1.65536.3.1.4 to .1.3.6.1.4.1.65536.3.4.4)
-          - [x] door open  (.1.3.6.1.4.1.65536.3.1.5 to .1.3.6.1.4.1.65536.3.4.5)
+          - [x] syserror:     (.1.3.6.1.4.1.65536.2.9)
+          - [x] sysinfo:      (.1.3.6.1.4.1.65536.2.10)
+          - [x] door locks    (.1.3.6.1.4.1.65536.3.x.4)
+          - [x] door open     (.1.3.6.1.4.1.65536.3.x.5)
+          - [x] door button   (.1.3.6.1.4.1.65536.3.x.6)
+          - [ ] tamper detect (.1.3.6.1.4.1.65536.4.1)
+          - [ ] fire alarm    (.1.3.6.1.4.1.65536.4.2)
           - [ ] ut0311: remap uint16 to uint8
     - [ ] SSMP_ERROR_NOTWRITABLE (17)
     - [ ] SSMP_ERROR_WRONGTYPE (7)

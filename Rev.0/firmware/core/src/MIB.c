@@ -130,6 +130,22 @@ value MIB_get(const char *OID) {
         return MIB_get_boolean(OID);
     }
 
+    if (strcmp(OID, MIB_DOORS_1_BUTTON) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_2_BUTTON) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_3_BUTTON) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_4_BUTTON) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
     return v;
 }
 
@@ -177,6 +193,28 @@ value MIB_get_boolean(const char *OID) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_door(4);
     }
+
+    if (strcmp(OID, MIB_DOORS_1_BUTTON) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U3_get_button(1);
+    }
+
+    if (strcmp(OID, MIB_DOORS_2_BUTTON) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U3_get_button(2);
+    }
+
+    if (strcmp(OID, MIB_DOORS_3_BUTTON) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U3_get_button(3);
+    }
+
+    if (strcmp(OID, MIB_DOORS_4_BUTTON) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U3_get_button(4);
+    }
+
+    // FIXME return error ?
 
     return v;
 }

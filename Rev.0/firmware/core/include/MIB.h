@@ -20,5 +20,10 @@
 #define MIB_DOORS_3_OPEN "0.1.3.6.1.4.1.65536.3.3.5"
 #define MIB_DOORS_4_OPEN "0.1.3.6.1.4.1.65536.3.4.5"
 
+#define MIB_DOORS_1_BUTTON "0.1.3.6.1.4.1.65536.3.1.6"
+#define MIB_DOORS_2_BUTTON "0.1.3.6.1.4.1.65536.3.2.6"
+#define MIB_DOORS_3_BUTTON "0.1.3.6.1.4.1.65536.3.3.6"
+#define MIB_DOORS_4_BUTTON "0.1.3.6.1.4.1.65536.3.4.6"
+
 value MIB_get(const char *OID);
 int64_t MIB_set(const char *OID, const value u, value *v);
