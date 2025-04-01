@@ -5,6 +5,7 @@
 #include <MIB.h>
 #include <RTC.h>
 #include <SSMP.h>
+#include <U3.h>
 #include <U4.h>
 #include <breakout.h>
 #include <log.h>
@@ -113,6 +114,22 @@ value MIB_get(const char *OID) {
         return MIB_get_boolean(OID);
     }
 
+    if (strcmp(OID, MIB_DOORS_1_OPEN) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_2_OPEN) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_3_OPEN) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
+    if (strcmp(OID, MIB_DOORS_4_OPEN) == 0) {
+        return MIB_get_boolean(OID);
+    }
+
     return v;
 }
 
@@ -139,6 +156,26 @@ value MIB_get_boolean(const char *OID) {
     if (strcmp(OID, MIB_DOORS_4_UNLOCKED) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U4_get_relay(4);
+    }
+
+    if (strcmp(OID, MIB_DOORS_1_OPEN) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U3_get_door(1);
+    }
+
+    if (strcmp(OID, MIB_DOORS_2_OPEN) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U3_get_door(2);
+    }
+
+    if (strcmp(OID, MIB_DOORS_3_OPEN) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U3_get_door(3);
+    }
+
+    if (strcmp(OID, MIB_DOORS_4_OPEN) == 0) {
+        v.tag = VALUE_BOOLEAN;
+        v.boolean = U3_get_door(4);
     }
 
     return v;
