@@ -13,7 +13,7 @@
 
 #define LOGTAG "MIB"
 
-value MIB_get_boolean(const char *OID);
+extern const MIBItem OIDs[21];
 
 value MIB_get(const char *OID) {
     uint32_t hash = djb2(OID);
@@ -98,142 +98,70 @@ value MIB_get(const char *OID) {
         v.integer = 0;
     }
 
-    if (strcmp(OID, MIB_DOORS_1_UNLOCKED.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
+    int N = sizeof(OIDs) / sizeof(MIBItem);
+    for (int i = 0; i < N; i++) {
+        MIBItem item = OIDs[i];
 
-    if (strcmp(OID, MIB_DOORS_2_UNLOCKED.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_3_UNLOCKED.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_4_UNLOCKED.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_1_OPEN.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_2_OPEN.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_3_OPEN.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_4_OPEN.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_1_BUTTON.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_2_BUTTON.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_3_BUTTON.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_DOORS_4_BUTTON.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_ALARMS_TAMPER_DETECT.OID) == 0) {
-        return MIB_get_boolean(OID);
-    }
-
-    if (strcmp(OID, MIB_ALARMS_FIRE_ALARM.OID) == 0) {
-        return MIB_get_boolean(OID);
+        if ((hash == item.hash) && (strcmp(OID, item.OID) == 0) && (item.get != NULL)) {
+            return item.get();
+        }
     }
 
     return v;
 }
 
-value MIB_get_boolean(const char *OID) {
-    value v = {
-        .tag = VALUE_NULL,
-    };
-
-    if (strcmp(OID, MIB_DOORS_1_UNLOCKED.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U4_get_relay(1);
-    }
-
-    if (strcmp(OID, MIB_DOORS_2_UNLOCKED.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U4_get_relay(2);
-    }
-
-    if (strcmp(OID, MIB_DOORS_3_UNLOCKED.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U4_get_relay(3);
-    }
-
-    if (strcmp(OID, MIB_DOORS_4_UNLOCKED.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U4_get_relay(4);
-    }
-
-    if (strcmp(OID, MIB_DOORS_1_OPEN.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U3_get_door(1);
-    }
-
-    if (strcmp(OID, MIB_DOORS_2_OPEN.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U3_get_door(2);
-    }
-
-    if (strcmp(OID, MIB_DOORS_3_OPEN.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U3_get_door(3);
-    }
-
-    if (strcmp(OID, MIB_DOORS_4_OPEN.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U3_get_door(4);
-    }
-
-    if (strcmp(OID, MIB_DOORS_1_BUTTON.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U3_get_button(1);
-    }
-
-    if (strcmp(OID, MIB_DOORS_2_BUTTON.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U3_get_button(2);
-    }
-
-    if (strcmp(OID, MIB_DOORS_3_BUTTON.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U3_get_button(3);
-    }
-
-    if (strcmp(OID, MIB_DOORS_4_BUTTON.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = U3_get_button(4);
-    }
-
-    if (strcmp(OID, MIB_ALARMS_TAMPER_DETECT.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = false;
-    }
-
-    if (strcmp(OID, MIB_ALARMS_FIRE_ALARM.OID) == 0) {
-        v.tag = VALUE_BOOLEAN;
-        v.boolean = false;
-    }
-
-    // FIXME return error ?
-
-    return v;
+value MIB_get_doors_1_unlocked() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U4_get_relay(1)};
 }
 
+value MIB_get_doors_2_unlocked() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U4_get_relay(2)};
+}
+
+value MIB_get_doors_3_unlocked() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U4_get_relay(3)};
+}
+
+value MIB_get_doors_4_unlocked() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U4_get_relay(4)};
+}
+
+value MIB_get_doors_1_open() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U3_get_door(1)};
+}
+
+value MIB_get_doors_2_open() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U3_get_door(2)};
+}
+
+value MIB_get_doors_3_open() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U3_get_door(3)};
+}
+
+value MIB_get_doors_4_open() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U3_get_door(4)};
+}
+
+value MIB_get_doors_1_pushbutton() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U3_get_button(1)};
+}
+
+value MIB_get_doors_2_pushbutton() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U3_get_button(2)};
+}
+
+value MIB_get_doors_3_pushbutton() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U3_get_button(3)};
+}
+
+value MIB_get_doors_4_pushbutton() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = U3_get_button(4)};
+}
+
+value MIB_get_alarms_tamper_detect() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = false};
+}
+
+value MIB_get_alarms_fire_alarm() {
+    return (value){.tag = VALUE_BOOLEAN, .boolean = false};
+}

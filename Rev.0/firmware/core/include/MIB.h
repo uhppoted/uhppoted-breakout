@@ -5,6 +5,7 @@
 typedef struct MIBItem {
     uint32_t hash;
     const char *OID;
+    value (*get)();
 } MIBItem;
 
 extern const MIBItem MIB_BOARD_ID;
