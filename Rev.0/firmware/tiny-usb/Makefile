@@ -14,7 +14,10 @@ TRACE ?= 10
 
 .PHONY: format
 
-clean: 
+regenerate:
+	python3 ../../scripts/MIB.py
+
+clean: regenerate
 	@echo "--- $(BUILD) build ---" | tr '[:lower:]' '[:upper:]'
 	rm -rf build
 	mkdir -p build

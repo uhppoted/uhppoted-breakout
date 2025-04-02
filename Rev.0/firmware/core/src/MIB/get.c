@@ -22,7 +22,7 @@ value MIB_get(const char *OID) {
         .tag = VALUE_UNKNOWN,
     };
 
-    if (strcmp(OID, MIB_BOARD_ID) == 0) {
+    if (strcmp(OID, MIB_BOARD_ID.OID) == 0) {
         char ID[32];
         int N = sys_id(ID, sizeof(ID));
         slice octets = {
@@ -37,17 +37,17 @@ value MIB_get(const char *OID) {
         v.octets = octets;
     }
 
-    if (strcmp(OID, MIB_CONTROLLER_ID) == 0) {
+    if (strcmp(OID, MIB_CONTROLLER_ID.OID) == 0) {
         v.tag = VALUE_UINT32;
         v.integer = CONTROLLER;
     }
 
-    if (strcmp(OID, MIB_CONTROLLER_VERSION) == 0) {
+    if (strcmp(OID, MIB_CONTROLLER_VERSION.OID) == 0) {
         v.tag = VALUE_UINT16;
         v.integer = VERSION;
     }
 
-    if (strcmp(OID, MIB_CONTROLLER_RELEASED) == 0) {
+    if (strcmp(OID, MIB_CONTROLLER_RELEASED.OID) == 0) {
         slice octets = {
             .capacity = 32,
             .length = 0,
@@ -63,7 +63,7 @@ value MIB_get(const char *OID) {
         v.octets = octets;
     }
 
-    if (strcmp(OID, MIB_CONTROLLER_DATETIME) == 0) {
+    if (strcmp(OID, MIB_CONTROLLER_DATETIME.OID) == 0) {
         slice octets = {
             .capacity = 32,
             .length = 0,
@@ -88,69 +88,69 @@ value MIB_get(const char *OID) {
         v.octets = octets;
     }
 
-    if (strcmp(OID, MIB_CONTROLLER_SYSERROR) == 0) {
+    if (strcmp(OID, MIB_CONTROLLER_SYSERROR.OID) == 0) {
         v.tag = VALUE_UINT8;
         v.integer = (uint8_t)get_errors();
     }
 
-    if (strcmp(OID, MIB_CONTROLLER_SYSINFO) == 0) {
+    if (strcmp(OID, MIB_CONTROLLER_SYSINFO.OID) == 0) {
         v.tag = VALUE_UINT8;
         v.integer = 0;
     }
 
-    if (strcmp(OID, MIB_DOORS_1_UNLOCKED) == 0) {
+    if (strcmp(OID, MIB_DOORS_1_UNLOCKED.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_2_UNLOCKED) == 0) {
+    if (strcmp(OID, MIB_DOORS_2_UNLOCKED.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_3_UNLOCKED) == 0) {
+    if (strcmp(OID, MIB_DOORS_3_UNLOCKED.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_4_UNLOCKED) == 0) {
+    if (strcmp(OID, MIB_DOORS_4_UNLOCKED.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_1_OPEN) == 0) {
+    if (strcmp(OID, MIB_DOORS_1_OPEN.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_2_OPEN) == 0) {
+    if (strcmp(OID, MIB_DOORS_2_OPEN.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_3_OPEN) == 0) {
+    if (strcmp(OID, MIB_DOORS_3_OPEN.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_4_OPEN) == 0) {
+    if (strcmp(OID, MIB_DOORS_4_OPEN.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_1_BUTTON) == 0) {
+    if (strcmp(OID, MIB_DOORS_1_BUTTON.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_2_BUTTON) == 0) {
+    if (strcmp(OID, MIB_DOORS_2_BUTTON.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_3_BUTTON) == 0) {
+    if (strcmp(OID, MIB_DOORS_3_BUTTON.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_DOORS_4_BUTTON) == 0) {
+    if (strcmp(OID, MIB_DOORS_4_BUTTON.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_ALARMS_TAMPER_DETECT) == 0) {
+    if (strcmp(OID, MIB_ALARMS_TAMPER_DETECT.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
-    if (strcmp(OID, MIB_ALARMS_FIRE_ALARM) == 0) {
+    if (strcmp(OID, MIB_ALARMS_FIRE_ALARM.OID) == 0) {
         return MIB_get_boolean(OID);
     }
 
@@ -162,72 +162,72 @@ value MIB_get_boolean(const char *OID) {
         .tag = VALUE_NULL,
     };
 
-    if (strcmp(OID, MIB_DOORS_1_UNLOCKED) == 0) {
+    if (strcmp(OID, MIB_DOORS_1_UNLOCKED.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U4_get_relay(1);
     }
 
-    if (strcmp(OID, MIB_DOORS_2_UNLOCKED) == 0) {
+    if (strcmp(OID, MIB_DOORS_2_UNLOCKED.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U4_get_relay(2);
     }
 
-    if (strcmp(OID, MIB_DOORS_3_UNLOCKED) == 0) {
+    if (strcmp(OID, MIB_DOORS_3_UNLOCKED.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U4_get_relay(3);
     }
 
-    if (strcmp(OID, MIB_DOORS_4_UNLOCKED) == 0) {
+    if (strcmp(OID, MIB_DOORS_4_UNLOCKED.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U4_get_relay(4);
     }
 
-    if (strcmp(OID, MIB_DOORS_1_OPEN) == 0) {
+    if (strcmp(OID, MIB_DOORS_1_OPEN.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_door(1);
     }
 
-    if (strcmp(OID, MIB_DOORS_2_OPEN) == 0) {
+    if (strcmp(OID, MIB_DOORS_2_OPEN.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_door(2);
     }
 
-    if (strcmp(OID, MIB_DOORS_3_OPEN) == 0) {
+    if (strcmp(OID, MIB_DOORS_3_OPEN.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_door(3);
     }
 
-    if (strcmp(OID, MIB_DOORS_4_OPEN) == 0) {
+    if (strcmp(OID, MIB_DOORS_4_OPEN.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_door(4);
     }
 
-    if (strcmp(OID, MIB_DOORS_1_BUTTON) == 0) {
+    if (strcmp(OID, MIB_DOORS_1_BUTTON.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_button(1);
     }
 
-    if (strcmp(OID, MIB_DOORS_2_BUTTON) == 0) {
+    if (strcmp(OID, MIB_DOORS_2_BUTTON.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_button(2);
     }
 
-    if (strcmp(OID, MIB_DOORS_3_BUTTON) == 0) {
+    if (strcmp(OID, MIB_DOORS_3_BUTTON.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_button(3);
     }
 
-    if (strcmp(OID, MIB_DOORS_4_BUTTON) == 0) {
+    if (strcmp(OID, MIB_DOORS_4_BUTTON.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = U3_get_button(4);
     }
 
-    if (strcmp(OID, MIB_ALARMS_TAMPER_DETECT) == 0) {
+    if (strcmp(OID, MIB_ALARMS_TAMPER_DETECT.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = false;
     }
 
-    if (strcmp(OID, MIB_ALARMS_FIRE_ALARM) == 0) {
+    if (strcmp(OID, MIB_ALARMS_FIRE_ALARM.OID) == 0) {
         v.tag = VALUE_BOOLEAN;
         v.boolean = false;
     }

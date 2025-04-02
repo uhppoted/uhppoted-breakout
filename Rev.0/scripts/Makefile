@@ -1,6 +1,6 @@
 format: 
-	yapf -ri djb2.py
+	yapf -ri MIB.py
 
 build: format
 	python3 -m compileall .
-	python3 djb2.py
+	python3 MIB.py

@@ -28,7 +28,7 @@ int64_t MIB_set(const char *OID, const value u, value *v) {
 }
 
 int64_t MIB_set_string(const char *OID, const char *s, int length, value *v) {
-    if (strcmp(OID, MIB_CONTROLLER_DATETIME) == 0) {
+    if (strcmp(OID, MIB_CONTROLLER_DATETIME.OID) == 0) {
         int year;
         int month;
         int day;

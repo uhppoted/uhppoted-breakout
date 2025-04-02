@@ -42,35 +42,38 @@ def djb2(s):
         hash = ((hash << 5) + hash) + ord(c)
     return hash & 0x00ffffffff
 
-
-with open('MIB.h', 'w') as f:
+with open('../core/include/MIB.h', 'w') as f:
     f.write('#pragma once\n')
     f.write('\n')
-    f.write("#include <encoding/ssmp/ssmp.h>\n")
+    f.write('#include <encoding/ssmp/ssmp.h>\n')
+    f.write('\n')
+    f.write('typedef struct MIBItem {\n')
+    f.write('    uint32_t hash;\n')
+    f.write('    const char *OID;\n');
+    f.write('} MIBItem;\n')
 
     f.write('\n')
     for k, v in OIDs.items():
-        f.write(f'#define {k:28} "{v}"\n')
-
-    f.write('\n')
-    for k, v in OIDs.items():
-        f.write(f'#define HASH_{k:23} ({djb2(v)})\n')
+        f.write(f'extern const MIBItem {k};\n')
 
     f.write('\n')
     f.write('value MIB_get(const char *OID);\n')
     f.write('int64_t MIB_set(const char *OID, const value u, value *v);\n')
     f.write('\n')
 
-with open("MIB.c", "w") as f:
-
+with open("../core/src/MIB/MIB.c", "w") as f:
     f.write('#include <MIB.h>\n')
     f.write('\n')
-    f.write('const struct {\n')
-    f.write('    uint32_t hash;\n')
-    f.write('    char *OID;\n')
-    f.write('} MIB[] = {\n')
 
     for k, v in OIDs.items():
-        f.write(f'    {{.hash = HASH_{k}, .OID = {k}}},\n')
-    f.write('};\n')
+        f.write(f'const MIBItem {k} = {{\n')
+        f.write(f'    .hash = {djb2(v)},\n')
+        f.write(f'    .OID = "{v}",\n')
+        f.write('};\n')
+        f.write('\n')
+
     f.write('\n')
+    f.write(f'const MIBItem OIDs[{len(OIDs)}] = {{\n')
+    for k, v in OIDs.items():
+        f.write(f'    {k},\n')
+    f.write('};\n')

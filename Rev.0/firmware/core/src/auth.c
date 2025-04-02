@@ -12,38 +12,38 @@ typedef struct community {
 } community;
 
 const struct {
-    char *get[20];
-    char *set[1];
+    MIBItem const *get[20];
+    MIBItem const *set[1];
 } PUBLIC = {
     .get = {
-        MIB_CONTROLLER_ID,
-        MIB_CONTROLLER_VERSION,
-        MIB_CONTROLLER_RELEASED,
-        MIB_CONTROLLER_DATETIME,
-        MIB_CONTROLLER_SYSERROR,
-        MIB_CONTROLLER_SYSINFO,
+        &MIB_CONTROLLER_ID,
+        &MIB_CONTROLLER_VERSION,
+        &MIB_CONTROLLER_RELEASED,
+        &MIB_CONTROLLER_DATETIME,
+        &MIB_CONTROLLER_SYSERROR,
+        &MIB_CONTROLLER_SYSINFO,
 
-        MIB_DOORS_1_UNLOCKED,
-        MIB_DOORS_2_UNLOCKED,
-        MIB_DOORS_3_UNLOCKED,
-        MIB_DOORS_4_UNLOCKED,
+        &MIB_DOORS_1_UNLOCKED,
+        &MIB_DOORS_2_UNLOCKED,
+        &MIB_DOORS_3_UNLOCKED,
+        &MIB_DOORS_4_UNLOCKED,
 
-        MIB_DOORS_1_OPEN,
-        MIB_DOORS_2_OPEN,
-        MIB_DOORS_3_OPEN,
-        MIB_DOORS_4_OPEN,
+        &MIB_DOORS_1_OPEN,
+        &MIB_DOORS_2_OPEN,
+        &MIB_DOORS_3_OPEN,
+        &MIB_DOORS_4_OPEN,
 
-        MIB_DOORS_1_BUTTON,
-        MIB_DOORS_2_BUTTON,
-        MIB_DOORS_3_BUTTON,
-        MIB_DOORS_4_BUTTON,
+        &MIB_DOORS_1_BUTTON,
+        &MIB_DOORS_2_BUTTON,
+        &MIB_DOORS_3_BUTTON,
+        &MIB_DOORS_4_BUTTON,
 
-        MIB_ALARMS_TAMPER_DETECT,
-        MIB_ALARMS_FIRE_ALARM,
+        &MIB_ALARMS_TAMPER_DETECT,
+        &MIB_ALARMS_FIRE_ALARM,
     },
 
     .set = {
-        MIB_CONTROLLER_DATETIME,
+        &MIB_CONTROLLER_DATETIME,
     },
 };
 
@@ -61,9 +61,9 @@ community private = {
 
 bool auth_authorised(const char *community, const char *oid, OP op) {
     if (strcmp(community, "public") == 0 && op == OP_GET) {
-        int N = sizeof(PUBLIC.get) / sizeof(const char *);
+        int N = sizeof(PUBLIC.get) / sizeof(const MIBItem *);
         for (int i = 0; i < N; i++) {
-            if (strcmp(oid, PUBLIC.get[i]) == 0) {
+            if (strcmp(oid, PUBLIC.get[i]->OID) == 0) {
                 return true;
             }
         }
@@ -72,7 +72,7 @@ bool auth_authorised(const char *community, const char *oid, OP op) {
     if (strcmp(community, "public") == 0 && op == OP_SET) {
         int N = sizeof(PUBLIC.set) / sizeof(const char *);
         for (int i = 0; i < N; i++) {
-            if (strcmp(oid, PUBLIC.set[i]) == 0) {
+            if (strcmp(oid, PUBLIC.set[i]->OID) == 0) {
                 return true;
             }
         }
