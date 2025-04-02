@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <crypt/hash/djb2.h>
+
 #include <MIB.h>
 #include <RTC.h>
 #include <SSMP.h>
@@ -13,11 +15,38 @@
 
 #define LOGTAG "MIB"
 
+const struct {
+    uint32_t hash;
+    char *OID;
+} MIB[] = {
+    {.hash = HASH_MIB_BOARD_ID, .OID = MIB_BOARD_ID},
+    {.hash = HASH_MIB_CONTROLLER_ID, .OID = MIB_CONTROLLER_ID},
+    {.hash = HASH_MIB_CONTROLLER_VERSION, .OID = MIB_CONTROLLER_VERSION},
+    {.hash = HASH_MIB_CONTROLLER_RELEASED, .OID = MIB_CONTROLLER_RELEASED},
+    {.hash = HASH_MIB_CONTROLLER_DATETIME, .OID = MIB_CONTROLLER_DATETIME},
+    {.hash = HASH_MIB_CONTROLLER_SYSERROR, .OID = MIB_CONTROLLER_SYSERROR},
+    {.hash = HASH_MIB_CONTROLLER_SYSINFO, .OID = MIB_CONTROLLER_SYSINFO},
+    {.hash = HASH_MIB_DOORS_1_UNLOCKED, .OID = MIB_DOORS_1_UNLOCKED},
+    {.hash = HASH_MIB_DOORS_2_UNLOCKED, .OID = MIB_DOORS_2_UNLOCKED},
+    {.hash = HASH_MIB_DOORS_3_UNLOCKED, .OID = MIB_DOORS_3_UNLOCKED},
+    {.hash = HASH_MIB_DOORS_4_UNLOCKED, .OID = MIB_DOORS_4_UNLOCKED},
+    {.hash = HASH_MIB_DOORS_1_OPEN, .OID = MIB_DOORS_1_OPEN},
+    {.hash = HASH_MIB_DOORS_2_OPEN, .OID = MIB_DOORS_2_OPEN},
+    {.hash = HASH_MIB_DOORS_3_OPEN, .OID = MIB_DOORS_3_OPEN},
+    {.hash = HASH_MIB_DOORS_4_OPEN, .OID = MIB_DOORS_4_OPEN},
+    {.hash = HASH_MIB_DOORS_1_BUTTON, .OID = MIB_DOORS_1_BUTTON},
+    {.hash = HASH_MIB_DOORS_2_BUTTON, .OID = MIB_DOORS_2_BUTTON},
+    {.hash = HASH_MIB_DOORS_3_BUTTON, .OID = MIB_DOORS_3_BUTTON},
+    {.hash = HASH_MIB_DOORS_4_BUTTON, .OID = MIB_DOORS_4_BUTTON},
+};
+
 value MIB_get_boolean(const char *OID);
 
 int64_t MIB_set_string(const char *OID, const char *s, int length, value *v);
 
 value MIB_get(const char *OID) {
+    uint32_t hash = djb2(OID);
+
     value v = {
         .tag = VALUE_UNKNOWN,
     };

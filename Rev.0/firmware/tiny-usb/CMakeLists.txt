@@ -74,6 +74,7 @@ add_executable(${TARGET_NAME}
   ${LIB}/src/encoding/ssmp/get.c
   ${LIB}/src/encoding/ssmp/set.c
   ${LIB}/src/encoding/ssmp/response.c
+  ${LIB}/src/crypt/hash/djb2.c
   ${LIB}/src/crypt/hash/sha1.c
   ${LIB}/src/crypt/hmac/hmac_sha1.c
   ${LIB}/src/crypt/otp/hotp.c
