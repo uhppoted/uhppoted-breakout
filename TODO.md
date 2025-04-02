@@ -64,8 +64,8 @@
           - [x] door locks    (.1.3.6.1.4.1.65536.3.x.4)
           - [x] door open     (.1.3.6.1.4.1.65536.3.x.5)
           - [x] door button   (.1.3.6.1.4.1.65536.3.x.6)
-          - [ ] tamper detect (.1.3.6.1.4.1.65536.4.1)
-          - [ ] fire alarm    (.1.3.6.1.4.1.65536.4.2)
+          - [x] tamper detect (.1.3.6.1.4.1.65536.4.1)
+          - [x] fire alarm    (.1.3.6.1.4.1.65536.4.2)
           - [ ] ut0311: remap uint16 to uint8
     - [ ] SSMP_ERROR_NOTWRITABLE (17)
     - [ ] SSMP_ERROR_WRONGTYPE (7)

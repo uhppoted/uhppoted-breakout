@@ -1,3 +1,5 @@
+#include <MIB.h>
+
 const struct {
     uint32_t hash;
     char *OID;
@@ -21,4 +23,6 @@ const struct {
     {.hash = HASH_MIB_DOORS_2_BUTTON, .OID = MIB_DOORS_2_BUTTON},
     {.hash = HASH_MIB_DOORS_3_BUTTON, .OID = MIB_DOORS_3_BUTTON},
     {.hash = HASH_MIB_DOORS_4_BUTTON, .OID = MIB_DOORS_4_BUTTON},
+    {.hash = HASH_MIB_ALARMS_TAMPER_DETECT, .OID = MIB_ALARMS_TAMPER_DETECT},
+    {.hash = HASH_MIB_ALARMS_FIRE_ALARM, .OID = MIB_ALARMS_FIRE_ALARM},
 };

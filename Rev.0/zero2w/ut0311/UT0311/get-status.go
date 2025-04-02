@@ -121,13 +121,13 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... inputs
-		if tampered, err := scmp.Get[bool](ut0311.driver, scmp.OID_INPUTS_TAMPER_DETECT); err != nil {
+		if tampered, err := scmp.Get[bool](ut0311.driver, scmp.OID_ALARMS_TAMPER_DETECT); err != nil {
 			return nil, err
 		} else if tampered {
 			response.InputState |= 0x01
 		}
 
-		if fire, err := scmp.Get[bool](ut0311.driver, scmp.OID_INPUTS_FIRE_ALARM); err != nil {
+		if fire, err := scmp.Get[bool](ut0311.driver, scmp.OID_ALARMS_FIRE_ALARM); err != nil {
 			return nil, err
 		} else if fire {
 			response.InputState |= 0x02

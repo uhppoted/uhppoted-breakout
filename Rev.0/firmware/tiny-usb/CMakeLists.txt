@@ -49,12 +49,14 @@ add_executable(${TARGET_NAME}
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
   ${CORE}/src/SSMP.c
-  ${CORE}/src/MIB.c
   ${CORE}/src/auth.c
   ${CORE}/src/log.c
   ${CORE}/src/ANSI.c
   ${CORE}/src/mempool.c
   ${CORE}/src/usb.c
+  ${CORE}/src/MIB/MIB.c
+  ${CORE}/src/MIB/get.c
+  ${CORE}/src/MIB/set.c
 
   ${LIB}/src/I2C.c
   ${LIB}/src/RX8900SA.c

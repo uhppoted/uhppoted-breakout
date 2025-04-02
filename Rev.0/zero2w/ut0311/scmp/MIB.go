@@ -44,8 +44,8 @@ var OID_DOORS_4_UNLOCKED = OID{1, 3, 6, 1, 4, 1, 65536, 3, 4, 4}
 var OID_DOORS_4_OPEN = OID{1, 3, 6, 1, 4, 1, 65536, 3, 4, 5}
 var OID_DOORS_4_BUTTON = OID{1, 3, 6, 1, 4, 1, 65536, 3, 4, 6}
 
-var OID_INPUTS_TAMPER_DETECT = OID{1, 3, 6, 1, 4, 1, 65536, 4, 1}
-var OID_INPUTS_FIRE_ALARM = OID{1, 3, 6, 1, 4, 1, 65536, 4, 2}
+var OID_ALARMS_TAMPER_DETECT = OID{1, 3, 6, 1, 4, 1, 65536, 4, 1}
+var OID_ALARMS_FIRE_ALARM = OID{1, 3, 6, 1, 4, 1, 65536, 4, 2}
 
 var OID_CARDS_COUNT = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 1}
 var OID_CARDS_CARD = OID{1, 3, 6, 1, 4, 1, 65536, 3, 5, 0, 2, 0xffffffff}
