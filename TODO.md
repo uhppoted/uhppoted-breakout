@@ -45,11 +45,16 @@
       - pico_stdio
 
 ### SSMP
-    - [ ] TRAP
-    - [ ] hash OIDs for faster lookup
+    - [x] hash OIDs for faster lookup
+          - [x] get
+          - [x] set
+          - [x] #define N_OIDs
+
     - [ ] return error if MIB `get` fails
+    - [ ] TRAP
     - [x] include SET/GET in auth rq
           - [ ] SSMP_ERROR_AUTHORIZATIONERROR (16)
+
     - [x] free set.value.octets
     - [x] get-controller-id
     - [x] get-version

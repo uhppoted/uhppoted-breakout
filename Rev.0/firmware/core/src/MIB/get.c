@@ -13,90 +13,8 @@
 
 #define LOGTAG "MIB"
 
-extern const MIBItem OIDs[21];
-
 value MIB_get(const char *OID) {
     uint32_t hash = djb2(OID);
-
-    value v = {
-        .tag = VALUE_UNKNOWN,
-    };
-
-    if (strcmp(OID, MIB_BOARD_ID.OID) == 0) {
-        char ID[32];
-        int N = sys_id(ID, sizeof(ID));
-        slice octets = {
-            .capacity = 64,
-            .length = N,
-            .bytes = (char *)calloc(64, sizeof(uint8_t)),
-        };
-
-        memmove(octets.bytes, ID, N);
-
-        v.tag = VALUE_OCTET_STRING;
-        v.octets = octets;
-    }
-
-    if (strcmp(OID, MIB_CONTROLLER_ID.OID) == 0) {
-        v.tag = VALUE_UINT32;
-        v.integer = CONTROLLER;
-    }
-
-    if (strcmp(OID, MIB_CONTROLLER_VERSION.OID) == 0) {
-        v.tag = VALUE_UINT16;
-        v.integer = VERSION;
-    }
-
-    if (strcmp(OID, MIB_CONTROLLER_RELEASED.OID) == 0) {
-        slice octets = {
-            .capacity = 32,
-            .length = 0,
-            .bytes = (char *)calloc(32, sizeof(uint8_t)),
-        };
-
-        int N = snprintf(octets.bytes, octets.capacity, "%s", RELEASED);
-        if (N > 0) {
-            octets.length = N < strlen(RELEASED) ? N : strlen(RELEASED);
-        }
-
-        v.tag = VALUE_OCTET_STRING;
-        v.octets = octets;
-    }
-
-    if (strcmp(OID, MIB_CONTROLLER_DATETIME.OID) == 0) {
-        slice octets = {
-            .capacity = 32,
-            .length = 0,
-            .bytes = (char *)calloc(32, sizeof(uint8_t)),
-        };
-
-        char date[16] = {0};
-        char time[16] = {0};
-        char datetime[32] = {0};
-
-        RTC_get_date(date, sizeof(date));
-        RTC_get_time(time, sizeof(time));
-
-        snprintf(datetime, sizeof(datetime), "%s %s", date, time);
-
-        int N = snprintf(octets.bytes, octets.capacity, "%s", datetime);
-        if (N > 0) {
-            octets.length = N < strlen(datetime) ? N : strlen(datetime);
-        }
-
-        v.tag = VALUE_OCTET_STRING;
-        v.octets = octets;
-    }
-
-    if (strcmp(OID, MIB_CONTROLLER_SYSERROR.OID) == 0) {
-        v.tag = VALUE_UINT8;
-        v.integer = (uint8_t)get_errors();
-    }
-
-    if (strcmp(OID, MIB_CONTROLLER_SYSINFO.OID) == 0) {
-        v.tag = VALUE_UINT8;
-        v.integer = 0;
-    }
 
     int N = sizeof(OIDs) / sizeof(MIBItem);
     for (int i = 0; i < N; i++) {
@@ -107,7 +25,76 @@ value MIB_get(const char *OID) {
         }
     }
 
-    return v;
+    return (value){.tag = VALUE_UNKNOWN};
+}
+
+value MIB_get_sys_board_id() {
+    char ID[32];
+    int N = sys_id(ID, sizeof(ID));
+    slice octets = {
+        .capacity = 64,
+        .length = N,
+        .bytes = (char *)calloc(64, sizeof(uint8_t)),
+    };
+
+    memmove(octets.bytes, ID, N);
+
+    return (value){.tag = VALUE_OCTET_STRING, .octets = octets};
+}
+
+value MIB_get_controller_id() {
+    return (value){.tag = VALUE_UINT32, .integer = CONTROLLER};
+}
+
+value MIB_get_controller_version() {
+    return (value){.tag = VALUE_UINT16, .integer = VERSION};
+}
+
+value MIB_get_controller_released() {
+    slice octets = {
+        .capacity = 32,
+        .length = 0,
+        .bytes = (char *)calloc(32, sizeof(uint8_t)),
+    };
+
+    int N = snprintf(octets.bytes, octets.capacity, "%s", RELEASED);
+    if (N > 0) {
+        octets.length = N < strlen(RELEASED) ? N : strlen(RELEASED);
+    }
+
+    return (value){.tag = VALUE_OCTET_STRING, .octets = octets};
+}
+
+value MIB_get_controller_datetime() {
+    slice octets = {
+        .capacity = 32,
+        .length = 0,
+        .bytes = (char *)calloc(32, sizeof(uint8_t)),
+    };
+
+    char date[16] = {0};
+    char time[16] = {0};
+    char datetime[32] = {0};
+
+    RTC_get_date(date, sizeof(date));
+    RTC_get_time(time, sizeof(time));
+
+    snprintf(datetime, sizeof(datetime), "%s %s", date, time);
+
+    int N = snprintf(octets.bytes, octets.capacity, "%s", datetime);
+    if (N > 0) {
+        octets.length = N < strlen(datetime) ? N : strlen(datetime);
+    }
+
+    return (value){.tag = VALUE_OCTET_STRING, .octets = octets};
+}
+
+value MIB_get_controller_syserror() {
+    return (value){.tag = VALUE_UINT8, .integer = (uint8_t)get_errors()};
+}
+
+value MIB_get_controller_sysinfo() {
+    return (value){.tag = VALUE_UINT8, .integer = 0};
 }
 
 value MIB_get_doors_1_unlocked() {

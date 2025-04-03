@@ -2,6 +2,8 @@ package scmp
 
 import ()
 
+var OID_SYS_BOARD_ID = OID{1, 3, 6, 1, 4, 1, 65536, 1, 1}
+
 var OID_CONTROLLER_ID = OID{1, 3, 6, 1, 4, 1, 65536, 2, 1}
 var OID_CONTROLLER_VERSION = OID{1, 3, 6, 1, 4, 1, 65536, 2, 2}
 var OID_CONTROLLER_RELEASED = OID{1, 3, 6, 1, 4, 1, 65536, 2, 3}

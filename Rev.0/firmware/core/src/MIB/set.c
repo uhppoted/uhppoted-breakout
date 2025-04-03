@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <crypt/hash/djb2.h>
+
 #include <MIB.h>
 #include <RTC.h>
 #include <SSMP.h>
@@ -9,70 +11,65 @@
 
 #define LOGTAG "MIB"
 
-int64_t MIB_set_string(const char *OID, const char *s, int length, value *v);
-
 int64_t MIB_set(const char *OID, const value u, value *v) {
-    switch (u.tag) {
-    case VALUE_OCTET_STRING:
-        return MIB_set_string(OID, u.octets.bytes, u.octets.length, v);
-        break;
+    uint32_t hash = djb2(OID);
 
-    case VALUE_NULL:
-        warnf(LOGTAG, "set - NULL value");
-        return SSMP_ERROR_BAD_VALUE;
+    int N = sizeof(OIDs) / sizeof(MIBItem);
+    for (int i = 0; i < N; i++) {
+        MIBItem item = OIDs[i];
 
-    default:
-        warnf(LOGTAG, "set - unknown value type (%d)", u.tag);
-        return SSMP_ERROR_BAD_VALUE;
-    }
-}
-
-int64_t MIB_set_string(const char *OID, const char *s, int length, value *v) {
-    if (strcmp(OID, MIB_CONTROLLER_DATETIME.OID) == 0) {
-        int year;
-        int month;
-        int day;
-        int hour;
-        int minute;
-        int second;
-        int rc;
-
-        if ((rc = sscanf(s, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day, &hour, &minute, &second)) != 6) {
-            return SSMP_ERROR_BAD_VALUE;
-        } else if (!RTC_set_date(year, month, day)) {
-            warnf(LOGTAG, "error setting RTC date %04d-%02d-%02d", year, month, day);
-            return SSMP_ERROR_COMMIT_FAILED;
-        } else if (!RTC_set_time(hour, minute, second)) {
-            warnf(LOGTAG, "error setting RTC time %02d:%02d:%02d", hour, minute, second);
-            return SSMP_ERROR_COMMIT_FAILED;
+        if ((hash == item.hash) && (strcmp(OID, item.OID) == 0) && (item.set != NULL)) {
+            return item.set(u, v);
         }
-
-        slice octets = {
-            .capacity = 32,
-            .length = 0,
-            .bytes = (char *)calloc(32, sizeof(uint8_t)),
-        };
-
-        // NTS: RTC is not updated immediately
-        // char date[16] = {0};
-        // char time[16] = {0};
-        // char datetime[32] = {0};
-        //
-        // RTC_get_date(date, sizeof(date));
-        // RTC_get_time(time, sizeof(time));
-        //
-        // snprintf(datetime, sizeof(datetime), "%s %s", date, time);
-
-        int N = snprintf(octets.bytes, octets.capacity, "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
-        if (N > 0) {
-            octets.length = N;
-        }
-
-        v->tag = VALUE_OCTET_STRING;
-        v->octets = octets;
-
-        return SSMP_ERROR_NONE;
     }
 
     return SSMP_ERROR_NO_SUCH_OBJECT;
+}
+
+int64_t MIB_set_datetime(const value u, value *v) {
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+    int second;
+    int rc;
+
+    const char *s = u.octets.bytes;
+
+    if ((rc = sscanf(s, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day, &hour, &minute, &second)) != 6) {
+        return SSMP_ERROR_BAD_VALUE;
+    } else if (!RTC_set_date(year, month, day)) {
+        warnf(LOGTAG, "error setting RTC date %04d-%02d-%02d", year, month, day);
+        return SSMP_ERROR_COMMIT_FAILED;
+    } else if (!RTC_set_time(hour, minute, second)) {
+        warnf(LOGTAG, "error setting RTC time %02d:%02d:%02d", hour, minute, second);
+        return SSMP_ERROR_COMMIT_FAILED;
+    }
+
+    slice octets = {
+        .capacity = 32,
+        .length = 0,
+        .bytes = (char *)calloc(32, sizeof(uint8_t)),
+    };
+
+    // NTS: RTC is not updated immediately
+    // char date[16] = {0};
+    // char time[16] = {0};
+    // char datetime[32] = {0};
+    //
+    // RTC_get_date(date, sizeof(date));
+    // RTC_get_time(time, sizeof(time));
+    //
+    // snprintf(datetime, sizeof(datetime), "%s %s", date, time);
+
+    int N = snprintf(octets.bytes, octets.capacity, "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+    if (N > 0) {
+        octets.length = N;
+    }
+
+    v->tag = VALUE_OCTET_STRING;
+    v->octets = octets;
+
+    return SSMP_ERROR_NONE;
 }

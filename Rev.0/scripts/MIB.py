@@ -8,18 +8,19 @@ class MIBItem:
     name: str
     OID: str
     get: Optional[str] = None
+    set: Optional[str] = None
 
 OIDs = [
     # sys
-    MIBItem('MIB_BOARD_ID', '0.1.3.6.1.4.1.65536.1.1'),
+    MIBItem('MIB_SYS_BOARD_ID', '0.1.3.6.1.4.1.65536.1.1', 'MIB_get_sys_board_id'),
 
     # controller
-    MIBItem('MIB_CONTROLLER_ID', '0.1.3.6.1.4.1.65536.2.1'),
-    MIBItem('MIB_CONTROLLER_VERSION', '0.1.3.6.1.4.1.65536.2.2'),
-    MIBItem('MIB_CONTROLLER_RELEASED', '0.1.3.6.1.4.1.65536.2.3'),
-    MIBItem('MIB_CONTROLLER_DATETIME', '0.1.3.6.1.4.1.65536.2.8'),
-    MIBItem('MIB_CONTROLLER_SYSERROR', '0.1.3.6.1.4.1.65536.2.9'),
-    MIBItem('MIB_CONTROLLER_SYSINFO', '0.1.3.6.1.4.1.65536.2.10'),
+    MIBItem('MIB_CONTROLLER_ID', '0.1.3.6.1.4.1.65536.2.1', 'MIB_get_controller_id'),
+    MIBItem('MIB_CONTROLLER_VERSION', '0.1.3.6.1.4.1.65536.2.2', 'MIB_get_controller_version'),
+    MIBItem('MIB_CONTROLLER_RELEASED', '0.1.3.6.1.4.1.65536.2.3', 'MIB_get_controller_released'),
+    MIBItem('MIB_CONTROLLER_DATETIME', '0.1.3.6.1.4.1.65536.2.8', 'MIB_get_controller_datetime', 'MIB_set_datetime'),
+    MIBItem('MIB_CONTROLLER_SYSERROR', '0.1.3.6.1.4.1.65536.2.9', 'MIB_get_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSINFO', '0.1.3.6.1.4.1.65536.2.10', 'MIB_get_controller_sysinfo'),
 
     # door locks
     MIBItem('MIB_DOORS_1_UNLOCKED', '0.1.3.6.1.4.1.65536.3.1.4', 'MIB_get_doors_1_unlocked'),
@@ -58,7 +59,8 @@ with open('../core/include/MIB.h', 'w') as f:
     f.write('typedef struct MIBItem {\n')
     f.write('    uint32_t hash;\n')
     f.write('    const char *OID;\n')
-    f.write('    value (*get)();\n')
+    f.write('    value   (*get)();\n')
+    f.write('    int64_t (*set)(const value, value *);\n')
     f.write('} MIBItem;\n')
 
     f.write('\n')
@@ -66,16 +68,24 @@ with open('../core/include/MIB.h', 'w') as f:
         f.write(f'extern const MIBItem {v.name};\n')
 
     f.write('\n')
+    f.write(f'extern const MIBItem OIDs[{len(OIDs)}];\n')
+
+    f.write('\n')
     f.write('value MIB_get(const char *OID);\n')
     f.write('int64_t MIB_set(const char *OID, const value u, value *v);\n')
 
 with open("../core/src/MIB/MIB.c", "w") as f:
     f.write('#include <MIB.h>\n')
-    f.write('\n')
 
+    f.write('\n')
     for v in OIDs:
         if v.get != None:
             f.write(f'extern value {v.get}();\n')
+
+    f.write('\n')
+    for v in OIDs:
+        if v.set != None:
+            f.write(f'extern int64_t {v.set}(const value,value *);\n')
 
     f.write('\n')
     for v in OIDs:
@@ -85,6 +95,9 @@ with open("../core/src/MIB/MIB.c", "w") as f:
 
         if v.get != None:
             f.write(f'    .get = {v.get},\n')
+
+        if v.set != None:
+            f.write(f'    .set = {v.set},\n')
 
         f.write('};\n')
         f.write('\n')
