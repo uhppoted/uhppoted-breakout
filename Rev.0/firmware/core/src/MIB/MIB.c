@@ -1,26 +1,26 @@
 #include <MIB.h>
 
-extern value MIB_get_sys_board_id();
-extern value MIB_get_controller_id();
-extern value MIB_get_controller_version();
-extern value MIB_get_controller_released();
-extern value MIB_get_controller_datetime();
-extern value MIB_get_controller_syserror();
-extern value MIB_get_controller_sysinfo();
-extern value MIB_get_doors_1_unlocked();
-extern value MIB_get_doors_2_unlocked();
-extern value MIB_get_doors_3_unlocked();
-extern value MIB_get_doors_4_unlocked();
-extern value MIB_get_doors_1_open();
-extern value MIB_get_doors_2_open();
-extern value MIB_get_doors_3_open();
-extern value MIB_get_doors_4_open();
-extern value MIB_get_doors_1_pushbutton();
-extern value MIB_get_doors_2_pushbutton();
-extern value MIB_get_doors_3_pushbutton();
-extern value MIB_get_doors_4_pushbutton();
-extern value MIB_get_alarms_tamper_detect();
-extern value MIB_get_alarms_fire_alarm();
+extern int64_t MIB_get_sys_board_id(value *);
+extern int64_t MIB_get_controller_id(value *);
+extern int64_t MIB_get_controller_version(value *);
+extern int64_t MIB_get_controller_released(value *);
+extern int64_t MIB_get_controller_datetime(value *);
+extern int64_t MIB_get_controller_syserror(value *);
+extern int64_t MIB_get_controller_sysinfo(value *);
+extern int64_t MIB_get_doors_1_unlocked(value *);
+extern int64_t MIB_get_doors_2_unlocked(value *);
+extern int64_t MIB_get_doors_3_unlocked(value *);
+extern int64_t MIB_get_doors_4_unlocked(value *);
+extern int64_t MIB_get_doors_1_open(value *);
+extern int64_t MIB_get_doors_2_open(value *);
+extern int64_t MIB_get_doors_3_open(value *);
+extern int64_t MIB_get_doors_4_open(value *);
+extern int64_t MIB_get_doors_1_pushbutton(value *);
+extern int64_t MIB_get_doors_2_pushbutton(value *);
+extern int64_t MIB_get_doors_3_pushbutton(value *);
+extern int64_t MIB_get_doors_4_pushbutton(value *);
+extern int64_t MIB_get_alarms_tamper_detect(value *);
+extern int64_t MIB_get_alarms_fire_alarm(value *);
 
 extern int64_t MIB_set_datetime(const value, value *);
 

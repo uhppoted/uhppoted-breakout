@@ -202,35 +202,40 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
  *
  */
 void SSMP_get(const char *community, int64_t rqid, const char *OID) {
-    value v = MIB_get(OID);
+    value v;
+    int64_t err = MIB_get(OID, &v);
 
-    packet reply = {
-        .tag = PACKET_RESPONSE,
-        .version = 0,
-        .community = strdup(community),
-        .response = {
-            .request_id = rqid,
-            .error = 0,
-            .error_index = 0,
-            .OID = strdup(OID),
-            .value = v,
-        },
-    };
+    if (err != SSMP_ERROR_NONE) {
+        SSMP_err(community, rqid, OID, err, 1);
+    } else {
+        packet reply = {
+            .tag = PACKET_RESPONSE,
+            .version = 0,
+            .community = strdup(community),
+            .response = {
+                .request_id = rqid,
+                .error = 0,
+                .error_index = 0,
+                .OID = strdup(OID),
+                .value = v,
+            },
+        };
 
-    if (v.tag == VALUE_UNKNOWN) {
-        reply.response.error = SSMP_ERROR_NO_SUCH_OBJECT;
-        reply.response.error_index = 1;
+        if (v.tag == VALUE_UNKNOWN) {
+            reply.response.error = SSMP_ERROR_NO_SUCH_OBJECT;
+            reply.response.error_index = 1;
+        }
+
+        // ... encode
+        slice packed = ssmp_encode(reply);
+        slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+
+        SSMP_write(encoded.bytes, encoded.length);
+
+        slice_free(&encoded);
+        slice_free(&packed);
+        packet_free(&reply);
     }
-
-    // ... encode
-    slice packed = ssmp_encode(reply);
-    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
-
-    SSMP_write(encoded.bytes, encoded.length);
-
-    slice_free(&encoded);
-    slice_free(&packed);
-    packet_free(&reply);
 }
 
 /* SSMP SET implementation.
@@ -273,8 +278,6 @@ void SSMP_set(const char *community, int64_t rqid, const char *OID, const value 
  *
  */
 void SSMP_err(const char *community, int64_t rqid, const char *OID, int64_t error, int64_t index) {
-    value v = MIB_get(OID);
-
     packet reply = {
         .tag = PACKET_RESPONSE,
         .version = 0,

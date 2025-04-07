@@ -59,7 +59,7 @@ with open('../core/include/MIB.h', 'w') as f:
     f.write('typedef struct MIBItem {\n')
     f.write('    uint32_t hash;\n')
     f.write('    const char *OID;\n')
-    f.write('    value   (*get)();\n')
+    f.write('    int64_t (*get)(value *);\n')
     f.write('    int64_t (*set)(const value, value *);\n')
     f.write('} MIBItem;\n')
 
@@ -71,7 +71,7 @@ with open('../core/include/MIB.h', 'w') as f:
     f.write(f'extern const MIBItem OIDs[{len(OIDs)}];\n')
 
     f.write('\n')
-    f.write('value MIB_get(const char *OID);\n')
+    f.write('int64_t MIB_get(const char *OID, value *v);\n')
     f.write('int64_t MIB_set(const char *OID, const value u, value *v);\n')
 
 with open("../core/src/MIB/MIB.c", "w") as f:
@@ -80,7 +80,7 @@ with open("../core/src/MIB/MIB.c", "w") as f:
     f.write('\n')
     for v in OIDs:
         if v.get != None:
-            f.write(f'extern value {v.get}();\n')
+            f.write(f'extern int64_t {v.get}(value *);\n')
 
     f.write('\n')
     for v in OIDs:

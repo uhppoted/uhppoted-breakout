@@ -1,5 +1,8 @@
 # TODO
 
+- [ ] ut0311/rpcd queues **all** incoming request
+      - limit pending request queue
+
 ## RPCD
     - [x] GET cache
     - [ ] daemonize
@@ -46,24 +49,16 @@
 
 ### SSMP
     - [x] hash OIDs for faster lookup
-    - [ ] return error if MIB `get` fails
-    - [ ] GET: multiple OIDs
-    - [ ] TRAP
     - [x] include SET/GET in auth rq
     - [x] SSMP_ERROR_AUTHORIZATION (16)
-
+    - [x] get-status
+    - [x] return error if MIB `get` fails
     - [ ] set-datetime
           - (?) RTC set-datetime (atomic)
           - [ ] Figure out RTC set/get delay thing
-    - [x] get-status
-          - [x] syserror:     (.1.3.6.1.4.1.65536.2.9)
-          - [x] sysinfo:      (.1.3.6.1.4.1.65536.2.10)
-          - [x] door locks    (.1.3.6.1.4.1.65536.3.x.4)
-          - [x] door open     (.1.3.6.1.4.1.65536.3.x.5)
-          - [x] door button   (.1.3.6.1.4.1.65536.3.x.6)
-          - [x] tamper detect (.1.3.6.1.4.1.65536.4.1)
-          - [x] fire alarm    (.1.3.6.1.4.1.65536.4.2)
-          - [x] ut0311: remap uint16 to uint8
+    - [ ] GET: multiple OIDs
+    - [ ] TRAP
+
     - [ ] get-door-delay
     - [ ] get-door-mode
     - [ ] SSMP_ERROR_NOTWRITABLE (17)
