@@ -47,9 +47,10 @@
 ### SSMP
     - [x] hash OIDs for faster lookup
     - [ ] return error if MIB `get` fails
+    - [ ] GET: multiple OIDs
     - [ ] TRAP
     - [x] include SET/GET in auth rq
-          - [ ] SSMP_ERROR_AUTHORIZATIONERROR (16)
+    - [x] SSMP_ERROR_AUTHORIZATION (16)
 
     - [ ] set-datetime
           - (?) RTC set-datetime (atomic)

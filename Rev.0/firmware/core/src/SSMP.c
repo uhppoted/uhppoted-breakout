@@ -24,6 +24,7 @@ const int64_t SSMP_ERROR_NONE = 0;
 const int64_t SSMP_ERROR_NO_SUCH_OBJECT = 2;
 const int64_t SSMP_ERROR_BAD_VALUE = 3;
 const int64_t SSMP_ERROR_COMMIT_FAILED = 14;
+const int64_t SSMP_ERROR_AUTHORIZATION = 16;
 
 void SSMP_rxchar(uint8_t ch);
 void SSMP_enq();
@@ -31,6 +32,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
 void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
 void SSMP_set(const char *community, int64_t rqid, const char *OID, const value val);
+void SSMP_err(const char *community, int64_t rqid, const char *OID, int64_t error, int64_t index);
 void SSMP_write(const uint8_t *buffer, int N);
 
 struct {
@@ -135,11 +137,11 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         const char *oid = request->get.OID;
         uint32_t rqid = request->get.request_id;
 
-        if (auth_authorised(community, oid, OP_GET)) {
-            if (auth_validate(community, rqid)) {
-                SSMP_touched();
-                SSMP_get(community, rqid, oid);
-            }
+        if (auth_authorised(community, oid, OP_GET) && auth_validate(community, rqid)) {
+            SSMP_touched();
+            SSMP_get(community, rqid, oid);
+        } else {
+            SSMP_err(community, rqid, oid, SSMP_ERROR_AUTHORIZATION, 1);
         }
     }
 
@@ -184,11 +186,11 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         const char *oid = request->get.OID;
         uint32_t rqid = request->get.request_id;
 
-        if (auth_authorised(community, oid, OP_SET)) {
-            if (auth_validate(community, rqid)) {
-                SSMP_touched();
-                SSMP_set(community, rqid, oid, request->set.value);
-            }
+        if (auth_authorised(community, oid, OP_SET) && auth_validate(community, rqid)) {
+            SSMP_touched();
+            SSMP_set(community, rqid, oid, request->set.value);
+        } else {
+            SSMP_err(community, rqid, oid, SSMP_ERROR_AUTHORIZATION, 1);
         }
     }
 
@@ -255,6 +257,36 @@ void SSMP_set(const char *community, int64_t rqid, const char *OID, const value 
         reply.response.error = err;
         reply.response.error_index = 1;
     }
+
+    // ... encode
+    slice packed = ssmp_encode(reply);
+    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
+
+    SSMP_write(encoded.bytes, encoded.length);
+
+    slice_free(&encoded);
+    slice_free(&packed);
+    packet_free(&reply);
+}
+
+/* SSMP error implementation.
+ *
+ */
+void SSMP_err(const char *community, int64_t rqid, const char *OID, int64_t error, int64_t index) {
+    value v = MIB_get(OID);
+
+    packet reply = {
+        .tag = PACKET_RESPONSE,
+        .version = 0,
+        .community = strdup(community),
+        .response = {
+            .request_id = rqid,
+            .error = error,
+            .error_index = index,
+            .OID = strdup(OID),
+            .value = (value){.tag = VALUE_NULL},
+        },
+    };
 
     // ... encode
     slice packed = ssmp_encode(reply);
