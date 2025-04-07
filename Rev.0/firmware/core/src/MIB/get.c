@@ -90,7 +90,7 @@ value MIB_get_controller_datetime() {
 }
 
 value MIB_get_controller_syserror() {
-    return (value){.tag = VALUE_UINT8, .integer = (uint8_t)get_errors()};
+    return (value){.tag = VALUE_UINT16, .integer = (uint16_t)get_errors()};
 }
 
 value MIB_get_controller_sysinfo() {

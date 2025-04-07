@@ -7,6 +7,17 @@ import (
 	"emulator/scmp"
 )
 
+const errMemory uint16 = 0x0001
+const errQueue uint16 = 0x0002
+const errI2C uint16 = 0x0004
+const errRX8900 uint16 = 0x0008
+const errU2 uint16 = 0x0010
+const errU3 uint16 = 0x0020
+const errU4 uint16 = 0x0040
+const errWatchdog uint16 = 0x0080
+const errDebug uint16 = 0x4000
+const errUnknown uint16 = 0x8000
+
 func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 	if id, err := scmp.Get[uint32](ut0311.driver, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
@@ -26,10 +37,24 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			response.SystemTime = types.SystemTime(datetime)
 		}
 
-		if v, err := scmp.Get[uint8](ut0311.driver, scmp.OID_CONTROLLER_SYSERR); err != nil {
+		if v, err := scmp.Get[uint16](ut0311.driver, scmp.OID_CONTROLLER_SYSERR); err != nil {
 			return nil, err
 		} else {
-			response.SystemError = v
+			syserr := uint8(0x00)
+
+			if (v & (errMemory | errQueue | errI2C | errRX8900 | errU2 | errU3 | errU4)) != 0x0000 {
+				syserr |= 0x01
+			}
+
+			if (v & errWatchdog) != 0x0000 {
+				syserr |= 0x02
+			}
+
+			if (v & errUnknown) != 0x0000 {
+				syserr |= 0x08
+			}
+
+			response.SystemError = syserr
 		}
 
 		if v, err := scmp.Get[uint8](ut0311.driver, scmp.OID_CONTROLLER_SYSINFO); err != nil {
