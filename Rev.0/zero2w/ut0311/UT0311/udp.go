@@ -55,23 +55,25 @@ func (c *UDP) listen(received func(any) (any, error)) error {
 				if request, err := messages.UnmarshalRequest(buffer[0:N]); err != nil {
 					warnf("UDP  %v", err)
 				} else {
-					reply, err := received(request)
+					go func() {
+						reply, err := received(request)
 
-					if err != nil {
-						warnf("UDP  %v", err)
-					}
-
-					if !isnil(reply) {
-						if packet, err := codec.Marshal(reply); err != nil {
+						if err != nil {
 							warnf("UDP  %v", err)
-						} else if packet == nil {
-							warnf("UDP  invalid reply packet (%v)", packet)
-						} else if N, err := socket.WriteToUDPAddrPort(packet, addr); err != nil {
-							warnf("UDP  %v", err)
-						} else {
-							debugf("UDP  sent %v bytes to %v", N, addr)
 						}
-					}
+
+						if !isnil(reply) {
+							if packet, err := codec.Marshal(reply); err != nil {
+								warnf("UDP  %v", err)
+							} else if packet == nil {
+								warnf("UDP  invalid reply packet (%v)", packet)
+							} else if N, err := socket.WriteToUDPAddrPort(packet, addr); err != nil {
+								warnf("UDP  %v", err)
+							} else {
+								debugf("UDP  sent %v bytes to %v", N, addr)
+							}
+						}
+					}()
 				}
 			}
 		}

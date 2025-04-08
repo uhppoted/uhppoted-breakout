@@ -201,11 +201,21 @@ func (ut0311 *UT0311) listen(tag string, c listener) {
 }
 
 func (ut0311 UT0311) received(request any) (any, error) {
-	infof("UDP  request %T", request)
+	infof("UDP  request %T tokens:%v", request, ut0311.rate.Tokens())
 
 	if !ut0311.rate.Allow() {
 		return nil, fmt.Errorf("request rate limit exceeded")
 	}
+
+	println(">>>> received")
+	result, err := ut0311.dispatch(request)
+	println("<<<< dispatched")
+
+	return result, err
+}
+
+func (ut0311 UT0311) dispatch(request any) (any, error) {
+	infof("UDP  dispatch %T", request)
 
 	switch rq := request.(type) {
 	case *messages.GetDeviceRequest:

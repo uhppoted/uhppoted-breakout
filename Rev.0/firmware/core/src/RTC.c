@@ -189,7 +189,7 @@ void RTC_read(void *data) {
 
             if (!RTC.ready && ok) {
                 RTC.ready = true;
-                infof(LOGTAG, "READY %04d-%02d-%02d %02d:%02d:%02d", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
+                infof(LOGTAG, "READY %04u-%02u-%02u %02u:%02u:%02u", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
             }
 
             // // ... update onboard RTC
@@ -319,7 +319,7 @@ void RTC_get_date(char *yymmmdd, int N) {
 }
 
 bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
-    debugf(LOGTAG, "set-date %04d-%02d-%02d  %s", year, month, day, RTC.initialised ? "" : "-- not initialised --");
+    debugf(LOGTAG, "set-date %04u-%02u-%02u  %s", year, month, day, RTC.initialised ? "" : "-- not initialised --");
 
     if (RTC.initialised) {
         uint8_t weekday = dow(year, month, day);
@@ -376,7 +376,7 @@ void RTC_get_time(char *HHmmss, int N) {
 }
 
 bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
-    debugf(LOGTAG, "set-time %02d-%02d-%02d  %s", hour, minute, second, RTC.initialised ? "" : "-- not initialised --");
+    debugf(LOGTAG, "set-time %02u-%02u-%02u  %s", hour, minute, second, RTC.initialised ? "" : "-- not initialised --");
 
     if (RTC.initialised) {
         datetime *dt = datetime_alloc();
@@ -427,14 +427,14 @@ void RTC_get_datetime(char *datetime, int N) {
         uint8_t minute = dt.min;
         uint8_t second = dt.sec;
 
-        snprintf(datetime, N, "%04u-%02u-%02u %02d:%02d:%0d", year, month, day, hour, minute, second);
+        snprintf(datetime, N, "%04u-%02u-%02u %02u:%02u:%02u", year, month, day, hour, minute, second);
     } else {
         snprintf(datetime, N, "---- -- --");
     }
 }
 
 bool RTC_set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
-    debugf(LOGTAG, "set-datetime %04d-%02d-%02d %02d:%02d:%02d %s",
+    debugf(LOGTAG, "set-datetime %04u-%02u-%02u %02u:%02u:%02u %s",
            year, month, day,
            hour, minute, second,
            RTC.initialised ? "" : "-- not initialised --");

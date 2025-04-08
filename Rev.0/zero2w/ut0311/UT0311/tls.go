@@ -122,22 +122,24 @@ func (c TLS) read(socket net.Conn, received func(any) (any, error)) error {
 			if request, err := messages.UnmarshalRequest(buffer[0:N]); err != nil {
 				warnf("TLS  %v", err)
 			} else {
-				reply, err := received(request)
-				if err != nil {
-					warnf("TLS  %v", err)
-				}
-
-				if !isnil(reply) {
-					if packet, err := codec.Marshal(reply); err != nil {
+				go func() {
+					reply, err := received(request)
+					if err != nil {
 						warnf("TLS  %v", err)
-					} else if packet == nil {
-						warnf("TLS  invalid reply packet (%v)", packet)
-					} else if N, err := socket.Write(packet); err != nil {
-						warnf("TLS  %v", err)
-					} else {
-						debugf("TLS  sent %v bytes to %v", N, socket.RemoteAddr())
 					}
-				}
+
+					if !isnil(reply) {
+						if packet, err := codec.Marshal(reply); err != nil {
+							warnf("TLS  %v", err)
+						} else if packet == nil {
+							warnf("TLS  invalid reply packet (%v)", packet)
+						} else if N, err := socket.Write(packet); err != nil {
+							warnf("TLS  %v", err)
+						} else {
+							debugf("TLS  sent %v bytes to %v", N, socket.RemoteAddr())
+						}
+					}
+				}()
 			}
 		}
 
