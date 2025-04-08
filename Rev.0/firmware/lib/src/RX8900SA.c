@@ -305,6 +305,37 @@ int RX8900SA_set_time(I2C dev, uint8_t hour, uint8_t minute, uint8_t second) {
     return I2C_write_all(dev, TIME, time, 3);
 }
 
+int RX8900SA_get_datetime(I2C dev, uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
+    uint8_t datetime[7];
+    int err;
+
+    if ((err = I2C_read_all(dev, SECOND, datetime, 7)) != ERR_OK) {
+        return err;
+    }
+
+    *hour = bcd2dec(datetime[2]);
+    *minute = bcd2dec(datetime[1]);
+    *second = bcd2dec(datetime[0]);
+
+    *year = 2000 + bcd2dec(datetime[6]);
+    *month = bcd2dec(datetime[5]);
+    *day = bcd2dec(datetime[4]);
+
+    return ERR_OK;
+}
+
+int RX8900SA_set_datetime(I2C dev, uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second, uint8_t weekday) {
+    uint8_t YY = dec2bcd(year % 100);
+    uint8_t MM = dec2bcd(month);
+    uint8_t DD = dec2bcd(day);
+    uint8_t hh = dec2bcd(hour);
+    uint8_t mm = dec2bcd(minute);
+    uint8_t ss = dec2bcd(second);
+    uint8_t datetime[] = {ss, mm, hh, weekday, DD, MM, YY};
+
+    return I2C_write_all(dev, SECOND, datetime, 7);
+}
+
 int RX8900SA_get_dow(I2C dev, uint8_t *weekday) {
     int err;
 

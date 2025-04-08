@@ -39,11 +39,8 @@ int64_t MIB_set_datetime(const value u, value *v) {
 
     if ((rc = sscanf(s, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day, &hour, &minute, &second)) != 6) {
         return SSMP_ERROR_BAD_VALUE;
-    } else if (!RTC_set_date(year, month, day)) {
-        warnf(LOGTAG, "error setting RTC date %04d-%02d-%02d", year, month, day);
-        return SSMP_ERROR_COMMIT_FAILED;
-    } else if (!RTC_set_time(hour, minute, second)) {
-        warnf(LOGTAG, "error setting RTC time %02d:%02d:%02d", hour, minute, second);
+    } else if (!RTC_set_datetime(year, month, day, hour, minute, second)) {
+        warnf(LOGTAG, "error setting RTC datetime %04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
         return SSMP_ERROR_COMMIT_FAILED;
     }
 

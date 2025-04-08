@@ -34,6 +34,7 @@
       - [ ] make debugf, infof, etc interrupt safe
             - use arg index
             - predeclared int/float/etc args
+            - push onto queue for later snprintf
       - [ ] log once on occurrence
       - [ ] CLI show errors
       - (?) count up/down to auto-clear
@@ -54,15 +55,15 @@
     - [x] get-status
     - [x] return error if MIB `get` fails
     - [ ] set-datetime
-          - (?) RTC set-datetime (atomic)
+          - [x] RTC get/set-datetime
           - [ ] Figure out RTC set/get delay thing
+          - [ ] SSMP_ERROR_WRONGTYPE (7)
     - [ ] GET: multiple OIDs
     - [ ] TRAP
 
     - [ ] get-door-delay
     - [ ] get-door-mode
     - [ ] SSMP_ERROR_NOTWRITABLE (17)
-    - [ ] SSMP_ERROR_WRONGTYPE (7)
     - [ ] SSMP_ERROR_NOACCESS (6)
     - [ ] SSMP_ERROR_READONLY (4)
     - (?) queue UART write

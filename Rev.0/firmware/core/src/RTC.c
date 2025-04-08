@@ -254,6 +254,30 @@ void RTC_write(void *data) {
                 mutex_exit(&RTC.guard);
             }
         }
+
+        if (dt->tag == RTC_SET_DATETIME) {
+            uint16_t year = dt->datetime.year;
+            uint8_t month = dt->datetime.month;
+            uint8_t day = dt->datetime.day;
+            uint8_t hour = dt->datetime.hour;
+            uint8_t minute = dt->datetime.minute;
+            uint8_t second = dt->datetime.second;
+            uint8_t dow = dt->datetime.dow;
+            int err;
+
+            if ((err = RX8900SA_set_datetime(U5, year, month, day, hour, minute, second, dow)) != ERR_OK) {
+                warnf(LOGTAG, "set-datetime error %d", err);
+            } else if (mutex_try_enter(&RTC.guard, NULL)) {
+                RTC.year = year;
+                RTC.month = month;
+                RTC.day = day;
+                RTC.hour = hour;
+                RTC.minute = minute;
+                RTC.second = second;
+                RTC.dow = dow;
+                mutex_exit(&RTC.guard);
+            }
+        }
     }
 
     datetime_free(dt);
@@ -362,6 +386,72 @@ bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
             dt->HHmmss.hour = hour;
             dt->HHmmss.minute = minute;
             dt->HHmmss.second = second;
+
+            closure write = {
+                .f = RTC_write,
+                .data = dt,
+            };
+
+            closure read = {
+                .f = RTC_read,
+                .data = &RTC,
+            };
+
+            if (!I2C0_push(&write)) {
+                datetime_free(dt);
+            } else if (I2C0_push(&read)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void RTC_get_datetime(char *datetime, int N) {
+    if (RTC.initialised && RTC.ready) {
+        // mutex_enter_blocking(&RTC.guard);
+        // uint16_t year = RTC.year;
+        // uint8_t month = RTC.month;
+        // uint8_t day = RTC.day;
+        // mutex_exit(&RTC.guard);
+
+        datetime_t dt;
+
+        rtc_get_datetime(&dt);
+
+        uint16_t year = dt.year;
+        uint8_t month = dt.month;
+        uint8_t day = dt.day;
+        uint8_t hour = dt.hour;
+        uint8_t minute = dt.min;
+        uint8_t second = dt.sec;
+
+        snprintf(datetime, N, "%04u-%02u-%02u %02d:%02d:%0d", year, month, day, hour, minute, second);
+    } else {
+        snprintf(datetime, N, "---- -- --");
+    }
+}
+
+bool RTC_set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
+    debugf(LOGTAG, "set-datetime %04d-%02d-%02d %02d:%02d:%02d %s",
+           year, month, day,
+           hour, minute, second,
+           RTC.initialised ? "" : "-- not initialised --");
+
+    if (RTC.initialised) {
+        uint8_t weekday = dow(year, month, day);
+        datetime *dt = datetime_alloc();
+
+        if (dt != NULL) {
+            dt->tag = RTC_SET_DATETIME;
+            dt->datetime.year = year;
+            dt->datetime.month = month;
+            dt->datetime.day = day;
+            dt->datetime.dow = weekday;
+            dt->datetime.hour = hour;
+            dt->datetime.minute = minute;
+            dt->datetime.second = second;
 
             closure write = {
                 .f = RTC_write,

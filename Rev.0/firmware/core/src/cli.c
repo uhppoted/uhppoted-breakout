@@ -426,13 +426,11 @@ void get_ID() {
 }
 
 void get_datetime() {
-    char date[11] = {0};
-    char time[11] = {0};
+    char datetime[20] = {0};
 
-    RTC_get_date(date, 11);
-    RTC_get_time(time, 11);
+    RTC_get_datetime(datetime, sizeof(datetime));
 
-    display("get-datetime: %s %s\n", date, time);
+    display("get-datetime: %s\n", datetime);
 }
 
 void set_datetime(const char *cmd) {
@@ -445,15 +443,13 @@ void set_datetime(const char *cmd) {
     int rc;
 
     if ((rc = sscanf(cmd, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day, &hour, &minute, &second)) == 6) {
-        RTC_set_date(year, month, day);
-        RTC_set_time(hour, minute, second);
+        RTC_set_datetime(year, month, day, hour, minute, second);
         display("set-datetime: ok");
         return;
     }
 
     if ((rc = sscanf(cmd, "%04d-%02d-%02d %02d:%02d", &year, &month, &day, &hour, &minute)) == 5) {
-        RTC_set_date(year, month, day);
-        RTC_set_time(hour, minute, 0);
+        RTC_set_datetime(year, month, day, hour, minute, 0);
         display("set-datetime: ok");
         return;
     }

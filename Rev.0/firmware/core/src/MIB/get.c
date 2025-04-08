@@ -89,14 +89,9 @@ int64_t MIB_get_controller_datetime(value *v) {
         .bytes = (char *)calloc(32, sizeof(uint8_t)),
     };
 
-    char date[16] = {0};
-    char time[16] = {0};
-    char datetime[32] = {0};
+    char datetime[20] = {0};
 
-    RTC_get_date(date, sizeof(date));
-    RTC_get_time(time, sizeof(time));
-
-    snprintf(datetime, sizeof(datetime), "%s %s", date, time);
+    RTC_get_datetime(datetime, sizeof(datetime));
 
     int N = snprintf(octets.bytes, octets.capacity, "%s", datetime);
     if (N > 0) {
