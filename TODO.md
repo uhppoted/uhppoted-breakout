@@ -63,10 +63,13 @@
           - [x] SSMP_ERROR_READONLY (4)
           - [x] SSMP_ERROR_NO_ACCESS (6)
           - [x] SSMP_ERROR_NOT_WRITABLE (17)
-          - [ ] SSMP_ERROR_NO_SUCH_OBJECT precedes NO_ACCESS
+          - [x] SSMP_ERROR_NO_SUCH_OBJECT precedes NO_ACCESS
+          - [ ] MIB_find (returns const *MIBItem)
+          - [ ] check returned datetime in ut0311
+          - [ ] MIB_get/set/find externs to SSMP (to avoid script errors)
+
     - [ ] GET: multiple OIDs
     - [ ] TRAP
-
     - [ ] get-door-delay
     - [ ] get-door-mode
     - (?) queue UART write

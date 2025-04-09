@@ -54,6 +54,8 @@ def djb2(s):
 with open('../core/include/MIB.h', 'w') as f:
     f.write('#pragma once\n')
     f.write('\n')
+    f.write('#include <stdbool.h>\n')
+    f.write('\n')
     f.write('#include <encoding/ssmp/ssmp.h>\n')
     f.write('\n')
     f.write('typedef struct MIBItem {\n')
@@ -71,6 +73,7 @@ with open('../core/include/MIB.h', 'w') as f:
     f.write(f'extern const MIBItem OIDs[{len(OIDs)}];\n')
 
     f.write('\n')
+    f.write('bool MIB_has(const char *OID);\n')
     f.write('int64_t MIB_get(const char *OID, value *v);\n')
     f.write('int64_t MIB_set(const char *OID, const value u, value *v);\n')
 

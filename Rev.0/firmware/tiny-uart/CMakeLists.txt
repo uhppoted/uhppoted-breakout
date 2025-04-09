@@ -53,6 +53,7 @@ add_executable(breakout
   ${CORE}/src/uart1.c
   ${CORE}/src/mempool.c
   ${CORE}/src/MIB/MIB.c
+  ${CORE}/src/MIB/find.c
   ${CORE}/src/MIB/get.c
   ${CORE}/src/MIB/set.c
 

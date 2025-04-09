@@ -141,11 +141,13 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         const char *oid = request->get.OID;
         uint32_t rqid = request->get.request_id;
 
-        if (auth_authorised(community, oid, OP_GET) && auth_validate(community, rqid)) {
+        if (!MIB_has(oid)) {
+            SSMP_err(community, rqid, oid, SSMP_ERROR_NO_SUCH_OBJECT, 1);
+        } else if (!auth_authorised(community, oid, OP_GET) && auth_validate(community, rqid)) {
+            SSMP_err(community, rqid, oid, SSMP_ERROR_NO_ACCESS, 1);
+        } else {
             SSMP_touched();
             SSMP_get(community, rqid, oid);
-        } else {
-            SSMP_err(community, rqid, oid, SSMP_ERROR_NO_ACCESS, 1);
         }
     }
 
@@ -190,11 +192,13 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         const char *oid = request->get.OID;
         uint32_t rqid = request->get.request_id;
 
-        if (auth_authorised(community, oid, OP_SET) && auth_validate(community, rqid)) {
+        if (!MIB_has(oid)) {
+            SSMP_err(community, rqid, oid, SSMP_ERROR_NO_SUCH_OBJECT, 1);
+        } else if (!auth_authorised(community, oid, OP_SET) && auth_validate(community, rqid)) {
+            SSMP_err(community, rqid, oid, SSMP_ERROR_NO_ACCESS, 1);
+        } else {
             SSMP_touched();
             SSMP_set(community, rqid, oid, request->set.value);
-        } else {
-            SSMP_err(community, rqid, oid, SSMP_ERROR_NO_ACCESS, 1);
         }
     }
 

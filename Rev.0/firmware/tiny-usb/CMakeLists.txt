@@ -55,6 +55,7 @@ add_executable(${TARGET_NAME}
   ${CORE}/src/mempool.c
   ${CORE}/src/usb.c
   ${CORE}/src/MIB/MIB.c
+  ${CORE}/src/MIB/find.c
   ${CORE}/src/MIB/get.c
   ${CORE}/src/MIB/set.c
 

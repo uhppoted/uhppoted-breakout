@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include <encoding/ssmp/ssmp.h>
 
 typedef struct MIBItem {
@@ -33,5 +35,6 @@ extern const MIBItem MIB_ALARMS_FIRE_ALARM;
 
 extern const MIBItem OIDs[21];
 
+bool MIB_has(const char *OID);
 int64_t MIB_get(const char *OID, value *v);
 int64_t MIB_set(const char *OID, const value u, value *v);
