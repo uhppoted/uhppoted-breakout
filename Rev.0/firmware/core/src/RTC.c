@@ -296,6 +296,13 @@ void RTC_reset() {
     add_alarm_in_ms(RX8900SA_tSTA, RTC_on_setup, NULL, true);
 }
 
+/*
+ * Returns true if the RX8900SA has been initialised.
+ */
+bool RTC_ready() {
+    return RTC.initialised && RTC.ready;
+}
+
 void RTC_get_date(char *yymmmdd, int N) {
     if (RTC.initialised && RTC.ready) {
         // mutex_enter_blocking(&RTC.guard);

@@ -23,8 +23,12 @@ const int64_t SSMP_IDLE = 5000; // ms
 const int64_t SSMP_ERROR_NONE = 0;
 const int64_t SSMP_ERROR_NO_SUCH_OBJECT = 2;
 const int64_t SSMP_ERROR_BAD_VALUE = 3;
+const int64_t SSMP_ERROR_READONLY = 4;
+const int64_t SSMP_ERROR_NO_ACCESS = 6;
+const int64_t SSMP_ERROR_WRONG_TYPE = 7;
 const int64_t SSMP_ERROR_COMMIT_FAILED = 14;
 const int64_t SSMP_ERROR_AUTHORIZATION = 16;
+const int64_t SSMP_ERROR_NOT_WRITABLE = 17;
 
 void SSMP_rxchar(uint8_t ch);
 void SSMP_enq();
@@ -141,7 +145,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
             SSMP_touched();
             SSMP_get(community, rqid, oid);
         } else {
-            SSMP_err(community, rqid, oid, SSMP_ERROR_AUTHORIZATION, 1);
+            SSMP_err(community, rqid, oid, SSMP_ERROR_NO_ACCESS, 1);
         }
     }
 
@@ -190,7 +194,7 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
             SSMP_touched();
             SSMP_set(community, rqid, oid, request->set.value);
         } else {
-            SSMP_err(community, rqid, oid, SSMP_ERROR_AUTHORIZATION, 1);
+            SSMP_err(community, rqid, oid, SSMP_ERROR_NO_ACCESS, 1);
         }
     }
 

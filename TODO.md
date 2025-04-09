@@ -48,24 +48,27 @@
       - pico_malloc
       - pico_stdio
 
+- [ ] CLI up arrow for 'last command'
+
 ### SSMP
     - [x] hash OIDs for faster lookup
     - [x] include SET/GET in auth rq
     - [x] SSMP_ERROR_AUTHORIZATION (16)
     - [x] get-status
     - [x] return error if MIB `get` fails
-    - [ ] set-datetime
+    - [x] set-datetime
           - [x] RTC get/set-datetime
           - [x] Figure out RTC set/get delay thing
-          - [ ] SSMP_ERROR_WRONGTYPE (7)
+          - [x] SSMP_ERROR_WRONGTYPE (7)
+          - [x] SSMP_ERROR_READONLY (4)
+          - [x] SSMP_ERROR_NO_ACCESS (6)
+          - [x] SSMP_ERROR_NOT_WRITABLE (17)
+          - [ ] SSMP_ERROR_NO_SUCH_OBJECT precedes NO_ACCESS
     - [ ] GET: multiple OIDs
     - [ ] TRAP
 
     - [ ] get-door-delay
     - [ ] get-door-mode
-    - [ ] SSMP_ERROR_NOTWRITABLE (17)
-    - [ ] SSMP_ERROR_NOACCESS (6)
-    - [ ] SSMP_ERROR_READONLY (4)
     - (?) queue UART write
 
 ## Zero2W

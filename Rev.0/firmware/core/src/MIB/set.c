@@ -20,7 +20,11 @@ int64_t MIB_set(const char *OID, const value u, value *v) {
     for (int i = 0; i < N; i++) {
         MIBItem item = OIDs[i];
 
-        if ((hash == item.hash) && (strcmp(OID, item.OID) == 0) && (item.set != NULL)) {
+        if (hash == item.hash && strcmp(OID, item.OID) == 0) {
+            if (item.set == NULL) {
+                return SSMP_ERROR_READONLY;
+            }
+
             return item.set(u, v);
         }
     }
@@ -29,6 +33,16 @@ int64_t MIB_set(const char *OID, const value u, value *v) {
 }
 
 int64_t MIB_set_datetime(const value u, value *v) {
+    // ... check value type
+    if (u.tag != VALUE_OCTET_STRING) {
+        return SSMP_ERROR_WRONG_TYPE;
+    }
+
+    // ... RTC initialised?
+    if (!RTC_ready()) {
+        return SSMP_ERROR_NOT_WRITABLE;
+    }
+
     // ... set RTC time
     int year;
     int month;
@@ -53,8 +67,8 @@ int64_t MIB_set_datetime(const value u, value *v) {
         .bytes = (char *)calloc(32, sizeof(uint8_t)),
     };
 
-    // ... delay to let RTC time propagate
-    sleep_ms(1);
+    // ... delay to let RTC time (hopefully) propagate
+    sleep_ms(5);
 
     // ... return actual RTC time
     char datetime[20] = {0};
