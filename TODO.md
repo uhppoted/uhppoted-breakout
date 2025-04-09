@@ -56,7 +56,7 @@
     - [x] return error if MIB `get` fails
     - [ ] set-datetime
           - [x] RTC get/set-datetime
-          - [ ] Figure out RTC set/get delay thing
+          - [x] Figure out RTC set/get delay thing
           - [ ] SSMP_ERROR_WRONGTYPE (7)
     - [ ] GET: multiple OIDs
     - [ ] TRAP

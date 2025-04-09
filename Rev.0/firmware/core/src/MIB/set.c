@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <pico/time.h>
+
 #include <crypt/hash/djb2.h>
 
 #include <MIB.h>
@@ -27,6 +29,7 @@ int64_t MIB_set(const char *OID, const value u, value *v) {
 }
 
 int64_t MIB_set_datetime(const value u, value *v) {
+    // ... set RTC time
     int year;
     int month;
     int day;
@@ -50,17 +53,15 @@ int64_t MIB_set_datetime(const value u, value *v) {
         .bytes = (char *)calloc(32, sizeof(uint8_t)),
     };
 
-    // NTS: RTC is not updated immediately
-    // char date[16] = {0};
-    // char time[16] = {0};
-    // char datetime[32] = {0};
-    //
-    // RTC_get_date(date, sizeof(date));
-    // RTC_get_time(time, sizeof(time));
-    //
-    // snprintf(datetime, sizeof(datetime), "%s %s", date, time);
+    // ... delay to let RTC time propagate
+    sleep_ms(1);
 
-    int N = snprintf(octets.bytes, octets.capacity, "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+    // ... return actual RTC time
+    char datetime[20] = {0};
+
+    RTC_get_datetime(datetime, sizeof(datetime));
+
+    int N = snprintf(octets.bytes, octets.capacity, "%s", datetime);
     if (N > 0) {
         octets.length = N;
     }
