@@ -73,9 +73,6 @@ with open('../core/include/MIB.h', 'w') as f:
     f.write(f'extern const MIBItem OIDs[{len(OIDs)}];\n')
 
     f.write('\n')
-    f.write('bool MIB_has(const char *OID);\n')
-    f.write('int64_t MIB_get(const char *OID, value *v);\n')
-    f.write('int64_t MIB_set(const char *OID, const value u, value *v);\n')
 
 with open("../core/src/MIB/MIB.c", "w") as f:
     f.write('#include <MIB.h>\n')

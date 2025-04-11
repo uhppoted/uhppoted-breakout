@@ -426,9 +426,19 @@ void get_ID() {
 }
 
 void get_datetime() {
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
     char datetime[20] = {0};
 
-    RTC_get_datetime(datetime, sizeof(datetime));
+    if (RTC_get_datetime(&year, &month, &day, &hour, &minute, &second)) {
+        snprintf(datetime, sizeof(datetime), "%04u-%02u-%02u %02u:%02u:%02u", year, month, day, hour, minute, second);
+    } else {
+        snprintf(datetime, sizeof(datetime), "---- -- --");
+    }
 
     display("get-datetime: %s\n", datetime);
 }

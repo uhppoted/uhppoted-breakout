@@ -19,6 +19,10 @@
 
 #define LOGTAG "SSMP"
 
+extern bool MIB_has(const char *OID);
+extern int64_t MIB_get(const char *OID, value *v);
+extern int64_t MIB_set(const char *OID, const value u, value *v);
+
 const int64_t SSMP_IDLE = 5000; // ms
 const int64_t SSMP_ERROR_NONE = 0;
 const int64_t SSMP_ERROR_NO_SUCH_OBJECT = 2;

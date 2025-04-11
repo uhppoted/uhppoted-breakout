@@ -162,34 +162,48 @@ void RTC_read(void *data) {
 
         if (mutex_try_enter(&RTC.guard, NULL)) {
 
-            if ((err = RX8900SA_get_date(U5, &year, &month, &day)) != ERR_OK) {
-                set_error(ERR_RX8900SA, LOGTAG, "get-date error %d", err);
+            if ((err = RX8900SA_get_datetime(U5, &year, &month, &day, &hour, &minute, &second)) != ERR_OK) {
+                set_error(ERR_RX8900SA, LOGTAG, "get-datetime error %d", err);
                 ok = false;
             } else {
+                weekday = dow(year, month, day);
+
                 RTC.year = year;
                 RTC.month = month;
                 RTC.day = day;
-            }
-
-            if ((err = RX8900SA_get_time(U5, &hour, &minute, &second)) != ERR_OK) {
-                set_error(ERR_RX8900SA, LOGTAG, "get-time error %d", err);
-                ok = false;
-            } else {
                 RTC.hour = hour;
                 RTC.minute = minute;
                 RTC.second = second;
-            }
-
-            if ((err = RX8900SA_get_dow(U5, &weekday)) != ERR_OK) {
-                set_error(ERR_RX8900SA, LOGTAG, "get-dow error %d", err);
-                ok = false;
-            } else {
                 RTC.dow = weekday;
             }
 
+            // if ((err = RX8900SA_get_date(U5, &year, &month, &day)) != ERR_OK) {
+            //     set_error(ERR_RX8900SA, LOGTAG, "get-date error %d", err);
+            //     ok = false;
+            // } else {
+            //     RTC.year = year;
+            //     RTC.month = month;
+            //     RTC.day = day;
+            // }
+
+            // if ((err = RX8900SA_get_time(U5, &hour, &minute, &second)) != ERR_OK) {
+            //     set_error(ERR_RX8900SA, LOGTAG, "get-time error %d", err);
+            //     ok = false;
+            // } else {
+            //     RTC.hour = hour;
+            //     RTC.minute = minute;
+            //     RTC.second = second;
+            // }
+
+            // if ((err = RX8900SA_get_dow(U5, &weekday)) != ERR_OK) {
+            //     set_error(ERR_RX8900SA, LOGTAG, "get-dow error %d", err);
+            //     ok = false;
+            // } else {
+            //     RTC.dow = weekday;
+            // }
+
             if (!RTC.ready && ok) {
                 RTC.ready = true;
-                infof(LOGTAG, "READY %04u-%02u-%02u %02u:%02u:%02u", RTC.year, RTC.month, RTC.day, RTC.hour, RTC.minute, RTC.second);
             }
 
             // // ... update onboard RTC
@@ -415,29 +429,49 @@ bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
     return false;
 }
 
-void RTC_get_datetime(char *datetime, int N) {
+bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
     if (RTC.initialised && RTC.ready) {
         // mutex_enter_blocking(&RTC.guard);
         // uint16_t year = RTC.year;
         // uint8_t month = RTC.month;
         // uint8_t day = RTC.day;
+        // uint8_t hour = RTC.hour;
+        // uint8_t minute = RTC.minute;
+        // uint8_t second = RTC.second;
         // mutex_exit(&RTC.guard);
 
         datetime_t dt;
 
         rtc_get_datetime(&dt);
 
-        uint16_t year = dt.year;
-        uint8_t month = dt.month;
-        uint8_t day = dt.day;
-        uint8_t hour = dt.hour;
-        uint8_t minute = dt.min;
-        uint8_t second = dt.sec;
+        if (year != NULL) {
+            *year = dt.year;
+        }
 
-        snprintf(datetime, N, "%04u-%02u-%02u %02u:%02u:%02u", year, month, day, hour, minute, second);
-    } else {
-        snprintf(datetime, N, "---- -- --");
+        if (month != NULL) {
+            *month = dt.month;
+        }
+
+        if (day != NULL) {
+            *day = dt.day;
+        }
+
+        if (hour != NULL) {
+            *hour = dt.hour;
+        }
+
+        if (minute != NULL) {
+            *minute = dt.min;
+        }
+
+        if (second != NULL) {
+            *second = dt.sec;
+        }
+
+        return true;
     }
+
+    return false;
 }
 
 bool RTC_set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {

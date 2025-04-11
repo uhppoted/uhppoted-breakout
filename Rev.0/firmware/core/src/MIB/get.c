@@ -83,23 +83,29 @@ int64_t MIB_get_controller_released(value *v) {
 }
 
 int64_t MIB_get_controller_datetime(value *v) {
-    slice octets = {
-        .capacity = 32,
-        .length = 0,
-        .bytes = (char *)calloc(32, sizeof(uint8_t)),
-    };
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    int N;
 
-    char datetime[20] = {0};
+    if (!RTC_get_datetime(&year, &month, &day, &hour, &minute, &second)) {
+        v->tag = VALUE_NULL;
+    } else {
+        slice octets = {
+            .capacity = 32,
+            .length = 0,
+            .bytes = (char *)calloc(32, sizeof(uint8_t)),
+        };
 
-    RTC_get_datetime(datetime, sizeof(datetime));
+        N = snprintf(octets.bytes, octets.capacity, "%04u-%02u-%02u %02u:%02u:%02u", year, month, day, hour, minute, second);
+        octets.length = N < 0 ? 0 : (N < 19 ? N : 19);
 
-    int N = snprintf(octets.bytes, octets.capacity, "%s", datetime);
-    if (N > 0) {
-        octets.length = N < strlen(datetime) ? N : strlen(datetime);
+        v->tag = VALUE_OCTET_STRING;
+        v->octets = octets;
     }
-
-    v->tag = VALUE_OCTET_STRING;
-    v->octets = octets;
 
     return SSMP_ERROR_NONE;
 }
