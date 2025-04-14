@@ -127,3 +127,13 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 1. https://forums.raspberrypi.com/viewtopic.php?t=331351
 2. https://forums.raspberrypi.com/viewtopic.php?t=316853
 3. https://forums.raspberrypi.com/viewtopic.php?t=316853
+
+## RTC
+
+`rtc_set_datetime` always increments the second i.e. `rtc_set_datetime` followed by `rtc_get_datetime` will always
+return a date/time that is a second after the _set_ datetime.
+
+1. https://forums.raspberrypi.com/viewtopic.php?t=325598
+2. https://forums.raspberrypi.com/viewtopic.php?t=377876
+3. https://forums.raspberrypi.com/viewtopic.php?t=348730
+4. https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#group_pico_aon_timer

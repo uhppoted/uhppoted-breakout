@@ -83,9 +83,6 @@ int64_t MIB_set_datetime(const value u, value *v) {
         return SSMP_ERROR_COMMIT_FAILED;
     }
 
-    printf(">>> %04d-%02d-%02d %02d:%02d:%02d\n", year, month, day, hour, minute, second);
-    printf(">>> %04d-%02d-%02d %02d:%02d:%02d\n", yyyy, mm, dd, HH, MM, SS);
-
     N = snprintf(octets.bytes, octets.capacity, "%04u-%02u-%02u %02u:%02u:%02u", yyyy, mm, dd, HH, MM, SS);
     octets.length = N < 0 ? 0 : (N < 19 ? N : 19);
 

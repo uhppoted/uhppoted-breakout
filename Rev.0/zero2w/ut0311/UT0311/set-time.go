@@ -22,10 +22,6 @@ func (ut0311 *UT0311) setTime(rq *messages.SetTimeRequest) (any, error) {
 		q := time.Time(v)
 		delta := p.Sub(q).Abs()
 
-		fmt.Printf(">>>>>>>>>>>>>>>>>> %s\n", p.Format("2006-01-02 15:04:05"))
-		fmt.Printf(">>>>>>>>>>>>>>>>>> %s\n", q.Format("2006-01-02 15:04:05"))
-		fmt.Printf(">>>>>>>>>>>>>>>>>> %v\n", delta)
-
 		if delta > 1*time.Second {
 			return nil, fmt.Errorf("set time incorrect (%v)", delta)
 		}

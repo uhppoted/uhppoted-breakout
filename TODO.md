@@ -32,6 +32,9 @@
 
 - [ ] syserror
       - [ ] make debugf, infof, etc interrupt safe
+            - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
+            - https://github.com/idning/safe_snprintf
+            - https://stackoverflow.com/questions/14573000/print-int-from-signal-handler-using-write-or-async-safe-functions
             - use arg index
             - predeclared int/float/etc args
             - push onto queue for later snprintf
@@ -66,15 +69,13 @@
           - [x] SSMP_ERROR_NO_SUCH_OBJECT precedes NO_ACCESS
           - [x] MIB_get/set/find externs to SSMP (to avoid script errors)
           - [x] check returned datetime in ut0311
+          - [x] weird 1s difference on set-time + get-time
           - [ ] include dow in RX8900SA_get_datetime
+          - [ ] unify get-date, get-time, get-datetime
+          - [ ] software-rtc
           - [ ] MIB_find (returns const *MIBItem)
           - [ ] SSMP_ERROR_COMMIT_FAILED
-          - [ ] weird 1s difference on set-time + get-time
-          - [ ] unify get-date, get-time, get-datetime
-          - [ ] PID to set on-chip RTC
-                - if delta > 2s set on-chip RTC
-                - if delta < 1s do nothing
-                - otherwise sneak up on it
+
           - https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#group_util_datetime
           - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#structdatetime_t
           - https://github.com/khoih-prog/RP2040_RTC/issues/4
@@ -89,6 +90,8 @@
 
 ## Zero2W
 - [ ] serial logger
+- [ ] custom image
+      - https://github.com/raspberrypi/rpi-image-gen
 
 ### UT0311
     - [ ] rework with text tags
