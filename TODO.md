@@ -70,7 +70,7 @@
           - [x] MIB_get/set/find externs to SSMP (to avoid script errors)
           - [x] check returned datetime in ut0311
           - [x] weird 1s difference on set-time + get-time
-          - [ ] include dow in RX8900SA_get_datetime
+          - [x] include dow in RX8900SA_get_datetime
           - [ ] unify get-date, get-time, get-datetime
           - [ ] software-rtc
           - [ ] MIB_find (returns const *MIBItem)

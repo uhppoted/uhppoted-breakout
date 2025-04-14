@@ -162,12 +162,10 @@ void RTC_read(void *data) {
 
         if (mutex_try_enter(&RTC.guard, NULL)) {
 
-            if ((err = RX8900SA_get_datetime(U5, &year, &month, &day, &hour, &minute, &second)) != ERR_OK) {
+            if ((err = RX8900SA_get_datetime(U5, &year, &month, &day, &hour, &minute, &second, &weekday)) != ERR_OK) {
                 set_error(ERR_RX8900SA, LOGTAG, "get-datetime error %d", err);
                 ok = false;
             } else {
-                weekday = dow(year, month, day);
-
                 RTC.year = year;
                 RTC.month = month;
                 RTC.day = day;
@@ -176,31 +174,6 @@ void RTC_read(void *data) {
                 RTC.second = second;
                 RTC.dow = weekday;
             }
-
-            // if ((err = RX8900SA_get_date(U5, &year, &month, &day)) != ERR_OK) {
-            //     set_error(ERR_RX8900SA, LOGTAG, "get-date error %d", err);
-            //     ok = false;
-            // } else {
-            //     RTC.year = year;
-            //     RTC.month = month;
-            //     RTC.day = day;
-            // }
-
-            // if ((err = RX8900SA_get_time(U5, &hour, &minute, &second)) != ERR_OK) {
-            //     set_error(ERR_RX8900SA, LOGTAG, "get-time error %d", err);
-            //     ok = false;
-            // } else {
-            //     RTC.hour = hour;
-            //     RTC.minute = minute;
-            //     RTC.second = second;
-            // }
-
-            // if ((err = RX8900SA_get_dow(U5, &weekday)) != ERR_OK) {
-            //     set_error(ERR_RX8900SA, LOGTAG, "get-dow error %d", err);
-            //     ok = false;
-            // } else {
-            //     RTC.dow = weekday;
-            // }
 
             if (!RTC.ready && ok) {
                 RTC.ready = true;

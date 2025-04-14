@@ -305,7 +305,7 @@ int RX8900SA_set_time(I2C dev, uint8_t hour, uint8_t minute, uint8_t second) {
     return I2C_write_all(dev, TIME, time, 3);
 }
 
-int RX8900SA_get_datetime(I2C dev, uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
+int RX8900SA_get_datetime(I2C dev, uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second, uint8_t *weekday) {
     uint8_t datetime[7];
     int err;
 
@@ -313,13 +313,33 @@ int RX8900SA_get_datetime(I2C dev, uint16_t *year, uint8_t *month, uint8_t *day,
         return err;
     }
 
-    *hour = bcd2dec(datetime[2]);
-    *minute = bcd2dec(datetime[1]);
-    *second = bcd2dec(datetime[0]);
+    if (hour != NULL) {
+        *hour = bcd2dec(datetime[2]);
+    }
 
-    *year = 2000 + bcd2dec(datetime[6]);
-    *month = bcd2dec(datetime[5]);
-    *day = bcd2dec(datetime[4]);
+    if (minute != NULL) {
+        *minute = bcd2dec(datetime[1]);
+    }
+
+    if (second != NULL) {
+        *second = bcd2dec(datetime[0]);
+    }
+
+    if (year != NULL) {
+        *year = 2000 + bcd2dec(datetime[6]);
+    }
+
+    if (month != NULL) {
+        *month = bcd2dec(datetime[5]);
+    }
+
+    if (day != NULL) {
+        *day = bcd2dec(datetime[4]);
+    }
+
+    if (weekday != NULL) {
+        *weekday = bcd2dec(datetime[3]);
+    }
 
     return ERR_OK;
 }
