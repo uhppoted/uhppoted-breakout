@@ -13,6 +13,8 @@
 
 #define LOGTAG "MIB"
 
+int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec);
+
 int64_t MIB_set(const char *OID, const value u, value *v) {
     uint32_t hash = djb2(OID);
 
@@ -61,16 +63,10 @@ int64_t MIB_set_datetime(const value u, value *v) {
         return SSMP_ERROR_COMMIT_FAILED;
     }
 
-    slice octets = {
-        .capacity = 32,
-        .length = 0,
-        .bytes = (char *)calloc(32, sizeof(uint8_t)),
-    };
-
     // ... delay to let RTC time (hopefully) propagate
     sleep_ms(5);
 
-    // ... return actual RTC time
+    // ... get current RTC time
     uint16_t yyyy;
     uint8_t mm;
     uint8_t dd;
@@ -83,6 +79,22 @@ int64_t MIB_set_datetime(const value u, value *v) {
         return SSMP_ERROR_COMMIT_FAILED;
     }
 
+    // ... check delta < 1s
+    int64_t t1 = datetime_to_epoch(year, month, day, hour, minute, second);
+    int64_t t2 = datetime_to_epoch(yyyy, mm, dd, HH, MM, SS);
+    int64_t dt = t1 < t2 ? t2 - t1 : t1 - t2;
+
+    if (dt > 1) {
+        return SSMP_ERROR_COMMIT_FAILED;
+    }
+
+    // ... return current RTC time
+    slice octets = {
+        .capacity = 32,
+        .length = 0,
+        .bytes = (char *)calloc(32, sizeof(uint8_t)),
+    };
+
     N = snprintf(octets.bytes, octets.capacity, "%04u-%02u-%02u %02u:%02u:%02u", yyyy, mm, dd, HH, MM, SS);
     octets.length = N < 0 ? 0 : (N < 19 ? N : 19);
 
@@ -92,33 +104,30 @@ int64_t MIB_set_datetime(const value u, value *v) {
     return SSMP_ERROR_NONE;
 }
 
-// bool is_leap_year(int year) {
-//     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-// }
-//
-// uint64_t datetime_to_epoch(const datetime_t* dt) {
-//     const int days_in_month[] = {
-//         0, 31, 28, 31, 30, 31, 30,
-//         31, 31, 30, 31, 30, 31
-//     };
-//
-//     uint64_t seconds = 0;
-//
-//     for (int y = 1970; y < dt->year; y++) {
-//         seconds += (is_leap_year(y) ? 366 : 365) * 86400;
-//     }
-//
-//     for (int m = 1; m < dt->month; m++) {
-//         if (m == 2 && is_leap_year(dt->year))
-//             seconds += 29 * 86400;
-//         else
-//             seconds += days_in_month[m] * 86400;
-//     }
-//
-//     seconds += (dt->day - 1) * 86400;
-//     seconds += dt->hour * 3600;
-//     seconds += dt->min * 60;
-//     seconds += dt->sec;
-//
-//     return seconds;
-// }
+int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec) {
+    bool is_leap(int y) {
+        return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
+    }
+
+    const int days_in_month[] = {
+        31, 28, 31, 30, 31, 30,
+        31, 31, 30, 31, 30, 31};
+
+    int64_t days = 0;
+
+    // ... years since 1970
+    for (int y = 1970; y < year; y++) {
+        days += is_leap(y) ? 366 : 365;
+    }
+
+    // ... months this year (1–(mon-1))
+    for (int m = 1; m < mon; m++) {
+        days += days_in_month[m - 1];
+        if (m == 2 && is_leap(year))
+            days += 1;
+    }
+
+    days += day - 1;
+
+    return (int64_t)(days * 86400 + hour * 3600 + min * 60 + sec);
+}

@@ -67,20 +67,15 @@
           - [x] SSMP_ERROR_NO_ACCESS (6)
           - [x] SSMP_ERROR_NOT_WRITABLE (17)
           - [x] SSMP_ERROR_NO_SUCH_OBJECT precedes NO_ACCESS
+          - [x] SSMP_ERROR_COMMIT_FAILED
           - [x] MIB_get/set/find externs to SSMP (to avoid script errors)
           - [x] check returned datetime in ut0311
           - [x] weird 1s difference on set-time + get-time
           - [x] include dow in RX8900SA_get_datetime
+          - [x] set-time: check delta < 1s
           - [ ] unify get-date, get-time, get-datetime
           - [ ] software-rtc
           - [ ] MIB_find (returns const *MIBItem)
-          - [ ] SSMP_ERROR_COMMIT_FAILED
-
-          - https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#group_util_datetime
-          - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#structdatetime_t
-          - https://github.com/khoih-prog/RP2040_RTC/issues/4
-          - https://github.com/raspberrypi/pico-sdk/blob/master/src/rp2_common/hardware_rtc/rtc.c
-          - https://github.com/raspberrypi/pico-sdk/blob/master/src/common/pico_base_headers/include/pico/types.h#L115
 
     - [ ] GET: multiple OIDs
     - [ ] TRAP
