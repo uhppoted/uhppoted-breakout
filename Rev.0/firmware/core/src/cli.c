@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hardware/rtc.h"
 #include "pico/bootrom.h"
 #include "pico/stdlib.h"
 #include "pico/util/datetime.h"

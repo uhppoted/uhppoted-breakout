@@ -117,7 +117,6 @@ target_link_libraries(
     hardware_i2c
     hardware_pio 
     hardware_watchdog
-    hardware_rtc
     hardware_flash
 
     tinyusb_device

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <hardware/rtc.h>
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
@@ -82,10 +81,6 @@ void RTC_init() {
         .sec = 0,
     };
 
-    rtc_init();
-    sleep_us(64);
-    rtc_set_datetime(&t);
-
     infof(LOGTAG, "initialised %p", &RTC);
 }
 
@@ -130,8 +125,7 @@ void RTC_start() {
     };
 
     I2C0_push(&task);
-
-    add_repeating_timer_ms(60000, RTC_on_update, NULL, &RTC.timer);
+    add_repeating_timer_ms(400, RTC_on_update, NULL, &RTC.timer);
 }
 
 bool RTC_on_update(repeating_timer_t *rt) {
@@ -157,43 +151,23 @@ void RTC_read(void *data) {
         uint8_t minute = 0;
         uint8_t second = 0;
         uint8_t weekday = 0;
-        bool ok = true;
         int err;
 
-        if (mutex_try_enter(&RTC.guard, NULL)) {
+        if ((err = RX8900SA_get_datetime(U5, &year, &month, &day, &hour, &minute, &second, &weekday)) != ERR_OK) {
+            set_error(ERR_RX8900SA, LOGTAG, "get-datetime error %d", err);
+        } else {
+            mutex_enter_blocking(&RTC.guard);
+            RTC.year = year;
+            RTC.month = month;
+            RTC.day = day;
+            RTC.hour = hour;
+            RTC.minute = minute;
+            RTC.second = second;
+            RTC.dow = weekday;
 
-            if ((err = RX8900SA_get_datetime(U5, &year, &month, &day, &hour, &minute, &second, &weekday)) != ERR_OK) {
-                set_error(ERR_RX8900SA, LOGTAG, "get-datetime error %d", err);
-                ok = false;
-            } else {
-                RTC.year = year;
-                RTC.month = month;
-                RTC.day = day;
-                RTC.hour = hour;
-                RTC.minute = minute;
-                RTC.second = second;
-                RTC.dow = weekday;
-            }
-
-            if (!RTC.ready && ok) {
+            if (!RTC.ready) {
                 RTC.ready = true;
             }
-
-            // // ... update onboard RTC
-            if (ok) {
-                datetime_t t = {
-                    .year = RTC.year,
-                    .month = RTC.month,
-                    .day = RTC.day,
-                    .dotw = weekday2dow(weekday),
-                    .hour = RTC.hour,
-                    .min = RTC.minute,
-                    .sec = RTC.second,
-                };
-
-                rtc_set_datetime(&t);
-            }
-
             mutex_exit(&RTC.guard);
         }
     }
@@ -217,12 +191,6 @@ void RTC_write(void *data) {
                 warnf(LOGTAG, "set-date error %d", err);
             } else if ((err = RX8900SA_set_dow(U5, dow)) != ERR_OK) {
                 warnf(LOGTAG, "set-date error %d", err);
-            } else if (mutex_try_enter(&RTC.guard, NULL)) {
-                RTC.year = year;
-                RTC.month = month;
-                RTC.day = day;
-                RTC.dow = dow;
-                mutex_exit(&RTC.guard);
             }
         }
 
@@ -234,11 +202,6 @@ void RTC_write(void *data) {
 
             if ((err = RX8900SA_set_time(U5, hour, minute, second)) != ERR_OK) {
                 warnf(LOGTAG, "set-time error %d", err);
-            } else if (mutex_try_enter(&RTC.guard, NULL)) {
-                RTC.hour = hour;
-                RTC.minute = minute;
-                RTC.second = second;
-                mutex_exit(&RTC.guard);
             }
         }
 
@@ -254,15 +217,6 @@ void RTC_write(void *data) {
 
             if ((err = RX8900SA_set_datetime(U5, year, month, day, hour, minute, second, dow)) != ERR_OK) {
                 warnf(LOGTAG, "set-datetime error %d", err);
-            } else if (mutex_try_enter(&RTC.guard, NULL)) {
-                RTC.year = year;
-                RTC.month = month;
-                RTC.day = day;
-                RTC.hour = hour;
-                RTC.minute = minute;
-                RTC.second = second;
-                RTC.dow = dow;
-                mutex_exit(&RTC.guard);
             }
         }
     }
@@ -292,19 +246,11 @@ bool RTC_ready() {
 
 void RTC_get_date(char *yymmmdd, int N) {
     if (RTC.initialised && RTC.ready) {
-        // mutex_enter_blocking(&RTC.guard);
-        // uint16_t year = RTC.year;
-        // uint8_t month = RTC.month;
-        // uint8_t day = RTC.day;
-        // mutex_exit(&RTC.guard);
-
-        datetime_t dt;
-
-        rtc_get_datetime(&dt);
-
-        uint16_t year = dt.year;
-        uint8_t month = dt.month;
-        uint8_t day = dt.day;
+        mutex_enter_blocking(&RTC.guard);
+        uint16_t year = RTC.year;
+        uint8_t month = RTC.month;
+        uint8_t day = RTC.day;
+        mutex_exit(&RTC.guard);
 
         snprintf(yymmmdd, N, "%04u-%02u-%02u", year, month, day);
     } else {
@@ -349,19 +295,11 @@ bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
 
 void RTC_get_time(char *HHmmss, int N) {
     if (RTC.initialised && RTC.ready) {
-        // mutex_enter_blocking(&RTC.guard);
-        // uint8_t hour = RTC.hour;
-        // uint8_t minute = RTC.minute;
-        // uint8_t second = RTC.second;
-        // mutex_exit(&RTC.guard);
-
-        datetime_t dt;
-
-        rtc_get_datetime(&dt);
-
-        uint8_t hour = dt.hour;
-        uint8_t minute = dt.min;
-        uint8_t second = dt.sec;
+        mutex_enter_blocking(&RTC.guard);
+        uint8_t hour = RTC.hour;
+        uint8_t minute = RTC.minute;
+        uint8_t second = RTC.second;
+        mutex_exit(&RTC.guard);
 
         snprintf(HHmmss, N, "%02u:%02u:%02u", hour, minute, second);
     } else {
@@ -404,42 +342,33 @@ bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
 
 bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
     if (RTC.initialised && RTC.ready) {
-        // mutex_enter_blocking(&RTC.guard);
-        // uint16_t year = RTC.year;
-        // uint8_t month = RTC.month;
-        // uint8_t day = RTC.day;
-        // uint8_t hour = RTC.hour;
-        // uint8_t minute = RTC.minute;
-        // uint8_t second = RTC.second;
-        // mutex_exit(&RTC.guard);
-
-        datetime_t dt;
-
-        rtc_get_datetime(&dt);
+        mutex_enter_blocking(&RTC.guard);
 
         if (year != NULL) {
-            *year = dt.year;
+            *year = RTC.year;
         }
 
         if (month != NULL) {
-            *month = dt.month;
+            *month = RTC.month;
         }
 
         if (day != NULL) {
-            *day = dt.day;
+            *day = RTC.day;
         }
 
         if (hour != NULL) {
-            *hour = dt.hour;
+            *hour = RTC.hour;
         }
 
         if (minute != NULL) {
-            *minute = dt.min;
+            *minute = RTC.minute;
         }
 
         if (second != NULL) {
-            *second = dt.sec;
+            *second = RTC.second;
         }
+
+        mutex_exit(&RTC.guard);
 
         return true;
     }
@@ -490,49 +419,49 @@ bool RTC_set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, u
 
 void RTC_get_dow(char *weekday, int N) {
     if (RTC.initialised && RTC.ready) {
-        // mutex_enter_blocking(&RTC.guard);
-        // uint8_t dow = RTC.dow;
-        // mutex_exit(&RTC.guard);
-        //
-        // if (RTC.dow == SUNDAY) {
-        //     snprintf(weekday, N, "Sunday");
-        // } else if (RTC.dow == MONDAY) {
-        //     snprintf(weekday, N, "Monday");
-        // } else if (RTC.dow == TUESDAY) {
-        //     snprintf(weekday, N, "Tuesday");
-        // } else if (RTC.dow == WEDNESDAY) {
-        //     snprintf(weekday, N, "Wednesday");
-        // } else if (RTC.dow == THURSDAY) {
-        //     snprintf(weekday, N, "Thursday");
-        // } else if (RTC.dow == FRIDAY) {
-        //     snprintf(weekday, N, "Friday");
-        // } else if (RTC.dow == SATURDAY) {
-        //     snprintf(weekday, N, "Saturday");
-        // } else {
-        //     snprintf(weekday, N, "???");
-        // }
+        mutex_enter_blocking(&RTC.guard);
+        uint8_t dow = RTC.dow;
+        mutex_exit(&RTC.guard);
 
-        datetime_t dt;
-
-        rtc_get_datetime(&dt);
-
-        if (dt.dotw == 0) {
+        if (RTC.dow == SUNDAY) {
             snprintf(weekday, N, "Sunday");
-        } else if (dt.dotw == 1) {
+        } else if (RTC.dow == MONDAY) {
             snprintf(weekday, N, "Monday");
-        } else if (dt.dotw == 2) {
+        } else if (RTC.dow == TUESDAY) {
             snprintf(weekday, N, "Tuesday");
-        } else if (dt.dotw == 3) {
+        } else if (RTC.dow == WEDNESDAY) {
             snprintf(weekday, N, "Wednesday");
-        } else if (dt.dotw == 4) {
+        } else if (RTC.dow == THURSDAY) {
             snprintf(weekday, N, "Thursday");
-        } else if (dt.dotw == 5) {
+        } else if (RTC.dow == FRIDAY) {
             snprintf(weekday, N, "Friday");
-        } else if (dt.dotw == 6) {
+        } else if (RTC.dow == SATURDAY) {
             snprintf(weekday, N, "Saturday");
         } else {
             snprintf(weekday, N, "???");
         }
+
+        // datetime_t dt;
+        //
+        // rtc_get_datetime(&dt);
+        //
+        // if (dt.dotw == 0) {
+        //     snprintf(weekday, N, "Sunday");
+        // } else if (dt.dotw == 1) {
+        //     snprintf(weekday, N, "Monday");
+        // } else if (dt.dotw == 2) {
+        //     snprintf(weekday, N, "Tuesday");
+        // } else if (dt.dotw == 3) {
+        //     snprintf(weekday, N, "Wednesday");
+        // } else if (dt.dotw == 4) {
+        //     snprintf(weekday, N, "Thursday");
+        // } else if (dt.dotw == 5) {
+        //     snprintf(weekday, N, "Friday");
+        // } else if (dt.dotw == 6) {
+        //     snprintf(weekday, N, "Saturday");
+        // } else {
+        //     snprintf(weekday, N, "???");
+        // }
     } else {
         snprintf(weekday, N, "---");
     }

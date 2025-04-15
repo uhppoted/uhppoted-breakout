@@ -115,6 +115,5 @@ target_link_libraries(
     hardware_pio 
     hardware_uart
     hardware_watchdog
-    hardware_rtc
     hardware_flash
 )

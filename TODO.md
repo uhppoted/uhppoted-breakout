@@ -74,8 +74,9 @@
           - [x] include dow in RX8900SA_get_datetime
           - [x] set-time: check delta < 1s
           - [ ] unify get-date, get-time, get-datetime
-          - [ ] software-rtc
+          - [x] software-rtc
           - [ ] MIB_find (returns const *MIBItem)
+          - [ ] PID/Kalman filter for software-rtc
 
     - [ ] GET: multiple OIDs
     - [ ] TRAP
