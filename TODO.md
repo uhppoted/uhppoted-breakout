@@ -1,7 +1,8 @@
 # TODO
 
 - [ ] ut0311/rpcd queues **all** incoming request
-      - limit pending request queue
+      - (?) limit pending request queue
+      - (?) seems to be something to do with GetStatusRequest::getControllerID
 
 ## RPCD
     - [x] GET cache

@@ -1,6 +1,7 @@
 package UT0311
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -208,13 +209,24 @@ func (ut0311 UT0311) received(request any) (any, error) {
 	}
 
 	println(">>>> received")
-	result, err := ut0311.dispatch(request)
-	println("<<<< dispatched")
 
-	return result, err
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
+	defer cancel()
+
+	result, err := ut0311.dispatch(ctx, request)
+
+	select {
+	case <-ctx.Done():
+		println("<<<< timeout")
+		return nil, fmt.Errorf("timeout")
+
+	default:
+		fmt.Printf("<<<< processed %v %v\n", result, err)
+		return result, err
+	}
 }
 
-func (ut0311 UT0311) dispatch(request any) (any, error) {
+func (ut0311 UT0311) dispatch(ctx context.Context, request any) (any, error) {
 	infof("UDP  dispatch %T", request)
 
 	switch rq := request.(type) {
