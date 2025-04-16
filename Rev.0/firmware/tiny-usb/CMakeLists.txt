@@ -40,24 +40,25 @@ add_executable(${TARGET_NAME}
 
   ${CORE}/src/breakout.c
   ${CORE}/src/sys.c
+  ${CORE}/src/log.c
   ${CORE}/src/I2C0.c
   ${CORE}/src/I2C1.c
   ${CORE}/src/RTC.c
-  ${CORE}/src/cli.c
   ${CORE}/src/IOX.c
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
-  ${CORE}/src/SSMP.c
+  ${CORE}/src/doors.c
   ${CORE}/src/auth.c
-  ${CORE}/src/log.c
+  ${CORE}/src/SSMP.c
+  ${CORE}/src/cli.c
   ${CORE}/src/ANSI.c
   ${CORE}/src/mempool.c
-  ${CORE}/src/usb.c
   ${CORE}/src/MIB/MIB.c
   ${CORE}/src/MIB/find.c
   ${CORE}/src/MIB/get.c
   ${CORE}/src/MIB/set.c
+  ${CORE}/src/usb.c
 
   ${LIB}/src/I2C.c
   ${LIB}/src/RX8900SA.c

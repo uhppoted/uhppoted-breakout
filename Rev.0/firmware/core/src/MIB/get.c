@@ -6,15 +6,15 @@
 
 #include <MIB.h>
 #include <RTC.h>
-#include <U3.h>
-#include <U4.h>
 #include <breakout.h>
+#include <doors.h>
 #include <sys.h>
 
 #define LOGTAG "MIB"
 
 extern const int64_t SSMP_ERROR_NONE;
 extern const int64_t SSMP_ERROR_NO_SUCH_OBJECT;
+extern const int64_t SSMP_ERROR_NO_ACCESS;
 
 int64_t MIB_get(const char *OID, value *v) {
     uint32_t hash = djb2(OID);
@@ -124,88 +124,144 @@ int64_t MIB_get_controller_sysinfo(value *v) {
     return SSMP_ERROR_NONE;
 }
 
-int64_t MIB_get_doors_1_unlocked(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U4_get_relay(1);
+int64_t get_door_mode(uint8_t door, value *v) {
+    uint8_t mode;
 
-    return SSMP_ERROR_NONE;
+    if (doors_get_mode(door, &mode)) {
+        v->tag = VALUE_UINT8;
+        v->integer = mode;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}
+
+int64_t get_door_delay(uint8_t door, value *v) {
+    uint8_t delay;
+
+    if (doors_get_delay(door, &delay)) {
+        v->tag = VALUE_UINT8;
+        v->integer = delay;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}
+
+int64_t get_door_unlocked(uint8_t door, value *v) {
+    bool unlocked;
+
+    if (doors_get_unlocked(door, &unlocked)) {
+        v->tag = VALUE_BOOLEAN;
+        v->boolean = unlocked;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}
+
+int64_t get_door_open(uint8_t door, value *v) {
+    bool open;
+
+    if (doors_get_open(door, &open)) {
+        v->tag = VALUE_BOOLEAN;
+        v->boolean = open;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}
+
+int64_t get_door_pushbutton(uint8_t door, value *v) {
+    bool pressed;
+
+    if (doors_get_pushbutton(door, &pressed)) {
+        v->tag = VALUE_BOOLEAN;
+        v->boolean = pressed;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}
+
+int64_t MIB_get_doors_1_mode(value *v) {
+    return get_door_mode(1, v);
+}
+
+int64_t MIB_get_doors_2_mode(value *v) {
+    return get_door_mode(2, v);
+}
+
+int64_t MIB_get_doors_3_mode(value *v) {
+    return get_door_mode(3, v);
+}
+
+int64_t MIB_get_doors_4_mode(value *v) {
+    return get_door_mode(4, v);
+}
+
+int64_t MIB_get_doors_1_delay(value *v) {
+    return get_door_delay(1, v);
+}
+
+int64_t MIB_get_doors_2_delay(value *v) {
+    return get_door_delay(2, v);
+}
+
+int64_t MIB_get_doors_3_delay(value *v) {
+    return get_door_delay(3, v);
+}
+
+int64_t MIB_get_doors_4_delay(value *v) {
+    return get_door_delay(4, v);
+}
+
+int64_t MIB_get_doors_1_unlocked(value *v) {
+    return get_door_unlocked(1, v);
 }
 
 int64_t MIB_get_doors_2_unlocked(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U4_get_relay(2);
-
-    return SSMP_ERROR_NONE;
+    return get_door_unlocked(2, v);
 }
 
 int64_t MIB_get_doors_3_unlocked(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U4_get_relay(3);
-
-    return SSMP_ERROR_NONE;
+    return get_door_unlocked(3, v);
 }
 
 int64_t MIB_get_doors_4_unlocked(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U4_get_relay(4);
-
-    return SSMP_ERROR_NONE;
+    return get_door_unlocked(4, v);
 }
 
 int64_t MIB_get_doors_1_open(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U3_get_door(1);
-
-    return SSMP_ERROR_NONE;
+    return get_door_open(1, v);
 }
 
 int64_t MIB_get_doors_2_open(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U3_get_door(2);
-
-    return SSMP_ERROR_NONE;
+    return get_door_open(2, v);
 }
 
 int64_t MIB_get_doors_3_open(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U3_get_door(3);
-
-    return SSMP_ERROR_NONE;
+    return get_door_open(3, v);
 }
 
 int64_t MIB_get_doors_4_open(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U3_get_door(4);
-
-    return SSMP_ERROR_NONE;
+    return get_door_open(4, v);
 }
 
 int64_t MIB_get_doors_1_pushbutton(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U3_get_button(1);
-
-    return SSMP_ERROR_NONE;
+    return get_door_pushbutton(1, v);
 }
 
 int64_t MIB_get_doors_2_pushbutton(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U3_get_button(2);
-
-    return SSMP_ERROR_NONE;
+    return get_door_pushbutton(2, v);
 }
 
 int64_t MIB_get_doors_3_pushbutton(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U3_get_button(3);
-
-    return SSMP_ERROR_NONE;
+    return get_door_pushbutton(3, v);
 }
 
 int64_t MIB_get_doors_4_pushbutton(value *v) {
-    v->tag = VALUE_BOOLEAN;
-    v->boolean = U3_get_button(4);
-
-    return SSMP_ERROR_NONE;
+    return get_door_pushbutton(4, v);
 }
 
 int64_t MIB_get_alarms_tamper_detect(value *v) {

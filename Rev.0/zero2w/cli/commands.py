@@ -169,8 +169,8 @@ def set_listener(u, dest, timeout, args, protocol='udp'):
 
 
 def get_door(u, dest, timeout, args, protocol='udp'):
-    controller = (CONTROLLER, dest, protocol)
-    door = DOOR
+    controller = (args.controller, dest, protocol)
+    door = args.door
 
     return u.get_door_control(controller, door, timeout=timeout)
 

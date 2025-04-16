@@ -22,6 +22,18 @@ OIDs = [
     MIBItem('MIB_CONTROLLER_SYSERROR', '0.1.3.6.1.4.1.65536.2.9', 'MIB_get_controller_syserror'),
     MIBItem('MIB_CONTROLLER_SYSINFO', '0.1.3.6.1.4.1.65536.2.10', 'MIB_get_controller_sysinfo'),
 
+    # door mode
+    MIBItem('MIB_DOORS_1_MODE', '0.1.3.6.1.4.1.65536.3.1.1', 'MIB_get_doors_1_mode'),
+    MIBItem('MIB_DOORS_2_MODE', '0.1.3.6.1.4.1.65536.3.2.1', 'MIB_get_doors_2_mode'),
+    MIBItem('MIB_DOORS_3_MODE', '0.1.3.6.1.4.1.65536.3.3.1', 'MIB_get_doors_3_mode'),
+    MIBItem('MIB_DOORS_4_MODE', '0.1.3.6.1.4.1.65536.3.4.1', 'MIB_get_doors_4_mode'),
+
+    # door delay
+    MIBItem('MIB_DOORS_1_DELAY', '0.1.3.6.1.4.1.65536.3.1.2', 'MIB_get_doors_1_delay'),
+    MIBItem('MIB_DOORS_2_DELAY', '0.1.3.6.1.4.1.65536.3.2.2', 'MIB_get_doors_2_delay'),
+    MIBItem('MIB_DOORS_3_DELAY', '0.1.3.6.1.4.1.65536.3.3.2', 'MIB_get_doors_3_delay'),
+    MIBItem('MIB_DOORS_4_DELAY', '0.1.3.6.1.4.1.65536.3.4.2', 'MIB_get_doors_4_delay'),
+
     # door locks
     MIBItem('MIB_DOORS_1_UNLOCKED', '0.1.3.6.1.4.1.65536.3.1.4', 'MIB_get_doors_1_unlocked'),
     MIBItem('MIB_DOORS_2_UNLOCKED', '0.1.3.6.1.4.1.65536.3.2.4', 'MIB_get_doors_2_unlocked'),

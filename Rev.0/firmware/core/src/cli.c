@@ -17,6 +17,7 @@
 #include <U4.h>
 #include <breakout.h>
 #include <cli.h>
+#include <doors.h>
 #include <log.h>
 #include <sys.h>
 #include <types/buffer.h>
@@ -565,12 +566,13 @@ void unlock_door(const char *cmd) {
     int N = strlen(cmd);
 
     if (N > 0) {
-        uint relay;
+        uint door;
         int rc;
 
-        if ((rc = sscanf(cmd, "%u", &relay)) == 1) {
-            U4_set_relay(relay, 5000);
-            display("door %u unlocked", relay);
+        if ((rc = sscanf(cmd, "%u", &door)) == 1) {
+            if (doors_unlock(door)) {
+                display("door %u unlocked", door);
+            }
         }
     }
 }

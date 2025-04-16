@@ -1,5 +1,7 @@
 ADDRESS ?= '127.0.0.1:60000'
 TLS ?= 'localhost:60443'
+CONTROLLER ?= 405419896
+DOOR ?= 1
 
 format: 
 	yapf -ri *.py
@@ -8,7 +10,7 @@ build: format
 	python3 -m compileall .
 
 debug:
-	python3 main.py get-status
+	python3 main.py get-door --controller $(CONTROLLER) --door $(DOOR)
 
 get-controller:
 	python3 main.py get-controller
@@ -35,7 +37,7 @@ get-status:
 	python3 main.py get-status
 
 get-door:
-	python3 main.py get-door
+	python3 main.py get-door --controller $(CONTROLLER) --door $(DOOR)
 
 set-door:
 	python3 main.py set-door

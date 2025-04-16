@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stdbool.h>
+#include <stdint.h>
+
 extern void U3_init();
 extern void U3_start();
 extern void U3_process(uint8_t inputs);

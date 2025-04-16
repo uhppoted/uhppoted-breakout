@@ -79,10 +79,15 @@
           - [ ] MIB_find (returns const *MIBItem)
           - [ ] PID/Kalman filter for software-rtc
 
-    - [ ] GET: multiple OIDs
+    - [x] get-door
+          - [x] mode
+          - [x] delay
+          - [x] door settings table
+
+    - [ ] set-door
+
     - [ ] TRAP
-    - [ ] get-door-delay
-    - [ ] get-door-mode
+    - [ ] GET: multiple OIDs
     - (?) queue UART write
 
 ## Zero2W

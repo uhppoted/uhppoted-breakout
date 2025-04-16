@@ -7,6 +7,14 @@ extern int64_t MIB_get_controller_released(value *);
 extern int64_t MIB_get_controller_datetime(value *);
 extern int64_t MIB_get_controller_syserror(value *);
 extern int64_t MIB_get_controller_sysinfo(value *);
+extern int64_t MIB_get_doors_1_mode(value *);
+extern int64_t MIB_get_doors_2_mode(value *);
+extern int64_t MIB_get_doors_3_mode(value *);
+extern int64_t MIB_get_doors_4_mode(value *);
+extern int64_t MIB_get_doors_1_delay(value *);
+extern int64_t MIB_get_doors_2_delay(value *);
+extern int64_t MIB_get_doors_3_delay(value *);
+extern int64_t MIB_get_doors_4_delay(value *);
 extern int64_t MIB_get_doors_1_unlocked(value *);
 extern int64_t MIB_get_doors_2_unlocked(value *);
 extern int64_t MIB_get_doors_3_unlocked(value *);
@@ -65,6 +73,54 @@ const MIBItem MIB_CONTROLLER_SYSINFO = {
     .hash = 3121245791,
     .OID = "0.1.3.6.1.4.1.65536.2.10",
     .get = MIB_get_controller_sysinfo,
+};
+
+const MIBItem MIB_DOORS_1_MODE = {
+    .hash = 4218049199,
+    .OID = "0.1.3.6.1.4.1.65536.3.1.1",
+    .get = MIB_get_doors_1_mode,
+};
+
+const MIBItem MIB_DOORS_2_MODE = {
+    .hash = 4218050288,
+    .OID = "0.1.3.6.1.4.1.65536.3.2.1",
+    .get = MIB_get_doors_2_mode,
+};
+
+const MIBItem MIB_DOORS_3_MODE = {
+    .hash = 4218051377,
+    .OID = "0.1.3.6.1.4.1.65536.3.3.1",
+    .get = MIB_get_doors_3_mode,
+};
+
+const MIBItem MIB_DOORS_4_MODE = {
+    .hash = 4218052466,
+    .OID = "0.1.3.6.1.4.1.65536.3.4.1",
+    .get = MIB_get_doors_4_mode,
+};
+
+const MIBItem MIB_DOORS_1_DELAY = {
+    .hash = 4218049200,
+    .OID = "0.1.3.6.1.4.1.65536.3.1.2",
+    .get = MIB_get_doors_1_delay,
+};
+
+const MIBItem MIB_DOORS_2_DELAY = {
+    .hash = 4218050289,
+    .OID = "0.1.3.6.1.4.1.65536.3.2.2",
+    .get = MIB_get_doors_2_delay,
+};
+
+const MIBItem MIB_DOORS_3_DELAY = {
+    .hash = 4218051378,
+    .OID = "0.1.3.6.1.4.1.65536.3.3.2",
+    .get = MIB_get_doors_3_delay,
+};
+
+const MIBItem MIB_DOORS_4_DELAY = {
+    .hash = 4218052467,
+    .OID = "0.1.3.6.1.4.1.65536.3.4.2",
+    .get = MIB_get_doors_4_delay,
 };
 
 const MIBItem MIB_DOORS_1_UNLOCKED = {
@@ -151,7 +207,7 @@ const MIBItem MIB_ALARMS_FIRE_ALARM = {
     .get = MIB_get_alarms_fire_alarm,
 };
 
-const MIBItem OIDs[21] = {
+const MIBItem OIDs[29] = {
     MIB_SYS_BOARD_ID,
     MIB_CONTROLLER_ID,
     MIB_CONTROLLER_VERSION,
@@ -159,6 +215,14 @@ const MIBItem OIDs[21] = {
     MIB_CONTROLLER_DATETIME,
     MIB_CONTROLLER_SYSERROR,
     MIB_CONTROLLER_SYSINFO,
+    MIB_DOORS_1_MODE,
+    MIB_DOORS_2_MODE,
+    MIB_DOORS_3_MODE,
+    MIB_DOORS_4_MODE,
+    MIB_DOORS_1_DELAY,
+    MIB_DOORS_2_DELAY,
+    MIB_DOORS_3_DELAY,
+    MIB_DOORS_4_DELAY,
     MIB_DOORS_1_UNLOCKED,
     MIB_DOORS_2_UNLOCKED,
     MIB_DOORS_3_UNLOCKED,
