@@ -74,7 +74,7 @@
           - [x] weird 1s difference on set-time + get-time
           - [x] include dow in RX8900SA_get_datetime
           - [x] set-time: check delta < 1s
-          - [ ] unify get-date, get-time, get-datetime
+          - [x] unify get-date, get-time, get-datetime
           - [x] software-rtc
           - [ ] MIB_find (returns const *MIBItem)
           - [ ] PID/Kalman filter for software-rtc

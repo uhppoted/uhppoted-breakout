@@ -433,7 +433,7 @@ void get_datetime() {
     uint8_t second;
     char datetime[20] = {0};
 
-    if (RTC_get_datetime(&year, &month, &day, &hour, &minute, &second)) {
+    if (RTC_get_datetime(&year, &month, &day, &hour, &minute, &second, NULL)) {
         snprintf(datetime, sizeof(datetime), "%04u-%02u-%02u %02u:%02u:%02u", year, month, day, hour, minute, second);
     } else {
         snprintf(datetime, sizeof(datetime), "---- -- --");
@@ -467,18 +467,25 @@ void set_datetime(const char *cmd) {
 }
 
 void get_date() {
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
     char date[11] = {0};
 
-    RTC_get_date(date, 11);
+    if (RTC_get_datetime(&year, &month, &day, NULL, NULL, NULL, NULL)) {
+        snprintf(date, sizeof(date), "%04u-%02u-%02u", year, month, day);
+    } else {
+        snprintf(date, sizeof(date), "---- -- --");
+    }
 
     display("get-date: %s", date);
 }
 
 void set_date(const char *cmd) {
-    int year;
-    int month;
-    int day;
-    int rc;
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t rc;
 
     if ((rc = sscanf(cmd, "%04d-%02d-%02d", &year, &month, &day)) == 3) {
         RTC_set_date(year, month, day);
@@ -490,9 +497,16 @@ void set_date(const char *cmd) {
 }
 
 void get_time() {
-    char time[11] = {0};
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    char time[10] = {0};
 
-    RTC_get_time(time, 11);
+    if (RTC_get_datetime(NULL, NULL, NULL, &hour, &minute, &second, NULL)) {
+        snprintf(time, sizeof(time), "%02u:%02u:%02u", hour, minute, second);
+    } else {
+        snprintf(time, sizeof(time), "--:--:--");
+    }
 
     display("get-time: %s", time);
 }
@@ -519,9 +533,30 @@ void set_time(const char *cmd) {
 }
 
 void get_weekday() {
+    uint8_t dow;
     char weekday[10] = {0};
 
-    RTC_get_dow(weekday, 10);
+    if (RTC_get_datetime(NULL, NULL, NULL, NULL, NULL, NULL, &dow)) {
+        if (dow == SUNDAY) {
+            snprintf(weekday, sizeof(weekday), "Sunday");
+        } else if (dow == MONDAY) {
+            snprintf(weekday, sizeof(weekday), "Monday");
+        } else if (dow == TUESDAY) {
+            snprintf(weekday, sizeof(weekday), "Tuesday");
+        } else if (dow == WEDNESDAY) {
+            snprintf(weekday, sizeof(weekday), "Wednesday");
+        } else if (dow == THURSDAY) {
+            snprintf(weekday, sizeof(weekday), "Thursday");
+        } else if (dow == FRIDAY) {
+            snprintf(weekday, sizeof(weekday), "Friday");
+        } else if (dow == SATURDAY) {
+            snprintf(weekday, sizeof(weekday), "Saturday");
+        } else {
+            snprintf(weekday, sizeof(weekday), "---");
+        }
+    } else {
+        snprintf(weekday, sizeof(weekday), "---");
+    }
 
     display("get-weekday: %s", weekday);
 }

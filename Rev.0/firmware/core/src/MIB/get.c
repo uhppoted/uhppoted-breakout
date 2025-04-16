@@ -91,7 +91,7 @@ int64_t MIB_get_controller_datetime(value *v) {
     uint8_t second;
     int N;
 
-    if (!RTC_get_datetime(&year, &month, &day, &hour, &minute, &second)) {
+    if (!RTC_get_datetime(&year, &month, &day, &hour, &minute, &second, NULL)) {
         v->tag = VALUE_NULL;
     } else {
         slice octets = {

@@ -75,7 +75,7 @@ int64_t MIB_set_datetime(const value u, value *v) {
     uint8_t SS;
     int N;
 
-    if (!RTC_get_datetime(&yyyy, &mm, &dd, &HH, &MM, &SS)) {
+    if (!RTC_get_datetime(&yyyy, &mm, &dd, &HH, &MM, &SS, NULL)) {
         return SSMP_ERROR_COMMIT_FAILED;
     }
 

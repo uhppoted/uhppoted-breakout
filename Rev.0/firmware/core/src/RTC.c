@@ -244,20 +244,6 @@ bool RTC_ready() {
     return RTC.initialised && RTC.ready;
 }
 
-void RTC_get_date(char *yymmmdd, int N) {
-    if (RTC.initialised && RTC.ready) {
-        mutex_enter_blocking(&RTC.guard);
-        uint16_t year = RTC.year;
-        uint8_t month = RTC.month;
-        uint8_t day = RTC.day;
-        mutex_exit(&RTC.guard);
-
-        snprintf(yymmmdd, N, "%04u-%02u-%02u", year, month, day);
-    } else {
-        snprintf(yymmmdd, N, "---- -- --");
-    }
-}
-
 bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
     debugf(LOGTAG, "set-date %04u-%02u-%02u  %s", year, month, day, RTC.initialised ? "" : "-- not initialised --");
 
@@ -293,20 +279,6 @@ bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
     return false;
 }
 
-void RTC_get_time(char *HHmmss, int N) {
-    if (RTC.initialised && RTC.ready) {
-        mutex_enter_blocking(&RTC.guard);
-        uint8_t hour = RTC.hour;
-        uint8_t minute = RTC.minute;
-        uint8_t second = RTC.second;
-        mutex_exit(&RTC.guard);
-
-        snprintf(HHmmss, N, "%02u:%02u:%02u", hour, minute, second);
-    } else {
-        snprintf(HHmmss, N, "--:--:--");
-    }
-}
-
 bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
     debugf(LOGTAG, "set-time %02u-%02u-%02u  %s", hour, minute, second, RTC.initialised ? "" : "-- not initialised --");
 
@@ -340,7 +312,7 @@ bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
     return false;
 }
 
-bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
+bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second, uint8_t *dow) {
     if (RTC.initialised && RTC.ready) {
         mutex_enter_blocking(&RTC.guard);
 
@@ -366,6 +338,10 @@ bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hou
 
         if (second != NULL) {
             *second = RTC.second;
+        }
+
+        if (dow != NULL) {
+            *dow = RTC.dow;
         }
 
         mutex_exit(&RTC.guard);
@@ -415,56 +391,6 @@ bool RTC_set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, u
     }
 
     return false;
-}
-
-void RTC_get_dow(char *weekday, int N) {
-    if (RTC.initialised && RTC.ready) {
-        mutex_enter_blocking(&RTC.guard);
-        uint8_t dow = RTC.dow;
-        mutex_exit(&RTC.guard);
-
-        if (RTC.dow == SUNDAY) {
-            snprintf(weekday, N, "Sunday");
-        } else if (RTC.dow == MONDAY) {
-            snprintf(weekday, N, "Monday");
-        } else if (RTC.dow == TUESDAY) {
-            snprintf(weekday, N, "Tuesday");
-        } else if (RTC.dow == WEDNESDAY) {
-            snprintf(weekday, N, "Wednesday");
-        } else if (RTC.dow == THURSDAY) {
-            snprintf(weekday, N, "Thursday");
-        } else if (RTC.dow == FRIDAY) {
-            snprintf(weekday, N, "Friday");
-        } else if (RTC.dow == SATURDAY) {
-            snprintf(weekday, N, "Saturday");
-        } else {
-            snprintf(weekday, N, "???");
-        }
-
-        // datetime_t dt;
-        //
-        // rtc_get_datetime(&dt);
-        //
-        // if (dt.dotw == 0) {
-        //     snprintf(weekday, N, "Sunday");
-        // } else if (dt.dotw == 1) {
-        //     snprintf(weekday, N, "Monday");
-        // } else if (dt.dotw == 2) {
-        //     snprintf(weekday, N, "Tuesday");
-        // } else if (dt.dotw == 3) {
-        //     snprintf(weekday, N, "Wednesday");
-        // } else if (dt.dotw == 4) {
-        //     snprintf(weekday, N, "Thursday");
-        // } else if (dt.dotw == 5) {
-        //     snprintf(weekday, N, "Friday");
-        // } else if (dt.dotw == 6) {
-        //     snprintf(weekday, N, "Saturday");
-        // } else {
-        //     snprintf(weekday, N, "???");
-        // }
-    } else {
-        snprintf(weekday, N, "---");
-    }
 }
 
 // Tøndering's variation of Zeller's congruence
