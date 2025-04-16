@@ -205,9 +205,12 @@ func (s *SSMP) Stop() error {
 }
 
 func (s *SSMP) Get(oid string) (any, error) {
+	println("---- rpcd::ssmp::get/0")
 	if o, err := BER.ParseOID(oid); err != nil {
+		println("---- rpcd::ssmp::get/1")
 		return nil, err
 	} else if v, ok := cache.Get(oid); ok {
+		println("---- rpcd::ssmp::get/2")
 		debugf("returning cached value for %v", oid)
 		return v, nil
 	} else {
@@ -225,6 +228,7 @@ func (s *SSMP) Get(oid string) (any, error) {
 		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
 		} else {
+			println("---- rpcd::ssmp::get/3")
 			pipe := make(chan BER.GetResponse, 1)
 			done := make(chan struct{})
 
@@ -232,16 +236,22 @@ func (s *SSMP) Get(oid string) (any, error) {
 			defer close(done)
 			defer s.pending.delete(rq.RequestID)
 
+			// FIXME exit on timeout or can't put or or requests blocked or something
 			s.queue <- func() {
+				println("---- --- rpcd::ssmp::get::f/0")
 				s.pending.put(rq.RequestID, func(packet BER.GetResponse) {
 					pipe <- packet
 				})
 
+				println("---- --- rpcd::ssmp::get::f/1")
 				s.requests <- encoded
 
+				println("---- --- rpcd::ssmp::get::f/2")
 				<-done
+				println("---- --- rpcd::ssmp::get::f/3")
 			}
 
+			println("---- rpcd::ssmp::get/4")
 			select {
 			case <-time.After(2500 * time.Millisecond):
 				return nil, fmt.Errorf("timeout")

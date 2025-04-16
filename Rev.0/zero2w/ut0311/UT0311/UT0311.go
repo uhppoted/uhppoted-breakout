@@ -208,8 +208,6 @@ func (ut0311 UT0311) received(request any) (any, error) {
 		return nil, fmt.Errorf("request rate limit exceeded")
 	}
 
-	println(">>>> received")
-
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
 
@@ -217,11 +215,9 @@ func (ut0311 UT0311) received(request any) (any, error) {
 
 	select {
 	case <-ctx.Done():
-		println("<<<< timeout")
 		return nil, fmt.Errorf("timeout")
 
 	default:
-		fmt.Printf("<<<< processed %v %v\n", result, err)
 		return result, err
 	}
 }
