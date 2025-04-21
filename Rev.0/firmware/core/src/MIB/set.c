@@ -9,6 +9,7 @@
 #include <MIB.h>
 #include <RTC.h>
 #include <SSMP.h>
+#include <doors.h>
 #include <log.h>
 
 #define LOGTAG "MIB"
@@ -102,6 +103,82 @@ int64_t MIB_set_datetime(const value u, value *v) {
     v->octets = octets;
 
     return SSMP_ERROR_NONE;
+}
+
+int64_t set_door_mode(uint8_t door, value u, value *v) {
+    if (u.tag != VALUE_UINT8 && u.tag != VALUE_UINT16 && u.tag != VALUE_UINT32) {
+        return SSMP_ERROR_WRONG_TYPE;
+    }
+
+    if (u.integer != 1 && u.integer != 2 && u.integer != 3) {
+        return SSMP_ERROR_BAD_VALUE;
+    }
+
+    uint8_t mode = (uint8_t)u.integer;
+
+    if (!doors_set_mode(door, mode)) {
+        return SSMP_ERROR_COMMIT_FAILED;
+    }
+
+    if (doors_get_mode(door, &mode)) {
+        v->tag = VALUE_UINT8;
+        v->integer = mode;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}
+
+int64_t set_door_delay(uint8_t door, value u, value *v) {
+    if (u.tag != VALUE_UINT8 && u.tag != VALUE_UINT16 && u.tag != VALUE_UINT32) {
+        return SSMP_ERROR_WRONG_TYPE;
+    }
+
+    uint8_t delay = (uint8_t)u.integer;
+
+    if (!doors_set_delay(door, delay)) {
+        return SSMP_ERROR_COMMIT_FAILED;
+    }
+
+    if (doors_get_delay(door, &delay)) {
+        v->tag = VALUE_UINT8;
+        v->integer = delay;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}
+
+int64_t MIB_set_door_1_mode(const value u, value *v) {
+    return set_door_mode(1, u, v);
+}
+
+int64_t MIB_set_door_2_mode(const value u, value *v) {
+    return set_door_mode(2, u, v);
+}
+
+int64_t MIB_set_door_3_mode(const value u, value *v) {
+    return set_door_mode(3, u, v);
+}
+
+int64_t MIB_set_door_4_mode(const value u, value *v) {
+    return set_door_mode(4, u, v);
+}
+
+int64_t MIB_set_door_1_delay(const value u, value *v) {
+    return set_door_delay(1, u, v);
+}
+
+int64_t MIB_set_door_2_delay(const value u, value *v) {
+    return set_door_delay(2, u, v);
+}
+
+int64_t MIB_set_door_3_delay(const value u, value *v) {
+    return set_door_delay(3, u, v);
+}
+
+int64_t MIB_set_door_4_delay(const value u, value *v) {
+    return set_door_delay(4, u, v);
 }
 
 int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec) {

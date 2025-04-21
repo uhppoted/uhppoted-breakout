@@ -145,10 +145,12 @@ func (r RPC) SetUint8(oid scmp.OID, value uint8) (uint8, error) {
 
 	if reply, err := r.set(oid, value); err != nil {
 		return 0, err
-	} else if u8, ok := reply.(uint8); !ok {
-		return 0, fmt.Errorf("invalid reply - expected 'uint8', got '%T'", reply)
-	} else {
+	} else if u8, ok := reply.(uint8); ok {
 		return u8, nil
+	} else if i64, ok := reply.(int64); ok {
+		return uint8(i64), nil
+	} else {
+		return 0, fmt.Errorf("invalid reply - expected 'uint8', got '%T'", reply)
 	}
 }
 

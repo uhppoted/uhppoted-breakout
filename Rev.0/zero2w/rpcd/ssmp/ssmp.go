@@ -259,7 +259,7 @@ func (s *SSMP) Get(oid string) (any, error) {
 			case response := <-pipe:
 				debugf("response %v", response)
 				if response.Error != 0 {
-					return nil, fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex)
+					return nil, fmt.Errorf("error code %v (%v) at index %v", response.Error, lookup(response.Error), response.ErrorIndex)
 				} else {
 					cache.Set(oid, response.Value)
 
@@ -312,12 +312,43 @@ func (s *SSMP) Set(oid string, value any) (any, error) {
 
 			case response := <-pipe:
 				if response.Error != 0 {
-					return nil, fmt.Errorf("error code %v at index %v", response.Error, response.ErrorIndex)
+					return nil, fmt.Errorf("error code %v (%v) at index %v", response.Error, lookup(response.Error), response.ErrorIndex)
 				} else {
 					return response.Value, nil
 				}
 			}
 		}
+	}
+}
+
+func lookup(err int64) string {
+	switch err {
+	case 2:
+		return "unknown OID"
+
+	case 3:
+		return "bad value"
+
+	case 4:
+		return "readonly"
+
+	case 6:
+		return "not allowed"
+
+	case 7:
+		return "incorrect type"
+
+	case 14:
+		return "commit failed"
+
+	case 15:
+		return "authorisation error"
+
+	case 16:
+		return "not writable"
+
+	default:
+		return "unknown"
 	}
 }
 

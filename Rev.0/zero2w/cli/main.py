@@ -91,8 +91,11 @@ def parse_args():
     get_door.add_argument('--door', type=int, default=DOOR, help='door ID [1..4]')
 
     # ... set-door
-    set_door_control = parsers['set-door']
-    set_door_control.add_argument('--controller', type=int, default=CONTROLLER, help='controller serial number, e.g. 405419896')
+    set_door = parsers['set-door']
+    set_door.add_argument('--controller', type=int, default=CONTROLLER, help='controller serial number, e.g. 405419896')
+    set_door.add_argument('--door', type=int, default=DOOR, help='door ID [1..4]')
+    set_door.add_argument('--delay', type=int, default=5, help='door unlock duration')
+    set_door.add_argument('--mode', type=str, default='controlled', help="door control mode ('controlled', 'normally-open', 'normally-closed'")
 
     # ... open-door
     open_door = parsers['open-door']

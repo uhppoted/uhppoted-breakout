@@ -39,6 +39,9 @@ packet *ssmp_decode_set(int64_t version, char *community, vector *pdu) {
 
                 if (rq->size > 1 && rq->fields[1]->tag == FIELD_NULL) {
                     value.tag = VALUE_NULL;
+                } else if (rq->size > 1 && rq->fields[1]->tag == FIELD_INTEGER) {
+                    value.tag = VALUE_UINT32;
+                    value.integer = rq->fields[1]->integer.value;
                 } else if (rq->size > 1 && rq->fields[1]->tag == FIELD_OCTET_STRING) {
                     int N = 64;
                     while (N < rq->fields[1]->octets.length && N < 2048) {
@@ -53,6 +56,10 @@ packet *ssmp_decode_set(int64_t version, char *community, vector *pdu) {
 
                         memmove(value.octets.bytes, rq->fields[1]->octets.octets, value.octets.length);
                     }
+                } else if (rq->size > 1 && rq->fields[1]->tag == FIELD_NULL) {
+                    value.tag = VALUE_NULL;
+                } else {
+                    value.tag = VALUE_NULL;
                 }
             }
         }

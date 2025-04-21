@@ -222,7 +222,7 @@ func EncodeSetRequest(rq SetRequest) ([]byte, error) {
 
 	// ... value
 	switch val := rq.Value.(type) {
-	case uint32:
+	case uint8:
 		if v, err := pack_integer(int64(val)); err != nil {
 			return nil, err
 		} else {
@@ -230,6 +230,13 @@ func EncodeSetRequest(rq SetRequest) ([]byte, error) {
 		}
 
 	case uint16:
+		if v, err := pack_integer(int64(val)); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+
+	case uint32:
 		if v, err := pack_integer(int64(val)); err != nil {
 			return nil, err
 		} else {

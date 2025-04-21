@@ -60,36 +60,12 @@
 - [ ] CLI up arrow for 'last command'
 
 ### SSMP
-    - [x] hash OIDs for faster lookup
-    - [x] include SET/GET in auth rq
-    - [x] SSMP_ERROR_AUTHORIZATION (16)
-    - [x] get-status
-    - [x] return error if MIB `get` fails
-    - [x] set-datetime
-          - [x] RTC get/set-datetime
-          - [x] Figure out RTC set/get delay thing
-          - [x] SSMP_ERROR_WRONGTYPE (7)
-          - [x] SSMP_ERROR_READONLY (4)
-          - [x] SSMP_ERROR_NO_ACCESS (6)
-          - [x] SSMP_ERROR_NOT_WRITABLE (17)
-          - [x] SSMP_ERROR_NO_SUCH_OBJECT precedes NO_ACCESS
-          - [x] SSMP_ERROR_COMMIT_FAILED
-          - [x] MIB_get/set/find externs to SSMP (to avoid script errors)
-          - [x] check returned datetime in ut0311
-          - [x] weird 1s difference on set-time + get-time
-          - [x] include dow in RX8900SA_get_datetime
-          - [x] set-time: check delta < 1s
-          - [x] unify get-date, get-time, get-datetime
-          - [x] software-rtc
-          - [ ] MIB_find (returns const *MIBItem)
-          - [ ] PID/Kalman filter for software-rtc
-
-    - [x] get-door
+    - [ ] MIB_find (returns const *MIBItem)
+    - [ ] PID/Kalman filter for software-rtc
+    - [ ] set-door
           - [x] mode
           - [x] delay
-          - [x] door settings table
-
-    - [ ] set-door
+          - [ ] save to flash
 
     - [ ] TRAP
     - [ ] GET: multiple OIDs
@@ -178,6 +154,7 @@
 - Nerves
 - Embassy (Rust)
 - https://interrupt.memfault.com/blog/diving-into-jtag-part-6
+- https://pwy.io/posts/marching-events/
 - [ ] Pinout diagram
      - (?) [WireViz] https://github.com/formatc1702/WireViz
      - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator

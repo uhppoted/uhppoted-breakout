@@ -55,6 +55,30 @@ bool doors_get_mode(uint8_t door, uint8_t *mode) {
     return false;
 }
 
+bool doors_set_mode(uint8_t door, uint8_t mode) {
+    if (mode == 1 || mode == 2 || mode == 3) {
+        switch (door) {
+        case 1:
+            DOORS.door1.mode = mode;
+            return true;
+
+        case 2:
+            DOORS.door2.mode = mode;
+            return true;
+
+        case 3:
+            DOORS.door3.mode = mode;
+            return true;
+
+        case 4:
+            DOORS.door4.mode = mode;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool doors_get_delay(uint8_t door, uint8_t *delay) {
     switch (door) {
     case 1:
@@ -72,6 +96,30 @@ bool doors_get_delay(uint8_t door, uint8_t *delay) {
     case 4:
         *delay = DOORS.door4.delay;
         return true;
+    }
+
+    return false;
+}
+
+bool doors_set_delay(uint8_t door, uint8_t delay) {
+    if (delay > 0 && delay <= 60) {
+        switch (door) {
+        case 1:
+            DOORS.door1.delay = delay;
+            return true;
+
+        case 2:
+            DOORS.door2.delay = delay;
+            return true;
+
+        case 3:
+            DOORS.door3.delay = delay;
+            return true;
+
+        case 4:
+            DOORS.door4.delay = delay;
+            return true;
+        }
     }
 
     return false;

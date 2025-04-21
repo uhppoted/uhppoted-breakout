@@ -184,94 +184,94 @@ int64_t get_door_pushbutton(uint8_t door, value *v) {
     return SSMP_ERROR_NO_ACCESS;
 }
 
-int64_t MIB_get_doors_1_mode(value *v) {
+int64_t MIB_get_door_1_mode(value *v) {
     return get_door_mode(1, v);
 }
 
-int64_t MIB_get_doors_2_mode(value *v) {
+int64_t MIB_get_door_2_mode(value *v) {
     return get_door_mode(2, v);
 }
 
-int64_t MIB_get_doors_3_mode(value *v) {
+int64_t MIB_get_door_3_mode(value *v) {
     return get_door_mode(3, v);
 }
 
-int64_t MIB_get_doors_4_mode(value *v) {
+int64_t MIB_get_door_4_mode(value *v) {
     return get_door_mode(4, v);
 }
 
-int64_t MIB_get_doors_1_delay(value *v) {
+int64_t MIB_get_door_1_delay(value *v) {
     return get_door_delay(1, v);
 }
 
-int64_t MIB_get_doors_2_delay(value *v) {
+int64_t MIB_get_door_2_delay(value *v) {
     return get_door_delay(2, v);
 }
 
-int64_t MIB_get_doors_3_delay(value *v) {
+int64_t MIB_get_door_3_delay(value *v) {
     return get_door_delay(3, v);
 }
 
-int64_t MIB_get_doors_4_delay(value *v) {
+int64_t MIB_get_door_4_delay(value *v) {
     return get_door_delay(4, v);
 }
 
-int64_t MIB_get_doors_1_unlocked(value *v) {
+int64_t MIB_get_door_1_unlocked(value *v) {
     return get_door_unlocked(1, v);
 }
 
-int64_t MIB_get_doors_2_unlocked(value *v) {
+int64_t MIB_get_door_2_unlocked(value *v) {
     return get_door_unlocked(2, v);
 }
 
-int64_t MIB_get_doors_3_unlocked(value *v) {
+int64_t MIB_get_door_3_unlocked(value *v) {
     return get_door_unlocked(3, v);
 }
 
-int64_t MIB_get_doors_4_unlocked(value *v) {
+int64_t MIB_get_door_4_unlocked(value *v) {
     return get_door_unlocked(4, v);
 }
 
-int64_t MIB_get_doors_1_open(value *v) {
+int64_t MIB_get_door_1_open(value *v) {
     return get_door_open(1, v);
 }
 
-int64_t MIB_get_doors_2_open(value *v) {
+int64_t MIB_get_door_2_open(value *v) {
     return get_door_open(2, v);
 }
 
-int64_t MIB_get_doors_3_open(value *v) {
+int64_t MIB_get_door_3_open(value *v) {
     return get_door_open(3, v);
 }
 
-int64_t MIB_get_doors_4_open(value *v) {
+int64_t MIB_get_door_4_open(value *v) {
     return get_door_open(4, v);
 }
 
-int64_t MIB_get_doors_1_pushbutton(value *v) {
+int64_t MIB_get_door_1_pushbutton(value *v) {
     return get_door_pushbutton(1, v);
 }
 
-int64_t MIB_get_doors_2_pushbutton(value *v) {
+int64_t MIB_get_door_2_pushbutton(value *v) {
     return get_door_pushbutton(2, v);
 }
 
-int64_t MIB_get_doors_3_pushbutton(value *v) {
+int64_t MIB_get_door_3_pushbutton(value *v) {
     return get_door_pushbutton(3, v);
 }
 
-int64_t MIB_get_doors_4_pushbutton(value *v) {
+int64_t MIB_get_door_4_pushbutton(value *v) {
     return get_door_pushbutton(4, v);
 }
 
-int64_t MIB_get_alarms_tamper_detect(value *v) {
+int64_t MIB_get_alarm_tamper_detect(value *v) {
     v->tag = VALUE_BOOLEAN;
     v->boolean = false;
 
     return SSMP_ERROR_NONE;
 }
 
-int64_t MIB_get_alarms_fire_alarm(value *v) {
+int64_t MIB_get_alarm_fire_alarm(value *v) {
     v->tag = VALUE_BOOLEAN;
     v->boolean = false;
 

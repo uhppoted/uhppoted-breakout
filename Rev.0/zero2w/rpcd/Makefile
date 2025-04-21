@@ -19,7 +19,7 @@ test: build
 	go test ./...
 
 debug: build
-	go test -v -timeout 500ms ./... -run TestDecodeGetRequest
+	go test -v -timeout 500ms ./... -run TestEncodeSetUint8Request
 
 run-tcp: build
 	./bin/rpcd --bind "tcp:::1234" --device stub --cacheable .cacheable.json

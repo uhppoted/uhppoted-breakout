@@ -176,12 +176,22 @@ def get_door(u, dest, timeout, args, protocol='udp'):
 
 
 def set_door(u, dest, timeout, args, protocol='udp'):
-    controller = (CONTROLLER, dest, protocol)
-    door = DOOR
-    mode = MODE
-    delay = DELAY
+    controller = (args.controller, dest, protocol)
+    door = args.door
+    mode = args.mode
+    delay = args.delay
 
-    return u.set_door_control(controller, door, mode, delay, timeout=timeout)
+    if delay < 1 or delay > 60:
+        raise ValueError(f'invalid door unlock duration {delay}')
+
+    if mode == 'normally-open':
+        return u.set_door_control(controller, door, 1, delay, timeout=timeout)
+    elif mode == 'normally-closed':
+        return u.set_door_control(controller, door, 2, delay, timeout=timeout)
+    elif mode == 'controlled':
+        return u.set_door_control(controller, door, 3, delay, timeout=timeout)
+    else:
+        raise ValueError(f'invalid door control mode {mode}')
 
 
 def get_status(u, dest, timeout, args, protocol='udp'):
