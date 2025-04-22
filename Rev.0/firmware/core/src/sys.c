@@ -17,6 +17,7 @@
 #include <cli.h>
 #include <log.h>
 #include <mempool.h>
+#include <settings.h>
 #include <sys.h>
 #include <types/buffer.h>
 
@@ -36,6 +37,7 @@ const uint32_t MSG_SWIPE = 0x20000000;
 const uint32_t MSG_KEYCODE = 0x30000000;
 const uint32_t MSG_U3 = 0x40000000;
 const uint32_t MSG_RX = 0x50000000;
+const uint32_t MSG_SAVE = 0x60000000;
 const uint32_t MSG_TTY = 0xb0000000;
 const uint32_t MSG_TRACE = 0xc0000000;
 const uint32_t MSG_LOG = 0xd0000000;
@@ -97,6 +99,9 @@ bool _trace(repeating_timer_t *t);
 bool sysinit() {
     mutex_init(&SYSTEM.guard);
     mutex_init(&SYSTEM.queue.lock);
+
+    // ... restore settings
+    settings_restore();
 
     // ... USB/UART0 mode
     if (strcasecmp(MODE, "cli") == 0) {
@@ -308,6 +313,10 @@ void dispatch(uint32_t v) {
         struct circular_buffer *b = (struct circular_buffer *)(SRAM_BASE | (v & 0x0fffffff));
 
         cli_rx(b);
+    }
+
+    if ((v & MSG) == MSG_SAVE) {
+        settings_save();
     }
 
     if ((v & MSG) == MSG_TRACE) {

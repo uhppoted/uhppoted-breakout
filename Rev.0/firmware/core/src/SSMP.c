@@ -39,7 +39,7 @@ void SSMP_enq();
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
 void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
-void SSMP_set(const char *community, int64_t rqid, const char *OID, const value val);
+bool SSMP_set(const char *community, int64_t rqid, const char *OID, const value val);
 void SSMP_err(const char *community, int64_t rqid, const char *OID, int64_t error, int64_t index);
 void SSMP_write(const uint8_t *buffer, int N);
 
@@ -200,9 +200,15 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
             SSMP_err(community, rqid, oid, SSMP_ERROR_NO_SUCH_OBJECT, 1);
         } else if (!auth_authorised(community, oid, OP_SET) && auth_validate(community, rqid)) {
             SSMP_err(community, rqid, oid, SSMP_ERROR_NO_ACCESS, 1);
-        } else {
+        } else if (SSMP_set(community, rqid, oid, request->set.value)) {
             SSMP_touched();
-            SSMP_set(community, rqid, oid, request->set.value);
+
+            message msg = {
+                .message = MSG_SAVE,
+                .tag = MESSAGE_NONE,
+            };
+
+            push(msg);
         }
     }
 
@@ -253,7 +259,7 @@ void SSMP_get(const char *community, int64_t rqid, const char *OID) {
 /* SSMP SET implementation.
  *
  */
-void SSMP_set(const char *community, int64_t rqid, const char *OID, const value val) {
+bool SSMP_set(const char *community, int64_t rqid, const char *OID, const value val) {
     value v;
     int64_t err = MIB_set(OID, val, &v);
 
@@ -284,6 +290,8 @@ void SSMP_set(const char *community, int64_t rqid, const char *OID, const value 
     slice_free(&encoded);
     slice_free(&packed);
     packet_free(&reply);
+
+    return err == SSMP_ERROR_NONE;
 }
 
 /* SSMP error implementation.

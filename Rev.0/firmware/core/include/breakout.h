@@ -13,6 +13,7 @@ extern const uint32_t MSG_SWIPE;
 extern const uint32_t MSG_KEYCODE;
 extern const uint32_t MSG_U3;
 extern const uint32_t MSG_TICK;
+extern const uint32_t MSG_SAVE;
 extern const uint32_t MSG_TRACE;
 extern const uint32_t MSG_LOG;
 extern const uint32_t MSG_WATCHDOG;

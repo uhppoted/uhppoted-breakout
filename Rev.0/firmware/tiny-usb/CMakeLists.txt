@@ -48,6 +48,7 @@ add_executable(${TARGET_NAME}
   ${CORE}/src/U2.c
   ${CORE}/src/U3.c
   ${CORE}/src/U4.c
+  ${CORE}/src/settings.c
   ${CORE}/src/doors.c
   ${CORE}/src/auth.c
   ${CORE}/src/SSMP.c
