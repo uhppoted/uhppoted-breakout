@@ -1,16 +1,10 @@
 # TODO
 
-- [ ] ut0311/rpcd queues **all** incoming request
-      - (?) limit pending request queue
-      - (?) seems to be something to do with GetStatusRequest::getControllerID
-      - `scmp.Get[uint32](ut0311.driver, scmp.OID_CONTROLLER_ID)` hangs forever
-      - timeout in rpcd::ssmp::get not working
-      - timeout does not remove message from queue!
-         - `s.queue <- func()` is blocking
-         - `s.requests <- encoded` is blocking
+- [x] ut0311/rpcd queues **all** incoming requests
 
 ## RPCD
     - [x] GET cache
+    - [ ] commonalise GET/SET queue handling
     - [ ] daemonize
     - [ ] monitor
     - (?) Context.WithTimeout 

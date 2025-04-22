@@ -205,12 +205,9 @@ func (s *SSMP) Stop() error {
 }
 
 func (s *SSMP) Get(oid string) (any, error) {
-	println("---- rpcd::ssmp::get/0")
 	if o, err := BER.ParseOID(oid); err != nil {
-		println("---- rpcd::ssmp::get/1")
 		return nil, err
 	} else if v, ok := cache.Get(oid); ok {
-		println("---- rpcd::ssmp::get/2")
 		debugf("returning cached value for %v", oid)
 		return v, nil
 	} else {
@@ -228,34 +225,36 @@ func (s *SSMP) Get(oid string) (any, error) {
 		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
 		} else {
-			println("---- rpcd::ssmp::get/3")
+			debugf("pending queue: %v", len(s.pending.m))
+
 			pipe := make(chan BER.GetResponse, 1)
-			done := make(chan struct{})
 
-			defer close(pipe)
-			defer close(done)
-			defer s.pending.delete(rq.RequestID)
-
-			// FIXME exit on timeout or can't put or or requests blocked or something
-			s.queue <- func() {
-				println("---- --- rpcd::ssmp::get::f/0")
+			f := func() {
 				s.pending.put(rq.RequestID, func(packet BER.GetResponse) {
 					pipe <- packet
 				})
 
-				println("---- --- rpcd::ssmp::get::f/1")
-				s.requests <- encoded
+				select {
+				case s.requests <- encoded:
+					return
 
-				println("---- --- rpcd::ssmp::get::f/2")
-				<-done
-				println("---- --- rpcd::ssmp::get::f/3")
+				case <-time.After(2500 * time.Millisecond):
+					return
+				}
 			}
 
-			println("---- rpcd::ssmp::get/4")
+			defer close(pipe)
+			defer s.pending.delete(rq.RequestID)
+
 			select {
+			case s.queue <- f:
+				// pending
+
 			case <-time.After(2500 * time.Millisecond):
 				return nil, fmt.Errorf("timeout")
+			}
 
+			select {
 			case response := <-pipe:
 				debugf("response %v", response)
 				if response.Error != 0 {
@@ -265,6 +264,9 @@ func (s *SSMP) Get(oid string) (any, error) {
 
 					return response.Value, nil
 				}
+
+			case <-time.After(2500 * time.Millisecond):
+				return nil, fmt.Errorf("timeout")
 			}
 		}
 	}
@@ -289,21 +291,33 @@ func (s *SSMP) Set(oid string, value any) (any, error) {
 		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
 		} else {
+			debugf("pending queue: %v", len(s.pending.m))
+
 			pipe := make(chan BER.GetResponse, 1)
-			done := make(chan struct{})
 
-			defer close(pipe)
-			defer close(done)
-			defer s.pending.delete(rq.RequestID)
-
-			s.queue <- func() {
+			f := func() {
 				s.pending.put(rq.RequestID, func(packet BER.GetResponse) {
 					pipe <- packet
 				})
 
-				s.requests <- encoded
+				select {
+				case s.requests <- encoded:
+					return
 
-				<-done
+				case <-time.After(2500 * time.Millisecond):
+					return
+				}
+			}
+
+			defer close(pipe)
+			defer s.pending.delete(rq.RequestID)
+
+			select {
+			case s.queue <- f:
+				// pending
+
+			case <-time.After(2500 * time.Millisecond):
+				return nil, fmt.Errorf("timeout")
 			}
 
 			select {
