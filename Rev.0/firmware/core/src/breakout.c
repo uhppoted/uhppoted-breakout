@@ -67,6 +67,10 @@ bool push(message msg) {
     case MESSAGE_SWIPE:
         m |= ((uint32_t)msg.swipe & 0x0fffffff);
         break;
+
+    case MESSAGE_INPUTS:
+        m |= msg.inputs & 0x0fffffff;
+        break;
     }
 
     if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {

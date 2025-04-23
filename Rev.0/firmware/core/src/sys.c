@@ -38,6 +38,7 @@ const uint32_t MSG_KEYCODE = 0x30000000;
 const uint32_t MSG_U3 = 0x40000000;
 const uint32_t MSG_RX = 0x50000000;
 const uint32_t MSG_SAVE = 0x60000000;
+const uint32_t MSG_EVENT = 0x70000000;
 const uint32_t MSG_TTY = 0xb0000000;
 const uint32_t MSG_TRACE = 0xc0000000;
 const uint32_t MSG_LOG = 0xd0000000;
@@ -350,6 +351,10 @@ void dispatch(uint32_t v) {
         };
 
         push(qmsg);
+    }
+
+    if ((v & MSG) == MSG_EVENT) {
+        SSMP_trap();
     }
 
     if ((v & MSG) == MSG_LOG) {

@@ -8,10 +8,15 @@
 extern packet *ssmp_decode_get(int64_t version, char *community, vector *pdu);
 extern packet *ssmp_decode_set(int64_t version, char *community, vector *pdu);
 extern slice ssmp_encode_response(packet);
+extern slice ssmp_encode_trap(packet);
 
 slice ssmp_encode(packet p) {
     if (p.tag == PACKET_RESPONSE) {
         return ssmp_encode_response(p);
+    }
+
+    if (p.tag == PACKET_TRAP) {
+        return ssmp_encode_trap(p);
     }
 
     slice s = {

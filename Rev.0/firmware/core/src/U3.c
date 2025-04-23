@@ -230,6 +230,14 @@ void U3_process(uint8_t data) {
     if (inputs != U3x.inputs.state) {
         U3x.inputs.state = inputs;
 
+        message qmsg = {
+            .message = MSG_EVENT,
+            .tag = MESSAGE_INPUTS,
+            .inputs = U3x.inputs.state,
+        };
+
+        push(qmsg);
+
         debugf(LOGTAG, "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
     }
 

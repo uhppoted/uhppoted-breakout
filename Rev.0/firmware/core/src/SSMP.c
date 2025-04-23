@@ -294,6 +294,30 @@ bool SSMP_set(const char *community, int64_t rqid, const char *OID, const value 
     return err == SSMP_ERROR_NONE;
 }
 
+/* SSMP event TRAP implementation.
+ *
+ */
+void SSMP_trap() {
+    packet trap = {
+        .tag = PACKET_TRAP,
+        .version = 0,
+        .community = "public",
+        .trap = {
+            .id = 405419896,
+            .category = 0,
+            .event = 0,
+            .timestamp = 0,
+            .OID = strdup("0.1.3.6.1.4.1.65536.99.1"),
+            .value = (value){.tag = VALUE_NULL},
+        },
+    };
+
+    // ... encode
+    slice packed = ssmp_encode(trap);
+
+    debugf(LOGTAG, ">> TRAP %d", packed.length);
+}
+
 /* SSMP error implementation.
  *
  */
