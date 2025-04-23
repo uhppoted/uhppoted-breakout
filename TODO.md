@@ -33,11 +33,7 @@
 - [ ] syserror
       - [ ] make debugf, infof, etc interrupt safe
             - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
-            - https://github.com/idning/safe_snprintf
-            - https://stackoverflow.com/questions/14573000/print-int-from-signal-handler-using-write-or-async-safe-functions
-            - use arg index
-            - predeclared int/float/etc args
-            - push onto queue for later snprintf
+            - https://github.com/LukeShu/pico-fmt
       - [ ] log once on occurrence
       - [ ] CLI show errors
       - (?) count up/down to auto-clear
