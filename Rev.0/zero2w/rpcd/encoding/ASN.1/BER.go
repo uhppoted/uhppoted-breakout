@@ -9,6 +9,7 @@ const tagSequence byte = 48
 const tagGetRequest byte = 160
 const tagGetResponse byte = 162
 const tagSetRequest byte = 163
+const tagTrap byte = 164
 
 type GetRequest struct {
 	Version   uint8
@@ -35,6 +36,16 @@ type SetRequest struct {
 	Value     any
 }
 
+type Trap struct {
+	Version   uint8
+	Community string
+	OID       OID
+	ID        uint32
+	Category  uint32
+	Event     uint32
+	Timestamp string
+}
+
 type sequence []any
 type variable struct {
 	oid   OID
@@ -47,6 +58,15 @@ type pdu struct {
 	errorCode  int64
 	errorIndex int64
 	vars       []variable
+}
+
+type trap struct {
+	tag       byte
+	oid       OID
+	id        uint32
+	category  uint32
+	event     uint32
+	timestamp string
 }
 
 type null struct{}

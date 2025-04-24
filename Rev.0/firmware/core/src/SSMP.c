@@ -5,6 +5,7 @@
 #include <pico/time.h>
 
 #include <MIB.h>
+#include <RTC.h>
 #include <SSMP.h>
 #include <auth.h>
 #include <breakout.h>
@@ -298,24 +299,46 @@ bool SSMP_set(const char *community, int64_t rqid, const char *OID, const value 
  *
  */
 void SSMP_trap() {
+    // ... timestamp
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    char timestamp[20] = {0};
+
+    if (RTC_get_datetime(&year, &month, &day, &hour, &minute, &second, NULL)) {
+        snprintf(timestamp, sizeof(timestamp), "%04u-%02u-%02u %02u:%02u:%02u", year, month, day, hour, minute, second);
+    } else {
+        snprintf(timestamp, sizeof(timestamp), "---- -- --");
+    }
+
     packet trap = {
         .tag = PACKET_TRAP,
         .version = 0,
-        .community = "public",
+        .community = strdup("public"),
         .trap = {
+            .OID = strdup("0.1.3.6.1.4.1.65536"),
             .id = 405419896,
-            .category = 0,
-            .event = 0,
-            .timestamp = 0,
-            .OID = strdup("0.1.3.6.1.4.1.65536.99.1"),
+            .category = 6, // generic-trap: enterprise specific
+            .event = 0,    // specific-trap: event type
+            .timestamp = strdup(timestamp),
             .value = (value){.tag = VALUE_NULL},
         },
     };
 
     // ... encode
     slice packed = ssmp_encode(trap);
+    slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
     debugf(LOGTAG, ">> TRAP %d", packed.length);
+
+    SSMP_write(encoded.bytes, encoded.length);
+
+    slice_free(&encoded);
+    slice_free(&packed);
+    packet_free(&trap);
 }
 
 /* SSMP error implementation.

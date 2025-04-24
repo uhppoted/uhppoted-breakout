@@ -5,6 +5,8 @@
 #include <encoding/ASN.1/BER.h>
 #include <types/slice.h>
 
+#define LOGTAG "ASN.1"
+
 slice pack_boolean(const field *f);
 slice pack_integer(const field *f);
 slice pack_octets(const field *f);
@@ -47,6 +49,10 @@ slice BER_encode(const struct field f) {
         break;
 
     case FIELD_PDU_RESPONSE:
+        s = pack_pdu(&f);
+        break;
+
+    case FIELD_PDU_TRAP:
         s = pack_pdu(&f);
         break;
     }
@@ -277,6 +283,10 @@ slice pack_pdu(const field *f) {
 
     case FIELD_PDU_RESPONSE:
         s.bytes[s.length++] = 0xA2;
+        break;
+
+    case FIELD_PDU_TRAP:
+        s.bytes[s.length++] = 0xA4;
         break;
     }
 

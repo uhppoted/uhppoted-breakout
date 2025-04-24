@@ -14,7 +14,7 @@ typedef enum {
     // FIELD_PDU_GET_NEXT = 0xA1,
     FIELD_PDU_RESPONSE = 0xa2,
     FIELD_PDU_SET = 0xA3,
-    // FIELD_PDU_TRAP: 0xA4,
+    FIELD_PDU_TRAP = 0xA4,
 } FIELD;
 
 typedef struct field {

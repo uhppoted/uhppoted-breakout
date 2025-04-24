@@ -174,10 +174,12 @@ func (s *SSMP) dispatch(packet any) {
 			warnf("no handler for GET response %v", v.RequestID)
 		}
 
+	case BER.Trap:
+		warnf(">>>>> TRAP %v", v)
+
 	default:
 		errorf("unknown packet type (%T)", packet)
 	}
-
 }
 
 func (s *SSMP) Stop() error {

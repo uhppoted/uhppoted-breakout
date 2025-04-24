@@ -4,20 +4,39 @@ import (
 	"fmt"
 )
 
+// 48 29
+//
+//		  2 1 0                        version
+//		  4 6 112 117 98 108 105 99    community
+//	   164 16                       TRAP
+//	       6 8 43 6 1 4 1 132 128 0 OID
+//	       2 4 24 42 55 120         id
 func Decode(bytes []byte) (any, error) {
+	fmt.Printf(">>> %v\n", bytes)
+
 	if v, _, err := unpack(bytes); err != nil {
 		return nil, err
 	} else if v == nil {
 		return nil, nil
 	} else if seq, ok := v.(sequence); !ok {
-		return nil, fmt.Errorf("invalid packet")
+		return nil, fmt.Errorf("invalid packet - expected SEQUENCE")
 	} else if len(seq) < 3 {
-		return nil, fmt.Errorf("invalid packet")
+		return nil, fmt.Errorf("invalid packet - expected PDU")
 	} else if version, ok := seq[0].(int64); !ok {
 		return nil, fmt.Errorf("invalid packet version")
 	} else if community, ok := seq[1].(string); !ok {
 		return nil, fmt.Errorf("invalid packet community")
-	} else if PDU, ok := seq[2].(pdu); !ok || len(PDU.vars) < 1 {
+	} else if PDU, ok := seq[2].(pdu); ok {
+		return decode_PDU(version, community, PDU)
+	} else if TRAP, ok := seq[2].(trap); ok {
+		return decode_TRAP(version, community, TRAP)
+	} else {
+		return nil, fmt.Errorf("unknown PDU type (%v)", PDU.tag)
+	}
+}
+
+func decode_PDU(version int64, community string, PDU pdu) (any, error) {
+	if len(PDU.vars) < 1 {
 		return nil, fmt.Errorf("invalid packet PDU")
 	} else if vars := PDU.vars; len(vars) < 1 {
 		return nil, fmt.Errorf("invalid packet variable bind list")
@@ -59,6 +78,18 @@ func Decode(bytes []byte) (any, error) {
 	}
 }
 
+func decode_TRAP(version int64, community string, TRAP trap) (any, error) {
+	return Trap{
+		Version:   uint8(version),
+		Community: community,
+		OID:       TRAP.oid,
+		ID:        TRAP.id,
+		Category:  TRAP.category,
+		Event:     TRAP.event,
+		Timestamp: TRAP.timestamp,
+	}, nil
+}
+
 func unpack(bytes []byte) (any, []byte, error) {
 	if len(bytes) == 0 {
 		return nil, bytes, nil
@@ -92,6 +123,9 @@ func unpack(bytes []byte) (any, []byte, error) {
 
 		case tagSetRequest:
 			return unpack_PDU(tagSetRequest, bytes)
+
+		case tagTrap:
+			return unpack_TRAP(tagTrap, bytes)
 
 		case tagSequence:
 			return unpack_sequence(bytes)
@@ -314,6 +348,68 @@ func unpack_PDU(tag byte, bytes []byte) (pdu, []byte, error) {
 		}
 
 		return PDU, bytes[N:], nil
+	}
+}
+
+func unpack_TRAP(tag byte, bytes []byte) (trap, []byte, error) {
+	if N, bytes, err := unpack_length(bytes); err != nil {
+		return trap{}, bytes, err
+	} else if N > uint32(len(bytes)) {
+		return trap{}, nil, fmt.Errorf("invalid PDU")
+	} else {
+		TRAP := trap{
+			tag: tag,
+		}
+		chunk := bytes[:N]
+
+		if len(chunk) > 0 {
+			if v, remaining, err := unpack(chunk); err != nil {
+				return trap{}, bytes[N:], err
+			} else if oid, ok := v.(OID); !ok {
+				return trap{}, nil, fmt.Errorf("invalid trap OID")
+			} else {
+				TRAP.oid = oid
+				chunk = remaining
+			}
+
+			if v, remaining, err := unpack(chunk); err != nil {
+				return trap{}, bytes[N:], err
+			} else if u32, ok := v.(int64); !ok {
+				return trap{}, nil, fmt.Errorf("invalid trap origin ID")
+			} else {
+				TRAP.id = uint32(u32)
+				chunk = remaining
+			}
+
+			if v, remaining, err := unpack(chunk); err != nil {
+				return trap{}, bytes[N:], err
+			} else if u32, ok := v.(int64); !ok {
+				return trap{}, nil, fmt.Errorf("invalid trap category")
+			} else {
+				TRAP.category = uint32(u32)
+				chunk = remaining
+			}
+
+			if v, remaining, err := unpack(chunk); err != nil {
+				return trap{}, bytes[N:], err
+			} else if u32, ok := v.(int64); !ok {
+				return trap{}, nil, fmt.Errorf("invalid trap event")
+			} else {
+				TRAP.event = uint32(u32)
+				chunk = remaining
+			}
+
+			if v, remaining, err := unpack(chunk); err != nil {
+				return trap{}, bytes[N:], err
+			} else if timestamp, ok := v.(string); !ok {
+				return trap{}, nil, fmt.Errorf("invalid trap timestamp")
+			} else {
+				TRAP.timestamp = timestamp
+				chunk = remaining
+			}
+		}
+
+		return TRAP, bytes[N:], nil
 	}
 }
 

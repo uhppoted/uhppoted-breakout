@@ -66,8 +66,8 @@ typedef struct packet {
             uint32_t id;
             uint32_t category;
             uint32_t event;
-            uint32_t timestamp;
-            value value; // FIXME allow multiple values
+            char *timestamp;
+            value value;
         } trap;
     };
 

@@ -38,21 +38,20 @@
 - [ ] Rework print queue
       - (?) setvbuf
 
-- [ ] Use Pico optimized libraries
-      - pico_mem_ops
-      - pico_printf
-      - pico_malloc
-      - pico_stdio
-
 - [ ] CLI up arrow for 'last command'
 
 ### SSMP
     - [ ] TRAP
-    - [ ] GET: multiple OIDs
+          - flush SSMP::write on connected
+          - translate timestamp to DateTime
+          - use rtcd time if timestamp is invalid
+
     - [ ] set-door
           - [x] mode
           - [x] delay
           - [ ] save to flash
+
+    - [ ] GET: multiple OIDs
     - [ ] MIB_find (returns const *MIBItem)
     - [ ] PID/Kalman filter for software-rtc
     - (?) queue UART write
