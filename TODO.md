@@ -1,9 +1,6 @@
 # TODO
 
-- [x] ut0311/rpcd queues **all** incoming requests
-
 ## RPCD
-    - [x] GET cache
     - [ ] commonalise GET/SET queue handling
     - [ ] daemonize
     - [ ] monitor
@@ -31,8 +28,8 @@
 ### misc
 
 - [ ] syserror
+      - [x] CLI show errors
       - [ ] log once on occurrence/reset after interval
-      - [ ] CLI show errors
       - [ ] make debugf, infof, etc interrupt safe
             - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
             - https://github.com/LukeShu/pico-fmt
@@ -50,15 +47,14 @@
 - [ ] CLI up arrow for 'last command'
 
 ### SSMP
-    - [ ] MIB_find (returns const *MIBItem)
-    - [ ] PID/Kalman filter for software-rtc
+    - [ ] TRAP
+    - [ ] GET: multiple OIDs
     - [ ] set-door
           - [x] mode
           - [x] delay
           - [ ] save to flash
-
-    - [ ] TRAP
-    - [ ] GET: multiple OIDs
+    - [ ] MIB_find (returns const *MIBItem)
+    - [ ] PID/Kalman filter for software-rtc
     - (?) queue UART write
 
 ## Zero2W

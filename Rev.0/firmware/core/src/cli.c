@@ -408,12 +408,16 @@ void debug() {
 }
 
 void state() {
-    debugf(TAG, ">>> I2C   %s", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
-    debugf(TAG, ">>> queue %s", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
-    debugf(TAG, ">>> RTC   %s", get_error(ERR_RX8900SA) ? "error" : "ok");
-    debugf(TAG, ">>> U3    %s", get_error(ERR_U3) ? "error" : "ok");
-    debugf(TAG, ">>> U4    %s", get_error(ERR_U4) ? "error" : "ok");
-    debugf(TAG, ">>> other %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
+    debugf(TAG, ">>> I2C      %s", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
+    debugf(TAG, ">>> queue    %s", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
+    debugf(TAG, ">>> memory   %s", get_error(ERR_MEMORY) ? "error" : "ok");
+    debugf(TAG, ">>> watchdog %s", get_error(ERR_WATCHDOG) ? "error" : "ok");
+    debugf(TAG, ">>> RTC      %s", get_error(ERR_RX8900SA) ? "error" : "ok");
+    debugf(TAG, ">>> U2       %s", get_error(ERR_U2) ? "error" : "ok");
+    debugf(TAG, ">>> U3       %s", get_error(ERR_U3) ? "error" : "ok");
+    debugf(TAG, ">>> U4       %s", get_error(ERR_U4) ? "error" : "ok");
+    debugf(TAG, ">>> debug    %s", get_error(ERR_DEBUG) ? "error" : "ok");
+    debugf(TAG, ">>> other    %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
 }
 
 void get_ID() {
