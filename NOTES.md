@@ -143,3 +143,5 @@ return a date/time that is a second after the _set_ datetime.
 1. https://github.com/picolibc/picolibc/blob/main/doc/printf.md
 2. https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
 3. https://github.com/LukeShu/pico-fmt
+4. https://popovicu.com/posts/bare-metal-printf
+

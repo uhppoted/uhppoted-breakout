@@ -82,6 +82,8 @@ bool push(message msg) {
 }
 
 void set_error(err error, const char *tag, const char *fmt, ...) {
+    bool loggable = true;
+
     switch (error) {
     case ERR_OK:
         break;
@@ -95,10 +97,12 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
         break;
 
     case ERR_QUEUE_FULL:
+        loggable = !STATE.errors.queue;
         STATE.errors.queue = true;
         break;
 
     case ERR_MEMORY:
+        loggable = !STATE.errors.memory;
         STATE.errors.memory = true;
         break;
 
@@ -119,6 +123,7 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
         break;
 
     case ERR_WATCHDOG:
+        loggable = !STATE.errors.watchdog;
         STATE.errors.watchdog = true;
         break;
 
@@ -130,14 +135,16 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
         break;
     }
 
-    char msg[64];
+    if (loggable) {
+        char msg[64];
 
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(msg, sizeof(msg), fmt, args);
-    va_end(args);
+        va_list args;
+        va_start(args, fmt);
+        vsnprintf(msg, sizeof(msg), fmt, args);
+        va_end(args);
 
-    errorf(tag, "%s", msg);
+        errorf(tag, "%s", msg);
+    }
 }
 
 bool get_error(err error) {

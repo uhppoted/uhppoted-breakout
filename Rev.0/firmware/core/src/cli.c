@@ -26,7 +26,7 @@
 #include <MIB.h>
 #include <auth.h>
 
-#define TAG "CLI"
+#define LOGTAG "CLI"
 
 uint16_t CRC_CCITT(uint16_t crc, void const *mem, size_t len);
 uint16_t CRC_DNP(uint16_t crc, void const *mem, size_t len);
@@ -404,20 +404,20 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    debugf(TAG, ">>> sizeof(vector) %lu", sizeof(vector));
+    set_error(ERR_DEBUG, LOGTAG, "<<< DEBUG");
 }
 
 void state() {
-    debugf(TAG, ">>> I2C      %s", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
-    debugf(TAG, ">>> queue    %s", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
-    debugf(TAG, ">>> memory   %s", get_error(ERR_MEMORY) ? "error" : "ok");
-    debugf(TAG, ">>> watchdog %s", get_error(ERR_WATCHDOG) ? "error" : "ok");
-    debugf(TAG, ">>> RTC      %s", get_error(ERR_RX8900SA) ? "error" : "ok");
-    debugf(TAG, ">>> U2       %s", get_error(ERR_U2) ? "error" : "ok");
-    debugf(TAG, ">>> U3       %s", get_error(ERR_U3) ? "error" : "ok");
-    debugf(TAG, ">>> U4       %s", get_error(ERR_U4) ? "error" : "ok");
-    debugf(TAG, ">>> debug    %s", get_error(ERR_DEBUG) ? "error" : "ok");
-    debugf(TAG, ">>> other    %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
+    debugf(LOGTAG, ">>> I2C      %s", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
+    debugf(LOGTAG, ">>> queue    %s", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
+    debugf(LOGTAG, ">>> memory   %s", get_error(ERR_MEMORY) ? "error" : "ok");
+    debugf(LOGTAG, ">>> watchdog %s", get_error(ERR_WATCHDOG) ? "error" : "ok");
+    debugf(LOGTAG, ">>> RTC      %s", get_error(ERR_RX8900SA) ? "error" : "ok");
+    debugf(LOGTAG, ">>> U2       %s", get_error(ERR_U2) ? "error" : "ok");
+    debugf(LOGTAG, ">>> U3       %s", get_error(ERR_U3) ? "error" : "ok");
+    debugf(LOGTAG, ">>> U4       %s", get_error(ERR_U4) ? "error" : "ok");
+    debugf(LOGTAG, ">>> debug    %s", get_error(ERR_DEBUG) ? "error" : "ok");
+    debugf(LOGTAG, ">>> other    %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
 }
 
 void get_ID() {

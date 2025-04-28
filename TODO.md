@@ -28,12 +28,12 @@
 ### misc
 
 - [ ] syserror
-      - [x] CLI show errors
-      - [ ] log once on occurrence/reset after interval
+      - [x] log once on occurrence
+      - [ ] reset error after interval/count
+            - (?) count up/down to auto-clear
       - [ ] make debugf, infof, etc interrupt safe
             - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
             - https://github.com/LukeShu/pico-fmt
-      - (?) count up/down to auto-clear
 
 - [ ] Rework print queue
       - (?) setvbuf
