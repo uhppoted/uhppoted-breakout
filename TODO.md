@@ -45,6 +45,7 @@
           - flush SSMP::write on connected
           - translate timestamp to DateTime
           - use rtcd time if timestamp is invalid
+          - (?) queue if rpcd is not connected
 
     - [ ] set-door
           - [x] mode

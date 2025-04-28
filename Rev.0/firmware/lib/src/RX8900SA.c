@@ -178,7 +178,7 @@ int RX8900SA_setup(I2C dev) {
         MONDAY,           // weekday
         0x01,             // day
         JANUARY,          // month
-        0x24,             // year
+        0x25,             // year
         0x00,             // RAM
         ALARM_OFF | 0x00, // alarm: enable + minute
         ALARM_OFF | 0x00, // alarm: enable + hour

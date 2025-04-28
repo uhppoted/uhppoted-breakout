@@ -33,17 +33,17 @@ func NewRPCD(deviceId string, address string) (*RPCD, error) {
 	} else {
 		ctx, cancel := context.WithCancel(context.Background())
 
-		if d, err := ssmp.NewSSMP(deviceId); err != nil {
+		v := RPCD{
+			network: matches[1],
+			addr:    matches[2],
+			ctx:     ctx,
+			cancel:  cancel,
+		}
+
+		if d, err := ssmp.NewSSMP(deviceId, v.Trap); err != nil {
 			return nil, err
 		} else {
-			v := RPCD{
-				network: matches[1],
-				addr:    matches[2],
-				ssmp:    d,
-
-				ctx:    ctx,
-				cancel: cancel,
-			}
+			v.ssmp = d
 
 			return &v, nil
 		}
@@ -105,6 +105,10 @@ func (r *RPCD) Set(kv KV, reply *any) error {
 		*reply = v
 		return nil
 	}
+}
+
+func (r *RPCD) Trap(trap any) {
+	debugf("trap %v", trap)
 }
 
 func debugf(format string, args ...any) {

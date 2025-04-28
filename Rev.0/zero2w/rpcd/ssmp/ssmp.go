@@ -25,6 +25,7 @@ type SSMP struct {
 	rx       chan []byte
 	wg       sync.WaitGroup
 	pending  pending[BER.GetResponse]
+	trap     func(packet any)
 
 	driver interface {
 		Run() error
@@ -52,7 +53,7 @@ func (c callback) OnMessage(header []uint8, content []uint8) {
 
 var ID atomic.Uint32
 
-func NewSSMP(deviceId string) (*SSMP, error) {
+func NewSSMP(deviceId string, trap func(packet any)) (*SSMP, error) {
 	requests := make(chan []byte, 1)
 	rx := make(chan []byte, 1)
 
@@ -65,6 +66,7 @@ func NewSSMP(deviceId string) (*SSMP, error) {
 		pending: pending[BER.GetResponse]{
 			m: map[uint32]e[BER.GetResponse]{},
 		},
+		trap: trap,
 	}
 
 	if deviceId == "stub" {
@@ -175,7 +177,11 @@ func (s *SSMP) dispatch(packet any) {
 		}
 
 	case BER.Trap:
-		warnf(">>>>> TRAP %v", v)
+		if s.trap != nil {
+			s.trap(v)
+		} else {
+			warnf("no handler for TRAP %v", v.ID)
+		}
 
 	default:
 		errorf("unknown packet type (%T)", packet)
