@@ -8,31 +8,79 @@
 
 extern queue_t queue;
 
-struct {
+typedef struct _err {
+    bool value;
+    uint16_t logged;
+    uint16_t logcount;
+} _err;
+
+typedef struct _state {
     struct {
-        bool queue;
-        bool memory;
-        bool I2C;
-        bool RX8900SA;
-        bool U2;
-        bool U3;
-        bool U4;
-        bool watchdog;
-        bool debug;
-        bool unknown;
+        _err queue;
+        _err memory;
+        _err I2C;
+        _err RX8900SA;
+        _err U2;
+        _err U3;
+        _err U4;
+        _err watchdog;
+        _err debug;
+        _err unknown;
     } errors;
-} STATE = {
+} _state;
+
+_state STATE = {
     .errors = {
-        .queue = false,
-        .memory = false,
-        .I2C = false,
-        .RX8900SA = false,
-        .U2 = false,
-        .U3 = false,
-        .U4 = false,
-        .watchdog = false,
-        .debug = false,
-        .unknown = false,
+        .queue = {
+            .value = false,
+            .logged = 0,
+            .logcount = 25,
+        },
+        .memory = {
+            .value = false,
+            .logged = 0,
+            .logcount = 25,
+        },
+        .I2C = {
+            .value = false,
+            .logged = 0,
+            .logcount = 1,
+        },
+        .RX8900SA = {
+            .value = false,
+            .logged = 0,
+            .logcount = 1,
+        },
+        .U2 = {
+            .value = false,
+            .logged = 0,
+            .logcount = 1,
+        },
+        .U3 = {
+            .value = false,
+            .logged = 0,
+            .logcount = 1,
+        },
+        .U4 = {
+            .value = false,
+            .logged = 0,
+            .logcount = 1,
+        },
+        .watchdog = {
+            .value = false,
+            .logged = 0,
+            .logcount = 1,
+        },
+        .debug = {
+            .value = false,
+            .logged = 0,
+            .logcount = 1,
+        },
+        .unknown = {
+            .value = false,
+            .logged = 0,
+            .logcount = 1,
+        },
     },
 };
 
@@ -81,106 +129,104 @@ bool push(message msg) {
     return true;
 }
 
-void set_error(err error, const char *tag, const char *fmt, ...) {
-    bool loggable = true;
-
+_err *_find(err error) {
     switch (error) {
     case ERR_OK:
-        break;
+        return NULL;
 
     case ERR_I2C_GENERIC:
-        STATE.errors.I2C = true;
-        break;
+        return &STATE.errors.I2C;
 
     case ERR_I2C_TIMEOUT:
-        STATE.errors.I2C = true;
-        break;
+        return &STATE.errors.I2C;
 
     case ERR_QUEUE_FULL:
-        loggable = !STATE.errors.queue;
-        STATE.errors.queue = true;
-        break;
+        return &STATE.errors.queue;
 
     case ERR_MEMORY:
-        loggable = !STATE.errors.memory;
-        STATE.errors.memory = true;
-        break;
+        return &STATE.errors.memory;
 
     case ERR_RX8900SA:
-        STATE.errors.RX8900SA = true;
-        break;
+        return &STATE.errors.RX8900SA;
 
     case ERR_U2:
-        STATE.errors.U2 = true;
-        break;
+        return &STATE.errors.U2;
 
     case ERR_U3:
-        STATE.errors.U3 = true;
-        break;
+        return &STATE.errors.U3;
 
     case ERR_U4:
-        STATE.errors.U4 = true;
-        break;
+        return &STATE.errors.U4;
 
     case ERR_WATCHDOG:
-        loggable = !STATE.errors.watchdog;
-        STATE.errors.watchdog = true;
-        break;
+        return &STATE.errors.watchdog;
 
     case ERR_DEBUG:
-        STATE.errors.debug = true;
+        return &STATE.errors.debug;
         break;
 
     case ERR_UNKNOWN:
-        break;
+        return &STATE.errors.unknown;
     }
 
-    if (loggable) {
-        char msg[64];
+    return NULL;
+}
 
-        va_list args;
-        va_start(args, fmt);
-        vsnprintf(msg, sizeof(msg), fmt, args);
-        va_end(args);
+void set_error(err error, const char *tag, const char *fmt, ...) {
+    _err *e = _find(error);
 
-        errorf(tag, "%s", msg);
+    if (e != NULL) {
+        bool loggable = e->logged == 0;
+        e->value = true;
+        e->logged = (e->logged + 1) % e->logcount;
+
+        if (loggable) {
+            char msg[64];
+
+            va_list args;
+            va_start(args, fmt);
+            vsnprintf(msg, sizeof(msg), fmt, args);
+            va_end(args);
+
+            errorf(tag, "%s", msg);
+        }
     }
 }
 
 bool get_error(err error) {
     switch (error) {
     case ERR_I2C_GENERIC:
-        return STATE.errors.I2C;
+        return STATE.errors.I2C.value;
 
     case ERR_I2C_TIMEOUT:
-        return STATE.errors.I2C;
+        return STATE.errors.I2C.value;
 
     case ERR_QUEUE_FULL:
-        return STATE.errors.queue;
+        return STATE.errors.queue.value;
 
     case ERR_MEMORY:
-        return STATE.errors.memory;
+        return STATE.errors.memory.value;
 
     case ERR_RX8900SA:
-        return STATE.errors.RX8900SA;
+        return STATE.errors.RX8900SA.value;
 
     case ERR_U2:
-        return STATE.errors.U2;
+        return STATE.errors.U2.value;
 
     case ERR_U3:
-        return STATE.errors.U3;
+        return STATE.errors.U3.value;
 
     case ERR_U4:
-        return STATE.errors.U4;
+        return STATE.errors.U4.value;
 
     case ERR_WATCHDOG:
-        return STATE.errors.watchdog;
+        return STATE.errors.watchdog.value;
 
     case ERR_DEBUG:
-        return STATE.errors.debug;
+        return STATE.errors.debug.value;
 
     case ERR_UNKNOWN:
-        return STATE.errors.unknown;
+        return STATE.errors.unknown.value;
     }
 
     return false;
@@ -189,27 +235,27 @@ bool get_error(err error) {
 uint16_t get_errors() {
     uint16_t bits = 0x0000;
 
-    bits |= STATE.errors.memory ? BITMASK_ERR_MEMORY : 0x0000;
-    bits |= STATE.errors.queue ? BITMASK_ERR_QUEUE : 0x0000;
-    bits |= STATE.errors.I2C ? BITMASK_ERR_I2C : 0x0000;
-    bits |= STATE.errors.RX8900SA ? BITMASK_ERR_RX8900SA : 0x0000;
-    bits |= STATE.errors.U2 ? BITMASK_ERR_U2 : 0x0000;
-    bits |= STATE.errors.U3 ? BITMASK_ERR_U3 : 0x0000;
-    bits |= STATE.errors.U4 ? BITMASK_ERR_U4 : 0x0000;
-    bits |= STATE.errors.watchdog ? BITMASK_ERR_WATCHDOG : 0x0000;
-    bits |= STATE.errors.debug ? BITMASK_ERR_DEBUG : 0x0000;
-    bits |= STATE.errors.unknown ? BITMASK_ERR_UNKNOWN : 0x0000;
+    bits |= STATE.errors.memory.value ? BITMASK_ERR_MEMORY : 0x0000;
+    bits |= STATE.errors.queue.value ? BITMASK_ERR_QUEUE : 0x0000;
+    bits |= STATE.errors.I2C.value ? BITMASK_ERR_I2C : 0x0000;
+    bits |= STATE.errors.RX8900SA.value ? BITMASK_ERR_RX8900SA : 0x0000;
+    bits |= STATE.errors.U2.value ? BITMASK_ERR_U2 : 0x0000;
+    bits |= STATE.errors.U3.value ? BITMASK_ERR_U3 : 0x0000;
+    bits |= STATE.errors.U4.value ? BITMASK_ERR_U4 : 0x0000;
+    bits |= STATE.errors.watchdog.value ? BITMASK_ERR_WATCHDOG : 0x0000;
+    bits |= STATE.errors.debug.value ? BITMASK_ERR_DEBUG : 0x0000;
+    bits |= STATE.errors.unknown.value ? BITMASK_ERR_UNKNOWN : 0x0000;
 
-    //  STATE.errors.memory = false;
-    STATE.errors.I2C = false;
-    STATE.errors.queue = false;
-    STATE.errors.RX8900SA = false;
-    STATE.errors.U2 = false;
-    STATE.errors.U3 = false;
-    STATE.errors.U4 = false;
-    //  STATE.errors.watchdog = false;
-    //  STATE.errors.debug = false;
-    STATE.errors.unknown = false;
+    //  STATE.errors.memory.value = false;
+    STATE.errors.I2C.value = false;
+    STATE.errors.queue.value = false;
+    STATE.errors.RX8900SA.value = false;
+    STATE.errors.U2.value = false;
+    STATE.errors.U3.value = false;
+    STATE.errors.U4.value = false;
+    //  STATE.errors.watchdog.value = false;
+    //  STATE.errors.debug.value = false;
+    STATE.errors.unknown.value = false;
 
     return bits;
 }

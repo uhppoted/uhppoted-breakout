@@ -9,6 +9,22 @@
 
 ## breakout
 
+### misc
+
+- [ ] syserror
+      - [x] log once on occurrence
+      - [ ] re-enable logging after interval/count
+      - [ ] reset error after interval/count
+
+- [ ] make debugf, infof, etc interrupt safe
+      - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
+      - https://github.com/LukeShu/pico-fmt
+
+- [ ] Rework print queue
+      - (?) setvbuf
+
+- [ ] CLI up arrow for 'last command'
+
 - [ ] USB
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
@@ -24,21 +40,6 @@
         - https://github.com/tomas-pecserke/pico_tusb_reset_interface
         - https://github.com/hathach/tinyusb/discussions/664
         - https://github.com/piersfinlayson/tinyusb-vendor-example
-
-### misc
-
-- [ ] syserror
-      - [x] log once on occurrence
-      - [ ] reset error after interval/count
-            - (?) count up/down to auto-clear
-      - [ ] make debugf, infof, etc interrupt safe
-            - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
-            - https://github.com/LukeShu/pico-fmt
-
-- [ ] Rework print queue
-      - (?) setvbuf
-
-- [ ] CLI up arrow for 'last command'
 
 ### SSMP
     - [ ] TRAP
