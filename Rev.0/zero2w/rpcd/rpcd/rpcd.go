@@ -15,11 +15,19 @@ import (
 )
 
 type RPCD struct {
-	network string
-	addr    string
-	ssmp    *ssmp.SSMP
-	ctx     context.Context
-	cancel  context.CancelFunc
+	ssmp   *ssmp.SSMP
+	ctx    context.Context
+	cancel context.CancelFunc
+
+	listen struct {
+		network string
+		addr    string
+	}
+
+	dial struct {
+		network string
+		addr    string
+	}
 }
 
 type KV struct {
@@ -27,27 +35,48 @@ type KV struct {
 	Value any
 }
 
-func NewRPCD(deviceId string, address string) (*RPCD, error) {
-	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(address); len(matches) < 3 {
-		return nil, fmt.Errorf("invalid bind address (%v)", address)
-	} else {
-		ctx, cancel := context.WithCancel(context.Background())
+func NewRPCD(deviceId string, listen string, dial string) (*RPCD, error) {
+	ctx, cancel := context.WithCancel(context.Background())
 
-		v := RPCD{
+	v := RPCD{
+		ctx:    ctx,
+		cancel: cancel,
+	}
+
+	// ... set 'listen' address:port
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(listen); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid bind address (%v)", listen)
+	} else {
+		v.listen = struct {
+			network string
+			addr    string
+		}{
 			network: matches[1],
 			addr:    matches[2],
-			ctx:     ctx,
-			cancel:  cancel,
-		}
-
-		if d, err := ssmp.NewSSMP(deviceId, v.Trap); err != nil {
-			return nil, err
-		} else {
-			v.ssmp = d
-
-			return &v, nil
 		}
 	}
+
+	// ... set 'dial' address:port
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(dial); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid dial address (%v)", dial)
+	} else {
+		v.dial = struct {
+			network string
+			addr    string
+		}{
+			network: matches[1],
+			addr:    matches[2],
+		}
+	}
+
+	// ... create SSMP codec
+	if d, err := ssmp.NewSSMP(deviceId, v.Trap); err != nil {
+		return nil, err
+	} else {
+		v.ssmp = d
+	}
+
+	return &v, nil
 }
 
 func (r *RPCD) Run() {
@@ -58,16 +87,16 @@ func (r *RPCD) Run() {
 	rpc.Register(r)
 	rpc.HandleHTTP()
 
-	if r.network == "unix" {
-		folder := filepath.Dir(r.addr)
+	if r.listen.network == "unix" {
+		folder := filepath.Dir(r.listen.addr)
 		if err := os.MkdirAll(folder, 0766); err != nil {
 			errorf("listen error: %v", err)
 		}
 
-		os.Remove(r.addr)
+		os.Remove(r.listen.addr)
 	}
 
-	if l, err := net.Listen(r.network, r.addr); err != nil {
+	if l, err := net.Listen(r.listen.network, r.listen.addr); err != nil {
 		errorf("listen error: %v", err)
 	} else {
 		go func() {
@@ -75,7 +104,7 @@ func (r *RPCD) Run() {
 			l.Close()
 		}()
 
-		infof("listening %v %v", r.network, r.addr)
+		infof("listening %v %v", r.listen.network, r.listen.addr)
 		http.Serve(l, nil)
 	}
 }
@@ -109,6 +138,20 @@ func (r *RPCD) Set(kv KV, reply *any) error {
 
 func (r *RPCD) Trap(trap any) {
 	debugf("trap %v", trap)
+
+	var event = KV{
+		OID: "AWOOGAH",
+	}
+
+	var reply any
+
+	if client, err := rpc.DialHTTP(r.dial.network, r.dial.addr); err != nil {
+		errorf("trap %v", err)
+	} else if err := client.Call("RPC.Trap", event, &reply); err != nil {
+		errorf("trap %v", err)
+	} else {
+		infof("trap sent (%v)", reply)
+	}
 }
 
 func debugf(format string, args ...any) {

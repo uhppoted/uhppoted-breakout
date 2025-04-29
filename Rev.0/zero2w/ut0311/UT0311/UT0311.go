@@ -55,7 +55,7 @@ func (ut0311 *UT0311) SetConfig(c *config.Config) {
 func NewUT0311(c *config.Config) (*UT0311, error) {
 	cm := NewConnectionManager(MAX_CONNECTIONS)
 
-	if rpc, err := rpcd.NewRPC(c.Driver.RPC.Address); err != nil {
+	if rpc, err := rpcd.NewRPC(c.Driver.RPC.DialAddr, c.Driver.RPC.ListenAddr); err != nil {
 		return nil, err
 	} else {
 		ut0311 := UT0311{
@@ -99,6 +99,13 @@ func (ut0311 *UT0311) Run() {
 	wg.Add(1)
 	go func() {
 		ut0311.listen("TLS", ut0311.tls)
+		wg.Done()
+	}()
+
+	// ... start SSMP event trap listener
+	wg.Add(1)
+	go func() {
+		ut0311.driver.Listen()
 		wg.Done()
 	}()
 

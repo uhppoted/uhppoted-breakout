@@ -2,7 +2,11 @@ package rpcd
 
 import (
 	"fmt"
+	"net"
+	"net/http"
 	"net/rpc"
+	"os"
+	"path/filepath"
 	"regexp"
 
 	"emulator/log"
@@ -10,8 +14,15 @@ import (
 )
 
 type RPC struct {
-	Network string
-	Address string
+	dial struct {
+		network string
+		address string
+	}
+
+	listen struct {
+		network string
+		address string
+	}
 }
 
 type KV struct {
@@ -19,26 +30,53 @@ type KV struct {
 	Value any
 }
 
-func NewRPC(address string) (*RPC, error) {
-	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(address); len(matches) < 3 {
-		return nil, fmt.Errorf("invalid RPC address (%v)", address)
+func NewRPC(dial string, listen string) (*RPC, error) {
+	infof("init dial:%v", dial)
+
+	r := RPC{}
+
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(dial); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid RPC 'dial' address (%v)", dial)
 	} else {
-		network := matches[1]
-		address := matches[2]
-
-		infof("init network:%v  address:%v", network, address)
-
-		rpcd := RPC{
-			Network: network,
-			Address: address,
-		}
-
-		return &rpcd, nil
+		r.dial.network = matches[1]
+		r.dial.address = matches[2]
 	}
+
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(listen); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid RPC 'listen' address (%v)", dial)
+	} else {
+		r.listen.network = matches[1]
+		r.listen.address = matches[2]
+	}
+
+	return &r, nil
 }
 
-func (r RPC) dial() (*rpc.Client, error) {
-	return rpc.DialHTTP(r.Network, r.Address)
+func (r *RPC) Listen() {
+	rpc.Register(r)
+	rpc.HandleHTTP()
+
+	if r.listen.network == "unix" {
+		folder := filepath.Dir(r.listen.address)
+		if err := os.MkdirAll(folder, 0766); err != nil {
+			errorf("listen error: %v", err)
+		}
+
+		os.Remove(r.listen.address)
+	}
+
+	if l, err := net.Listen(r.listen.network, r.listen.address); err != nil {
+		errorf("listen error: %v", err)
+	} else {
+		defer l.Close()
+		// go func() {
+		// 	<-r.ctx.Done()
+		// 	l.Close()
+		// }()
+
+		infof("listening %v %v", r.listen.network, r.listen.address)
+		http.Serve(l, nil)
+	}
 }
 
 func (r RPC) get(oid scmp.OID) (any, error) {
@@ -47,7 +85,7 @@ func (r RPC) get(oid scmp.OID) (any, error) {
 	var key = fmt.Sprintf("%v", oid)
 	var reply any
 
-	if client, err := r.dial(); err != nil {
+	if client, err := rpc.DialHTTP(r.dial.network, r.dial.address); err != nil {
 		return 0, err
 	} else if err := client.Call("RPCD.Get", key, &reply); err != nil {
 		return 0, err
@@ -65,13 +103,21 @@ func (r RPC) set(oid scmp.OID, value any) (any, error) {
 	}
 	var reply any
 
-	if client, err := r.dial(); err != nil {
+	if client, err := rpc.DialHTTP(r.dial.network, r.dial.address); err != nil {
 		return 0, err
 	} else if err := client.Call("RPCD.Set", kv, &reply); err != nil {
 		return 0, err
 	} else {
 		return reply, nil
 	}
+}
+
+func (r *RPC) Trap(event KV, reply *any) error {
+	debugf("trap %v", event)
+
+	*reply = true
+
+	return nil
 }
 
 func (r RPC) GetUint8(oid scmp.OID) (uint8, error) {

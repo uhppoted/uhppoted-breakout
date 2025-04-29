@@ -27,7 +27,8 @@ type driver struct {
 }
 
 type rpc struct {
-	Address string `json:"address"`
+	DialAddr   string `json:"dial"`
+	ListenAddr string `json:"listen"`
 }
 
 type network struct {
@@ -58,7 +59,8 @@ func Load(filepath string) (Config, []byte, error) {
 		Driver: driver{
 			Driver: "rpc",
 			RPC: rpc{
-				Address: "tcp::0.0.0.0:1234",
+				DialAddr:   "tcp::0.0.0.0:1234",
+				ListenAddr: "tcp::0.0.0.0:4321",
 			},
 		},
 		TLS: TLS{
