@@ -320,7 +320,7 @@ void SSMP_trap() {
         .community = strdup("public"),
         .trap = {
             .OID = strdup("0.1.3.6.1.4.1.65536"),
-            .id = 405419896,
+            .id = CONTROLLER,
             .category = 6, // generic-trap: enterprise specific
             .event = 0,    // specific-trap: event type
             .timestamp = strdup(timestamp),

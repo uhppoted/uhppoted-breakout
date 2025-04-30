@@ -15,7 +15,9 @@
       - [x] log once on occurrence
       - [x] log every N occurrences
       - [x] log after interval
-      - [ ] reset error after interval/count
+      - [ ] syserr_reset()
+            - CLI
+            - MIB
 
 - [ ] make debugf, infof, etc interrupt safe
       - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation

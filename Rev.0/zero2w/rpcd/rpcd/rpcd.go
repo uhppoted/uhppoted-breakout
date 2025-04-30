@@ -9,7 +9,9 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"time"
 
+	"ssmp/encoding/ASN.1"
 	"ssmp/log"
 	"ssmp/ssmp"
 )
@@ -33,6 +35,15 @@ type RPCD struct {
 type KV struct {
 	OID   string
 	Value any
+}
+
+type Event struct {
+	Timestamp time.Time
+	ID        uint32
+	Category  uint32
+	Event     uint32
+	OID       string
+	Value     any
 }
 
 func NewRPCD(deviceId string, listen string, dial string) (*RPCD, error) {
@@ -137,20 +148,34 @@ func (r *RPCD) Set(kv KV, reply *any) error {
 }
 
 func (r *RPCD) Trap(trap any) {
-	debugf("trap %v", trap)
+	debugf("trap %#v", trap)
 
-	var event = KV{
-		OID: "AWOOGAH",
-	}
+	if v, ok := trap.(BER.Trap); ok {
+		timestamp := time.Now().Round(time.Second)
+		if t, err := time.ParseInLocation("2006-01-02 15:04:05", v.Timestamp, time.Local); err == nil {
+			timestamp = t
+		}
 
-	var reply any
+		oid := fmt.Sprintf("%v", v.OID)
 
-	if client, err := rpc.DialHTTP(r.dial.network, r.dial.addr); err != nil {
-		errorf("trap %v", err)
-	} else if err := client.Call("RPC.Trap", event, &reply); err != nil {
-		errorf("trap %v", err)
-	} else {
-		infof("trap sent (%v)", reply)
+		var event = Event{
+			Timestamp: timestamp,
+			ID:        v.ID,
+			Category:  v.Category,
+			Event:     v.Event,
+			OID:       oid,
+			Value:     nil, // FIXME
+		}
+
+		var reply any
+
+		if client, err := rpc.DialHTTP(r.dial.network, r.dial.addr); err != nil {
+			errorf("trap %v", err)
+		} else if err := client.Call("RPC.Trap", event, &reply); err != nil {
+			errorf("trap %v", err)
+		} else {
+			infof("trap sent (%v)", reply)
+		}
 	}
 }
 

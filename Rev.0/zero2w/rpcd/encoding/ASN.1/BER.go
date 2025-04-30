@@ -44,6 +44,8 @@ type Trap struct {
 	Category  uint32
 	Event     uint32
 	Timestamp string
+	// OID OID
+	// Value any
 }
 
 type sequence []any

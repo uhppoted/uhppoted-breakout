@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"time"
 
 	"emulator/log"
 	"emulator/scmp"
@@ -28,6 +29,15 @@ type RPC struct {
 type KV struct {
 	OID   string
 	Value any
+}
+
+type Event struct {
+	Timestamp time.Time
+	ID        uint32
+	Category  uint32
+	Event     uint32
+	OID       string
+	Value     any
 }
 
 func NewRPC(dial string, listen string) (*RPC, error) {
@@ -112,7 +122,7 @@ func (r RPC) set(oid scmp.OID, value any) (any, error) {
 	}
 }
 
-func (r *RPC) Trap(event KV, reply *any) error {
+func (r *RPC) Trap(event Event, reply *any) error {
 	debugf("trap %v", event)
 
 	*reply = true
