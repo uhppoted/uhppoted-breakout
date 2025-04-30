@@ -112,7 +112,7 @@ int64_t MIB_get_controller_datetime(value *v) {
 
 int64_t MIB_get_controller_syserror(value *v) {
     v->tag = VALUE_UINT16;
-    v->integer = (uint16_t)get_errors();
+    v->integer = (uint16_t)syserr_bitmask();
 
     return SSMP_ERROR_NONE;
 }

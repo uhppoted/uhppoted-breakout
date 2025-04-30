@@ -183,7 +183,7 @@ void U3_read(void *data) {
     int err;
 
     if ((err = PCAL6408A_read(U3, &inputs)) != ERR_OK) {
-        set_error(ERR_U3, LOGTAG, "error reading PCAL6408A inputs (%d)", err);
+        syserr_set(ERR_U3, LOGTAG, "error reading PCAL6408A inputs (%d)", err);
     } else {
         message qmsg = {
             .message = MSG_U3,

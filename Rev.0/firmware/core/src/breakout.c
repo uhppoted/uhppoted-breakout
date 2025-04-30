@@ -6,14 +6,25 @@
 
 #define LOGTAG "SYS"
 
-extern queue_t queue;
+const uint16_t BITMASK_ERR_MEMORY = 0x0001;
+const uint16_t BITMASK_ERR_QUEUE = 0x0002;
+const uint16_t BITMASK_ERR_I2C = 0x0004;
+const uint16_t BITMASK_ERR_RX8900SA = 0x0008;
+const uint16_t BITMASK_ERR_U2 = 0x0010;
+const uint16_t BITMASK_ERR_U3 = 0x0020;
+const uint16_t BITMASK_ERR_U4 = 0x0040;
+const uint16_t BITMASK_ERR_WATCHDOG = 0x0080;
+const uint16_t BITMASK_ERR_DEBUG = 0x4000;
+const uint16_t BITMASK_ERR_UNKNOWN = 0x8000;
 
 typedef struct _err {
+    err id;
     bool value;
     uint16_t counter;
     uint16_t timer;
     uint16_t count;
     uint16_t interval;
+    uint16_t mask;
 } _err;
 
 typedef struct _state {
@@ -34,88 +45,99 @@ typedef struct _state {
 _state STATE = {
     .errors = {
         .queue = {
+            .id = ERR_QUEUE_FULL,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 25,
             .interval = 15,
+            .mask = BITMASK_ERR_QUEUE,
         },
         .memory = {
+            .id = ERR_MEMORY,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 25,
             .interval = 15,
+            .mask = BITMASK_ERR_MEMORY,
         },
         .I2C = {
+            .id = ERR_I2C,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 1,
             .interval = 0,
+            .mask = BITMASK_ERR_I2C,
         },
         .RX8900SA = {
+            .id = ERR_RX8900SA,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 1,
             .interval = 0,
+            .mask = BITMASK_ERR_RX8900SA,
         },
         .U2 = {
+            .id = ERR_U2,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 1,
             .interval = 0,
+            .mask = BITMASK_ERR_U2,
         },
         .U3 = {
+            .id = ERR_U3,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 1,
             .interval = 0,
+            .mask = BITMASK_ERR_U3,
         },
         .U4 = {
+            .id = ERR_U4,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 1,
             .interval = 0,
+            .mask = BITMASK_ERR_U4,
         },
         .watchdog = {
+            .id = ERR_WATCHDOG,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 1,
             .interval = 0,
+            .mask = BITMASK_ERR_WATCHDOG,
         },
         .debug = {
+            .id = ERR_DEBUG,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 1,
             .interval = 0,
+            .mask = BITMASK_ERR_DEBUG,
         },
         .unknown = {
+            .id = ERR_UNKNOWN,
             .value = false,
             .counter = 0,
             .timer = 0,
             .count = 1,
             .interval = 0,
+            .mask = BITMASK_ERR_UNKNOWN,
         },
     },
 };
 
-const uint16_t BITMASK_ERR_MEMORY = 0x0001;
-const uint16_t BITMASK_ERR_QUEUE = 0x0002;
-const uint16_t BITMASK_ERR_I2C = 0x0004;
-const uint16_t BITMASK_ERR_RX8900SA = 0x0008;
-const uint16_t BITMASK_ERR_U2 = 0x0010;
-const uint16_t BITMASK_ERR_U3 = 0x0020;
-const uint16_t BITMASK_ERR_U4 = 0x0040;
-const uint16_t BITMASK_ERR_WATCHDOG = 0x0080;
-const uint16_t BITMASK_ERR_DEBUG = 0x4000;
-const uint16_t BITMASK_ERR_UNKNOWN = 0x8000;
+extern queue_t queue;
 
 // NTS: SRAM_BASE is 0x20000000
 bool push(message msg) {
@@ -144,7 +166,7 @@ bool push(message msg) {
     }
 
     if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
-        set_error(ERR_QUEUE_FULL, LOGTAG, "queue full");
+        syserr_set(ERR_QUEUE_FULL, LOGTAG, "queue full");
         return false;
     }
 
@@ -152,42 +174,27 @@ bool push(message msg) {
 }
 
 _err *_find(err error) {
-    switch (error) {
-    case ERR_OK:
-        return NULL;
+    _err *errors[] = {
+        &STATE.errors.I2C,
+        &STATE.errors.queue,
+        &STATE.errors.memory,
+        &STATE.errors.RX8900SA,
+        &STATE.errors.U2,
+        &STATE.errors.U3,
+        &STATE.errors.U4,
+        &STATE.errors.watchdog,
+        &STATE.errors.debug,
+        &STATE.errors.unknown,
+    };
 
-    case ERR_I2C_GENERIC:
-        return &STATE.errors.I2C;
+    int N = sizeof(errors) / sizeof(_err *);
 
-    case ERR_I2C_TIMEOUT:
-        return &STATE.errors.I2C;
+    for (int i = 0; i < N; i++) {
+        _err *e = errors[i];
 
-    case ERR_QUEUE_FULL:
-        return &STATE.errors.queue;
-
-    case ERR_MEMORY:
-        return &STATE.errors.memory;
-
-    case ERR_RX8900SA:
-        return &STATE.errors.RX8900SA;
-
-    case ERR_U2:
-        return &STATE.errors.U2;
-
-    case ERR_U3:
-        return &STATE.errors.U3;
-
-    case ERR_U4:
-        return &STATE.errors.U4;
-
-    case ERR_WATCHDOG:
-        return &STATE.errors.watchdog;
-
-    case ERR_DEBUG:
-        return &STATE.errors.debug;
-
-    case ERR_UNKNOWN:
-        return &STATE.errors.unknown;
+        if (e->id == error) {
+            return e;
+        }
     }
 
     return NULL;
@@ -195,8 +202,7 @@ _err *_find(err error) {
 
 void syserr_tick() {
     err errors[] = {
-        ERR_I2C_GENERIC,
-        ERR_I2C_TIMEOUT,
+        ERR_I2C,
         ERR_QUEUE_FULL,
         ERR_MEMORY,
         ERR_RX8900SA,
@@ -220,7 +226,7 @@ void syserr_tick() {
     }
 }
 
-void set_error(err error, const char *tag, const char *fmt, ...) {
+void syserr_set(err error, const char *tag, const char *fmt, ...) {
     _err *e = _find(error);
 
     if (e != NULL) {
@@ -243,58 +249,38 @@ void set_error(err error, const char *tag, const char *fmt, ...) {
     }
 }
 
-bool get_error(err error) {
-    switch (error) {
-    case ERR_I2C_GENERIC:
-        return STATE.errors.I2C.value;
+bool syserr_get(err error) {
+    _err *e = _find(error);
 
-    case ERR_I2C_TIMEOUT:
-        return STATE.errors.I2C.value;
-
-    case ERR_QUEUE_FULL:
-        return STATE.errors.queue.value;
-
-    case ERR_MEMORY:
-        return STATE.errors.memory.value;
-
-    case ERR_RX8900SA:
-        return STATE.errors.RX8900SA.value;
-
-    case ERR_U2:
-        return STATE.errors.U2.value;
-
-    case ERR_U3:
-        return STATE.errors.U3.value;
-
-    case ERR_U4:
-        return STATE.errors.U4.value;
-
-    case ERR_WATCHDOG:
-        return STATE.errors.watchdog.value;
-
-    case ERR_DEBUG:
-        return STATE.errors.debug.value;
-
-    case ERR_UNKNOWN:
-        return STATE.errors.unknown.value;
+    if (e != NULL) {
+        return e->value;
     }
 
     return false;
 }
 
-uint16_t get_errors() {
-    uint16_t bits = 0x0000;
+uint16_t syserr_bitmask() {
+    _err *errors[] = {
+        &STATE.errors.I2C,
+        &STATE.errors.queue,
+        &STATE.errors.memory,
+        &STATE.errors.RX8900SA,
+        &STATE.errors.U2,
+        &STATE.errors.U3,
+        &STATE.errors.U4,
+        &STATE.errors.watchdog,
+        &STATE.errors.debug,
+        &STATE.errors.unknown,
+    };
 
-    bits |= STATE.errors.memory.value ? BITMASK_ERR_MEMORY : 0x0000;
-    bits |= STATE.errors.queue.value ? BITMASK_ERR_QUEUE : 0x0000;
-    bits |= STATE.errors.I2C.value ? BITMASK_ERR_I2C : 0x0000;
-    bits |= STATE.errors.RX8900SA.value ? BITMASK_ERR_RX8900SA : 0x0000;
-    bits |= STATE.errors.U2.value ? BITMASK_ERR_U2 : 0x0000;
-    bits |= STATE.errors.U3.value ? BITMASK_ERR_U3 : 0x0000;
-    bits |= STATE.errors.U4.value ? BITMASK_ERR_U4 : 0x0000;
-    bits |= STATE.errors.watchdog.value ? BITMASK_ERR_WATCHDOG : 0x0000;
-    bits |= STATE.errors.debug.value ? BITMASK_ERR_DEBUG : 0x0000;
-    bits |= STATE.errors.unknown.value ? BITMASK_ERR_UNKNOWN : 0x0000;
+    int N = sizeof(errors) / sizeof(_err *);
+
+    uint16_t bits = 0x0000;
+    for (int i = 0; i < N; i++) {
+        _err *e = errors[i];
+
+        bits |= e->value ? e->mask : 0x0000;
+    }
 
     //  STATE.errors.memory.value = false;
     STATE.errors.I2C.value = false;

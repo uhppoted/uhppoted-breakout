@@ -154,42 +154,42 @@ void U4_init() {
     int err;
 
     if ((err = PCAL6416A_init(U4)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error initialising (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error initialising (%d)", err);
     }
 
     if ((err = PCAL6416A_set_open_drain(U4, false, false)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error configuring PCAL6416A open drain outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error configuring PCAL6416A open drain outputs (%d)", err);
     }
 
     if ((err = PCAL6416A_set_polarity(U4, 0x0000)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error setting PCAL6416A polarity (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A polarity (%d)", err);
     }
 
     if ((err = PCAL6416A_set_latched(U4, 0x0000)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error setting PCAL6416A latches (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A latches (%d)", err);
     }
 
     if ((err = PCAL6416A_set_pullups(U4, U4_PULLUPS)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error setting PCAL6416A pullups (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A pullups (%d)", err);
     }
 
     if ((err = PCAL6416A_write(U4, (U4x.outputs ^ U4x.polarity) & MASK)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error setting PCAL6416A outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A outputs (%d)", err);
     }
 
     if ((err = PCAL6416A_set_output_drive(U4, U4_OUTPUT_DRIVE)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error setting PCAL6416A outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A outputs (%d)", err);
     }
 
     if ((err = PCAL6416A_set_configuration(U4, 0xf800)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error configuring PCAL6416A (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error configuring PCAL6416A (%d)", err);
     }
 
     uint16_t outputs;
     if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error reading PCAL6416A outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error reading PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != ((U4x.outputs ^ U4x.polarity) & MASK)) {
-        set_error(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:%04x, got:%04x", U4x.outputs, outputs);
+        syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:%04x, got:%04x", U4x.outputs, outputs);
     }
 
     mutex_init(&U4x.guard);
@@ -297,11 +297,11 @@ void U4_write(void *data) {
     int err;
 
     if ((err = PCAL6416A_write(U4, outputs & MASK)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error writing PCAL6416A outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error writing PCAL6416A outputs (%d)", err);
     } else if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error reading back PCAL6416A outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error reading back PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != (op->write.outputs & MASK)) {
-        set_error(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
+        syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
     }
 
     operation_free(op);
@@ -316,9 +316,9 @@ void U4_healthcheck(void *data) {
     int err;
 
     if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-        set_error(ERR_U4, LOGTAG, "error reading back PCAL6416A outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error reading back PCAL6416A outputs (%d)", err);
     } else if ((outputs & MASK) != (op->healthcheck.outputs & MASK)) {
-        set_error(ERR_U4, LOGTAG, "PCAL6416A healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
+        syserr_set(ERR_U4, LOGTAG, "PCAL6416A healthcheck: expected:%04x, got:%04x", op->healthcheck.outputs, outputs);
 
         if (mutex_try_enter(&U4x.guard, NULL)) {
             U4x.write = true;

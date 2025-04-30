@@ -404,20 +404,20 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    set_error(ERR_DEBUG, LOGTAG, "<<< DEBUG");
+    syserr_set(ERR_DEBUG, LOGTAG, "<<< DEBUG");
 }
 
 void state() {
-    debugf(LOGTAG, ">>> I2C      %s", (get_error(ERR_I2C_GENERIC) || get_error(ERR_I2C_TIMEOUT)) ? "error" : "ok");
-    debugf(LOGTAG, ">>> queue    %s", get_error(ERR_QUEUE_FULL) ? "error" : "ok");
-    debugf(LOGTAG, ">>> memory   %s", get_error(ERR_MEMORY) ? "error" : "ok");
-    debugf(LOGTAG, ">>> watchdog %s", get_error(ERR_WATCHDOG) ? "error" : "ok");
-    debugf(LOGTAG, ">>> RTC      %s", get_error(ERR_RX8900SA) ? "error" : "ok");
-    debugf(LOGTAG, ">>> U2       %s", get_error(ERR_U2) ? "error" : "ok");
-    debugf(LOGTAG, ">>> U3       %s", get_error(ERR_U3) ? "error" : "ok");
-    debugf(LOGTAG, ">>> U4       %s", get_error(ERR_U4) ? "error" : "ok");
-    debugf(LOGTAG, ">>> debug    %s", get_error(ERR_DEBUG) ? "error" : "ok");
-    debugf(LOGTAG, ">>> other    %s", get_error(ERR_UNKNOWN) ? "error" : "ok");
+    debugf(LOGTAG, ">>> I2C      %s", syserr_get(ERR_I2C) ? "error" : "ok");
+    debugf(LOGTAG, ">>> queue    %s", syserr_get(ERR_QUEUE_FULL) ? "error" : "ok");
+    debugf(LOGTAG, ">>> memory   %s", syserr_get(ERR_MEMORY) ? "error" : "ok");
+    debugf(LOGTAG, ">>> watchdog %s", syserr_get(ERR_WATCHDOG) ? "error" : "ok");
+    debugf(LOGTAG, ">>> RTC      %s", syserr_get(ERR_RX8900SA) ? "error" : "ok");
+    debugf(LOGTAG, ">>> U2       %s", syserr_get(ERR_U2) ? "error" : "ok");
+    debugf(LOGTAG, ">>> U3       %s", syserr_get(ERR_U3) ? "error" : "ok");
+    debugf(LOGTAG, ">>> U4       %s", syserr_get(ERR_U4) ? "error" : "ok");
+    debugf(LOGTAG, ">>> debug    %s", syserr_get(ERR_DEBUG) ? "error" : "ok");
+    debugf(LOGTAG, ">>> other    %s", syserr_get(ERR_UNKNOWN) ? "error" : "ok");
 }
 
 void get_ID() {

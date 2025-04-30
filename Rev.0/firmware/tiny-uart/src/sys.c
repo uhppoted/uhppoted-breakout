@@ -74,7 +74,7 @@ bool sys_init() {
  *
  */
 void sys_tick() {
-    uint16_t errors = get_errors();
+    uint16_t errors = syserr_bitmask();
 
     sys.LED.LED = !sys.LED.LED;
 

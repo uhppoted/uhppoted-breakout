@@ -154,7 +154,7 @@ void RTC_read(void *data) {
         int err;
 
         if ((err = RX8900SA_get_datetime(U5, &year, &month, &day, &hour, &minute, &second, &weekday)) != ERR_OK) {
-            set_error(ERR_RX8900SA, LOGTAG, "get-datetime error %d", err);
+            syserr_set(ERR_RX8900SA, LOGTAG, "get-datetime error %d", err);
         } else {
             mutex_enter_blocking(&RTC.guard);
             RTC.year = year;

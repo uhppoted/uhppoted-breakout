@@ -42,8 +42,7 @@ extern const struct I2C U5;
 typedef enum {
     ERR_OK,
     ERR_MEMORY,
-    ERR_I2C_GENERIC,
-    ERR_I2C_TIMEOUT,
+    ERR_I2C,
     ERR_QUEUE_FULL,
     ERR_RX8900SA,
     ERR_U2,
@@ -79,6 +78,6 @@ typedef struct message {
 } message;
 
 bool push(message m);
-void set_error(err e, const char *tag, const char *fmt, ...);
-bool get_error(err e);
-uint16_t get_errors();
+void syserr_set(err e, const char *tag, const char *fmt, ...);
+bool syserr_get(err e);
+uint16_t syserr_bitmask();

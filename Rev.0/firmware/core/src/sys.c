@@ -162,8 +162,8 @@ void syscheck() {
     uint32_t available = get_free_heap();
     float used = 1.0 - ((float)available / (float)heap);
 
-    if (used > 0.5 && !get_error(ERR_MEMORY)) {
-        set_error(ERR_MEMORY, LOGTAG, "memory usage %d%%", (int)(100.0 * used));
+    if (used > 0.5 && !syserr_get(ERR_MEMORY)) {
+        syserr_set(ERR_MEMORY, LOGTAG, "memory usage %d%%", (int)(100.0 * used));
     }
 
     // ... kick watchdog
@@ -190,11 +190,11 @@ void sys_trace() {
     int64_t delta = absolute_time_diff_us(SYSTEM.trace.touched, now) / 1000;
 
     if (interval > 0 && delta >= interval) {
-        uint16_t errors = get_errors();
+        uint16_t errors = syserr_bitmask();
         uint32_t heap = get_total_heap();
         uint32_t available = get_free_heap();
         float used = 1.0 - ((float)available / (float)heap);
-        const char *watchdogged = get_error(ERR_WATCHDOG) ? "** watchdog **" : "";
+        const char *watchdogged = syserr_get(ERR_WATCHDOG) ? "** watchdog **" : "";
 
         debugf(LOGTAG, "ticks:%-5u queue:%u  I2C0:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
                SYSTEM.ticks,
