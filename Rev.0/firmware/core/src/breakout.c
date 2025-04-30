@@ -10,8 +10,10 @@ extern queue_t queue;
 
 typedef struct _err {
     bool value;
-    uint16_t logged;
-    uint16_t logcount;
+    uint16_t counter;
+    uint16_t timer;
+    uint16_t count;
+    uint16_t interval;
 } _err;
 
 typedef struct _state {
@@ -33,53 +35,73 @@ _state STATE = {
     .errors = {
         .queue = {
             .value = false,
-            .logged = 0,
-            .logcount = 25,
+            .counter = 0,
+            .timer = 0,
+            .count = 25,
+            .interval = 15,
         },
         .memory = {
             .value = false,
-            .logged = 0,
-            .logcount = 25,
+            .counter = 0,
+            .timer = 0,
+            .count = 25,
+            .interval = 15,
         },
         .I2C = {
             .value = false,
-            .logged = 0,
-            .logcount = 1,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
         },
         .RX8900SA = {
             .value = false,
-            .logged = 0,
-            .logcount = 1,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
         },
         .U2 = {
             .value = false,
-            .logged = 0,
-            .logcount = 1,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
         },
         .U3 = {
             .value = false,
-            .logged = 0,
-            .logcount = 1,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
         },
         .U4 = {
             .value = false,
-            .logged = 0,
-            .logcount = 1,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
         },
         .watchdog = {
             .value = false,
-            .logged = 0,
-            .logcount = 1,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
         },
         .debug = {
             .value = false,
-            .logged = 0,
-            .logcount = 1,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
         },
         .unknown = {
             .value = false,
-            .logged = 0,
-            .logcount = 1,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
         },
     },
 };
@@ -163,7 +185,6 @@ _err *_find(err error) {
 
     case ERR_DEBUG:
         return &STATE.errors.debug;
-        break;
 
     case ERR_UNKNOWN:
         return &STATE.errors.unknown;
@@ -172,15 +193,44 @@ _err *_find(err error) {
     return NULL;
 }
 
+void syserr_tick() {
+    err errors[] = {
+        ERR_I2C_GENERIC,
+        ERR_I2C_TIMEOUT,
+        ERR_QUEUE_FULL,
+        ERR_MEMORY,
+        ERR_RX8900SA,
+        ERR_U2,
+        ERR_U3,
+        ERR_U4,
+        ERR_WATCHDOG,
+        ERR_DEBUG,
+        ERR_UNKNOWN,
+    };
+
+    int N = sizeof(errors) / sizeof(err);
+
+    for (int i = 0; i < N; i++) {
+        _err *e = _find(errors[i]);
+        if (e != NULL) {
+            if (e->timer > 0) {
+                e->timer--;
+            }
+        }
+    }
+}
+
 void set_error(err error, const char *tag, const char *fmt, ...) {
     _err *e = _find(error);
 
     if (e != NULL) {
-        bool loggable = e->logged == 0;
         e->value = true;
-        e->logged = (e->logged + 1) % e->logcount;
 
+        bool loggable = (e->counter == 0) && (e->timer == 0);
         if (loggable) {
+            e->counter = (e->counter + 1) % e->count;
+            e->timer = e->interval;
+
             char msg[64];
 
             va_list args;

@@ -24,8 +24,6 @@
 #define LOGTAG "SYS"
 #define PRINT_QUEUE_SIZE 64
 
-extern queue_t queue;
-
 extern const char *TERMINAL_QUERY_STATUS;
 const int32_t FLUSH = 1000;              // ms
 const uint32_t MODE_CLI_TIMEOUT = 15000; // ms
@@ -45,10 +43,14 @@ const uint32_t MSG_LOG = 0xd0000000;
 const uint32_t MSG_WATCHDOG = 0xe0000000;
 const uint32_t MSG_TICK = 0xf0000000;
 
+extern queue_t queue;
+
 extern struct {
     queue_t queue;
     mutex_t guard;
 } I2C0;
+
+extern void syserr_tick();
 
 struct {
     repeating_timer_t timer;
@@ -135,6 +137,7 @@ bool _tick(repeating_timer_t *t) {
     };
 
     push(qmsg);
+    syserr_tick();
 
     return true;
 }

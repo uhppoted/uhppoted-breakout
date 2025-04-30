@@ -14,7 +14,7 @@
 - [ ] syserror
       - [x] log once on occurrence
       - [x] log every N occurrences
-      - [ ] log after interval
+      - [x] log after interval
       - [ ] reset error after interval/count
 
 - [ ] make debugf, infof, etc interrupt safe
