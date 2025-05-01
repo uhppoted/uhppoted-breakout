@@ -24,6 +24,8 @@ type RPC struct {
 		network string
 		address string
 	}
+
+	onEvent func(event any)
 }
 
 type KV struct {
@@ -40,10 +42,12 @@ type Event struct {
 	Value     any
 }
 
-func NewRPC(dial string, listen string) (*RPC, error) {
+func NewRPC(dial string, listen string, onEvent func(event any)) (*RPC, error) {
 	infof("init dial:%v", dial)
 
-	r := RPC{}
+	r := RPC{
+		onEvent: onEvent,
+	}
 
 	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(dial); len(matches) < 3 {
 		return nil, fmt.Errorf("invalid RPC 'dial' address (%v)", dial)
@@ -124,6 +128,12 @@ func (r RPC) set(oid scmp.OID, value any) (any, error) {
 
 func (r *RPC) Trap(event Event, reply *any) error {
 	debugf("trap %v", event)
+
+	if r.onEvent != nil {
+		go func() {
+			r.onEvent(event)
+		}()
+	}
 
 	*reply = true
 

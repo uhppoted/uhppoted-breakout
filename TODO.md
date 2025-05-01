@@ -11,7 +11,7 @@
 
 ### misc
 
-- [ ] syserror
+- [x] syserror
       - [x] log once on occurrence
       - [x] log every N occurrences
       - [x] log after interval
@@ -19,8 +19,9 @@
             - [x] CLI
             - [x] MIB::get
             - [x] MIB::set
-      - rework MIB get/set_door_xxx to use OID
 
+- [ ] rework MIB get/set_door_xxx to use OID
+- [ ] CLI up arrow for 'last command'
 - [ ] software RTC
       - [ ] use hardware counter/timer
       - (?) PID
@@ -32,8 +33,6 @@
 
 - [ ] Rework print queue
       - (?) setvbuf
-
-- [ ] CLI up arrow for 'last command'
 
 - [ ] USB
     - [ ] picotool reset
@@ -59,6 +58,7 @@
           - [ ] event item value
           - [ ] UDP event
           - [ ] store to SQLite DB
+          - [ ] rpcd::shutdown RPC listener
           - flush SSMP::write on connected
           - (?) queue if rpcd is not connected
 
