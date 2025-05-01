@@ -413,7 +413,7 @@ void debug() {
 
 void show_state() {
     infof(LOGTAG, ">>> I2C      %s", syserr_get(ERR_I2C) ? "error" : "ok");
-    infof(LOGTAG, ">>> queue    %s", syserr_get(ERR_QUEUE_FULL) ? "error" : "ok");
+    infof(LOGTAG, ">>> queue    %s", syserr_get(ERR_QUEUE) ? "error" : "ok");
     infof(LOGTAG, ">>> memory   %s", syserr_get(ERR_MEMORY) ? "error" : "ok");
     infof(LOGTAG, ">>> watchdog %s", syserr_get(ERR_WATCHDOG) ? "error" : "ok");
     infof(LOGTAG, ">>> RTC      %s", syserr_get(ERR_RX8900SA) ? "error" : "ok");
@@ -427,7 +427,7 @@ void show_state() {
 void clear_errors() {
     err errors[] = {
         ERR_I2C,
-        ERR_QUEUE_FULL,
+        ERR_QUEUE,
         ERR_MEMORY,
         ERR_RX8900SA,
         ERR_U2,

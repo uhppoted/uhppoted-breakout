@@ -58,7 +58,7 @@ void I2C0_run() {
 
 bool I2C0_push(const closure *v) {
     if (queue_is_full(&I2C0.queue) || !queue_try_add(&I2C0.queue, v)) {
-        syserr_set(ERR_QUEUE_FULL, LOGTAG, "push: queue full");
+        syserr_set(ERR_QUEUE, LOGTAG, "push: queue full");
         return false;
     }
 

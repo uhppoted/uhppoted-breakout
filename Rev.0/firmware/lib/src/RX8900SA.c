@@ -152,7 +152,7 @@ int RX8900SA_init(I2C dev) {
 
     if ((flag & VLF) == VLF) {
         warnf("RX8900SA", "power on VLF set");
-        return ERR_VLF;
+        return ERR_RX8900SA_VLF;
     }
 
     infof("RX8900SA", "power on ok");

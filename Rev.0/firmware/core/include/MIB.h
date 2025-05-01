@@ -7,8 +7,8 @@
 typedef struct MIBItem {
     uint32_t hash;
     const char *OID;
-    int64_t (*get)(value *);
-    int64_t (*set)(const value, value *);
+    int64_t (*get)(const char *OID, value *);
+    int64_t (*set)(const char *OID, const value, value *);
 } MIBItem;
 
 extern const MIBItem MIB_SYS_BOARD_ID;
@@ -17,6 +17,16 @@ extern const MIBItem MIB_CONTROLLER_VERSION;
 extern const MIBItem MIB_CONTROLLER_RELEASED;
 extern const MIBItem MIB_CONTROLLER_DATETIME;
 extern const MIBItem MIB_CONTROLLER_SYSERROR;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_MEMORY;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_I2C;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_QUEUE;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_RX8900SA;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_U2;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_U3;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_U4;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_WATCHDOG;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_DEBUG;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_UNKNOWN;
 extern const MIBItem MIB_CONTROLLER_SYSINFO;
 extern const MIBItem MIB_DOORS_1_MODE;
 extern const MIBItem MIB_DOORS_2_MODE;
@@ -41,4 +51,4 @@ extern const MIBItem MIB_DOORS_4_BUTTON;
 extern const MIBItem MIB_ALARMS_TAMPER_DETECT;
 extern const MIBItem MIB_ALARMS_FIRE_ALARM;
 
-extern const MIBItem OIDs[29];
+extern const MIBItem OIDs[39];

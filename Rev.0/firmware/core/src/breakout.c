@@ -45,7 +45,7 @@ typedef struct _state {
 _state STATE = {
     .errors = {
         .queue = {
-            .id = ERR_QUEUE_FULL,
+            .id = ERR_QUEUE,
             .value = false,
             .counter = 0,
             .timer = 0,
@@ -166,7 +166,7 @@ bool push(message msg) {
     }
 
     if (queue_is_full(&queue) || !queue_try_add(&queue, &m)) {
-        syserr_set(ERR_QUEUE_FULL, LOGTAG, "queue full");
+        syserr_set(ERR_QUEUE, LOGTAG, "queue full");
         return false;
     }
 
@@ -203,7 +203,7 @@ _err *_find(err error) {
 void syserr_tick() {
     err errors[] = {
         ERR_I2C,
-        ERR_QUEUE_FULL,
+        ERR_QUEUE,
         ERR_MEMORY,
         ERR_RX8900SA,
         ERR_U2,

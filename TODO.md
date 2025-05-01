@@ -17,7 +17,9 @@
       - [x] log after interval
       - [x] syserr_clear()
             - [x] CLI
-            - MIB
+            - [x] MIB::get
+            - [x] MIB::set
+      - rework MIB get/set_door_xxx to use OID
 
 - [ ] software RTC
       - [ ] use hardware counter/timer

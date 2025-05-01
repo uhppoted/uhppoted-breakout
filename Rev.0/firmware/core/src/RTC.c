@@ -61,7 +61,7 @@ void RTC_init() {
     if ((err = RX8900SA_init(U5)) == ERR_OK) {
         RTC.initialised = true;
         RTC.ready = false;
-    } else if (err == ERR_VLF) {
+    } else if (err == ERR_RX8900SA_VLF) {
         RTC.initialised = false;
         RTC.ready = false;
 

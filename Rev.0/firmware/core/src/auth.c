@@ -12,7 +12,7 @@ typedef struct community {
 } community;
 
 const struct {
-    MIBItem const *get[28];
+    MIBItem const *get[38];
     MIBItem const *set[9];
 } PUBLIC = {
     .get = {
@@ -21,6 +21,16 @@ const struct {
         &MIB_CONTROLLER_RELEASED,
         &MIB_CONTROLLER_DATETIME,
         &MIB_CONTROLLER_SYSERROR,
+        &MIB_CONTROLLER_SYSERROR_MEMORY,
+        &MIB_CONTROLLER_SYSERROR_I2C,
+        &MIB_CONTROLLER_SYSERROR_QUEUE,
+        &MIB_CONTROLLER_SYSERROR_RX8900SA,
+        &MIB_CONTROLLER_SYSERROR_U2,
+        &MIB_CONTROLLER_SYSERROR_U3,
+        &MIB_CONTROLLER_SYSERROR_U4,
+        &MIB_CONTROLLER_SYSERROR_WATCHDOG,
+        &MIB_CONTROLLER_SYSERROR_DEBUG,
+        &MIB_CONTROLLER_SYSERROR_UNKNOWN,
         &MIB_CONTROLLER_SYSINFO,
 
         &MIB_DOORS_1_MODE,
