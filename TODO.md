@@ -54,6 +54,12 @@
     - [ ] TRAP
           - [x] translate timestamp to DateTime
           - [x] use rtcd time if timestamp is invalid
+          - [ ] memory leak
+```
+          DEBUG  SYS        ticks:1582  queue:1  I2C0:0  total heap:241444  free heap:237064  used:1.8%  errors:0000
+          DEBUG  SYS        ticks:1592  queue:0  I2C0:0  total heap:241444  free heap:236808  used:1.9%  errors:0000
+          DEBUG  SYS        ticks:1745  queue:0  I2C0:0  total heap:241444  free heap:236552  used:2.0%  errors:0000
+```
           - [ ] event item OID
           - [ ] event item value
           - [ ] UDP event
