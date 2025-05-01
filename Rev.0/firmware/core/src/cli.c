@@ -59,7 +59,8 @@ void blink_LED(const char *led);
 void get_doors();
 void get_buttons();
 
-void state();
+void show_state();
+void clear_errors();
 void scan();
 void trace(const char *interval);
 void reboot(bool);
@@ -140,7 +141,8 @@ const char *HELP[] = {
     "  get doors",
     "  get buttons",
     "",
-    "  state",
+    "  show state",
+    "  clear errors",
     "  scan",
     "  trace <off|on|[0-300]>",
     "  reboot",
@@ -382,8 +384,10 @@ void exec(char *cmd) {
         get_doors();
     } else if (strncasecmp(cmd, "get buttons", 11) == 0) {
         get_buttons();
-    } else if (strncasecmp(cmd, "state", 5) == 0) {
-        state();
+    } else if (strncasecmp(cmd, "show state", 10) == 0) {
+        show_state();
+    } else if (strncasecmp(cmd, "clear errors", 12) == 0) {
+        clear_errors();
     } else if (strncasecmp(cmd, "scan", 4) == 0) {
         scan();
     } else if (strncasecmp(cmd, "trace ", 6) == 0) {
@@ -407,17 +411,38 @@ void debug() {
     syserr_set(ERR_DEBUG, LOGTAG, "<<< DEBUG");
 }
 
-void state() {
-    debugf(LOGTAG, ">>> I2C      %s", syserr_get(ERR_I2C) ? "error" : "ok");
-    debugf(LOGTAG, ">>> queue    %s", syserr_get(ERR_QUEUE_FULL) ? "error" : "ok");
-    debugf(LOGTAG, ">>> memory   %s", syserr_get(ERR_MEMORY) ? "error" : "ok");
-    debugf(LOGTAG, ">>> watchdog %s", syserr_get(ERR_WATCHDOG) ? "error" : "ok");
-    debugf(LOGTAG, ">>> RTC      %s", syserr_get(ERR_RX8900SA) ? "error" : "ok");
-    debugf(LOGTAG, ">>> U2       %s", syserr_get(ERR_U2) ? "error" : "ok");
-    debugf(LOGTAG, ">>> U3       %s", syserr_get(ERR_U3) ? "error" : "ok");
-    debugf(LOGTAG, ">>> U4       %s", syserr_get(ERR_U4) ? "error" : "ok");
-    debugf(LOGTAG, ">>> debug    %s", syserr_get(ERR_DEBUG) ? "error" : "ok");
-    debugf(LOGTAG, ">>> other    %s", syserr_get(ERR_UNKNOWN) ? "error" : "ok");
+void show_state() {
+    infof(LOGTAG, ">>> I2C      %s", syserr_get(ERR_I2C) ? "error" : "ok");
+    infof(LOGTAG, ">>> queue    %s", syserr_get(ERR_QUEUE_FULL) ? "error" : "ok");
+    infof(LOGTAG, ">>> memory   %s", syserr_get(ERR_MEMORY) ? "error" : "ok");
+    infof(LOGTAG, ">>> watchdog %s", syserr_get(ERR_WATCHDOG) ? "error" : "ok");
+    infof(LOGTAG, ">>> RTC      %s", syserr_get(ERR_RX8900SA) ? "error" : "ok");
+    infof(LOGTAG, ">>> U2       %s", syserr_get(ERR_U2) ? "error" : "ok");
+    infof(LOGTAG, ">>> U3       %s", syserr_get(ERR_U3) ? "error" : "ok");
+    infof(LOGTAG, ">>> U4       %s", syserr_get(ERR_U4) ? "error" : "ok");
+    infof(LOGTAG, ">>> debug    %s", syserr_get(ERR_DEBUG) ? "error" : "ok");
+    infof(LOGTAG, ">>> other    %s", syserr_get(ERR_UNKNOWN) ? "error" : "ok");
+}
+
+void clear_errors() {
+    err errors[] = {
+        ERR_I2C,
+        ERR_QUEUE_FULL,
+        ERR_MEMORY,
+        ERR_RX8900SA,
+        ERR_U2,
+        ERR_U3,
+        ERR_U4,
+        ERR_WATCHDOG,
+        ERR_DEBUG,
+        ERR_UNKNOWN,
+    };
+
+    int N = sizeof(errors) / sizeof(err);
+
+    for (int i = 0; i < N; i++) {
+        syserr_clear(errors[i]);
+    }
 }
 
 void get_ID() {

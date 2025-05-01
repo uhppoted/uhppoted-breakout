@@ -31,6 +31,10 @@
 ### SYS, ERR and IN LEDs
 1. (+5V - D5 - D6)/1k = (+5V - 0.6 - 0.6)/1k = 3.8mA
 
+### References
+1. https://www.cnx-software.com/2021/12/09/raspberry-pi-zero-2-w-power-consumption
+2. https://raspi.tv/2017/how-much-power-does-pi-zero-w-use
+
 
 ## PCAL6408APW
 

@@ -16,8 +16,6 @@
     - https://www.aliexpress.com/item/1195743182.htm
 11. https://electronics.stackexchange.com/questions/1849/is-there-a-correct-resistance-value-for-i2c-pull-up-resistors
 12. https://learn.sparkfun.com/tutorials/micromod-rp2040-processor-board-hookup-guide/all#introduction
-
-
 13. https://pmdway.com/products/soic24-tssop24-to-dip-adaptor-pcbs-10-pack
 14. https://www.aliexpress.com/item/2039729656.html
 15. https://www.mouser.ca/ProductDetail/TE-Connectivity/2-2316108-0
@@ -57,7 +55,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - https://github.com/ARM-software/CMSIS_5/issues/177
 - https://www.reddit.com/r/embedded/comments/9uvogb/freertos_malloc_and_c_standard_library/
 
-
 > No, it is not thread-safe. There may actually be a malloc_lock() and malloc_unlock() function available in your
 > C library. I know that these exist for the Newlib library. I had to use this to implement a mutex for my
 > processor, which is multi-threaded in hardware.
@@ -77,7 +74,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
    - https://raspberrypi.stackexchange.com/questions/132758/what-is-the-pico-max-spi-frequency
    - https://github.com/espressif/esp-idf/issues/4810
    - https://forums.raspberrypi.com/viewtopic.php?t=30052
-
    - https://forums.raspberrypi.com/viewtopic.php?t=324252
    - https://github.com/raspberrypi/pico-examples/tree/master/spi/spi_dma
    - https://forums.raspberrypi.com/viewtopic.php?t=338108
@@ -129,7 +125,6 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 3. https://forums.raspberrypi.com/viewtopic.php?t=316853
 
 ## RTC
-
 `rtc_set_datetime` always increments the second i.e. `rtc_set_datetime` followed by `rtc_get_datetime` will always
 return a date/time that is a second after the _set_ datetime.
 
@@ -138,10 +133,21 @@ return a date/time that is a second after the _set_ datetime.
 3. https://forums.raspberrypi.com/viewtopic.php?t=348730
 4. https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#group_pico_aon_timer
 
-
 # printf
 1. https://github.com/picolibc/picolibc/blob/main/doc/printf.md
 2. https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
 3. https://github.com/LukeShu/pico-fmt
 4. https://popovicu.com/posts/bare-metal-printf
 
+## I2C
+1. pullups
+   - https://electronics.stackexchange.com/questions/1849/is-there-a-correct-resistance-value-for-i2c-pull-up-resistors
+   - https://www.ti.com/lit/an/slva689/slva689.pdf
+   - https://www.edn.com/design-calculations-for-robust-i2c-communications/
+
+## Miscellaneous
+1. DC-DC converter modules:
+   - https://www.sparkfun.com/products/18375
+   - https://www.adafruit.com/product/1065
+   - https://www.adafruit.com/product/4739
+   - https://www.adafruit.com/product/1385

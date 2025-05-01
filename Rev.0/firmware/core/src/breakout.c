@@ -49,7 +49,7 @@ _state STATE = {
             .value = false,
             .counter = 0,
             .timer = 0,
-            .count = 25,
+            .count = 64,
             .interval = 15,
             .mask = BITMASK_ERR_QUEUE,
         },
@@ -58,7 +58,7 @@ _state STATE = {
             .value = false,
             .counter = 0,
             .timer = 0,
-            .count = 25,
+            .count = 64,
             .interval = 15,
             .mask = BITMASK_ERR_MEMORY,
         },
@@ -252,11 +252,15 @@ void syserr_set(err error, const char *tag, const char *fmt, ...) {
 bool syserr_get(err error) {
     _err *e = _find(error);
 
-    if (e != NULL) {
-        return e->value;
-    }
+    return e != NULL ? e->value : false;
+}
 
-    return false;
+void syserr_clear(err error) {
+    _err *e = _find(error);
+
+    if (e != NULL) {
+        e->value = false;
+    }
 }
 
 uint16_t syserr_bitmask() {
@@ -281,17 +285,5 @@ uint16_t syserr_bitmask() {
 
         bits |= e->value ? e->mask : 0x0000;
     }
-
-    //  STATE.errors.memory.value = false;
-    STATE.errors.I2C.value = false;
-    STATE.errors.queue.value = false;
-    STATE.errors.RX8900SA.value = false;
-    STATE.errors.U2.value = false;
-    STATE.errors.U3.value = false;
-    STATE.errors.U4.value = false;
-    //  STATE.errors.watchdog.value = false;
-    //  STATE.errors.debug.value = false;
-    STATE.errors.unknown.value = false;
-
     return bits;
 }

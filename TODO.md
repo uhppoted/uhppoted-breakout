@@ -15,9 +15,14 @@
       - [x] log once on occurrence
       - [x] log every N occurrences
       - [x] log after interval
-      - [ ] syserr_reset()
-            - CLI
+      - [x] syserr_clear()
+            - [x] CLI
             - MIB
+
+- [ ] software RTC
+      - [ ] use hardware counter/timer
+      - (?) PID
+      - (?) Kalman filter
 
 - [ ] make debugf, infof, etc interrupt safe
       - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
@@ -46,9 +51,13 @@
 
 ### SSMP
     - [ ] TRAP
+          - [x] translate timestamp to DateTime
+          - [x] use rtcd time if timestamp is invalid
+          - [ ] event item OID
+          - [ ] event item value
+          - [ ] UDP event
+          - [ ] store to SQLite DB
           - flush SSMP::write on connected
-          - translate timestamp to DateTime
-          - use rtcd time if timestamp is invalid
           - (?) queue if rpcd is not connected
 
     - [ ] set-door
@@ -58,7 +67,6 @@
 
     - [ ] GET: multiple OIDs
     - [ ] MIB_find (returns const *MIBItem)
-    - [ ] PID/Kalman filter for software-rtc
     - (?) queue UART write
 
 ## Zero2W
@@ -168,17 +176,6 @@
 4. https://en.wikipedia.org/wiki/Zero-configuration_networking
 5. https://learn.sparkfun.com/tutorials/micromod-rp2040-processor-board-hookup-guide/all#introduction
 6. https://www.proto-advantage.com/store/product_info.php?products_id=2200040
-7. I2C pullups
-      - https://electronics.stackexchange.com/questions/1849/is-there-a-correct-resistance-value-for-i2c-pull-up-resistors
-      - https://www.ti.com/lit/an/slva689/slva689.pdf
-      - https://www.edn.com/design-calculations-for-robust-i2c-communications/
-8. https://www.cnx-software.com/2021/12/09/raspberry-pi-zero-2-w-power-consumption
-9. https://raspi.tv/2017/how-much-power-does-pi-zero-w-use
-10. DC-DC converter modules:
-    - https://www.sparkfun.com/products/18375
-    - https://www.adafruit.com/product/1065
-    - https://www.adafruit.com/product/4739
-    - https://www.adafruit.com/product/1385
 11. https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/
 12. External flash
     - https://mcuoneclipse.com/2022/12/04/add-extra-storage-to-the-raspberry-pi-pico-with-w25q128-and-littlefs

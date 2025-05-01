@@ -80,4 +80,5 @@ typedef struct message {
 bool push(message m);
 void syserr_set(err e, const char *tag, const char *fmt, ...);
 bool syserr_get(err e);
+void syserr_clear(err e);
 uint16_t syserr_bitmask();
