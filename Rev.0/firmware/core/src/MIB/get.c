@@ -16,6 +16,8 @@ extern const int64_t SSMP_ERROR_NONE;
 extern const int64_t SSMP_ERROR_NO_SUCH_OBJECT;
 extern const int64_t SSMP_ERROR_NO_ACCESS;
 
+extern bool equal(const char *OID, const MIBItem oid);
+
 int64_t MIB_get(const char *OID, value *v) {
     uint32_t hash = djb2(OID);
 
@@ -111,79 +113,77 @@ int64_t MIB_get_controller_datetime(const char *OID, value *v) {
 }
 
 int64_t MIB_get_controller_syserror(const char *OID, value *v) {
-    uint32_t hash = djb2(OID);
-
-    if ((hash == MIB_CONTROLLER_SYSERROR.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR)) {
         v->tag = VALUE_UINT16;
         v->integer = (uint16_t)syserr_bitmask();
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_MEMORY.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_MEMORY.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_MEMORY)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_MEMORY);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_I2C.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_I2C.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_I2C)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_I2C);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_QUEUE.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_QUEUE.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_QUEUE)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_QUEUE);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_RX8900SA.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_RX8900SA.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_RX8900SA)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_RX8900SA);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_U2.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_U2.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_U2)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_U2);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_U3.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_U3.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_U3)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_U3);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_U4.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_U4.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_U4)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_U4);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_WATCHDOG.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_WATCHDOG.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_WATCHDOG)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_WATCHDOG);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_DEBUG.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_DEBUG.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_DEBUG)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_DEBUG);
 
         return SSMP_ERROR_NONE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR_DEBUG.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_DEBUG.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR_DEBUG)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = syserr_get(ERR_DEBUG);
 
@@ -202,8 +202,19 @@ int64_t MIB_get_controller_sysinfo(const char *OID, value *v) {
     return SSMP_ERROR_NONE;
 }
 
-int64_t get_door_mode(uint8_t door, value *v) {
+int64_t MIB_get_door_mode(const char *OID, value *v) {
+    uint8_t door;
     uint8_t mode;
+
+    if (equal(OID, MIB_DOORS_1_MODE)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOORS_2_MODE)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOORS_3_MODE)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOORS_4_MODE)) {
+        door = 4;
+    }
 
     if (doors_get_mode(door, &mode)) {
         v->tag = VALUE_UINT8;
@@ -214,8 +225,19 @@ int64_t get_door_mode(uint8_t door, value *v) {
     return SSMP_ERROR_NO_ACCESS;
 }
 
-int64_t get_door_delay(uint8_t door, value *v) {
+int64_t MIB_get_door_delay(const char *OID, value *v) {
+    uint8_t door;
     uint8_t delay;
+
+    if (equal(OID, MIB_DOORS_1_DELAY)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOORS_2_DELAY)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOORS_3_DELAY)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOORS_4_DELAY)) {
+        door = 4;
+    }
 
     if (doors_get_delay(door, &delay)) {
         v->tag = VALUE_UINT8;
@@ -226,8 +248,19 @@ int64_t get_door_delay(uint8_t door, value *v) {
     return SSMP_ERROR_NO_ACCESS;
 }
 
-int64_t get_door_unlocked(uint8_t door, value *v) {
+int64_t MIB_get_door_unlocked(const char *OID, value *v) {
+    uint8_t door;
     bool unlocked;
+
+    if (equal(OID, MIB_DOORS_1_UNLOCKED)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOORS_2_UNLOCKED)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOORS_3_UNLOCKED)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOORS_4_UNLOCKED)) {
+        door = 4;
+    }
 
     if (doors_get_unlocked(door, &unlocked)) {
         v->tag = VALUE_BOOLEAN;
@@ -238,8 +271,19 @@ int64_t get_door_unlocked(uint8_t door, value *v) {
     return SSMP_ERROR_NO_ACCESS;
 }
 
-int64_t get_door_open(uint8_t door, value *v) {
+int64_t MIB_get_door_open(const char *OID, value *v) {
+    uint8_t door;
     bool open;
+
+    if (equal(OID, MIB_DOORS_1_OPEN)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOORS_2_OPEN)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOORS_3_OPEN)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOORS_4_OPEN)) {
+        door = 4;
+    }
 
     if (doors_get_open(door, &open)) {
         v->tag = VALUE_BOOLEAN;
@@ -250,8 +294,19 @@ int64_t get_door_open(uint8_t door, value *v) {
     return SSMP_ERROR_NO_ACCESS;
 }
 
-int64_t get_door_pushbutton(uint8_t door, value *v) {
+int64_t MIB_get_door_pushbutton(const char *OID, value *v) {
+    uint8_t door;
     bool pressed;
+
+    if (equal(OID, MIB_DOORS_1_BUTTON)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOORS_2_BUTTON)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOORS_3_BUTTON)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOORS_4_BUTTON)) {
+        door = 4;
+    }
 
     if (doors_get_pushbutton(door, &pressed)) {
         v->tag = VALUE_BOOLEAN;
@@ -260,86 +315,6 @@ int64_t get_door_pushbutton(uint8_t door, value *v) {
     }
 
     return SSMP_ERROR_NO_ACCESS;
-}
-
-int64_t MIB_get_door_1_mode(const char *OID, value *v) {
-    return get_door_mode(1, v);
-}
-
-int64_t MIB_get_door_2_mode(const char *OID, value *v) {
-    return get_door_mode(2, v);
-}
-
-int64_t MIB_get_door_3_mode(const char *OID, value *v) {
-    return get_door_mode(3, v);
-}
-
-int64_t MIB_get_door_4_mode(const char *OID, value *v) {
-    return get_door_mode(4, v);
-}
-
-int64_t MIB_get_door_1_delay(const char *OID, value *v) {
-    return get_door_delay(1, v);
-}
-
-int64_t MIB_get_door_2_delay(const char *OID, value *v) {
-    return get_door_delay(2, v);
-}
-
-int64_t MIB_get_door_3_delay(const char *OID, value *v) {
-    return get_door_delay(3, v);
-}
-
-int64_t MIB_get_door_4_delay(const char *OID, value *v) {
-    return get_door_delay(4, v);
-}
-
-int64_t MIB_get_door_1_unlocked(const char *OID, value *v) {
-    return get_door_unlocked(1, v);
-}
-
-int64_t MIB_get_door_2_unlocked(const char *OID, value *v) {
-    return get_door_unlocked(2, v);
-}
-
-int64_t MIB_get_door_3_unlocked(const char *OID, value *v) {
-    return get_door_unlocked(3, v);
-}
-
-int64_t MIB_get_door_4_unlocked(const char *OID, value *v) {
-    return get_door_unlocked(4, v);
-}
-
-int64_t MIB_get_door_1_open(const char *OID, value *v) {
-    return get_door_open(1, v);
-}
-
-int64_t MIB_get_door_2_open(const char *OID, value *v) {
-    return get_door_open(2, v);
-}
-
-int64_t MIB_get_door_3_open(const char *OID, value *v) {
-    return get_door_open(3, v);
-}
-
-int64_t MIB_get_door_4_open(const char *OID, value *v) {
-    return get_door_open(4, v);
-}
-
-int64_t MIB_get_door_1_pushbutton(const char *OID, value *v) {
-    return get_door_pushbutton(1, v);
-}
-
-int64_t MIB_get_door_2_pushbutton(const char *OID, value *v) {
-    return get_door_pushbutton(2, v);
-}
-
-int64_t MIB_get_door_3_pushbutton(const char *OID, value *v) {
-    return get_door_pushbutton(3, v);
-}
-
-int64_t MIB_get_door_4_pushbutton(const char *OID, value *v) {
-    return get_door_pushbutton(4, v);
 }
 
 int64_t MIB_get_alarm_tamper_detect(const char *OID, value *v) {

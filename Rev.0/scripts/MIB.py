@@ -33,34 +33,34 @@ OIDs = [
     MIBItem('MIB_CONTROLLER_SYSINFO',           '0.1.3.6.1.4.1.65536.2.10',   'MIB_get_controller_sysinfo'),
 
     # door mode
-    MIBItem('MIB_DOORS_1_MODE', '0.1.3.6.1.4.1.65536.3.1.1', 'MIB_get_door_1_mode', 'MIB_set_door_1_mode'),
-    MIBItem('MIB_DOORS_2_MODE', '0.1.3.6.1.4.1.65536.3.2.1', 'MIB_get_door_2_mode', 'MIB_set_door_2_mode'),
-    MIBItem('MIB_DOORS_3_MODE', '0.1.3.6.1.4.1.65536.3.3.1', 'MIB_get_door_3_mode', 'MIB_set_door_3_mode'),
-    MIBItem('MIB_DOORS_4_MODE', '0.1.3.6.1.4.1.65536.3.4.1', 'MIB_get_door_4_mode', 'MIB_set_door_4_mode'),
+    MIBItem('MIB_DOORS_1_MODE', '0.1.3.6.1.4.1.65536.3.1.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
+    MIBItem('MIB_DOORS_2_MODE', '0.1.3.6.1.4.1.65536.3.2.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
+    MIBItem('MIB_DOORS_3_MODE', '0.1.3.6.1.4.1.65536.3.3.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
+    MIBItem('MIB_DOORS_4_MODE', '0.1.3.6.1.4.1.65536.3.4.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
 
     # door delay
-    MIBItem('MIB_DOORS_1_DELAY', '0.1.3.6.1.4.1.65536.3.1.2', 'MIB_get_door_1_delay', 'MIB_set_door_1_delay'),
-    MIBItem('MIB_DOORS_2_DELAY', '0.1.3.6.1.4.1.65536.3.2.2', 'MIB_get_door_2_delay', 'MIB_set_door_1_delay'),
-    MIBItem('MIB_DOORS_3_DELAY', '0.1.3.6.1.4.1.65536.3.3.2', 'MIB_get_door_3_delay', 'MIB_set_door_1_delay'),
-    MIBItem('MIB_DOORS_4_DELAY', '0.1.3.6.1.4.1.65536.3.4.2', 'MIB_get_door_4_delay', 'MIB_set_door_1_delay'),
+    MIBItem('MIB_DOORS_1_DELAY', '0.1.3.6.1.4.1.65536.3.1.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
+    MIBItem('MIB_DOORS_2_DELAY', '0.1.3.6.1.4.1.65536.3.2.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
+    MIBItem('MIB_DOORS_3_DELAY', '0.1.3.6.1.4.1.65536.3.3.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
+    MIBItem('MIB_DOORS_4_DELAY', '0.1.3.6.1.4.1.65536.3.4.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
 
     # door locks
-    MIBItem('MIB_DOORS_1_UNLOCKED', '0.1.3.6.1.4.1.65536.3.1.4', 'MIB_get_door_1_unlocked'),
-    MIBItem('MIB_DOORS_2_UNLOCKED', '0.1.3.6.1.4.1.65536.3.2.4', 'MIB_get_door_2_unlocked'),
-    MIBItem('MIB_DOORS_3_UNLOCKED', '0.1.3.6.1.4.1.65536.3.3.4', 'MIB_get_door_3_unlocked'),
-    MIBItem('MIB_DOORS_4_UNLOCKED', '0.1.3.6.1.4.1.65536.3.4.4', 'MIB_get_door_4_unlocked'),
+    MIBItem('MIB_DOORS_1_UNLOCKED', '0.1.3.6.1.4.1.65536.3.1.4', 'MIB_get_door_unlocked'),
+    MIBItem('MIB_DOORS_2_UNLOCKED', '0.1.3.6.1.4.1.65536.3.2.4', 'MIB_get_door_unlocked'),
+    MIBItem('MIB_DOORS_3_UNLOCKED', '0.1.3.6.1.4.1.65536.3.3.4', 'MIB_get_door_unlocked'),
+    MIBItem('MIB_DOORS_4_UNLOCKED', '0.1.3.6.1.4.1.65536.3.4.4', 'MIB_get_door_unlocked'),
 
     # door sensors
-    MIBItem('MIB_DOORS_1_OPEN', '0.1.3.6.1.4.1.65536.3.1.5', 'MIB_get_door_1_open'),
-    MIBItem('MIB_DOORS_2_OPEN', '0.1.3.6.1.4.1.65536.3.2.5', 'MIB_get_door_2_open'),
-    MIBItem('MIB_DOORS_3_OPEN', '0.1.3.6.1.4.1.65536.3.3.5', 'MIB_get_door_3_open'),
-    MIBItem('MIB_DOORS_4_OPEN', '0.1.3.6.1.4.1.65536.3.4.5', 'MIB_get_door_4_open'),
+    MIBItem('MIB_DOORS_1_OPEN', '0.1.3.6.1.4.1.65536.3.1.5', 'MIB_get_door_open'),
+    MIBItem('MIB_DOORS_2_OPEN', '0.1.3.6.1.4.1.65536.3.2.5', 'MIB_get_door_open'),
+    MIBItem('MIB_DOORS_3_OPEN', '0.1.3.6.1.4.1.65536.3.3.5', 'MIB_get_door_open'),
+    MIBItem('MIB_DOORS_4_OPEN', '0.1.3.6.1.4.1.65536.3.4.5', 'MIB_get_door_open'),
 
     # door pushbuttons
-    MIBItem('MIB_DOORS_1_BUTTON', '0.1.3.6.1.4.1.65536.3.1.6', 'MIB_get_door_1_pushbutton'),
-    MIBItem('MIB_DOORS_2_BUTTON', '0.1.3.6.1.4.1.65536.3.2.6', 'MIB_get_door_2_pushbutton'),
-    MIBItem('MIB_DOORS_3_BUTTON', '0.1.3.6.1.4.1.65536.3.3.6', 'MIB_get_door_3_pushbutton'),
-    MIBItem('MIB_DOORS_4_BUTTON', '0.1.3.6.1.4.1.65536.3.4.6', 'MIB_get_door_4_pushbutton'),
+    MIBItem('MIB_DOORS_1_BUTTON', '0.1.3.6.1.4.1.65536.3.1.6', 'MIB_get_door_pushbutton'),
+    MIBItem('MIB_DOORS_2_BUTTON', '0.1.3.6.1.4.1.65536.3.2.6', 'MIB_get_door_pushbutton'),
+    MIBItem('MIB_DOORS_3_BUTTON', '0.1.3.6.1.4.1.65536.3.3.6', 'MIB_get_door_pushbutton'),
+    MIBItem('MIB_DOORS_4_BUTTON', '0.1.3.6.1.4.1.65536.3.4.6', 'MIB_get_door_pushbutton'),
 
     # alarms
     MIBItem('MIB_ALARMS_TAMPER_DETECT', '0.1.3.6.1.4.1.65536.4.1', 'MIB_get_alarm_tamper_detect'),
@@ -97,7 +97,10 @@ with open('../core/include/MIB.h', 'w') as f:
     f.write('\n')
 
 with open("../core/src/MIB/MIB.c", "w") as f:
+    f.write('#include <string.h>\n')
+    f.write('\n')
     f.write('#include <MIB.h>\n')
+    f.write('#include <crypt/hash/djb2.h>\n')
 
     gets = list(dict.fromkeys([v.get for v in OIDs if v.get != None]))
     sets = list(dict.fromkeys([v.set for v in OIDs if v.set != None]))
@@ -130,3 +133,10 @@ with open("../core/src/MIB/MIB.c", "w") as f:
     for v in OIDs:
         f.write(f'    {v.name},\n')
     f.write('};\n')
+
+    f.write('\n')
+    f.write('bool equal(const char *OID, const MIBItem oid) {\n')
+    f.write('    return (djb2(OID) == oid.hash) && (strcmp(OID, oid.OID) == 0);\n')
+    f.write('}\n')
+
+    f.write('\n')

@@ -40,7 +40,7 @@ get-door:
 	python3 main.py get-door --controller $(CONTROLLER) --door $(DOOR)
 
 set-door:
-	python3 main.py set-door
+	python3 main.py set-door --controller $(CONTROLLER) --door $(DOOR) --mode controlled --delay 5
 
 set-door-passcodes:
 	python3 main.py set-door-passcodes

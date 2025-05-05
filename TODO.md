@@ -12,15 +12,8 @@
 ### misc
 
 - [x] syserror
-      - [x] log once on occurrence
-      - [x] log every N occurrences
-      - [x] log after interval
-      - [x] syserr_clear()
-            - [x] CLI
-            - [x] MIB::get
-            - [x] MIB::set
+- [x] rework MIB get/set_door_xxx to use OID
 
-- [ ] rework MIB get/set_door_xxx to use OID
 - [ ] CLI up arrow for 'last command'
 - [ ] software RTC
       - [ ] use hardware counter/timer
@@ -172,6 +165,7 @@
      - (?) https://www.flickr.com/photos/28521811@N04/
      - (?) https://github.com/stevenj/GenPinoutSVG
      - (?) https://yaqwsx.github.io/Pinion/
+     - (?) https://github.com/splitbrain/pinoutleaf
 
 ### Rust
 - https://rtic.rs/1/book/en/preface.html

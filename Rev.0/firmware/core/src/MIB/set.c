@@ -15,6 +15,7 @@
 
 #define LOGTAG "MIB"
 
+extern bool equal(const char *OID, const MIBItem oid);
 extern int64_t MIB_get_controller_syserror(const char *, value *);
 
 int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec);
@@ -109,8 +110,6 @@ int64_t MIB_set_controller_datetime(const char *OID, const value u, value *v) {
 }
 
 int64_t MIB_set_controller_syserror(const char *OID, const value u, value *v) {
-    uint32_t hash = djb2(OID);
-
     if (u.tag != VALUE_BOOLEAN) {
         return SSMP_ERROR_WRONG_TYPE;
     }
@@ -119,7 +118,7 @@ int64_t MIB_set_controller_syserror(const char *OID, const value u, value *v) {
         return SSMP_ERROR_BAD_VALUE;
     }
 
-    if ((hash == MIB_CONTROLLER_SYSERROR.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR.OID) == 0)) {
+    if (equal(OID, MIB_CONTROLLER_SYSERROR)) {
         syserr_clear(ERR_MEMORY);
         syserr_clear(ERR_I2C);
         syserr_clear(ERR_QUEUE);
@@ -130,32 +129,32 @@ int64_t MIB_set_controller_syserror(const char *OID, const value u, value *v) {
         syserr_clear(ERR_WATCHDOG);
         syserr_clear(ERR_DEBUG);
         syserr_clear(ERR_UNKNOWN);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_MEMORY.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_MEMORY.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_MEMORY)) {
         syserr_clear(ERR_MEMORY);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_I2C.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_I2C.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_I2C)) {
         syserr_clear(ERR_I2C);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_QUEUE.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_QUEUE.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_QUEUE)) {
         syserr_clear(ERR_QUEUE);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_RX8900SA.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_RX8900SA.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_RX8900SA)) {
         syserr_clear(ERR_RX8900SA);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_U2.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_U2.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_U2)) {
         syserr_clear(ERR_U2);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_U3.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_U3.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_U3)) {
         syserr_clear(ERR_U3);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_U4.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_U4.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_U4)) {
         syserr_clear(ERR_U4);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_WATCHDOG.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_WATCHDOG.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_WATCHDOG)) {
         syserr_clear(ERR_WATCHDOG);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_DEBUG.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_DEBUG.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_DEBUG)) {
         syserr_clear(ERR_DEBUG);
-    } else if ((hash == MIB_CONTROLLER_SYSERROR_DEBUG.hash) && (strcmp(OID, MIB_CONTROLLER_SYSERROR_DEBUG.OID) == 0)) {
+    } else if (equal(OID, MIB_CONTROLLER_SYSERROR_DEBUG)) {
         syserr_clear(ERR_UNKNOWN);
     }
 
     return MIB_get_controller_syserror(OID, v);
 }
 
-int64_t set_door_mode(uint8_t door, value u, value *v) {
+int64_t MIB_set_door_mode(const char *OID, const value u, value *v) {
     if (u.tag != VALUE_UINT8 && u.tag != VALUE_UINT16 && u.tag != VALUE_UINT32) {
         return SSMP_ERROR_WRONG_TYPE;
     }
@@ -165,6 +164,17 @@ int64_t set_door_mode(uint8_t door, value u, value *v) {
     }
 
     uint8_t mode = (uint8_t)u.integer;
+    uint8_t door;
+
+    if (equal(OID, MIB_DOORS_1_MODE)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOORS_2_MODE)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOORS_3_MODE)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOORS_4_MODE)) {
+        door = 4;
+    }
 
     if (!doors_set_mode(door, mode)) {
         return SSMP_ERROR_COMMIT_FAILED;
@@ -179,12 +189,23 @@ int64_t set_door_mode(uint8_t door, value u, value *v) {
     return SSMP_ERROR_NO_ACCESS;
 }
 
-int64_t set_door_delay(uint8_t door, value u, value *v) {
+int64_t MIB_set_door_delay(const char *OID, const value u, value *v) {
     if (u.tag != VALUE_UINT8 && u.tag != VALUE_UINT16 && u.tag != VALUE_UINT32) {
         return SSMP_ERROR_WRONG_TYPE;
     }
 
     uint8_t delay = (uint8_t)u.integer;
+    uint8_t door;
+
+    if (equal(OID, MIB_DOORS_1_DELAY)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOORS_2_DELAY)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOORS_3_DELAY)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOORS_4_DELAY)) {
+        door = 4;
+    }
 
     if (!doors_set_delay(door, delay)) {
         return SSMP_ERROR_COMMIT_FAILED;
@@ -197,38 +218,6 @@ int64_t set_door_delay(uint8_t door, value u, value *v) {
     }
 
     return SSMP_ERROR_NO_ACCESS;
-}
-
-int64_t MIB_set_door_1_mode(const char *OID, const value u, value *v) {
-    return set_door_mode(1, u, v);
-}
-
-int64_t MIB_set_door_2_mode(const char *OID, const value u, value *v) {
-    return set_door_mode(2, u, v);
-}
-
-int64_t MIB_set_door_3_mode(const char *OID, const value u, value *v) {
-    return set_door_mode(3, u, v);
-}
-
-int64_t MIB_set_door_4_mode(const char *OID, const value u, value *v) {
-    return set_door_mode(4, u, v);
-}
-
-int64_t MIB_set_door_1_delay(const char *OID, const value u, value *v) {
-    return set_door_delay(1, u, v);
-}
-
-int64_t MIB_set_door_2_delay(const char *OID, const value u, value *v) {
-    return set_door_delay(2, u, v);
-}
-
-int64_t MIB_set_door_3_delay(const char *OID, const value u, value *v) {
-    return set_door_delay(3, u, v);
-}
-
-int64_t MIB_set_door_4_delay(const char *OID, const value u, value *v) {
-    return set_door_delay(4, u, v);
 }
 
 int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec) {
