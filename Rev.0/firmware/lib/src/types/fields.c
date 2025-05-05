@@ -33,6 +33,10 @@ void field_free(field *f) {
         case FIELD_PDU_RESPONSE:
             vector_free(f->pdu.fields);
             break;
+
+        case FIELD_PDU_TRAP:
+            vector_free(f->pdu.fields);
+            break;
         }
 
         if (f->dynamic) {
