@@ -80,6 +80,29 @@ func (c *UDP) listen(received func(any) (any, error)) error {
 	}
 }
 
+func (udp *UDP) sendto(dest netip.AddrPort, message any) {
+	addr := net.UDPAddrFromAddrPort(dest)
+	msg, err := codec.Marshal(message)
+
+	if err != nil {
+		errorf("%v", err)
+		return
+	}
+
+	if socket, err := net.DialUDP("udp4", nil, addr); err != nil {
+		errorf("UDP", "error dialing UDP listener [%v]", err)
+	} else {
+
+		defer socket.Close()
+
+		if N, err := socket.Write(msg); err != nil {
+			errorf("failed to write message to UDP socket [%v]", err)
+		} else {
+			infof("sent %v bytes to %v", N, dest)
+		}
+	}
+}
+
 func (c *UDP) stop() error {
 	c.closing = true
 

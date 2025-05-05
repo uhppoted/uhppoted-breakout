@@ -65,33 +65,33 @@ class TLS:
         ssock = None
 
         if key in pool:
-           s = pool[key]
-           if s.fileno() != -1:
-              ssock = s
+            s = pool[key]
+            if s.fileno() != -1:
+                ssock = s
 
         if not ssock:
-           sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-           sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-           sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, net.WRITE_TIMEOUT)
-           sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, net.READ_TIMEOUT)
-           sock.settimeout(5)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, net.WRITE_TIMEOUT)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, net.READ_TIMEOUT)
+            sock.settimeout(5)
 
-           ssock = context.wrap_socket(sock, server_hostname=f'{addr[0]}')
+            ssock = context.wrap_socket(sock, server_hostname=f'{addr[0]}')
 
-           if not is_INADDR_ANY(self._bind):
-               ssock.bind(self._bind)
+            if not is_INADDR_ANY(self._bind):
+                ssock.bind(self._bind)
 
-           ssock.connect(addr)
-        
+            ssock.connect(addr)
+
         pool[key] = ssock
 
         ssock.sendall(request)
 
         if request[1] == 0x96:
-           return None
+            return None
         else:
-           return _read(ssock, timeout=timeout, debug=self._debug)
+            return _read(ssock, timeout=timeout, debug=self._debug)
 
     def dump(self, packet):
         '''
@@ -144,7 +144,7 @@ def _read(sock, timeout=2.5, debug=False):
 
         if len(reply) == 0:
             return None
-        
+
         if len(reply) == 64:
             if debug:
                 net.dump(reply)

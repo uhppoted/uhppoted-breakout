@@ -119,12 +119,13 @@ def get_controller(u, dest, timeout, args, protocol='udp'):
 
         return u.get_controller(controller, timeout=timeout)
 
+
 def debug_get_controller(u, dest, timeout, args, protocol):
     return u.get_controller((405419897, '192.168.1.100:60000', 'tcp'), timeout=2.5)
 
     # request = encode.get_controller_request(405419897)
     # bind = '0.0.0.0'
-    # 
+    #
     # reply = _tls(request, bind, 'localhost:60443', timeout, True)
     # if reply != None:
     #     return decode.get_controller_response(reply)
@@ -442,6 +443,7 @@ def _tls(request, bind, dest, timeout, debug):
     transport = tls.TLS(bind, debug)
 
     return transport.send(request, dest, timeout)
+
 
 # INTERNAL: pooled TCP handler
 def _pool(request, bind, dest, timeout, debug):

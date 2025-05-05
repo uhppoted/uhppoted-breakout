@@ -18,6 +18,10 @@ var events = []OID{
 	OID_EVENTS_EVENT_REASON,
 }
 
+func Parse(v string) (OID, error) {
+	return OID{}, fmt.Errorf("invalid OID (%v)", v)
+}
+
 func (o OID) String() string {
 	var b strings.Builder
 
@@ -32,6 +36,10 @@ func (o OID) String() string {
 	}
 
 	return b.String()
+}
+
+func Equal(p OID, q OID) bool {
+	return slices.Equal(p, q)
 }
 
 func Is(oid OID, t OID) bool {

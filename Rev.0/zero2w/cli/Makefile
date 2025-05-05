@@ -74,3 +74,6 @@ get-event-index:
 
 set-event-index:
 	python3 main.py set-event-index
+
+listen:
+	python3 main.py listen

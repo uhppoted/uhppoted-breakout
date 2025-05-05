@@ -61,29 +61,29 @@ class Pool:
         sock = None
 
         if key in pool:
-           s = pool[key]
-           if s.fileno() != -1:
-              sock = s
+            s = pool[key]
+            if s.fileno() != -1:
+                sock = s
 
         if not sock:
-           sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-           if not is_INADDR_ANY(self._bind):
-              sock.bind(self._bind)
-        
-           sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-           sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, net.WRITE_TIMEOUT)
-           sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, net.READ_TIMEOUT)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if not is_INADDR_ANY(self._bind):
+                sock.bind(self._bind)
 
-           sock.connect(addr)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, net.WRITE_TIMEOUT)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, net.READ_TIMEOUT)
+
+            sock.connect(addr)
 
         pool[key] = sock
 
         sock.sendall(request)
 
         if request[1] == 0x96:
-           return None
+            return None
         else:
-           return _read(sock, timeout=timeout, debug=self._debug)
+            return _read(sock, timeout=timeout, debug=self._debug)
 
     def dump(self, packet):
         '''
@@ -136,7 +136,7 @@ def _read(sock, timeout=2.5, debug=False):
 
         if len(reply) == 0:
             return None
-        
+
         if len(reply) == 64:
             if debug:
                 net.dump(reply)

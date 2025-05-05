@@ -2,8 +2,47 @@ package scmp
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 )
+
+func TestOIDParse(t *testing.T) {
+	t.Skip()
+	// tests := []struct {
+	// 	oid      string
+	// 	expected OID
+	// }{
+	// 	{".1.3.6.1.4.1.65536.1.1", []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1}},
+	// 	{".1.3.6.1.4.1.65536.1.1", []uint32{0, 1, 3, 6, 1, 4, 1, 65536, 1, 1}},
+	// }
+// 
+	// for _, test := range tests {
+	// 	if oid, err := Parse(test.oid); err != nil {
+	// 		t.Errorf("error %v parsing OID %v", err, test.oid)
+	// 	} else if !slices.Equal(oid, test.expected) {
+	// 		t.Errorf("incorrectly parsed OID - expected:%v, got:%v", test.expected, oid)
+	// 	}
+	// }
+}
+
+func TestOIDEquals(t *testing.T) {
+	t.Skip()
+	// tests := []struct {
+	// 	oid      string
+	// 	expected OID
+	// }{
+	// 	{".1.3.6.1.4.1.65536.1.1", []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1}},
+	// 	{".1.3.6.1.4.1.65536.1.1", []uint32{0, 1, 3, 6, 1, 4, 1, 65536, 1, 1}},
+	// }
+// 
+	// for _, test := range tests {
+	// 	if oid, err := Parse(test.oid); err != nil {
+	// 		t.Errorf("error %v parsing OID %v", err, test.oid)
+	// 	} else if !slices.Equal(oid, test.expected) {
+	// 		t.Errorf("incorrectly parsed OID - expected:%v, got:%v", test.expected, oid)
+	// 	}
+	// }
+}
 
 func TestOIDString(t *testing.T) {
 	tests := []struct {

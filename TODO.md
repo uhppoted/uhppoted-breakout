@@ -112,6 +112,7 @@
       - https://go.dev/blog/protobuf-opaque
       - [x] go-rpc
       - [x] unix domain sockets
+      - [ ] go-rpc+json
       - [ ] TLS
       - [ ] TCP/IP
       - [ ] grpc

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"net/netip"
 	"reflect"
 	"sync"
 	"time"
@@ -208,39 +207,6 @@ func (ut0311 *UT0311) listen(tag string, c listener) {
 			delay = dt
 		}
 	}
-}
-
-func sendto(dest netip.AddrPort, message any) {
-	// var addr *net.UDPAddr
-	//
-	//	if bind != nil && bind.IP != nil {
-	//		addr = &net.UDPAddr{
-	//			IP:   bind.IP.To4(),
-	//			Port: 0,
-	//			Zone: bind.Zone,
-	//		}
-	//	}
-	//
-	// msg, err := codec.Marshal(message)
-	//
-	//	if err != nil {
-	//		log.Errorf("%v", err)
-	//		return
-	//	}
-	//
-	//	if c, err := net.DialUDP("udp4", addr, dest); err != nil {
-	//		log.Errorf("failed to create UDP event socket [%v]", err)
-	//	} else {
-	//
-	//		defer c.Close()
-	//
-	//		N, err := c.Write(msg)
-	//		if err != nil {
-	//			errorf("udp", "failed to write to UDP socket [%v]", err)
-	//		} else if debug {
-	//			infof("udp", "sent %v bytes to %v\n%s", N, dest, codec.Dump(msg[0:N], " ...          "))
-	//		}
-	//	}
 }
 
 func (ut0311 UT0311) received(request any) (any, error) {

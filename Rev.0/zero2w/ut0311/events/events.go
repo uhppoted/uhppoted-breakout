@@ -2,10 +2,24 @@ package events
 
 import (
 	"fmt"
+	"sync/atomic"
+	"time"
 
+	"emulator/driver/rpcd"
 	"emulator/log"
 	"emulator/scmp"
 )
+
+type Event struct {
+	Index     uint32    `json:"index"`
+	Type      EventType `json:"type"`
+	Granted   bool      `json:"granted"`
+	Door      uint8     `json:"door"`
+	Direction uint8     `json:"direction"`
+	Card      uint32    `json:"card"`
+	Timestamp time.Time `json:"timestamp,omitempty"`
+	Reason    Reason    `json:"reason"`
+}
 
 type Events struct {
 	recordAll bool
@@ -16,6 +30,32 @@ func NewEvents() *Events {
 	return &Events{
 		recordAll: false,
 	}
+}
+
+var Index atomic.Uint32
+
+// type Event struct {
+// 	Timestamp time.Time
+// 	ID        uint32
+// 	Category  uint32
+// 	Event     uint32
+// 	OID       string
+// 	Value     any
+// }
+
+func (e *Events) Add(event rpcd.Event) Event {
+	evt := Event{
+		Index:     Index.Add(1),
+		Type:      lookup(event.OID),
+		Granted:   false,
+		Door:      door(event.OID),
+		Direction: 0,
+		Card:      0,
+		Timestamp: event.Timestamp,
+		Reason:    reason(event.OID, event.Value),
+	}
+
+	return evt
 }
 
 func (e *Events) GetUint8(oid scmp.OID) (uint8, error) {
