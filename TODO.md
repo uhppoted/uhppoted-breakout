@@ -1,5 +1,7 @@
 # TODO
 
+- [x] FIXME OID equals/parse tests
+
 ## RPCD
     - [ ] commonalise GET/SET queue handling
     - [ ] daemonize

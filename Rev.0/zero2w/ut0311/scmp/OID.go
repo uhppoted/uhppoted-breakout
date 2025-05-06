@@ -2,7 +2,9 @@ package scmp
 
 import (
 	"fmt"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -16,10 +18,6 @@ var events = []OID{
 	OID_EVENTS_EVENT_CARD,
 	OID_EVENTS_EVENT_GRANTED,
 	OID_EVENTS_EVENT_REASON,
-}
-
-func Parse(v string) (OID, error) {
-	return OID{}, fmt.Errorf("invalid OID (%v)", v)
 }
 
 func (o OID) String() string {
@@ -38,8 +36,39 @@ func (o OID) String() string {
 	return b.String()
 }
 
+func Parse(s string) (OID, error) {
+	re := regexp.MustCompile(`^0?(([.]\d+)+)$`)
+	m := re.FindAllStringSubmatch(s, -1)
+
+	if m != nil {
+		re := regexp.MustCompile(`[.]([0-9]+)`)
+		if matches := re.FindAllStringSubmatch(m[0][1], -1); matches != nil {
+			oid := OID{0}
+			for _, v := range matches {
+				if u, err := strconv.ParseUint(v[1], 10, 32); err != nil {
+					return OID{}, fmt.Errorf("invalid OID (%v)", s)
+				} else {
+					oid = append(oid, uint32(u))
+				}
+
+			}
+			return oid, nil
+		}
+	}
+
+	return OID{}, fmt.Errorf("invalid OID (%v)", s)
+}
+
 func Equal(p OID, q OID) bool {
-	return slices.Equal(p, q)
+	if slices.Equal(p, q) {
+		return true
+	} else if len(p) > 0 && p[0] == 0 && slices.Equal(p[1:], q) {
+		return true
+	} else if len(q) > 0 && q[0] == 0 && slices.Equal(p, q[1:]) {
+		return true
+	}
+
+	return false
 }
 
 func Is(oid OID, t OID) bool {

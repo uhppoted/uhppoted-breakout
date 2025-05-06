@@ -14,6 +14,9 @@ build: format
 test: build
 	go test ./...
 
+debug: build
+	go test ./... -run TestOIDEqual
+
 run-tcp: build
 	./bin/emulator --config .config.localhost
 

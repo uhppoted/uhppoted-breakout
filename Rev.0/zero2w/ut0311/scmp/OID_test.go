@@ -7,41 +7,40 @@ import (
 )
 
 func TestOIDParse(t *testing.T) {
-	t.Skip()
-	// tests := []struct {
-	// 	oid      string
-	// 	expected OID
-	// }{
-	// 	{".1.3.6.1.4.1.65536.1.1", []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1}},
-	// 	{".1.3.6.1.4.1.65536.1.1", []uint32{0, 1, 3, 6, 1, 4, 1, 65536, 1, 1}},
-	// }
-// 
-	// for _, test := range tests {
-	// 	if oid, err := Parse(test.oid); err != nil {
-	// 		t.Errorf("error %v parsing OID %v", err, test.oid)
-	// 	} else if !slices.Equal(oid, test.expected) {
-	// 		t.Errorf("incorrectly parsed OID - expected:%v, got:%v", test.expected, oid)
-	// 	}
-	// }
+	tests := []struct {
+		oid      string
+		expected OID
+	}{
+		{"0.1.3.6.1.4.1.65536.1.9", []uint32{0, 1, 3, 6, 1, 4, 1, 65536, 1, 9}},
+		{".1.3.6.1.4.1.65536.1.7", []uint32{0, 1, 3, 6, 1, 4, 1, 65536, 1, 7}},
+	}
+
+	for _, test := range tests {
+		if oid, err := Parse(test.oid); err != nil {
+			t.Errorf("%v", err)
+		} else if !slices.Equal(oid, test.expected) {
+			t.Errorf("incorrectly parsed OID - expected:%#v, got:%#v", test.expected, oid)
+		}
+	}
 }
 
-func TestOIDEquals(t *testing.T) {
-	t.Skip()
-	// tests := []struct {
-	// 	oid      string
-	// 	expected OID
-	// }{
-	// 	{".1.3.6.1.4.1.65536.1.1", []uint32{1, 3, 6, 1, 4, 1, 65536, 1, 1}},
-	// 	{".1.3.6.1.4.1.65536.1.1", []uint32{0, 1, 3, 6, 1, 4, 1, 65536, 1, 1}},
-	// }
-// 
-	// for _, test := range tests {
-	// 	if oid, err := Parse(test.oid); err != nil {
-	// 		t.Errorf("error %v parsing OID %v", err, test.oid)
-	// 	} else if !slices.Equal(oid, test.expected) {
-	// 		t.Errorf("incorrectly parsed OID - expected:%v, got:%v", test.expected, oid)
-	// 	}
-	// }
+func TestOIDEqual(t *testing.T) {
+	tests := []struct {
+		p        OID
+		q        OID
+		expected bool
+	}{
+		{OID{1, 3, 6, 1, 4, 1, 65536, 1, 9}, OID{1, 3, 6, 1, 4, 1, 65536, 1, 9}, true},
+		{OID{0, 1, 3, 6, 1, 4, 1, 65536, 1, 9}, OID{1, 3, 6, 1, 4, 1, 65536, 1, 9}, true},
+		{OID{1, 3, 6, 1, 4, 1, 65536, 1, 9}, OID{0, 1, 3, 6, 1, 4, 1, 65536, 1, 9}, true},
+		{OID{1, 3, 6, 1, 4, 1, 65536, 1, 9}, OID{1, 3, 6, 1, 4, 1, 65536, 1, 8}, false},
+	}
+
+	for _, test := range tests {
+		if b := Equal(test.p, test.q); b != test.expected {
+			t.Errorf("incorrect 'equals' for %v and %v - expected:%v, got:%v", test.p, test.q, test.expected, b)
+		}
+	}
 }
 
 func TestOIDString(t *testing.T) {
