@@ -15,8 +15,8 @@
 
 - [x] syserror
 - [x] rework MIB get/set_door_xxx to use OID
+- [x] CLI up arrow for 'last command'
 
-- [ ] CLI up arrow for 'last command'
 - [ ] software RTC
       - [ ] use hardware counter/timer
       - (?) PID

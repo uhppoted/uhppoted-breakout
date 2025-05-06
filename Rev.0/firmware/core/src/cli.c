@@ -35,7 +35,8 @@ const uint32_t CLI_TIMEOUT = 5000; // ms
 const uint8_t height = 25;
 
 void cli_rxchar(uint8_t ch);
-void cli_on_terminal_report(const char *buffer, int N);
+bool cli_on_terminal_report(const char *buffer, int N);
+bool cli_up_arrow(const char *buffer, int N);
 
 void echo(const char *line);
 void clearline();
@@ -84,6 +85,11 @@ struct {
     struct {
         char bytes[64];
         int ix;
+    } last;
+
+    struct {
+        char bytes[64];
+        int ix;
     } escape;
 } cli = {
     .rows = 40,
@@ -94,6 +100,10 @@ struct {
         .tail = 0,
     },
     .buffer = {
+        .bytes = {0},
+        .ix = 0,
+    },
+    .last = {
         .bytes = {0},
         .ix = 0,
     },
@@ -195,12 +205,6 @@ void cli_init() {
  */
 void cli_rx(circular_buffer *buffer) {
     buffer_flush(buffer, cli_rxchar);
-
-    if (cli.escaped) {
-        cli_on_terminal_report(cli.escape.bytes, cli.escape.ix);
-        cli.escape.ix = 0;
-        cli.escaped = false;
-    }
 }
 
 void cli_rxchar(uint8_t ch) {
@@ -214,6 +218,17 @@ void cli_rxchar(uint8_t ch) {
             cli.escape.ix = 1;
         } else if (cli.escape.ix < sizeof(cli.escape.bytes)) {
             cli.escape.bytes[cli.escape.ix++] = ch;
+
+            if (cli_up_arrow(cli.escape.bytes, cli.escape.ix)) {
+                cli.escape.ix = 0;
+                cli.escaped = false;
+            } else if (cli_on_terminal_report(cli.escape.bytes, cli.escape.ix)) {
+                cli.escape.ix = 0;
+                cli.escaped = false;
+            }
+        } else {
+            cli.escape.ix = 0;
+            cli.escaped = false;
         }
 
         return;
@@ -241,6 +256,7 @@ void cli_rxchar(uint8_t ch) {
 
         memset(cli.buffer.bytes, 0, sizeof(cli.buffer.bytes));
         cli.buffer.ix = 0;
+        echo(cli.buffer.bytes);
         break;
 
     default:
@@ -256,15 +272,17 @@ void cli_rxchar(uint8_t ch) {
 /** Processes ANSI/VT100 terminal report.
  *
  */
-void cli_on_terminal_report(const char *data, int N) {
+bool cli_on_terminal_report(const char *data, int N) {
     // ... report device code ?
     // e.g. [27 91 53 55 59 50 48 50 82 27 91 63 49 59 50 99 ]
     if (N >= 5 && data[0] == 27 && data[1] == '[' && data[N - 1] == 'c') {
+        return true;
     }
 
     // ... report device status?
     if (N >= 4 && data[0] == 27 && data[1] == '[' && data[2] == '0' && data[3] == 'n') {
         set_mode(MODE_CLI);
+        return true;
     }
 
     // ... report cursor position (ESC[#;#R)
@@ -274,7 +292,26 @@ void cli_on_terminal_report(const char *data, int N) {
 
         cpr(code);
         free(code);
+        return true;
     }
+
+    return false;
+}
+
+/** 'up arrow' puts last command in terminal buffer.
+ *
+ */
+bool cli_up_arrow(const char *data, int N) {
+    if (N == 3 && data[0] == ESC && data[1] == 0x5b && data[2] == 0x41) {
+        memset(cli.buffer.bytes, 0, sizeof(cli.buffer.bytes));
+        memmove(cli.buffer.bytes, cli.last.bytes, cli.last.ix);
+        cli.buffer.ix = cli.last.ix;
+
+        echo(cli.buffer.bytes);
+        return true;
+    }
+
+    return false;
 }
 
 /* Clears the terminal and queries window size
@@ -353,6 +390,9 @@ void display(const char *fmt, ...) {
 
 void exec(char *cmd) {
     char s[128];
+
+    memmove(cli.last.bytes, cli.buffer.bytes, cli.buffer.ix);
+    cli.last.ix = cli.buffer.ix;
 
     if (strncasecmp(cmd, "get id", 6) == 0) {
         get_ID();
@@ -443,6 +483,8 @@ void clear_errors() {
     for (int i = 0; i < N; i++) {
         syserr_clear(errors[i]);
     }
+
+    display("clear errors: ok\n");
 }
 
 void get_ID() {

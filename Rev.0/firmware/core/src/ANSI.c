@@ -11,3 +11,4 @@ const char *TERMINAL_ECHO = "\033[s\033[%d;0H\033[0K>> %s\033[u";
 const char *TERMINAL_CLEARLINE = "\033[s\033[%d;0H\033[0K>> \033[u";
 const char *TERMINAL_DISPLAY = "\033[s\033[%d;0H\033[0K>> %s\033[u";
 const char *TERMINAL_AT = "\033[s\033[%d;%dH\033[0K%s\033[u";
+const char *TERMINAL_UP_ARROW = "\x1b\x5b\x41";
