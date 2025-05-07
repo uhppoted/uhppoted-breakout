@@ -19,6 +19,7 @@ void RTC_setup();
 void RTC_read(void *data);
 void RTC_write(void *data);
 bool RTC_on_update(repeating_timer_t *rt);
+bool RTC_on_tick(repeating_timer_t *rt);
 uint8_t dow(uint16_t year, uint8_t month, uint8_t day);
 uint8_t weekday2dow(uint8_t weekday);
 
@@ -34,7 +35,19 @@ struct {
     uint8_t second;
     uint8_t dow;
 
-    repeating_timer_t timer;
+    struct {
+        repeating_timer_t sync;
+        repeating_timer_t tick;
+        uint64_t last_tick;
+        int64_t epoch;
+    } timers;
+
+    struct {
+        int64_t RTC;
+        int64_t time;
+        int64_t delta;
+    } drift;
+
     mutex_t guard;
 } RTC = {
     .initialised = false,
@@ -47,6 +60,17 @@ struct {
     .minute = 0,
     .second = 0,
     .dow = 0x08, // Wednesday
+
+    .timers = {
+        .last_tick = 0,
+        .epoch = 0, // 1577836800,
+    },
+
+    .drift = {
+        .RTC = 0,
+        .time = 0,
+        .delta = 0,
+    },
 };
 
 /*
@@ -125,9 +149,13 @@ void RTC_start() {
     };
 
     I2C0_push(&task);
-    add_repeating_timer_ms(400, RTC_on_update, NULL, &RTC.timer);
+    add_repeating_timer_ms(400, RTC_on_update, NULL, &RTC.timers.sync);
+    add_repeating_timer_ms(5000, RTC_on_tick, NULL, &RTC.timers.tick);
 }
 
+/*
+ * Queues a task to get the current time from the RX8900SA.
+ */
 bool RTC_on_update(repeating_timer_t *rt) {
     closure task = {
         .f = RTC_read,
@@ -135,6 +163,27 @@ bool RTC_on_update(repeating_timer_t *rt) {
     };
 
     I2C0_push(&task);
+
+    return true;
+}
+
+/*
+ * Updates the in-memory date/time from the microsecond hardware counter.
+ */
+bool RTC_on_tick(repeating_timer_t *rt) {
+    uint64_t now = time_us_64();
+    int64_t dt = now - RTC.timers.last_tick;
+
+    // debugf(LOGTAG, ">> tick      %ld", now);
+    // debugf(LOGTAG, ">> last tick %ld", RTC.timers.last_tick);
+    // debugf(LOGTAG, ">> epoch     %ld", RTC.timers.epoch);
+    // debugf(LOGTAG, ">>> drift.RTC:  %lu", RTC.drift.RTC);
+    // debugf(LOGTAG, ">>>      .time: %lu", RTC.drift.time);
+    debugf(LOGTAG, ">>> drift.delta:%.3f", (double)RTC.drift.delta / 1000.0);
+    debugf(LOGTAG, ">>       .dt:   %.3f", (double)dt / 1000.0);
+
+    RTC.timers.epoch += dt;
+    RTC.timers.last_tick = now;
 
     return true;
 }
@@ -168,6 +217,19 @@ void RTC_read(void *data) {
             if (!RTC.ready) {
                 RTC.ready = true;
             }
+
+            int64_t epoch = 1000000 * datetime_to_epoch(year, month, day, hour, minute, second);
+            int64_t delta = epoch - RTC.timers.epoch;
+
+            if (RTC.timers.epoch == 0) {
+                RTC.timers.epoch = epoch;
+                delta = 0;
+            }
+
+            RTC.drift.RTC = epoch;
+            RTC.drift.time = RTC.timers.epoch;
+            RTC.drift.delta = delta;
+
             mutex_exit(&RTC.guard);
         }
     }
@@ -441,4 +503,32 @@ uint8_t weekday2dow(uint8_t weekday) {
     } else {
         return 0;
     }
+}
+
+int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec) {
+    bool is_leap(int y) {
+        return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
+    }
+
+    const int days_in_month[] = {
+        31, 28, 31, 30, 31, 30,
+        31, 31, 30, 31, 30, 31};
+
+    int64_t days = 0;
+
+    // ... years since 1970
+    for (int y = 1970; y < year; y++) {
+        days += is_leap(y) ? 366 : 365;
+    }
+
+    // ... months this year (1–(mon-1))
+    for (int m = 1; m < mon; m++) {
+        days += days_in_month[m - 1];
+        if (m == 2 && is_leap(year))
+            days += 1;
+    }
+
+    days += day - 1;
+
+    return (int64_t)(days * 86400 + hour * 3600 + min * 60 + sec);
 }

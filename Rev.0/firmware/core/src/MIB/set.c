@@ -18,8 +18,6 @@
 extern bool equal(const char *OID, const MIBItem oid);
 extern int64_t MIB_get_controller_syserror(const char *, value *);
 
-int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec);
-
 int64_t MIB_set(const char *OID, const value u, value *v) {
     uint32_t hash = djb2(OID);
 
@@ -218,32 +216,4 @@ int64_t MIB_set_door_delay(const char *OID, const value u, value *v) {
     }
 
     return SSMP_ERROR_NO_ACCESS;
-}
-
-int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec) {
-    bool is_leap(int y) {
-        return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
-    }
-
-    const int days_in_month[] = {
-        31, 28, 31, 30, 31, 30,
-        31, 31, 30, 31, 30, 31};
-
-    int64_t days = 0;
-
-    // ... years since 1970
-    for (int y = 1970; y < year; y++) {
-        days += is_leap(y) ? 366 : 365;
-    }
-
-    // ... months this year (1–(mon-1))
-    for (int m = 1; m < mon; m++) {
-        days += days_in_month[m - 1];
-        if (m == 2 && is_leap(year))
-            days += 1;
-    }
-
-    days += day - 1;
-
-    return (int64_t)(days * 86400 + hour * 3600 + min * 60 + sec);
 }

@@ -1,8 +1,7 @@
 # TODO
 
-- [x] FIXME OID equals/parse tests
-
 ## RPCD
+    - [ ] move cache to ut0311
     - [ ] commonalise GET/SET queue handling
     - [ ] daemonize
     - [ ] monitor
@@ -50,11 +49,11 @@
           - [x] translate timestamp to DateTime
           - [x] use rtcd time if timestamp is invalid
           - [x] memory leak
+          - [x] UDP event
           - [ ] event item OID
           - [ ] event item value
-          - [ ] UDP event
-          - [ ] store to SQLite DB
-          - [ ] rpcd::shutdown RPC listener
+          - [ ] open door on PB
+          - [ ] open door on card swipe
           - flush SSMP::write on connected
           - (?) queue if rpcd is not connected
 
@@ -73,6 +72,10 @@
       - https://github.com/raspberrypi/rpi-image-gen
 
 ### UT0311
+    - [ ] store events to SQLite DB
+    - [ ] rpcd::shutdown RPC listener
+    - [ ] open door on PB
+    - [ ] open door on card swipe
     - [ ] rework with text tags
 
     - [ ] API

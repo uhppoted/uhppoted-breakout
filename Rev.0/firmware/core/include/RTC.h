@@ -12,6 +12,8 @@ extern bool RTC_set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t 
 extern bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day);
 extern bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second);
 
+extern int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec);
+
 extern const uint8_t SUNDAY;
 extern const uint8_t MONDAY;
 extern const uint8_t TUESDAY;
