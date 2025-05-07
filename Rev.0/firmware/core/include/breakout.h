@@ -55,11 +55,17 @@ typedef enum {
 } err;
 
 typedef enum {
+    EVENT_UNKNOWN,
+    EVENT_DOOR_1_OPEN,
+    EVENT_DOOR_1_CLOSE,
+} EVENT;
+
+typedef enum {
     MESSAGE_NONE,
     MESSAGE_UINT32,
     MESSAGE_BUFFER,
     MESSAGE_SWIPE,
-    MESSAGE_INPUTS,
+    MESSAGE_EVENT,
     MESSAGE_UNKNOWN,
 } msg_type;
 
@@ -71,7 +77,7 @@ typedef struct message {
     union {
         uint32_t none;
         uint32_t u32;
-        uint8_t inputs;
+        uint32_t event;
         struct circular_buffer *buffer;
         struct swipe *swipe;
     };

@@ -45,6 +45,8 @@
         - https://github.com/piersfinlayson/tinyusb-vendor-example
 
 ### SSMP
+    - [ ] guard around write
+          - (?) write queue
     - [ ] TRAP
           - [x] translate timestamp to DateTime
           - [x] use rtcd time if timestamp is invalid
@@ -52,6 +54,7 @@
           - [x] UDP event
           - [ ] event item OID
           - [ ] event item value
+                - //FIXME encode all var types
           - [ ] open door on PB
           - [ ] open door on card swipe
           - flush SSMP::write on connected
@@ -64,7 +67,6 @@
 
     - [ ] GET: multiple OIDs
     - [ ] MIB_find (returns const *MIBItem)
-    - (?) queue UART write
 
 ## Zero2W
 - [ ] serial logger

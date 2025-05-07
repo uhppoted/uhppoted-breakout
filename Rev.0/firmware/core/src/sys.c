@@ -357,7 +357,9 @@ void dispatch(uint32_t v) {
     }
 
     if ((v & MSG) == MSG_EVENT) {
-        SSMP_trap();
+        EVENT event = (EVENT)(v & 0x0fffffff);
+
+        SSMP_trap(event);
     }
 
     if ((v & MSG) == MSG_LOG) {

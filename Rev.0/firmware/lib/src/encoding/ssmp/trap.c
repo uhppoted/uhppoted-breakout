@@ -56,6 +56,38 @@ slice ssmp_encode_trap(packet p) {
         },
     };
 
+    field item_oid = {
+        .tag = FIELD_OID,
+        .OID = {
+            .OID = strdup(p.trap.var.OID),
+        },
+    };
+
+    // FIXME encode all var types
+    field item_value = {
+        .tag = FIELD_BOOLEAN,
+        .boolean.value = p.trap.var.value.boolean,
+    };
+
+    field var = {
+        .tag = FIELD_SEQUENCE,
+        .sequence = {
+            .fields = vector_new(),
+        },
+    };
+
+    var.sequence.fields = vector_add(var.sequence.fields, &item_oid);
+    var.sequence.fields = vector_add(var.sequence.fields, &item_value);
+
+    field vars = {
+        .tag = FIELD_SEQUENCE,
+        .sequence = {
+            .fields = vector_new(),
+        },
+    };
+
+    vars.sequence.fields = vector_add(vars.sequence.fields, &var);
+
     field pdu = {
         .tag = FIELD_PDU_TRAP,
         .sequence = {
@@ -68,6 +100,7 @@ slice ssmp_encode_trap(packet p) {
     pdu.pdu.fields = vector_add(pdu.pdu.fields, &category);
     pdu.pdu.fields = vector_add(pdu.pdu.fields, &event);
     pdu.pdu.fields = vector_add(pdu.pdu.fields, &timestamp);
+    pdu.pdu.fields = vector_add(pdu.pdu.fields, &vars);
 
     field trap = {
         .tag = FIELD_SEQUENCE,

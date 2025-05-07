@@ -160,8 +160,8 @@ bool push(message msg) {
         m |= ((uint32_t)msg.swipe & 0x0fffffff);
         break;
 
-    case MESSAGE_INPUTS:
-        m |= msg.inputs & 0x0fffffff;
+    case MESSAGE_EVENT:
+        m |= msg.event & 0x0fffffff;
         break;
     }
 

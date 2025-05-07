@@ -228,12 +228,20 @@ void U3_process(uint8_t data) {
     }
 
     if (inputs != U3x.inputs.state) {
+        uint8_t old = U3x.inputs.state;
         U3x.inputs.state = inputs;
+        EVENT event = EVENT_UNKNOWN;
+
+        if (((U3x.inputs.state & 0x01) == 0x00) && ((old & 0x01) == 0x01)) {
+            event = EVENT_DOOR_1_OPEN;
+        } else if (((U3x.inputs.state & 0x01) == 0x0001) && ((old & 0x01) == 0x00)) {
+            event = EVENT_DOOR_1_CLOSE;
+        }
 
         message qmsg = {
             .message = MSG_EVENT,
-            .tag = MESSAGE_INPUTS,
-            .inputs = U3x.inputs.state,
+            .tag = MESSAGE_EVENT,
+            .event = event,
         };
 
         push(qmsg);

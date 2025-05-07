@@ -33,6 +33,11 @@ typedef struct value {
     };
 } value;
 
+typedef struct var {
+    char *OID;
+    value value;
+} var;
+
 typedef struct packet {
     PACKET tag;
     int64_t version;
@@ -67,7 +72,7 @@ typedef struct packet {
             uint32_t category;
             uint32_t event;
             char *timestamp;
-            value value;
+            var var;
         } trap;
     };
 

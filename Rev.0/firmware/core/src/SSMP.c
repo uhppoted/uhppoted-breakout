@@ -298,7 +298,13 @@ bool SSMP_set(const char *community, int64_t rqid, const char *OID, const value 
 /* SSMP event TRAP implementation.
  *
  */
-void SSMP_trap() {
+void SSMP_trap(EVENT event) {
+    debugf(LOGTAG, ">>>> EVENT %d", event);
+
+    if (event == EVENT_UNKNOWN) {
+        return;
+    }
+
     // ... timestamp
     uint16_t year;
     uint8_t month;
@@ -321,12 +327,28 @@ void SSMP_trap() {
         .trap = {
             .OID = strdup("0.1.3.6.1.4.1.65536"),
             .id = CONTROLLER,
-            .category = 6, // generic-trap: enterprise specific
+            .category = 6, // generic-trap:  enterprise specific
             .event = 0,    // specific-trap: event type
             .timestamp = strdup(timestamp),
-            .value = (value){.tag = VALUE_NULL},
         },
     };
+
+    // ... append event var(s)
+    if (event == EVENT_DOOR_1_OPEN) {
+        trap.trap.var.OID = strdup(MIB_DOORS_1_OPEN.OID);
+        trap.trap.var.value = (value){
+            .tag = VALUE_BOOLEAN,
+            .boolean = true,
+        };
+    }
+
+    if (event == EVENT_DOOR_1_CLOSE) {
+        trap.trap.var.OID = strdup(MIB_DOORS_1_OPEN.OID);
+        trap.trap.var.value = (value){
+            .tag = VALUE_BOOLEAN,
+            .boolean = false,
+        };
+    }
 
     // ... encode
     slice packed = ssmp_encode(trap);

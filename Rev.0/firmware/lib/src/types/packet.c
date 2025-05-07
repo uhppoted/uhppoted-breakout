@@ -32,8 +32,9 @@ void packet_free(packet *p) {
             free(p->community);
             free(p->trap.OID);
             free(p->trap.timestamp);
-            if (p->trap.value.tag == VALUE_OCTET_STRING) {
-                slice_free(&p->trap.value.octets);
+            free(p->trap.var.OID);
+            if (p->trap.var.value.tag == VALUE_OCTET_STRING) {
+                slice_free(&p->trap.var.value.octets);
             }
             break;
         }
