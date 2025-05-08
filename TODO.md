@@ -18,8 +18,18 @@
 
 - [ ] software RTC
       - [ ] use hardware counter/timer
-      - (?) PID
-      - (?) Kalman filter
+            - [x] get-datetime
+            - [x] set-datetime
+            - [x] set-date
+                  - (?) big delta - maybe just set epoch to 0 and wait for/schedule next read
+            - [x] set-time
+                  - (?) big delta
+            - [ ] dow
+            - [ ] fix mutex in get/set-datetime
+            - [ ] remove RTC datetime struct
+            - [ ] synchronize with RX8900SA
+                  - (?) PID
+                  - (?) Kalman filter
 
 - [ ] make debugf, infof, etc interrupt safe
       - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation

@@ -554,10 +554,10 @@ void get_date() {
 }
 
 void set_date(const char *cmd) {
-    uint16_t year;
-    uint8_t month;
-    uint8_t day;
-    uint8_t rc;
+    int year;
+    int month;
+    int day;
+    int rc;
 
     if ((rc = sscanf(cmd, "%04d-%02d-%02d", &year, &month, &day)) == 3) {
         RTC_set_date(year, month, day);

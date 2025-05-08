@@ -23,6 +23,8 @@ bool RTC_on_tick(repeating_timer_t *rt);
 uint8_t dow(uint16_t year, uint8_t month, uint8_t day);
 uint8_t weekday2dow(uint8_t weekday);
 
+void epoch_to_datetime(int64_t, uint16_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *);
+
 struct {
     bool initialised;
     bool ready;
@@ -42,12 +44,6 @@ struct {
         int64_t epoch;
     } timers;
 
-    struct {
-        int64_t RTC;
-        int64_t time;
-        int64_t delta;
-    } drift;
-
     mutex_t guard;
 } RTC = {
     .initialised = false,
@@ -64,12 +60,6 @@ struct {
     .timers = {
         .last_tick = 0,
         .epoch = 0, // 1577836800,
-    },
-
-    .drift = {
-        .RTC = 0,
-        .time = 0,
-        .delta = 0,
     },
 };
 
@@ -149,8 +139,8 @@ void RTC_start() {
     };
 
     I2C0_push(&task);
-    add_repeating_timer_ms(400, RTC_on_update, NULL, &RTC.timers.sync);
-    add_repeating_timer_ms(5000, RTC_on_tick, NULL, &RTC.timers.tick);
+    add_repeating_timer_ms(5000, RTC_on_update, NULL, &RTC.timers.sync);
+    add_repeating_timer_ms(500, RTC_on_tick, NULL, &RTC.timers.tick);
 }
 
 /*
@@ -171,20 +161,17 @@ bool RTC_on_update(repeating_timer_t *rt) {
  * Updates the in-memory date/time from the microsecond hardware counter.
  */
 bool RTC_on_tick(repeating_timer_t *rt) {
-    uint64_t now = time_us_64();
-    int64_t dt = now - RTC.timers.last_tick;
+    if (RTC.initialised && RTC.ready && RTC.timers.epoch != 0) {
+        uint64_t now = time_us_64();
 
-    // debugf(LOGTAG, ">> tick      %ld", now);
-    // debugf(LOGTAG, ">> last tick %ld", RTC.timers.last_tick);
-    // debugf(LOGTAG, ">> epoch     %ld", RTC.timers.epoch);
-    // debugf(LOGTAG, ">>> drift.RTC:  %lu", RTC.drift.RTC);
-    // debugf(LOGTAG, ">>>      .time: %lu", RTC.drift.time);
-    debugf(LOGTAG, ">>> drift.delta:%.3f", (double)RTC.drift.delta / 1000.0);
-    debugf(LOGTAG, ">>       .dt:   %.3f", (double)dt / 1000.0);
+        if (RTC.timers.last_tick != 0) {
+            int64_t dt = now - RTC.timers.last_tick;
 
-    RTC.timers.epoch += dt;
-    RTC.timers.last_tick = now;
+            RTC.timers.epoch += dt;
+        }
 
+        RTC.timers.last_tick = now;
+    }
     return true;
 }
 
@@ -219,16 +206,14 @@ void RTC_read(void *data) {
             }
 
             int64_t epoch = 1000000 * datetime_to_epoch(year, month, day, hour, minute, second);
-            int64_t delta = epoch - RTC.timers.epoch;
 
             if (RTC.timers.epoch == 0) {
                 RTC.timers.epoch = epoch;
-                delta = 0;
-            }
+            } else {
+                int64_t delta = (int64_t)epoch - (int64_t)RTC.timers.epoch;
 
-            RTC.drift.RTC = epoch;
-            RTC.drift.time = RTC.timers.epoch;
-            RTC.drift.delta = delta;
+                debugf(LOGTAG, ">>> GET: %04u-%02u-%02u %02u:%02u:%02u delta:%.3f", year, month, day, hour, minute, second, (double)delta / 1000.0);
+            }
 
             mutex_exit(&RTC.guard);
         }
@@ -246,24 +231,44 @@ void RTC_write(void *data) {
             uint16_t year = dt->yyyymmdd.year;
             uint8_t month = dt->yyyymmdd.month;
             uint8_t day = dt->yyyymmdd.day;
+            uint8_t hour;
+            uint8_t minute;
+            uint8_t second;
             uint8_t dow = dt->yyyymmdd.dow;
             int err;
 
-            if ((err = RX8900SA_set_date(U5, year, month, day)) != ERR_OK) {
+            if (!RTC_get_datetime(NULL, NULL, NULL, &hour, &minute, &second, NULL)) {
+                warnf(LOGTAG, "set-date error (epoch conversion)");
+            } else if ((err = RX8900SA_set_date(U5, year, month, day)) != ERR_OK) {
                 warnf(LOGTAG, "set-date error %d", err);
             } else if ((err = RX8900SA_set_dow(U5, dow)) != ERR_OK) {
                 warnf(LOGTAG, "set-date error %d", err);
+            } else {
+                int64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
+
+                RTC.timers.epoch = 1000000 * epoch;
+                RTC.timers.last_tick = 0;
             }
         }
 
         if (dt->tag == RTC_SET_TIME) {
+            uint16_t year;
+            uint8_t month;
+            uint8_t day;
             uint8_t hour = dt->HHmmss.hour;
             uint8_t minute = dt->HHmmss.minute;
             uint8_t second = dt->HHmmss.second;
             int err;
 
-            if ((err = RX8900SA_set_time(U5, hour, minute, second)) != ERR_OK) {
+            if (!RTC_get_datetime(&year, &month, &day, NULL, NULL, NULL, NULL)) {
+                warnf(LOGTAG, "set-time error (epoch conversion)");
+            } else if ((err = RX8900SA_set_time(U5, hour, minute, second)) != ERR_OK) {
                 warnf(LOGTAG, "set-time error %d", err);
+            } else {
+                int64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
+
+                RTC.timers.epoch = 1000000 * epoch;
+                RTC.timers.last_tick = 0;
             }
         }
 
@@ -279,6 +284,10 @@ void RTC_write(void *data) {
 
             if ((err = RX8900SA_set_datetime(U5, year, month, day, hour, minute, second, dow)) != ERR_OK) {
                 warnf(LOGTAG, "set-datetime error %d", err);
+            } else {
+                int64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
+                RTC.timers.epoch = 1000000 * epoch;
+                RTC.timers.last_tick = 0;
             }
         }
     }
@@ -378,28 +387,39 @@ bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hou
     if (RTC.initialised && RTC.ready) {
         mutex_enter_blocking(&RTC.guard);
 
+        uint16_t yyyy;
+        uint8_t mmm;
+        uint8_t dd;
+        uint8_t HH;
+        uint8_t mm;
+        uint8_t ss;
+
+        int64_t epoch = RTC.timers.epoch / 1000000; // convert µs to s
+
+        epoch_to_datetime(epoch, &yyyy, &mmm, &dd, &HH, &mm, &ss);
+
         if (year != NULL) {
-            *year = RTC.year;
+            *year = yyyy;
         }
 
         if (month != NULL) {
-            *month = RTC.month;
+            *month = mmm;
         }
 
         if (day != NULL) {
-            *day = RTC.day;
+            *day = dd;
         }
 
         if (hour != NULL) {
-            *hour = RTC.hour;
+            *hour = HH;
         }
 
         if (minute != NULL) {
-            *minute = RTC.minute;
+            *minute = mm;
         }
 
         if (second != NULL) {
-            *second = RTC.second;
+            *second = ss;
         }
 
         if (dow != NULL) {
@@ -531,4 +551,53 @@ int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour,
     days += day - 1;
 
     return (int64_t)(days * 86400 + hour * 3600 + min * 60 + sec);
+}
+
+void epoch_to_datetime(int64_t epoch, uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
+    bool is_leap(int y) {
+        return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
+    }
+
+    const int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    int64_t days = epoch / 86400;
+    int64_t rem = epoch % 86400;
+
+    if (rem < 0) {
+        rem += 86400;
+        days -= 1;
+    }
+
+    *hour = rem / 3600;
+    rem %= 3600;
+    *minute = rem / 60;
+    *second = rem % 60;
+
+    int y = 1970;
+    int m;
+
+    while (1) {
+        int yd = is_leap(y) ? 366 : 365;
+        if (days >= yd) {
+            days -= yd;
+            y++;
+        } else {
+            break;
+        }
+    }
+
+    for (m = 0; m < 12; m++) {
+        int dim = days_in_month[m];
+        if (m == 1 && is_leap(y))
+            dim += 1;
+        if (days >= dim) {
+            days -= dim;
+        } else {
+            break;
+        }
+    }
+
+    *year = y;
+    *month = m + 1;
+    *day = days + 1;
 }
