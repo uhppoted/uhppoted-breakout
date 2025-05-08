@@ -36,10 +36,10 @@ type KV struct {
 type Event struct {
 	Timestamp time.Time
 	ID        uint32
-	Category  uint32
-	Event     uint32
-	OID       string
-	Value     any
+	Var       struct {
+		OID   string
+		Value any
+	}
 }
 
 func NewRPC(dial string, listen string, onEvent func(event any)) (*RPC, error) {

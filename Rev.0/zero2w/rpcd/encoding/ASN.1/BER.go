@@ -44,14 +44,14 @@ type Trap struct {
 	Category  uint32
 	Event     uint32
 	Timestamp string
-	// OID OID
-	// Value any
+	Vars      []variable
 }
 
 type sequence []any
+
 type variable struct {
-	oid   OID
-	value any
+	OID   OID
+	Value any
 }
 
 type pdu struct {
@@ -69,6 +69,7 @@ type trap struct {
 	category  uint32
 	event     uint32
 	timestamp string
+	vars      []variable
 }
 
 type null struct{}

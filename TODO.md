@@ -57,16 +57,15 @@
 ### SSMP
     - [ ] guard around write
           - (?) write queue
+
     - [ ] TRAP
           - [x] translate timestamp to DateTime
           - [x] use rtcd time if timestamp is invalid
           - [x] memory leak
           - [x] UDP event
-          - [ ] event item OID
-          - [ ] event item value
-                - //FIXME encode all var types
-          - [ ] open door on PB
-          - [ ] open door on card swipe
+          - [x] event item OID
+          - [x] event item value
+          - [ ] //FIXME encode all var types
           - flush SSMP::write on connected
           - (?) queue if rpcd is not connected
 
@@ -77,6 +76,10 @@
 
     - [ ] GET: multiple OIDs
     - [ ] MIB_find (returns const *MIBItem)
+
+### ACL
+- [ ] open door on PB
+- [ ] open door on card swipe
 
 ## Zero2W
 - [ ] serial logger

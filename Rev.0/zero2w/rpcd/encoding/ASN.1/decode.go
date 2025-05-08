@@ -4,16 +4,7 @@ import (
 	"fmt"
 )
 
-// 48 29
-//
-//		  2 1 0                        version
-//		  4 6 112 117 98 108 105 99    community
-//	   164 16                       TRAP
-//	       6 8 43 6 1 4 1 132 128 0 OID
-//	       2 4 24 42 55 120         id
 func Decode(bytes []byte) (any, error) {
-	fmt.Printf(">>> %v\n", bytes)
-
 	if v, _, err := unpack(bytes); err != nil {
 		return nil, err
 	} else if v == nil {
@@ -49,7 +40,7 @@ func decode_PDU(version int64, community string, PDU pdu) (any, error) {
 				Version:   uint8(version),
 				Community: community,
 				RequestID: PDU.requestId,
-				OID:       v.oid,
+				OID:       v.OID,
 			}, nil
 
 		case tagGetResponse:
@@ -59,8 +50,8 @@ func decode_PDU(version int64, community string, PDU pdu) (any, error) {
 				RequestID:  PDU.requestId,
 				Error:      PDU.errorCode,
 				ErrorIndex: PDU.errorIndex,
-				OID:        v.oid,
-				Value:      v.value,
+				OID:        v.OID,
+				Value:      v.Value,
 			}, nil
 
 		case tagSetRequest:
@@ -68,8 +59,8 @@ func decode_PDU(version int64, community string, PDU pdu) (any, error) {
 				Version:   uint8(version),
 				Community: community,
 				RequestID: PDU.requestId,
-				OID:       v.oid,
-				Value:     v.value,
+				OID:       v.OID,
+				Value:     v.Value,
 			}, nil
 
 		default:
@@ -87,6 +78,7 @@ func decode_TRAP(version int64, community string, TRAP trap) (any, error) {
 		Category:  TRAP.category,
 		Event:     TRAP.event,
 		Timestamp: TRAP.timestamp,
+		Vars:      TRAP.vars,
 	}, nil
 }
 
@@ -337,8 +329,8 @@ func unpack_PDU(tag byte, bytes []byte) (pdu, []byte, error) {
 							return pdu{}, nil, fmt.Errorf("invalid packet variable OID")
 						} else {
 							PDU.vars = append(PDU.vars, variable{
-								oid:   oid,
-								value: v[1],
+								OID:   oid,
+								Value: v[1],
 							})
 						}
 					}
@@ -405,6 +397,24 @@ func unpack_TRAP(tag byte, bytes []byte) (trap, []byte, error) {
 				return trap{}, nil, fmt.Errorf("invalid trap timestamp")
 			} else {
 				TRAP.timestamp = timestamp
+				chunk = remaining
+			}
+
+			if v, remaining, err := unpack(chunk); err != nil {
+				return trap{}, bytes[N:], err
+			} else if vars, ok := v.(sequence); !ok {
+				return trap{}, nil, fmt.Errorf("invalid trap vars list")
+			} else {
+				for _, vv := range vars {
+					if seq, ok := vv.(sequence); !ok || len(seq) != 2 {
+						return trap{}, nil, fmt.Errorf("invalid trap var (%v)", seq)
+					} else if oid, ok := seq[0].(OID); !ok {
+						return trap{}, nil, fmt.Errorf("invalid trap var (%v)", seq)
+					} else {
+						TRAP.vars = append(TRAP.vars, variable{oid, seq[1]})
+					}
+				}
+
 				chunk = remaining
 			}
 		}

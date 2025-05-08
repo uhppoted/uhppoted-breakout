@@ -1,6 +1,8 @@
 package events
 
 import (
+	"fmt"
+
 	"emulator/scmp"
 )
 
@@ -70,6 +72,7 @@ func lookup(OID string) EventType {
 }
 
 func door(OID string) uint8 {
+	fmt.Printf(">>> lookup::event-door %v\n", OID)
 	if oid, err := scmp.Parse(OID); err == nil {
 		doors := map[uint8][]scmp.OID{
 			1: {scmp.OID_DOORS_1_OPEN, scmp.OID_DOORS_1_BUTTON, scmp.OID_DOORS_1_UNLOCKED},
@@ -91,5 +94,26 @@ func door(OID string) uint8 {
 }
 
 func reason(OID string, value any) Reason {
+	if oid, err := scmp.Parse(OID); err == nil {
+		open := []scmp.OID{
+			scmp.OID_DOORS_1_OPEN,
+			scmp.OID_DOORS_2_OPEN,
+			scmp.OID_DOORS_3_OPEN,
+			scmp.OID_DOORS_4_OPEN,
+		}
+
+		for _, v := range open {
+			if scmp.Equal(oid, v) {
+				if b, ok := value.(bool); ok {
+					if b {
+						return ReasonDoorOpen
+					} else {
+						return ReasonDoorClosed
+					}
+				}
+			}
+		}
+	}
+
 	return ReasonUnknown
 }

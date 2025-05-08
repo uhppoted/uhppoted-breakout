@@ -40,10 +40,7 @@ type KV struct {
 type Event struct {
 	Timestamp time.Time
 	ID        uint32
-	Category  uint32
-	Event     uint32
-	OID       string
-	Value     any
+	Var       KV
 }
 
 func NewRPCD(deviceId string, listen string, dial string) (*RPCD, error) {
@@ -156,15 +153,17 @@ func (r *RPCD) Trap(trap any) {
 			timestamp = t
 		}
 
-		oid := fmt.Sprintf("%v", v.OID)
+		kv := KV{}
+		for _, vv := range v.Vars {
+			kv.OID = fmt.Sprintf("%s", vv.OID)
+			kv.Value = vv.Value
+			break
+		}
 
 		var event = Event{
 			Timestamp: timestamp,
 			ID:        v.ID,
-			Category:  v.Category,
-			Event:     v.Event,
-			OID:       oid,
-			Value:     nil, // FIXME
+			Var:       kv,
 		}
 
 		var reply any

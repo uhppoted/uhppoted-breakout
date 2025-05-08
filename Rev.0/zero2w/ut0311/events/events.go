@@ -46,13 +46,13 @@ var Index atomic.Uint32
 func (e *Events) Add(event rpcd.Event) Event {
 	evt := Event{
 		Index:     Index.Add(1),
-		Type:      lookup(event.OID),
+		Type:      lookup(event.Var.OID),
 		Granted:   false,
-		Door:      door(event.OID),
+		Door:      door(event.Var.OID),
 		Direction: 0,
 		Card:      0,
 		Timestamp: event.Timestamp,
-		Reason:    reason(event.OID, event.Value),
+		Reason:    reason(event.Var.OID, event.Var.Value),
 	}
 
 	return evt
