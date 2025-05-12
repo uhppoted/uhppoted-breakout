@@ -3,23 +3,15 @@ package events
 import (
 	"fmt"
 	"sync/atomic"
-	"time"
 
+	"emulator/db"
 	"emulator/driver/rpcd"
+	"emulator/entities"
 	"emulator/log"
 	"emulator/scmp"
 )
 
-type Event struct {
-	Index     uint32    `json:"index"`
-	Type      EventType `json:"type"`
-	Granted   bool      `json:"granted"`
-	Door      uint8     `json:"door"`
-	Direction uint8     `json:"direction"`
-	Card      uint32    `json:"card"`
-	Timestamp time.Time `json:"timestamp,omitempty"`
-	Reason    Reason    `json:"reason"`
-}
+const LOGTAG = "EVENTS"
 
 type Events struct {
 	recordAll bool
@@ -43,9 +35,9 @@ var Index atomic.Uint32
 // 	Value     any
 // }
 
-func (e *Events) Add(event rpcd.Event) Event {
-	evt := Event{
-		Index:     Index.Add(1),
+func (e *Events) Add(event rpcd.Event) entities.Event {
+	evt := entities.Event{
+		Index:     0,
 		Type:      lookup(event.Var.OID),
 		Granted:   false,
 		Door:      door(event.Var.OID),
@@ -53,6 +45,12 @@ func (e *Events) Add(event rpcd.Event) Event {
 		Card:      0,
 		Timestamp: event.Timestamp,
 		Reason:    reason(event.Var.OID, event.Var.Value),
+	}
+
+	if index, err := db.Put(evt); err != nil {
+		warnf("%v", err)
+	} else {
+		evt.Index = index
 	}
 
 	return evt
@@ -248,17 +246,17 @@ func (e *Events) SetString(oid scmp.OID, value string) (string, error) {
 }
 
 func debugf(format string, args ...any) {
-	log.Debugf("SYS", format, args...)
+	log.Debugf(LOGTAG, format, args...)
 }
 
 func infof(format string, args ...any) {
-	log.Infof("SYS", format, args...)
+	log.Infof(LOGTAG, format, args...)
 }
 
 func warnf(format string, args ...any) {
-	log.Warnf("SYS", format, args...)
+	log.Warnf(LOGTAG, format, args...)
 }
 
 func errorf(format string, args ...any) {
-	log.Errorf("SYS", format, args...)
+	log.Errorf(LOGTAG, format, args...)
 }

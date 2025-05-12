@@ -11,6 +11,7 @@ import (
 
 	"emulator/UT0311"
 	"emulator/config"
+	"emulator/db"
 	"emulator/log"
 )
 
@@ -29,6 +30,9 @@ func main() {
 	flag.Parse()
 
 	if cfg, hash, err := config.Load(options.config); err != nil {
+		errorf("%v", err)
+		os.Exit(1)
+	} else if err := db.Init(cfg.DB.DSN); err != nil {
 		errorf("%v", err)
 		os.Exit(1)
 	} else if ut0311, err := UT0311.NewUT0311(&cfg); err != nil {

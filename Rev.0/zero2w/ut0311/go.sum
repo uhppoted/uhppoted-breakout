@@ -1,4 +1,6 @@
-github.com/uhppoted/uhppote-core v0.8.10-0.20241211222320-20932bbf41db h1:a9Jux9RiOdcMEuG5aqQ1G0rz0XndsluPScBVWJnEQN4=
-github.com/uhppoted/uhppote-core v0.8.10-0.20241211222320-20932bbf41db/go.mod h1:oUQdz4NBMXkcwzEHUd6lYQgF6He32+jnb+FMwehZRwg=
+github.com/mattn/go-sqlite3 v1.14.28 h1:ThEiQrnbtumT+QMknw63Befp/ce/nUPgBPMlRFEum7A=
+github.com/mattn/go-sqlite3 v1.14.28/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
+github.com/uhppoted/uhppote-core v0.8.10 h1:A5knaNVpYib10seqevKLWLrAlrgDtY8jMTir/vvhCZw=
+github.com/uhppoted/uhppote-core v0.8.10/go.mod h1:oUQdz4NBMXkcwzEHUd6lYQgF6He32+jnb+FMwehZRwg=
 golang.org/x/time v0.9.0 h1:EsRrnYcQiGH+5FfbgvV4AP7qEZstoyrHB0DzarOQ4ZY=
 golang.org/x/time v0.9.0/go.mod h1:3BpzKBy/shNhVucY/MWOyx10tF3SFh9QdLuxbVysPQM=

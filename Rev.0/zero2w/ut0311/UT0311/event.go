@@ -4,10 +4,10 @@ import (
 	"net/netip"
 
 	"github.com/uhppoted/uhppote-core/messages"
-	"github.com/uhppoted/uhppote-core/types"
+	lib "github.com/uhppoted/uhppote-core/types"
 
 	"emulator/driver/rpcd"
-	"emulator/events"
+	"emulator/entities"
 	"emulator/scmp"
 )
 
@@ -24,14 +24,14 @@ func (ut0311 *UT0311) onEvent(event any) {
 	}
 }
 
-func (ut0311 *UT0311) makeListenEvent(controller uint32, event events.Event) messages.Event {
+func (ut0311 *UT0311) makeListenEvent(controller uint32, event entities.Event) messages.Event {
 	evt := messages.Event{
-		SerialNumber: types.SerialNumber(controller),
+		SerialNumber: lib.SerialNumber(controller),
 
 		EventIndex: event.Index,
 		EventType:  uint8(event.Type),
 		Reason:     uint8(event.Reason),
-		Timestamp:  types.DateTime(event.Timestamp),
+		Timestamp:  lib.DateTime(event.Timestamp),
 		CardNumber: event.Card,
 		Granted:    event.Granted,
 		Door:       event.Door,
@@ -39,11 +39,11 @@ func (ut0311 *UT0311) makeListenEvent(controller uint32, event events.Event) mes
 	}
 
 	// ... system date/time
-	if datetime, err := scmp.Get[types.DateTime](ut0311.driver, scmp.OID_CONTROLLER_DATETIME); err != nil {
+	if datetime, err := scmp.Get[lib.DateTime](ut0311.driver, scmp.OID_CONTROLLER_DATETIME); err != nil {
 		warnf("%v", err)
 	} else {
-		evt.SystemDate = types.SystemDate(datetime)
-		evt.SystemTime = types.SystemTime(datetime)
+		evt.SystemDate = lib.SystemDate(datetime)
+		evt.SystemTime = lib.SystemTime(datetime)
 	}
 
 	// ... system errors

@@ -19,6 +19,7 @@ type Config struct {
 	Network  network `json:"network"`
 	Events   events  `json:"events"`
 	TLS      TLS     `json:"TLS"`
+	DB       db      `json:"db"`
 }
 
 type driver struct {
@@ -51,6 +52,10 @@ type TLS struct {
 type events struct {
 	Listener netip.AddrPort `json:"listener"`
 	Interval uint8          `json:"interval"`
+}
+
+type db struct {
+	DSN string `json:"DSN"`
 }
 
 func Load(filepath string) (Config, []byte, error) {

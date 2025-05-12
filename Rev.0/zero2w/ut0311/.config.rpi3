@@ -18,5 +18,8 @@
     "events": {
         "listener": "192.168.1.100:60001",
         "interval": 0
+    },
+    "db": {
+        "DSN": "sqlite3://../workdir/db/sqlite3/ut0311.db"
     }
 }
