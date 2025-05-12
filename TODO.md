@@ -12,8 +12,6 @@
 
 ### misc
 
-- [x] syserror
-- [x] rework MIB get/set_door_xxx to use OID
 - [x] CLI up arrow for 'last command'
 
 - [ ] software RTC
@@ -21,13 +19,13 @@
             - [x] get-datetime
             - [x] set-datetime
             - [x] set-date
-                  - (?) big delta - maybe just set epoch to 0 and wait for/schedule next read
             - [x] set-time
-                  - (?) big delta
-            - [ ] dow
+            - [x] dow
             - [ ] fix mutex in get/set-datetime
             - [ ] remove RTC datetime struct
             - [ ] synchronize with RX8900SA
+                  - [ ] clear ready on set and wait for read
+                  - (?) big delta on set-date/time - maybe just set epoch to 0 and wait for/schedule next read
                   - (?) PID
                   - (?) Kalman filter
 
@@ -37,6 +35,7 @@
 
 - [ ] Rework print queue
       - (?) setvbuf
+      - (?) reservoir sampling (https://samwho.dev/reservoir-sampling)
 
 - [ ] USB
     - [ ] picotool reset
@@ -76,6 +75,8 @@
 
     - [ ] GET: multiple OIDs
     - [ ] MIB_find (returns const *MIBItem)
+    - [ ] Use 'perfect' hash function
+          - ref. https://www.gnu.org/software/gperf
 
 ### ACL
 - [ ] open door on PB

@@ -227,68 +227,21 @@ void RTC_write(void *data) {
     datetime *dt = (datetime *)data;
 
     if (RTC.initialised) {
-        if (dt->tag == RTC_SET_DATE) {
-            uint16_t year = dt->yyyymmdd.year;
-            uint8_t month = dt->yyyymmdd.month;
-            uint8_t day = dt->yyyymmdd.day;
-            uint8_t hour;
-            uint8_t minute;
-            uint8_t second;
-            uint8_t dow = dt->yyyymmdd.dow;
-            int err;
+        uint16_t year = dt->year;
+        uint8_t month = dt->month;
+        uint8_t day = dt->day;
+        uint8_t hour = dt->hour;
+        uint8_t minute = dt->minute;
+        uint8_t second = dt->second;
+        uint8_t dow = dt->dow;
+        int err;
 
-            if (!RTC_get_datetime(NULL, NULL, NULL, &hour, &minute, &second, NULL)) {
-                warnf(LOGTAG, "set-date error (epoch conversion)");
-            } else if ((err = RX8900SA_set_date(U5, year, month, day)) != ERR_OK) {
-                warnf(LOGTAG, "set-date error %d", err);
-            } else if ((err = RX8900SA_set_dow(U5, dow)) != ERR_OK) {
-                warnf(LOGTAG, "set-date error %d", err);
-            } else {
-                int64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
-
-                RTC.timers.epoch = 1000000 * epoch;
-                RTC.timers.last_tick = 0;
-            }
-        }
-
-        if (dt->tag == RTC_SET_TIME) {
-            uint16_t year;
-            uint8_t month;
-            uint8_t day;
-            uint8_t hour = dt->HHmmss.hour;
-            uint8_t minute = dt->HHmmss.minute;
-            uint8_t second = dt->HHmmss.second;
-            int err;
-
-            if (!RTC_get_datetime(&year, &month, &day, NULL, NULL, NULL, NULL)) {
-                warnf(LOGTAG, "set-time error (epoch conversion)");
-            } else if ((err = RX8900SA_set_time(U5, hour, minute, second)) != ERR_OK) {
-                warnf(LOGTAG, "set-time error %d", err);
-            } else {
-                int64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
-
-                RTC.timers.epoch = 1000000 * epoch;
-                RTC.timers.last_tick = 0;
-            }
-        }
-
-        if (dt->tag == RTC_SET_DATETIME) {
-            uint16_t year = dt->datetime.year;
-            uint8_t month = dt->datetime.month;
-            uint8_t day = dt->datetime.day;
-            uint8_t hour = dt->datetime.hour;
-            uint8_t minute = dt->datetime.minute;
-            uint8_t second = dt->datetime.second;
-            uint8_t dow = dt->datetime.dow;
-            int err;
-
-            if ((err = RX8900SA_set_datetime(U5, year, month, day, hour, minute, second, dow)) != ERR_OK) {
-                warnf(LOGTAG, "set-datetime error %d", err);
-            } else {
-                int64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
-                RTC.timers.epoch = 1000000 * epoch;
-                RTC.timers.last_tick = 0;
-            }
+        if ((err = RX8900SA_set_datetime(U5, year, month, day, hour, minute, second, dow)) != ERR_OK) {
+            warnf(LOGTAG, "set-datetime error %d", err);
+        } else {
+            int64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
+            RTC.timers.epoch = 1000000 * epoch;
+            RTC.timers.last_tick = 0;
         }
     }
 
@@ -318,16 +271,25 @@ bool RTC_ready() {
 bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
     debugf(LOGTAG, "set-date %04u-%02u-%02u  %s", year, month, day, RTC.initialised ? "" : "-- not initialised --");
 
-    if (RTC.initialised) {
-        uint8_t weekday = dow(year, month, day);
-        datetime *dt = datetime_alloc();
+    if (RTC.initialised && RTC.ready) {
+        uint8_t hour;
+        uint8_t minute;
+        uint8_t second;
 
+        if (!RTC_get_datetime(NULL, NULL, NULL, &hour, &minute, &second, NULL)) {
+            warnf(LOGTAG, "set-date error (epoch conversion)");
+            return false;
+        }
+
+        datetime *dt = datetime_alloc();
         if (dt != NULL) {
-            dt->tag = RTC_SET_DATE;
-            dt->yyyymmdd.year = year;
-            dt->yyyymmdd.month = month;
-            dt->yyyymmdd.day = day;
-            dt->yyyymmdd.dow = weekday;
+            dt->year = year;
+            dt->month = month;
+            dt->day = day;
+            dt->dow = dow(year, month, day);
+            dt->hour = hour;
+            dt->minute = minute;
+            dt->second = second;
 
             closure write = {
                 .f = RTC_write,
@@ -353,14 +315,25 @@ bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
 bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
     debugf(LOGTAG, "set-time %02u-%02u-%02u  %s", hour, minute, second, RTC.initialised ? "" : "-- not initialised --");
 
-    if (RTC.initialised) {
-        datetime *dt = datetime_alloc();
+    if (RTC.initialised && RTC.ready) {
+        uint16_t year;
+        uint8_t month;
+        uint8_t day;
 
+        if (!RTC_get_datetime(&year, &month, &day, NULL, NULL, NULL, NULL)) {
+            warnf(LOGTAG, "set-time error (epoch conversion)");
+            return false;
+        }
+
+        datetime *dt = datetime_alloc();
         if (dt != NULL) {
-            dt->tag = RTC_SET_TIME;
-            dt->HHmmss.hour = hour;
-            dt->HHmmss.minute = minute;
-            dt->HHmmss.second = second;
+            dt->year = year;
+            dt->month = month;
+            dt->day = day;
+            dt->dow = dow(year, month, day);
+            dt->hour = hour;
+            dt->minute = minute;
+            dt->second = second;
 
             closure write = {
                 .f = RTC_write,
@@ -383,7 +356,7 @@ bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
     return false;
 }
 
-bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second, uint8_t *dow) {
+bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second, uint8_t *weekday) {
     if (RTC.initialised && RTC.ready) {
         mutex_enter_blocking(&RTC.guard);
 
@@ -422,8 +395,8 @@ bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hou
             *second = ss;
         }
 
-        if (dow != NULL) {
-            *dow = RTC.dow;
+        if (weekday != NULL) {
+            *weekday = dow(yyyy, mmm, dd);
         }
 
         mutex_exit(&RTC.guard);
@@ -441,18 +414,16 @@ bool RTC_set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, u
            RTC.initialised ? "" : "-- not initialised --");
 
     if (RTC.initialised) {
-        uint8_t weekday = dow(year, month, day);
         datetime *dt = datetime_alloc();
 
         if (dt != NULL) {
-            dt->tag = RTC_SET_DATETIME;
-            dt->datetime.year = year;
-            dt->datetime.month = month;
-            dt->datetime.day = day;
-            dt->datetime.dow = weekday;
-            dt->datetime.hour = hour;
-            dt->datetime.minute = minute;
-            dt->datetime.second = second;
+            dt->year = year;
+            dt->month = month;
+            dt->day = day;
+            dt->dow = dow(year, month, day);
+            dt->hour = hour;
+            dt->minute = minute;
+            dt->second = second;
 
             closure write = {
                 .f = RTC_write,
