@@ -83,9 +83,9 @@ int64_t MIB_set_controller_datetime(const char *OID, const value u, value *v) {
     }
 
     // ... check delta < 1s
-    int64_t t1 = datetime_to_epoch(year, month, day, hour, minute, second);
-    int64_t t2 = datetime_to_epoch(yyyy, mm, dd, HH, MM, SS);
-    int64_t dt = t1 < t2 ? t2 - t1 : t1 - t2;
+    uint64_t t1 = datetime_to_epoch(year, month, day, hour, minute, second);
+    uint64_t t2 = datetime_to_epoch(yyyy, mm, dd, HH, MM, SS);
+    int64_t dt = t1 < t2 ? (int64_t)(t2 - t1) : (int64_t)(t1 - t2);
 
     if (dt > 1) {
         return SSMP_ERROR_COMMIT_FAILED;

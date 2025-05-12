@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -41,7 +42,7 @@ struct {
         repeating_timer_t sync;
         repeating_timer_t tick;
         uint64_t last_tick;
-        int64_t epoch;
+        uint64_t epoch;
     } timers;
 
     mutex_t guard;
@@ -205,12 +206,12 @@ void RTC_read(void *data) {
                 RTC.ready = true;
             }
 
-            int64_t epoch = 1000000 * datetime_to_epoch(year, month, day, hour, minute, second);
+            uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
 
             if (RTC.timers.epoch == 0) {
-                RTC.timers.epoch = epoch;
+                RTC.timers.epoch = 1000000 * epoch;
             } else {
-                int64_t delta = (int64_t)epoch - (int64_t)RTC.timers.epoch;
+                int64_t delta = (int64_t)(1000000 * epoch) - (int64_t)RTC.timers.epoch;
 
                 debugf(LOGTAG, ">>> GET: %04u-%02u-%02u %02u:%02u:%02u delta:%.3f", year, month, day, hour, minute, second, (double)delta / 1000.0);
             }
@@ -239,8 +240,10 @@ void RTC_write(void *data) {
         if ((err = RX8900SA_set_datetime(U5, year, month, day, hour, minute, second, dow)) != ERR_OK) {
             warnf(LOGTAG, "set-datetime error %d", err);
         } else {
-            int64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
-            RTC.timers.epoch = 1000000 * epoch;
+            uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
+            uint64_t µs = 500000; // RTC.timers.epoch % 1000000;
+
+            RTC.timers.epoch = (1000000 * epoch) + µs;
             RTC.timers.last_tick = 0;
         }
     }
@@ -496,7 +499,7 @@ uint8_t weekday2dow(uint8_t weekday) {
     }
 }
 
-int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec) {
+uint64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec) {
     bool is_leap(int y) {
         return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
     }
@@ -505,7 +508,7 @@ int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour,
         31, 28, 31, 30, 31, 30,
         31, 31, 30, 31, 30, 31};
 
-    int64_t days = 0;
+    uint64_t days = 0;
 
     // ... years since 1970
     for (int y = 1970; y < year; y++) {
@@ -521,7 +524,7 @@ int64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour,
 
     days += day - 1;
 
-    return (int64_t)(days * 86400 + hour * 3600 + min * 60 + sec);
+    return (uint64_t)(days * 86400 + hour * 3600 + min * 60 + sec);
 }
 
 void epoch_to_datetime(int64_t epoch, uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {

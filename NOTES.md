@@ -139,6 +139,7 @@ return a date/time that is a second after the _set_ datetime.
 2. https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
 3. https://github.com/LukeShu/pico-fmt
 4. https://popovicu.com/posts/bare-metal-printf
+5. https://stackoverflow.com/questions/9225567/how-to-portably-print-a-int64-t-type-in-c/9225648#9225648
 
 ## I2C
 1. pullups
