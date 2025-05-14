@@ -22,10 +22,11 @@
             - [x] set-time
             - [x] dow
             - [x] big delta on set-date/time
-            - [x] ~~fix mutex in get/set-datetime~~
+            - [x] use mutex in set-datetime
             - [x] remove RTC datetime struct
             - [ ] synchronize with RX8900SA
-                  - [ ] clear ready on set and wait for read
+                  - [x] clear ready on set and wait for read
+                  - [ ] scale increment to reduce delta
                   - (?) PID
                   - (?) Kalman filter
 
@@ -72,6 +73,10 @@
           - [x] mode
           - [x] delay
           - [ ] save to flash
+
+    - [ ] `DEBUG  DOORS  settings saved` on `set-time`
+          - only save if OID in 'save list'
+          - // FIXME check OID save list
 
     - [ ] GET: multiple OIDs
     - [ ] MIB_find (returns const *MIBItem)

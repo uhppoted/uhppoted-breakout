@@ -120,7 +120,8 @@ void RTC_start() {
     };
 
     I2C0_push(&task);
-    add_repeating_timer_ms(5000, RTC_on_update, NULL, &RTC.sync);
+
+    add_repeating_timer_ms(15000, RTC_on_update, NULL, &RTC.sync);
     add_repeating_timer_ms(500, RTC_on_tick, NULL, &RTC.tick);
 }
 
@@ -175,22 +176,15 @@ void RTC_read(void *data) {
             syserr_set(ERR_RX8900SA, LOGTAG, "get-datetime error %d", err);
         } else {
             mutex_enter_blocking(&RTC.guard);
-            // RTC.year = year;
-            // RTC.month = month;
-            // RTC.day = day;
-            // RTC.hour = hour;
-            // RTC.minute = minute;
-            // RTC.second = second;
-            // RTC.dow = weekday;
-
             if (!RTC.ready) {
                 RTC.ready = true;
             }
 
             uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
+            uint64_t µs = 500000; // RTC.timers.epoch % 1000000;
 
             if (RTC.epoch == 0) {
-                RTC.epoch = 1000000 * epoch;
+                RTC.epoch = 1000000 * epoch + µs;
             } else {
                 int64_t delta = (int64_t)(1000000 * epoch) - (int64_t)RTC.epoch;
 
@@ -221,11 +215,16 @@ void RTC_write(void *data) {
         if ((err = RX8900SA_set_datetime(U5, year, month, day, hour, minute, second, dow)) != ERR_OK) {
             warnf(LOGTAG, "set-datetime error %d", err);
         } else {
-            uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
-            uint64_t µs = 500000; // RTC.timers.epoch % 1000000;
+            // uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
+            // uint64_t µs = 500000; // RTC.timers.epoch % 1000000;
+            //
+            // RTC.epoch = (1000000 * epoch) + µs;
 
-            RTC.epoch = (1000000 * epoch) + µs;
+            mutex_enter_blocking(&RTC.guard);
+            RTC.ready = false;
+            RTC.epoch = 0;
             RTC.last_tick = 0;
+            mutex_exit(&RTC.guard);
         }
     }
 
