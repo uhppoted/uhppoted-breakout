@@ -24,44 +24,24 @@ bool RTC_on_tick(repeating_timer_t *rt);
 uint8_t dow(uint16_t year, uint8_t month, uint8_t day);
 uint8_t weekday2dow(uint8_t weekday);
 
-void epoch_to_datetime(int64_t, uint16_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *);
+void epoch_to_datetime(uint64_t, uint16_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *);
 
 struct {
     bool initialised;
     bool ready;
 
-    uint16_t year;
-    uint8_t month;
-    uint8_t day;
-    uint8_t hour;
-    uint8_t minute;
-    uint8_t second;
-    uint8_t dow;
-
-    struct {
-        repeating_timer_t sync;
-        repeating_timer_t tick;
-        uint64_t last_tick;
-        uint64_t epoch;
-    } timers;
+    repeating_timer_t sync;
+    repeating_timer_t tick;
+    uint64_t last_tick;
+    uint64_t epoch;
 
     mutex_t guard;
 } RTC = {
     .initialised = false,
     .ready = false,
 
-    .year = 2020,
-    .month = 1,
-    .day = 1,
-    .hour = 0,
-    .minute = 0,
-    .second = 0,
-    .dow = 0x08, // Wednesday
-
-    .timers = {
-        .last_tick = 0,
-        .epoch = 0, // 1577836800,
-    },
+    .last_tick = 0,
+    .epoch = 0,
 };
 
 /*
@@ -140,8 +120,8 @@ void RTC_start() {
     };
 
     I2C0_push(&task);
-    add_repeating_timer_ms(5000, RTC_on_update, NULL, &RTC.timers.sync);
-    add_repeating_timer_ms(500, RTC_on_tick, NULL, &RTC.timers.tick);
+    add_repeating_timer_ms(5000, RTC_on_update, NULL, &RTC.sync);
+    add_repeating_timer_ms(500, RTC_on_tick, NULL, &RTC.tick);
 }
 
 /*
@@ -162,17 +142,18 @@ bool RTC_on_update(repeating_timer_t *rt) {
  * Updates the in-memory date/time from the microsecond hardware counter.
  */
 bool RTC_on_tick(repeating_timer_t *rt) {
-    if (RTC.initialised && RTC.ready && RTC.timers.epoch != 0) {
+    if (RTC.initialised && RTC.ready && RTC.epoch != 0) {
         uint64_t now = time_us_64();
 
-        if (RTC.timers.last_tick != 0) {
-            int64_t dt = now - RTC.timers.last_tick;
+        if (RTC.last_tick != 0) {
+            int64_t dt = now - RTC.last_tick;
 
-            RTC.timers.epoch += dt;
+            RTC.epoch += dt;
         }
 
-        RTC.timers.last_tick = now;
+        RTC.last_tick = now;
     }
+
     return true;
 }
 
@@ -194,13 +175,13 @@ void RTC_read(void *data) {
             syserr_set(ERR_RX8900SA, LOGTAG, "get-datetime error %d", err);
         } else {
             mutex_enter_blocking(&RTC.guard);
-            RTC.year = year;
-            RTC.month = month;
-            RTC.day = day;
-            RTC.hour = hour;
-            RTC.minute = minute;
-            RTC.second = second;
-            RTC.dow = weekday;
+            // RTC.year = year;
+            // RTC.month = month;
+            // RTC.day = day;
+            // RTC.hour = hour;
+            // RTC.minute = minute;
+            // RTC.second = second;
+            // RTC.dow = weekday;
 
             if (!RTC.ready) {
                 RTC.ready = true;
@@ -208,10 +189,10 @@ void RTC_read(void *data) {
 
             uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
 
-            if (RTC.timers.epoch == 0) {
-                RTC.timers.epoch = 1000000 * epoch;
+            if (RTC.epoch == 0) {
+                RTC.epoch = 1000000 * epoch;
             } else {
-                int64_t delta = (int64_t)(1000000 * epoch) - (int64_t)RTC.timers.epoch;
+                int64_t delta = (int64_t)(1000000 * epoch) - (int64_t)RTC.epoch;
 
                 debugf(LOGTAG, ">>> GET: %04u-%02u-%02u %02u:%02u:%02u delta:%.3f", year, month, day, hour, minute, second, (double)delta / 1000.0);
             }
@@ -243,8 +224,8 @@ void RTC_write(void *data) {
             uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
             uint64_t µs = 500000; // RTC.timers.epoch % 1000000;
 
-            RTC.timers.epoch = (1000000 * epoch) + µs;
-            RTC.timers.last_tick = 0;
+            RTC.epoch = (1000000 * epoch) + µs;
+            RTC.last_tick = 0;
         }
     }
 
@@ -370,7 +351,7 @@ bool RTC_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hou
         uint8_t mm;
         uint8_t ss;
 
-        int64_t epoch = RTC.timers.epoch / 1000000; // convert µs to s
+        uint64_t epoch = RTC.epoch / 1000000; // convert µs to s
 
         epoch_to_datetime(epoch, &yyyy, &mmm, &dd, &HH, &mm, &ss);
 
@@ -527,15 +508,15 @@ uint64_t datetime_to_epoch(uint16_t year, uint8_t mon, uint8_t day, uint8_t hour
     return (uint64_t)(days * 86400 + hour * 3600 + min * 60 + sec);
 }
 
-void epoch_to_datetime(int64_t epoch, uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
+void epoch_to_datetime(uint64_t epoch, uint16_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
     bool is_leap(int y) {
         return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
     }
 
     const int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    int64_t days = epoch / 86400;
-    int64_t rem = epoch % 86400;
+    uint64_t days = epoch / 86400;
+    uint64_t rem = epoch % 86400;
 
     if (rem < 0) {
         rem += 86400;

@@ -22,8 +22,8 @@
             - [x] set-time
             - [x] dow
             - [x] big delta on set-date/time
-            - [ ] fix mutex in get/set-datetime
-            - [ ] remove RTC datetime struct
+            - [x] ~~fix mutex in get/set-datetime~~
+            - [x] remove RTC datetime struct
             - [ ] synchronize with RX8900SA
                   - [ ] clear ready on set and wait for read
                   - (?) PID
