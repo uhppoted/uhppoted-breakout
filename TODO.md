@@ -95,7 +95,7 @@
 
 ### UT0311
     - [x] store events to SQLite DB
-    - [ ] rpcd::shutdown RPC listener
+    - [x] rpcd::shutdown RPC listener
     - [ ] open door on PB
     - [ ] open door on card swipe
     - [ ] rework with text tags

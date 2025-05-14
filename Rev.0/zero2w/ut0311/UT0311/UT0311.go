@@ -165,6 +165,16 @@ func (ut0311 *UT0311) Stop() {
 		wg.Done()
 	}()
 
+	wg.Add(1)
+	go func() {
+		infof("stopping SSMP event handler")
+		if err := ut0311.driver.Stop(); err != nil {
+			warnf("%v", err)
+		}
+
+		wg.Done()
+	}()
+
 	go func() {
 		wg.Wait()
 		closed <- struct{}{}

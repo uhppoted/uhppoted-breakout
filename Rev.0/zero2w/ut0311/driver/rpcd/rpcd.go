@@ -1,6 +1,7 @@
 package rpcd
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sync"
 	"time"
 
 	"emulator/log"
@@ -25,6 +27,9 @@ type RPC struct {
 		address string
 	}
 
+	ctx     context.Context
+	cancel  context.CancelFunc
+	wg      sync.WaitGroup
 	onEvent func(event any)
 }
 
@@ -45,7 +50,11 @@ type Event struct {
 func NewRPC(dial string, listen string, onEvent func(event any)) (*RPC, error) {
 	infof("init dial:%v", dial)
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	r := RPC{
+		ctx:     ctx,
+		cancel:  cancel,
 		onEvent: onEvent,
 	}
 
@@ -79,17 +88,40 @@ func (r *RPC) Listen() {
 		os.Remove(r.listen.address)
 	}
 
+	r.wg.Add(1)
 	if l, err := net.Listen(r.listen.network, r.listen.address); err != nil {
 		errorf("listen error: %v", err)
 	} else {
 		defer l.Close()
-		// go func() {
-		// 	<-r.ctx.Done()
-		// 	l.Close()
-		// }()
+
+		go func() {
+			<-r.ctx.Done()
+			l.Close()
+		}()
 
 		infof("listening %v %v", r.listen.network, r.listen.address)
 		http.Serve(l, nil)
+	}
+
+	r.wg.Done()
+}
+
+func (r *RPC) Stop() error {
+	infof("stop")
+
+	terminated := make(chan bool)
+	go func() {
+		r.cancel()
+		r.wg.Wait()
+
+		terminated <- true
+	}()
+
+	select {
+	case <-terminated:
+		return nil
+	case <-time.After(5 * time.Second):
+		return nil
 	}
 }
 
