@@ -26,5 +26,5 @@ func Init(dsn string) error {
 }
 
 func Put(event entities.Event) (uint32, error) {
-	return 0, fmt.Errorf("*** NOT IMPLEMENTED ***")
+	return db.PutEvent(event)
 }

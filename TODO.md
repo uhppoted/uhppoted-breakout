@@ -26,6 +26,7 @@
             - [x] remove RTC datetime struct
             - [ ] synchronize with RX8900SA
                   - [x] clear ready on set and wait for read
+                  - [ ] (experimental) set us from from current epoch
                   - [ ] scale increment to reduce delta
                   - (?) PID
                   - (?) Kalman filter
@@ -93,7 +94,7 @@
       - https://github.com/raspberrypi/rpi-image-gen
 
 ### UT0311
-    - [ ] store events to SQLite DB
+    - [x] store events to SQLite DB
     - [ ] rpcd::shutdown RPC listener
     - [ ] open door on PB
     - [ ] open door on card swipe
