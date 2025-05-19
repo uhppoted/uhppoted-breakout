@@ -15,6 +15,11 @@
 
 #define LOGTAG "RTC"
 
+const int32_t RTC_SYNC_INTERVAL = 15000;
+const int32_t RTC_TICK_INTERVAL = 500;
+const double Kp = 0.0025;
+// const double Kp = 0.0001;
+
 int64_t RTC_on_setup(alarm_id_t id, void *data);
 void RTC_setup();
 void RTC_read(void *data);
@@ -34,6 +39,7 @@ struct {
     repeating_timer_t tick;
     uint64_t last_tick;
     uint64_t epoch;
+    double k;
 
     mutex_t guard;
 } RTC = {
@@ -42,6 +48,7 @@ struct {
 
     .last_tick = 0,
     .epoch = 0,
+    .k = 1.0,
 };
 
 /*
@@ -121,8 +128,8 @@ void RTC_start() {
 
     I2C0_push(&task);
 
-    add_repeating_timer_ms(15000, RTC_on_update, NULL, &RTC.sync);
-    add_repeating_timer_ms(500, RTC_on_tick, NULL, &RTC.tick);
+    add_repeating_timer_ms(RTC_SYNC_INTERVAL, RTC_on_update, NULL, &RTC.sync);
+    add_repeating_timer_ms(RTC_TICK_INTERVAL, RTC_on_tick, NULL, &RTC.tick);
 }
 
 /*
@@ -147,9 +154,12 @@ bool RTC_on_tick(repeating_timer_t *rt) {
         uint64_t now = time_us_64();
 
         if (RTC.last_tick != 0) {
-            int64_t dt = now - RTC.last_tick;
+            int64_t delta = now - RTC.last_tick;
+            double dt = RTC.k * (double)delta;
 
-            RTC.epoch += dt;
+            //  debugf(LOGTAG, ">>> delta:%lld  dt:%llf  %lld", delta, dt, (int64_t)dt);
+
+            RTC.epoch += (int64_t)dt;
         }
 
         RTC.last_tick = now;
@@ -186,9 +196,25 @@ void RTC_read(void *data) {
             if (RTC.epoch == 0) {
                 RTC.epoch = 1000000 * epoch + µs;
             } else {
-                int64_t delta = (int64_t)(1000000 * epoch) - (int64_t)RTC.epoch;
+                int64_t error = (int64_t)(1000000 * epoch) - (int64_t)RTC.epoch;
+                double g = Kp * (double)RTC_TICK_INTERVAL / (double)RTC_SYNC_INTERVAL;
+                double e = g * (double)error / 1000.0;
+                double k = 1.0 + e;
 
-                debugf(LOGTAG, ">>> GET: %04u-%02u-%02u %02u:%02u:%02u delta:%.3f", year, month, day, hour, minute, second, (double)delta / 1000.0);
+                debugf(LOGTAG, ">>> GET: %04u-%02u-%02u %02u:%02u:%02u delta:%.3llf e:%.3llf k:%.3llf (%.3llf)",
+                       year, month, day, hour, minute, second,
+                       (double)error / 1000.0,
+                       e,
+                       RTC.k,
+                       k);
+
+                if (k < 0.75) {
+                    RTC.k = 0.75;
+                } else if (k > 1.25) {
+                    RTC.k = 1.25;
+                } else {
+                    RTC.k = k;
+                }
             }
 
             mutex_exit(&RTC.guard);
@@ -296,7 +322,7 @@ bool RTC_set_date(uint16_t year, uint8_t month, uint8_t day) {
 }
 
 bool RTC_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
-    debugf(LOGTAG, "set-time %02u-%02u-%02u  %s", hour, minute, second, RTC.initialised ? "" : "-- not initialised --");
+    debugf(LOGTAG, "set-time %02u:%02u:%02u  %s", hour, minute, second, RTC.initialised ? "" : "-- not initialised --");
 
     if (RTC.initialised && RTC.ready) {
         uint16_t year;

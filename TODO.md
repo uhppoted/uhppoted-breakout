@@ -7,6 +7,7 @@
     - [ ] monitor
     - (?) Context.WithTimeout 
     - (?) https://go.dev/blog/synctest
+    - socat: https://tinkering.xyz/async-serial/
 
 ## breakout
 
@@ -24,11 +25,12 @@
             - [x] big delta on set-date/time
             - [x] use mutex in set-datetime
             - [x] remove RTC datetime struct
+            - https://hueffner.de/falk/blog/a-leap-year-check-in-three-instructions.html
             - [ ] synchronize with RX8900SA
                   - [x] clear ready on set and wait for read
-                  - [ ] (experimental) set us from from current epoch
+                  - [ ] PID
+                  - [ ] (experimental) set µs from from current epoch
                   - [ ] scale increment to reduce delta
-                  - (?) PID
                   - (?) Kalman filter
 
 - [ ] make debugf, infof, etc interrupt safe
