@@ -26,15 +26,6 @@ func NewEvents() *Events {
 
 var Index atomic.Uint32
 
-// type Event struct {
-// 	Timestamp time.Time
-// 	ID        uint32
-// 	Category  uint32
-// 	Event     uint32
-// 	OID       string
-// 	Value     any
-// }
-
 func (e *Events) Add(event rpcd.Event) entities.Event {
 	evt := entities.Event{
 		Index:     0,
@@ -54,6 +45,14 @@ func (e *Events) Add(event rpcd.Event) entities.Event {
 	}
 
 	return evt
+}
+
+func (e *Events) Get(index uint32) (entities.Event, error) {
+	if record, err := db.Get(index); err != nil {
+		return entities.Event{}, err
+	} else {
+		return record, nil
+	}
 }
 
 func (e *Events) GetUint8(oid scmp.OID) (uint8, error) {

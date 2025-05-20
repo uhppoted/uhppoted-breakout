@@ -9,6 +9,7 @@ import (
 )
 
 type DB interface {
+	GetEvent(index uint32) (entities.Event, error)
 	PutEvent(event entities.Event) (uint32, error)
 }
 
@@ -23,6 +24,10 @@ func Init(dsn string) error {
 	default:
 		return fmt.Errorf("unsupported DSN (%v)", dsn)
 	}
+}
+
+func Get(index uint32) (entities.Event, error) {
+	return db.GetEvent(index)
 }
 
 func Put(event entities.Event) (uint32, error) {

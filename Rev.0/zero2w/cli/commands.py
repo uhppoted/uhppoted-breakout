@@ -266,8 +266,8 @@ def delete_all_cards(u, dest, timeout, args, protocol='udp'):
 
 
 def get_event(u, dest, timeout, args, protocol='udp'):
-    controller = (CONTROLLER, dest, protocol)
-    index = EVENT_INDEX
+    controller = (args.controller, dest, protocol)
+    index = args.event
 
     response = u.get_event(controller, index, timeout=timeout)
     if response.event_type == 0xff:

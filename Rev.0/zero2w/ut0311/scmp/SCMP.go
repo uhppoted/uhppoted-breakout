@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/netip"
 
-	"github.com/uhppoted/uhppote-core/types"
+	lib "github.com/uhppoted/uhppote-core/types"
 )
 
 type GetV interface {
@@ -109,19 +109,19 @@ func Get[T any](scmp GetV, oid OID) (T, error) {
 			return any(MAC).(T), nil
 		}
 
-	case types.Date:
+	case lib.Date:
 		if v, err := scmp.GetString(oid); err != nil {
 			return zero, err
-		} else if date, err := types.ParseDate(v); err != nil {
+		} else if date, err := lib.ParseDate(v); err != nil {
 			return zero, err
 		} else {
 			return any(date).(T), nil
 		}
 
-	case types.DateTime:
+	case lib.DateTime:
 		if v, err := scmp.GetString(oid); err != nil {
 			return zero, err
-		} else if datetime, err := types.ParseDateTime(v); err != nil {
+		} else if datetime, err := lib.ParseDateTime(v); err != nil {
 			return zero, err
 		} else {
 			return any(datetime).(T), nil
@@ -156,19 +156,19 @@ func GetIndexed[T any](scmp GetI, oid OID, index uint32) (T, error) {
 			return any(v).(T), nil
 		}
 
-	case types.DateTime:
+	case lib.DateTime:
 		if v, err := scmp.GetIndexedString(oid, index); err != nil {
 			return zero, err
-		} else if datetime, err := types.ParseDateTime(v); err != nil {
+		} else if datetime, err := lib.ParseDateTime(v); err != nil {
 			return zero, err
 		} else {
 			return any(datetime).(T), nil
 		}
 
-	case types.Date:
+	case lib.Date:
 		if v, err := scmp.GetIndexedString(oid, index); err != nil {
 			return zero, err
-		} else if date, err := types.ParseDate(v); err != nil {
+		} else if date, err := lib.ParseDate(v); err != nil {
 			return zero, err
 		} else {
 			return any(date).(T), nil
@@ -228,10 +228,10 @@ func Set[T any](scmp SetV, oid OID, val T) (T, error) {
 			return any(addr).(T), nil
 		}
 
-	case types.DateTime:
+	case lib.DateTime:
 		if s, err := scmp.SetString(oid, fmt.Sprintf("%v", v)); err != nil {
 			return zero, err
-		} else if datetime, err := types.ParseDateTime(s); err != nil {
+		} else if datetime, err := lib.ParseDateTime(s); err != nil {
 			return zero, err
 		} else {
 			return any(datetime).(T), nil

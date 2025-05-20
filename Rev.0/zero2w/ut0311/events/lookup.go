@@ -45,7 +45,7 @@ func door(OID string) uint8 {
 	return 0
 }
 
-func reason(OID string, value any) entities.Reason {
+func reason(OID string, value any) entities.EventReason {
 	if oid, err := scmp.Parse(OID); err == nil {
 		open := []scmp.OID{
 			scmp.OID_DOORS_1_OPEN,

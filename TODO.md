@@ -13,8 +13,6 @@
 
 ### misc
 
-- [x] CLI up arrow for 'last command'
-
 - [ ] software RTC
       - [ ] use hardware counter/timer
             - [x] get-datetime
@@ -31,7 +29,6 @@
                   - [ ] PID
                   - [ ] reduce tick interval to 100ms
                   - [ ] (experimental) set µs from from current epoch
-                  - [ ] scale increment to reduce delta
                   - (?) Kalman filter
 
 - [ ] make debugf, infof, etc interrupt safe
@@ -125,6 +122,9 @@
       - [x] get-event-index
       - [x] set-event-index
       - [ ] get-event
+            - [x] event
+            - [ ] not found
+            - [ ] overwritten
       - [ ] get-time-profiles
       - [ ] set-time-profile
       - [ ] clear-time-profiles

@@ -75,5 +75,8 @@ get-event-index:
 set-event-index:
 	python3 main.py set-event-index
 
+get-event:
+	python3 main.py get-event --controller $(CONTROLLER) --event 13
+
 listen:
 	python3 main.py listen

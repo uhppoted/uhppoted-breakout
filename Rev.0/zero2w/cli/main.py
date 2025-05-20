@@ -179,6 +179,10 @@ def parse_args():
                            type=int,
                            default=CONTROLLER,
                            help='controller serial number, e.g. 405419896')
+    get_event.add_argument('--event',
+                           type=int,
+                           default=1,
+                           help='event index, e.g. 1735')
 
     # ... record-special-events
     record_special_events = parsers['record-special-events']

@@ -18,9 +18,7 @@ import (
 const MaxLifetime = 5 * time.Minute
 const MaxIdle = 2
 const MaxOpen = 5
-const LOGTAG = "sqlite3"
-
-// type record map[string]any
+const LogTag = "sqlite3"
 
 type impl struct {
 	dsn         string
@@ -38,13 +36,92 @@ func NewDB(dsn string) impl {
 	}
 }
 
+func (db impl) GetEvent(index uint32) (entities.Event, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	defer cancel()
+
+	query := fmt.Sprintf(`SELECT CAST(Timestamp AS VARCHAR),Type,Granted,Door,Direction,CardNumber,Reason FROM Events WHERE EventID=?;`)
+
+	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+		return entities.Event{}, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+	} else if err != nil {
+		return entities.Event{}, err
+	}
+
+	if dbc, err := db.open(); err != nil {
+		return entities.Event{}, err
+	} else if dbc == nil {
+		return entities.Event{}, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+	} else if prepared, err := dbc.Prepare(query); err != nil {
+		return entities.Event{}, err
+	} else if rs, err := prepared.QueryContext(ctx, index); err != nil {
+		return entities.Event{}, err
+	} else if rs == nil {
+		return entities.Event{}, fmt.Errorf("invalid resultset (%v)", rs)
+	} else {
+		defer rs.Close()
+
+		for rs.Next() {
+			record := struct {
+				timestamp string
+				event     uint8
+				granted   uint8
+				door      uint8
+				direction uint8
+				card      uint32
+				reason    uint8
+			}{}
+
+			pointers := []any{
+				&record.timestamp,
+				&record.event,
+				&record.granted,
+				&record.door,
+				&record.direction,
+				&record.card,
+				&record.reason,
+			}
+
+			if err := rs.Scan(pointers...); err != nil {
+				return entities.Event{}, err
+			} else {
+				timestamp := time.Time{}
+				if v, err := time.ParseInLocation("2006-01-02 15:04:05", record.timestamp[0:19], time.Local); err != nil {
+					warnf("%v", err)
+				} else {
+					timestamp = v
+				}
+
+				granted := false
+				if record.granted == 1 {
+					granted = true
+				}
+
+				return entities.Event{
+					Index:     index,
+					Timestamp: timestamp,
+					Type:      entities.EventType(record.event),
+					Granted:   granted,
+					Door:      record.door,
+					Direction: record.direction,
+					Card:      record.card,
+					Reason:    entities.EventReason(record.reason),
+				}, nil
+			}
+		}
+
+		return entities.Event{}, entities.ErrRecordNotFound
+	}
+}
+
 func (db impl) PutEvent(event entities.Event) (uint32, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
 	defer cancel()
 
 	record := map[string]any{
-		"Timestamp":  fmt.Sprintf("%v", event.Timestamp),
+		"Timestamp":  fmt.Sprintf("2006-01-02 15:04:05", event.Timestamp),
 		"Type":       event.Type,
 		"Granted":    event.Granted,
 		"Door":       event.Door,
@@ -122,17 +199,17 @@ func (db impl) insert(dbc *sql.DB, tx *sql.Tx, table string, record map[string]a
 }
 
 func debugf(format string, args ...any) {
-	log.Debugf(LOGTAG, format, args...)
+	log.Debugf(LogTag, format, args...)
 }
 
 func infof(format string, args ...any) {
-	log.Infof(LOGTAG, format, args...)
+	log.Infof(LogTag, format, args...)
 }
 
 func warnf(format string, args ...any) {
-	log.Warnf(LOGTAG, format, args...)
+	log.Warnf(LogTag, format, args...)
 }
 
 func errorf(format string, args ...any) {
-	log.Errorf(LOGTAG, format, args...)
+	log.Errorf(LogTag, format, args...)
 }

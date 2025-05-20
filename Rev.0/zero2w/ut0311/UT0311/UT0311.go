@@ -304,6 +304,9 @@ func (ut0311 UT0311) dispatch(ctx context.Context, request any) (any, error) {
 	case *messages.SetEventIndexRequest:
 		return ut0311.setEventIndex(rq)
 
+	case *messages.GetEventRequest:
+		return ut0311.getEvent(rq)
+
 	default:
 		warnf("unknown message type (%T)", request)
 	}
