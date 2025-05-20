@@ -17,8 +17,8 @@
 
 const int32_t RTC_SYNC_INTERVAL = 15000;
 const int32_t RTC_TICK_INTERVAL = 500;
-const double Kp = 0.0025;
-// const double Kp = 0.0001;
+const double Kp = 0.00015 * (double)RTC_TICK_INTERVAL / 1000.0;
+const double Ki = 0.00005 * (double)RTC_TICK_INTERVAL / 1000.0;
 
 int64_t RTC_on_setup(alarm_id_t id, void *data);
 void RTC_setup();
@@ -40,6 +40,7 @@ struct {
     uint64_t last_tick;
     uint64_t epoch;
     double k;
+    double integral;
 
     mutex_t guard;
 } RTC = {
@@ -49,6 +50,7 @@ struct {
     .last_tick = 0,
     .epoch = 0,
     .k = 1.0,
+    .integral = 0.0,
 };
 
 /*
@@ -197,16 +199,20 @@ void RTC_read(void *data) {
                 RTC.epoch = 1000000 * epoch + µs;
             } else {
                 int64_t error = (int64_t)(1000000 * epoch) - (int64_t)RTC.epoch;
-                double g = Kp * (double)RTC_TICK_INTERVAL / (double)RTC_SYNC_INTERVAL;
-                double e = g * (double)error / 1000.0;
-                double k = 1.0 + e;
+                double e = (double)error / 1000.0;
+                double integral = RTC.integral + e;
+                double delta = Kp * e + Ki * integral;
+                double k = 1.0 + delta;
 
-                debugf(LOGTAG, ">>> GET: %04u-%02u-%02u %02u:%02u:%02u delta:%.3llf e:%.3llf k:%.3llf (%.3llf)",
+                RTC.integral = integral;
+
+                debugf(LOGTAG, ">>> GET: %04u-%02u-%02u %02u:%02u:%02u error:%.3llf delta:%.3llf k:%.3llf (%.3llf) sigma:%llf",
                        year, month, day, hour, minute, second,
                        (double)error / 1000.0,
-                       e,
+                       delta,
                        RTC.k,
-                       k);
+                       k,
+                       integral);
 
                 if (k < 0.75) {
                     RTC.k = 0.75;

@@ -29,6 +29,7 @@
             - [ ] synchronize with RX8900SA
                   - [x] clear ready on set and wait for read
                   - [ ] PID
+                  - [ ] reduce tick interval to 100ms
                   - [ ] (experimental) set µs from from current epoch
                   - [ ] scale increment to reduce delta
                   - (?) Kalman filter
@@ -191,6 +192,8 @@
      - (?) https://github.com/stevenj/GenPinoutSVG
      - (?) https://yaqwsx.github.io/Pinion/
      - (?) https://github.com/splitbrain/pinoutleaf
+- OCDSP
+  - https://github.com/bytedreamer/Aporta
 
 ### Rust
 - https://rtic.rs/1/book/en/preface.html
