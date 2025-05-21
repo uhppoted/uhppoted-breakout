@@ -115,6 +115,47 @@ func (db impl) GetEvent(index uint32) (entities.Event, error) {
 	}
 }
 
+func (db impl) GetEvents() (uint32, uint32, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	defer cancel()
+
+	query := fmt.Sprintf(`SELECT MIN(EventID) AS First,MAX(EventID) AS Last FROM Events;`)
+
+	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+		return 0, 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+	} else if err != nil {
+		return 0, 0, err
+	}
+
+	if dbc, err := db.open(); err != nil {
+		return 0, 0, err
+	} else if dbc == nil {
+		return 0, 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+	} else if prepared, err := dbc.Prepare(query); err != nil {
+		return 0, 0, err
+	} else if rs, err := prepared.QueryContext(ctx); err != nil {
+		return 0, 0, err
+	} else if rs == nil {
+		return 0, 0, fmt.Errorf("invalid resultset (%v)", rs)
+	} else {
+		defer rs.Close()
+
+		for rs.Next() {
+			var first uint32
+			var last uint32
+
+			if err := rs.Scan(&first, &last); err != nil {
+				return 0, 0, err
+			} else {
+				return first, last, nil
+			}
+		}
+
+		return 0, 0, entities.ErrRecordNotFound
+	}
+}
+
 func (db impl) PutEvent(event entities.Event) (uint32, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 

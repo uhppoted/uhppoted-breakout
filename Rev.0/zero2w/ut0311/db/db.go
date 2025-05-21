@@ -9,6 +9,7 @@ import (
 )
 
 type DB interface {
+	GetEvents() (uint32, uint32, error)
 	GetEvent(index uint32) (entities.Event, error)
 	PutEvent(event entities.Event) (uint32, error)
 }
@@ -26,10 +27,14 @@ func Init(dsn string) error {
 	}
 }
 
-func Get(index uint32) (entities.Event, error) {
+func GetEvents() (uint32, uint32, error) {
+	return db.GetEvents()
+}
+
+func GetEvent(index uint32) (entities.Event, error) {
 	return db.GetEvent(index)
 }
 
-func Put(event entities.Event) (uint32, error) {
+func PutEvent(event entities.Event) (uint32, error) {
 	return db.PutEvent(event)
 }

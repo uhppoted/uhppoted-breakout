@@ -1,6 +1,7 @@
 package events
 
 import (
+	"errors"
 	"fmt"
 	"sync/atomic"
 
@@ -38,7 +39,7 @@ func (e *Events) Add(event rpcd.Event) entities.Event {
 		Reason:    reason(event.Var.OID, event.Var.Value),
 	}
 
-	if index, err := db.Put(evt); err != nil {
+	if index, err := db.PutEvent(evt); err != nil {
 		warnf("%v", err)
 	} else {
 		evt.Index = index
@@ -48,10 +49,33 @@ func (e *Events) Add(event rpcd.Event) entities.Event {
 }
 
 func (e *Events) Get(index uint32) (entities.Event, error) {
-	if record, err := db.Get(index); err != nil {
+	get := func(ix uint32) (entities.Event, error) {
+		if record, err := db.GetEvent(ix); err != nil {
+			return entities.Event{}, err
+		} else {
+			return record, nil
+		}
+	}
+
+	if record, err := get(index); err != nil && !errors.Is(err, entities.ErrRecordNotFound) {
 		return entities.Event{}, err
-	} else {
+	} else if err == nil {
 		return record, nil
+	} else if first, last, err := db.GetEvents(); err != nil {
+		return entities.Event{}, err
+	} else if index == 0 {
+		return get(first)
+	} else if index == 0xffffffff {
+		return get(last)
+	} else if index < first {
+		return entities.Event{
+			Index: index,
+			Type:  0xff, // overwritten
+		}, nil
+	} else if index > last {
+		return get(last)
+	} else {
+		return entities.Event{}, entities.ErrRecordNotFound
 	}
 }
 

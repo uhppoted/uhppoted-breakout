@@ -23,7 +23,6 @@
             - [x] big delta on set-date/time
             - [x] use mutex in set-datetime
             - [x] remove RTC datetime struct
-            - https://hueffner.de/falk/blog/a-leap-year-check-in-three-instructions.html
             - [ ] synchronize with RX8900SA
                   - [x] clear ready on set and wait for read
                   - [x] PID
@@ -32,6 +31,7 @@
                   - [ ] reduce tick interval to 100ms
                   - [ ] (experimental) set µs from from current epoch
                   - (?) Kalman filter
+            - https://hueffner.de/falk/blog/a-leap-year-check-in-three-instructions.html
 
 - [ ] make debugf, infof, etc interrupt safe
       - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
@@ -123,10 +123,10 @@
       - [x] record-special-events
       - [x] get-event-index
       - [x] set-event-index
-      - [ ] get-event
+      - [x] get-event
             - [x] event
-            - [ ] not found
-            - [ ] overwritten
+            - [x] not found
+            - [x] overwritten
       - [ ] get-time-profiles
       - [ ] set-time-profile
       - [ ] clear-time-profiles
