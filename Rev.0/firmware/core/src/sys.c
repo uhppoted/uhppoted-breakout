@@ -10,6 +10,7 @@
 #include <pico/sync.h>
 #include <pico/unique_id.h>
 
+#include <RTC.h>
 #include <SSMP.h>
 #include <U2.h>
 #include <U3.h>
@@ -71,6 +72,7 @@ struct {
     } cli;
 
     struct {
+        bool RTC;
         float interval;
         absolute_time_t touched;
         repeating_timer_t timer;
@@ -89,6 +91,7 @@ struct {
         .touched = 0,
     },
     .trace = {
+        .RTC = true,
         .interval = (float)TRACE,
         .touched = 0,
     }};
@@ -196,7 +199,7 @@ void sys_trace() {
         float used = 1.0 - ((float)available / (float)heap);
         const char *watchdogged = syserr_get(ERR_WATCHDOG) ? "** watchdog **" : "";
 
-        debugf(LOGTAG, "ticks:%-5u queue:%u  I2C0:%u  total heap:%u  free heap:%u  used:%.1f%%  errors:%04x  %s",
+        debugf(LOGTAG, "trace  ticks:%-5u queue:%u  I2C0:%u  heap:%u  heap:%u  used:%.1f%%  errors:%04x  %s",
                SYSTEM.ticks,
                queue_get_level(&queue),
                queue_get_level(&I2C0.queue),
@@ -278,6 +281,10 @@ void set_trace(float interval) {
     }
 }
 
+void set_trace_RTC(bool enabled) {
+    SYSTEM.trace.RTC = enabled;
+}
+
 void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_DEBUG) {
         debugf(LOGTAG, "... debug??");
@@ -325,6 +332,10 @@ void dispatch(uint32_t v) {
 
     if ((v & MSG) == MSG_TRACE) {
         sys_trace();
+
+        if (SYSTEM.trace.RTC) {
+            RTC_trace();
+        }
     }
 
     if ((v & MSG) == MSG_TICK) {

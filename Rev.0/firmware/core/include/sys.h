@@ -23,6 +23,7 @@ extern mode get_mode();
 extern void set_mode(mode);
 extern void stdout_connected(bool);
 extern void set_trace(float interval);
+extern void set_trace_RTC(bool enabled);
 
 extern uint32_t get_total_heap();
 extern uint32_t get_free_heap();

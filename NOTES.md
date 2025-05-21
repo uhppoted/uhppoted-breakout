@@ -134,6 +134,29 @@ return a date/time that is a second after the _set_ datetime.
 3. https://forums.raspberrypi.com/viewtopic.php?t=348730
 4. https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#group_pico_aon_timer
 
+error:+499.991 error:+499.976 error:+499.954 error:+499.979 
+error:-250.044 error:-287.511 error:-325.027 error:-296.922 
+error:-62.516  error:+15.320  error:+98.755  error:+35.670  
+error:-62.503  error:-110.063 error:-178.581 error:-125.191 
+error:-39.064  error:-21.004  error:+28.248  error:-11.869  
+error:-27.368  error:-40.332  error:-80.826  error:-47.282  
+error:-18.543  error:-14.670  error:+10.491  error:-11.185  
+error:-12.676  error:-15.765  error:-34.946  error:-18.197  
+error:-8.672   error:-7.727   error:+4.393   error:-6.461   
+error:-5.938   error:-6.506   error:-14.884  error:-7.273   
+error:-4.044   error:-3.717   error:+1.896   error:-3.282   
+error:-2.741   error:-2.775   error:-6.344   error:-2.972   
+error:-1.889   error:-1.728   error:+0.839   error:-1.549   
+error:-1.272   error:-1.202   error:-2.695   error:-1.273   
+error:-0.875   error:-0.766   error:+0.377   error:-0.727   
+error:-0.619   error:-0.669   error:-1.148   error:-0.545   
+error:-0.421   error:-0.261   error:+0.167   error:-0.341   
+error:-0.255   error:-0.250   error:-0.480   error:-0.221   
+error:-0.210   error:-0.109   error:+0.069   error:-0.166   
+error:-0.135   error:-0.101   error:-0.222   error:-0.090   
+error:-0.065   error:-0.060   error:+0.035   error:-0.051   
+error:-0.077   error:-0.044   error:-0.121   error:-0.038   
+
 # printf
 1. https://github.com/picolibc/picolibc/blob/main/doc/printf.md
 2. https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation

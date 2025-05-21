@@ -155,6 +155,7 @@ const char *HELP[] = {
     "  clear errors",
     "  scan",
     "  trace <off|on|[0-300]>",
+    "  trace RTC <off|on>",
     "  reboot",
     "  bootsel",
     "",
@@ -808,6 +809,14 @@ void trace(const char *arg) {
             set_trace(0.0);
             display("trace off");
         }
+    }
+
+    if (strcasecmp(arg, "RTC on") == 0) {
+        set_trace_RTC(true);
+        display("RTC trace on");
+    } else if (strcasecmp(arg, "RTC off") == 0) {
+        set_trace_RTC(false);
+        display("RTC trace off");
     }
 }
 

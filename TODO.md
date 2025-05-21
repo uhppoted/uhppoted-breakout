@@ -26,7 +26,9 @@
             - https://hueffner.de/falk/blog/a-leap-year-check-in-three-instructions.html
             - [ ] synchronize with RX8900SA
                   - [x] clear ready on set and wait for read
-                  - [ ] PID
+                  - [x] PID
+                  - [x] trace
+                  - [x] CLI trace RTC on/off
                   - [ ] reduce tick interval to 100ms
                   - [ ] (experimental) set µs from from current epoch
                   - (?) Kalman filter

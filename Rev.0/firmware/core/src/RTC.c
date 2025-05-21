@@ -19,6 +19,7 @@ const int32_t RTC_SYNC_INTERVAL = 15000;
 const int32_t RTC_TICK_INTERVAL = 500;
 const double Kp = 0.00015 * (double)RTC_TICK_INTERVAL / 1000.0;
 const double Ki = 0.00005 * (double)RTC_TICK_INTERVAL / 1000.0;
+const double Kd = 0.0000125 * (double)RTC_TICK_INTERVAL / 1000.0;
 
 int64_t RTC_on_setup(alarm_id_t id, void *data);
 void RTC_setup();
@@ -41,6 +42,18 @@ struct {
     uint64_t epoch;
     double k;
     double integral;
+    double error;
+
+    struct {
+        uint32_t counter;
+        uint16_t year;
+        uint8_t month;
+        uint8_t day;
+        uint8_t hour;
+        uint8_t minute;
+        uint8_t second;
+        double delta;
+    } trace;
 
     mutex_t guard;
 } RTC = {
@@ -51,6 +64,18 @@ struct {
     .epoch = 0,
     .k = 1.0,
     .integral = 0.0,
+    .error = 0.0,
+
+    .trace = {
+        .counter = 0,
+        .year = 0,
+        .month = 0,
+        .day = 0,
+        .hour = 0,
+        .minute = 0,
+        .day = 0,
+        .delta = 0.0,
+    },
 };
 
 /*
@@ -159,8 +184,6 @@ bool RTC_on_tick(repeating_timer_t *rt) {
             int64_t delta = now - RTC.last_tick;
             double dt = RTC.k * (double)delta;
 
-            //  debugf(LOGTAG, ">>> delta:%lld  dt:%llf  %lld", delta, dt, (int64_t)dt);
-
             RTC.epoch += (int64_t)dt;
         }
 
@@ -200,19 +223,22 @@ void RTC_read(void *data) {
             } else {
                 int64_t error = (int64_t)(1000000 * epoch) - (int64_t)RTC.epoch;
                 double e = (double)error / 1000.0;
-                double integral = RTC.integral + e;
-                double delta = Kp * e + Ki * integral;
+                double sum = RTC.integral + e;
+                double gradient = e - RTC.error;
+                double delta = Kp * e + Ki * sum + Kd * gradient;
                 double k = 1.0 + delta;
 
-                RTC.integral = integral;
+                RTC.integral = sum;
+                RTC.error = e;
 
-                debugf(LOGTAG, ">>> GET: %04u-%02u-%02u %02u:%02u:%02u error:%.3llf delta:%.3llf k:%.3llf (%.3llf) sigma:%llf",
-                       year, month, day, hour, minute, second,
-                       (double)error / 1000.0,
-                       delta,
-                       RTC.k,
-                       k,
-                       integral);
+                RTC.trace.counter++;
+                RTC.trace.year = year;
+                RTC.trace.month = month;
+                RTC.trace.day = day;
+                RTC.trace.hour = hour;
+                RTC.trace.minute = minute;
+                RTC.trace.second = second;
+                RTC.trace.delta = delta;
 
                 if (k < 0.75) {
                     RTC.k = 0.75;
@@ -225,6 +251,28 @@ void RTC_read(void *data) {
 
             mutex_exit(&RTC.guard);
         }
+    }
+}
+
+/*
+ * Prints out the current state of the RTC.
+ */
+void RTC_trace() {
+    static uint32_t counter = 0;
+
+    if (counter != RTC.trace.counter) {
+        counter = RTC.trace.counter;
+
+        debugf(LOGTAG, "trace  %04u-%02u-%02u %02u:%02u:%02u error:%-+8.3llf delta:%-+8.3llf k:%.3llf",
+               RTC.trace.year,
+               RTC.trace.month,
+               RTC.trace.day,
+               RTC.trace.hour,
+               RTC.trace.minute,
+               RTC.trace.second,
+               RTC.error,
+               RTC.trace.delta,
+               RTC.k);
     }
 }
 
