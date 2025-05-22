@@ -1,7 +1,7 @@
 # TODO
 
 ## RPCD
-    - [ ] move cache to ut0311
+    - [x] move cache to ut0311
     - [ ] commonalise GET/SET queue handling
     - [ ] daemonize
     - [ ] monitor
@@ -129,6 +129,7 @@
             - [x] event
             - [x] not found
             - [x] overwritten
+            - (?) use OIDs
       - [ ] get-time-profiles
       - [ ] set-time-profile
       - [ ] clear-time-profiles

@@ -27,6 +27,8 @@ type RPC struct {
 		address string
 	}
 
+	cache *cache
+
 	ctx     context.Context
 	cancel  context.CancelFunc
 	wg      sync.WaitGroup
@@ -47,7 +49,7 @@ type Event struct {
 	}
 }
 
-func NewRPC(dial string, listen string, onEvent func(event any)) (*RPC, error) {
+func NewRPC(dial string, listen string, caching map[string]time.Duration, onEvent func(event any)) (*RPC, error) {
 	infof("init dial:%v", dial)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -56,6 +58,7 @@ func NewRPC(dial string, listen string, onEvent func(event any)) (*RPC, error) {
 		ctx:     ctx,
 		cancel:  cancel,
 		onEvent: onEvent,
+		cache:   NewCache(caching),
 	}
 
 	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(dial); len(matches) < 3 {
@@ -125,17 +128,24 @@ func (r *RPC) Stop() error {
 	}
 }
 
-func (r RPC) get(oid scmp.OID) (any, error) {
+func (r *RPC) get(oid scmp.OID) (any, error) {
 	debugf("get %v", oid)
 
 	var key = fmt.Sprintf("%v", oid)
 	var reply any
+
+	if v, ok := r.cache.Get(oid); ok {
+		debugf("returning cached value for %v", oid)
+		return v, nil
+	}
 
 	if client, err := rpc.DialHTTP(r.dial.network, r.dial.address); err != nil {
 		return 0, err
 	} else if err := client.Call("RPCD.Get", key, &reply); err != nil {
 		return 0, err
 	} else {
+		r.cache.Set(oid, reply)
+
 		return reply, nil
 	}
 }

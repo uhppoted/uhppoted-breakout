@@ -9,6 +9,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"time"
 
 	"emulator/scmp"
 )
@@ -23,8 +24,9 @@ type Config struct {
 }
 
 type driver struct {
-	Driver string `json:"driver"`
-	RPC    rpc    `json:"RPC"`
+	Driver  string  `json:"driver"`
+	RPC     rpc     `json:"RPC"`
+	Caching caching `json:"caching"`
 }
 
 type rpc struct {
@@ -57,6 +59,8 @@ type events struct {
 type db struct {
 	DSN string `json:"DSN"`
 }
+
+type caching map[string]time.Duration
 
 func Load(filepath string) (Config, []byte, error) {
 	config := Config{
@@ -250,6 +254,28 @@ func (v *IPv4) UnmarshalJSON(bytes []byte) error {
 		v.Netmask = net.IPv4Mask(uint8(a), uint8(b), uint8(c), uint8(d))
 		v.Gateway = ipv4.Gateway
 		v.MAC = MAC
+
+		return nil
+	}
+}
+
+func (c *caching) UnmarshalJSON(bytes []byte) error {
+	m := map[string]string{}
+
+	if err := json.Unmarshal(bytes, &m); err != nil {
+		return err
+	} else {
+		cacheable := map[string]time.Duration{}
+
+		for k, v := range m {
+			if d, err := time.ParseDuration(v); err != nil {
+				return err
+			} else {
+				cacheable[k] = d
+			}
+		}
+
+		*c = cacheable
 
 		return nil
 	}

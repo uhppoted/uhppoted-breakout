@@ -6,7 +6,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"ssmp/cache"
 	"ssmp/encoding/ASN.1"
 	"ssmp/encoding/bisync"
 	"ssmp/log"
@@ -215,9 +214,6 @@ func (s *SSMP) Stop() error {
 func (s *SSMP) Get(oid string) (any, error) {
 	if o, err := BER.ParseOID(oid); err != nil {
 		return nil, err
-	} else if v, ok := cache.Get(oid); ok {
-		debugf("returning cached value for %v", oid)
-		return v, nil
 	} else {
 		rq := BER.GetRequest{
 			Version:   0,
@@ -268,8 +264,6 @@ func (s *SSMP) Get(oid string) (any, error) {
 				if response.Error != 0 {
 					return nil, fmt.Errorf("error code %v (%v) at index %v", response.Error, lookup(response.Error), response.ErrorIndex)
 				} else {
-					cache.Set(oid, response.Value)
-
 					return response.Value, nil
 				}
 

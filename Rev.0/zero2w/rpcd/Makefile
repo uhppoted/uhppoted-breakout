@@ -49,8 +49,7 @@ rpi3-run: rpi3-build
 	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/rpcd && \
 	            ./rpcd --bind tcp:::1234 \
 	                   --dial tcp::192.168.1.100:4321 \
-	                   --device /dev/serial/by-id/usb-uhppoted_breakout_E6625C05E7415B25-if02" \
-	                   --cacheable .cacheable.json
+	                   --device /dev/serial/by-id/usb-uhppoted_breakout_E6625C05E7415B25-if02"
 
 rpi3: rpi3-run
 
