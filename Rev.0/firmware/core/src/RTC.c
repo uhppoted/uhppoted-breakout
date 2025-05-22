@@ -16,10 +16,10 @@
 #define LOGTAG "RTC"
 
 const int32_t RTC_SYNC_INTERVAL = 15000;
-const int32_t RTC_TICK_INTERVAL = 500;
-const double Kp = 0.00015 * (double)RTC_TICK_INTERVAL / 1000.0;
-const double Ki = 0.00005 * (double)RTC_TICK_INTERVAL / 1000.0;
-const double Kd = 0.0000125 * (double)RTC_TICK_INTERVAL / 1000.0;
+const int32_t RTC_TICK_INTERVAL = 100;
+const double Kp = 7.5 / 100000.0;
+const double Ki = 2.5 / 100000.0;
+const double Kd = 0.625 / 100000.0;
 const double ANTI_WINDUP = 0.25 / Ki;
 
 int64_t RTC_on_setup(alarm_id_t id, void *data);

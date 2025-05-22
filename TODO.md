@@ -29,7 +29,7 @@
                   - [x] trace
                   - [x] CLI trace RTC on/off
                   - [x] anti-windup
-                  - [ ] reduce tick interval to 100ms
+                  - [x] reduce tick interval to 100ms
                   - [ ] reset if error out of range
                   - [ ] (experimental) set µs from from current epoch
             - (?) Kalman filter
