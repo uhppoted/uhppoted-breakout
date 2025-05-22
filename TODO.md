@@ -28,9 +28,11 @@
                   - [x] PID
                   - [x] trace
                   - [x] CLI trace RTC on/off
+                  - [x] anti-windup
                   - [ ] reduce tick interval to 100ms
+                  - [ ] reset if error out of range
                   - [ ] (experimental) set µs from from current epoch
-                  - (?) Kalman filter
+            - (?) Kalman filter
             - https://hueffner.de/falk/blog/a-leap-year-check-in-three-instructions.html
 
 - [ ] make debugf, infof, etc interrupt safe
@@ -136,9 +138,9 @@
       - [ ] set-pc-control
       - [ ] set-interlock
       - [ ] activate-keypads
-      - [ ] restore-default-parameters
       - [ ] get-anti-passback
       - [ ] set-anti-passback
+      - [ ] restore-default-parameters
 
    - [ ] RPC
       - https://go.dev/blog/protobuf-opaque

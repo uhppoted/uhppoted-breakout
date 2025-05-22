@@ -20,6 +20,7 @@ const int32_t RTC_TICK_INTERVAL = 500;
 const double Kp = 0.00015 * (double)RTC_TICK_INTERVAL / 1000.0;
 const double Ki = 0.00005 * (double)RTC_TICK_INTERVAL / 1000.0;
 const double Kd = 0.0000125 * (double)RTC_TICK_INTERVAL / 1000.0;
+const double ANTI_WINDUP = 0.25 / Ki;
 
 int64_t RTC_on_setup(alarm_id_t id, void *data);
 void RTC_setup();
@@ -31,6 +32,7 @@ uint8_t dow(uint16_t year, uint8_t month, uint8_t day);
 uint8_t weekday2dow(uint8_t weekday);
 
 void epoch_to_datetime(uint64_t, uint16_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *);
+inline double clampf(double, double, double);
 
 struct {
     bool initialised;
@@ -223,7 +225,7 @@ void RTC_read(void *data) {
             } else {
                 int64_t error = (int64_t)(1000000 * epoch) - (int64_t)RTC.epoch;
                 double e = (double)error / 1000.0;
-                double sum = RTC.integral + e;
+                double sum = clampf(RTC.integral + e, -ANTI_WINDUP, ANTI_WINDUP);
                 double gradient = e - RTC.error;
                 double delta = Kp * e + Ki * sum + Kd * gradient;
                 double k = 1.0 + delta;
@@ -634,4 +636,8 @@ void epoch_to_datetime(uint64_t epoch, uint16_t *year, uint8_t *month, uint8_t *
     *year = y;
     *month = m + 1;
     *day = days + 1;
+}
+
+inline double clampf(double v, double min, double max) {
+    return v < min ? min : (v > max ? max : v);
 }
