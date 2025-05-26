@@ -30,7 +30,8 @@
                   - [x] CLI trace RTC on/off
                   - [x] anti-windup
                   - [x] reduce tick interval to 100ms
-                  - [ ] reset if error out of range
+                  - [x] reset if error out of range
+                  - [x] set syserror flag
                   - [ ] (experimental) set µs from from current epoch
             - (?) Kalman filter
             - https://hueffner.de/falk/blog/a-leap-year-check-in-three-instructions.html
@@ -44,6 +45,7 @@
       - (?) reservoir sampling (https://samwho.dev/reservoir-sampling)
 
 - [ ] USB
+    - [ ] `WARN   USB        *** write error 21 of 107`
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88
@@ -199,6 +201,8 @@
      - (?) https://github.com/splitbrain/pinoutleaf
 - OCDSP
   - https://github.com/bytedreamer/Aporta
+- Mongoose Wizard
+  - https://mongoose.ws/wizard/#/
 
 ### Rust
 - https://rtic.rs/1/book/en/preface.html

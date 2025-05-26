@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,11 +16,13 @@
 
 #define LOGTAG "RTC"
 
-const int32_t RTC_SYNC_INTERVAL = 15000;
-const int32_t RTC_TICK_INTERVAL = 100;
-const double Kp = 7.5 / 100000.0;
-const double Ki = 2.5 / 100000.0;
-const double Kd = 0.625 / 100000.0;
+const int32_t RTC_SYNC_INTERVAL = 15000; // ms
+const int32_t RTC_TICK_INTERVAL = 100;   // ms
+const int32_t RTC_MAX_ERROR = 5000;      // ms
+
+const double Kp = 0.75 / 10000.0;
+const double Ki = 0.25 / 10000.0;
+const double Kd = 0.0625 / 10000.0;
 const double ANTI_WINDUP = 0.25 / Ki;
 
 int64_t RTC_on_setup(alarm_id_t id, void *data);
@@ -225,29 +228,35 @@ void RTC_read(void *data) {
             } else {
                 int64_t error = (int64_t)(1000000 * epoch) - (int64_t)RTC.epoch;
                 double e = (double)error / 1000.0;
-                double sum = clampf(RTC.integral + e, -ANTI_WINDUP, ANTI_WINDUP);
-                double gradient = e - RTC.error;
-                double delta = Kp * e + Ki * sum + Kd * gradient;
-                double k = 1.0 + delta;
 
-                RTC.integral = sum;
-                RTC.error = e;
-
-                RTC.trace.counter++;
-                RTC.trace.year = year;
-                RTC.trace.month = month;
-                RTC.trace.day = day;
-                RTC.trace.hour = hour;
-                RTC.trace.minute = minute;
-                RTC.trace.second = second;
-                RTC.trace.delta = delta;
-
-                if (k < 0.75) {
-                    RTC.k = 0.75;
-                } else if (k > 1.25) {
-                    RTC.k = 1.25;
+                if (fabs(e) > RTC_MAX_ERROR) {
+                    RTC.epoch = 1000000 * epoch + µs;
+                    syserr_set(ERR_RX8900SA, LOGTAG, "RTC unsynchronized (%.0llfs)", e / 1000.0);
                 } else {
-                    RTC.k = k;
+                    double sum = clampf(RTC.integral + e, -ANTI_WINDUP, ANTI_WINDUP);
+                    double gradient = e - RTC.error;
+                    double delta = Kp * e + Ki * sum + Kd * gradient;
+                    double k = 1.0 + delta;
+
+                    RTC.integral = sum;
+                    RTC.error = e;
+
+                    RTC.trace.counter++;
+                    RTC.trace.year = year;
+                    RTC.trace.month = month;
+                    RTC.trace.day = day;
+                    RTC.trace.hour = hour;
+                    RTC.trace.minute = minute;
+                    RTC.trace.second = second;
+                    RTC.trace.delta = delta;
+
+                    if (k < 0.75) {
+                        RTC.k = 0.75;
+                    } else if (k > 1.25) {
+                        RTC.k = 1.25;
+                    } else {
+                        RTC.k = k;
+                    }
                 }
             }
 
