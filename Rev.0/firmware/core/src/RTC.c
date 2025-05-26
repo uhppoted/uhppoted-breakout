@@ -221,7 +221,7 @@ void RTC_read(void *data) {
             }
 
             uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
-            uint64_t µs = 500000; // RTC.timers.epoch % 1000000;
+            uint64_t µs = 500000;
 
             if (RTC.epoch == 0) {
                 RTC.epoch = 1000000 * epoch + µs;
@@ -306,11 +306,6 @@ void RTC_write(void *data) {
         if ((err = RX8900SA_set_datetime(U5, year, month, day, hour, minute, second, dow)) != ERR_OK) {
             warnf(LOGTAG, "set-datetime error %d", err);
         } else {
-            // uint64_t epoch = datetime_to_epoch(year, month, day, hour, minute, second);
-            // uint64_t µs = 500000; // RTC.timers.epoch % 1000000;
-            //
-            // RTC.epoch = (1000000 * epoch) + µs;
-
             mutex_enter_blocking(&RTC.guard);
             RTC.ready = false;
             RTC.epoch = 0;

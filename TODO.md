@@ -13,8 +13,8 @@
 
 ### misc
 
-- [ ] software RTC
-      - [ ] use hardware counter/timer
+- [x] software RTC
+      - [x] use hardware counter/timer
             - [x] get-datetime
             - [x] set-datetime
             - [x] set-date
@@ -23,7 +23,7 @@
             - [x] big delta on set-date/time
             - [x] use mutex in set-datetime
             - [x] remove RTC datetime struct
-            - [ ] synchronize with RX8900SA
+            - [x] synchronize with RX8900SA
                   - [x] clear ready on set and wait for read
                   - [x] PID
                   - [x] trace
@@ -32,9 +32,7 @@
                   - [x] reduce tick interval to 100ms
                   - [x] reset if error out of range
                   - [x] set syserror flag
-                  - [ ] (experimental) set µs from from current epoch
-            - (?) Kalman filter
-            - https://hueffner.de/falk/blog/a-leap-year-check-in-three-instructions.html
+                  - [x] ~~set µs from from current epoch~~
 
 - [ ] make debugf, infof, etc interrupt safe
       - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
