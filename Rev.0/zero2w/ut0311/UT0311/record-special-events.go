@@ -8,7 +8,7 @@ import (
 )
 
 func (ut0311 *UT0311) recordSpecialEvents(rq *messages.RecordSpecialEventsRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.driver, scmp.OID_CONTROLLER_ID); err != nil {
+	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil

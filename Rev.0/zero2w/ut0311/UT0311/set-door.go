@@ -8,7 +8,7 @@ import (
 )
 
 func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.driver, scmp.OID_CONTROLLER_ID); err != nil {
+	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
@@ -22,7 +22,7 @@ func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, err
 
 		if oid, ok := lookup.modes[door]; !ok {
 			return nil, nil
-		} else if mode, err := scmp.Set[uint8](ut0311.driver, oid, rq.ControlState); err != nil {
+		} else if mode, err := scmp.Set[uint8](ut0311.breakout, oid, rq.ControlState); err != nil {
 			return nil, err
 		} else {
 			response.ControlState = mode
@@ -30,7 +30,7 @@ func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, err
 
 		if oid, ok := lookup.delays[door]; !ok {
 			return nil, nil
-		} else if delay, err := scmp.Set[uint8](ut0311.driver, oid, rq.Delay); err != nil {
+		} else if delay, err := scmp.Set[uint8](ut0311.breakout, oid, rq.Delay); err != nil {
 			return nil, err
 		} else {
 			response.Delay = delay

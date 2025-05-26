@@ -98,6 +98,7 @@
       - https://github.com/raspberrypi/rpi-image-gen
 
 ### UT0311
+    - [ ] rearchitecture as components
     - [x] store events to SQLite DB
     - [x] rpcd::shutdown RPC listener
     - [ ] open door on PB
@@ -129,7 +130,6 @@
             - [x] event
             - [x] not found
             - [x] overwritten
-            - (?) use OIDs
       - [ ] get-time-profiles
       - [ ] set-time-profile
       - [ ] clear-time-profiles

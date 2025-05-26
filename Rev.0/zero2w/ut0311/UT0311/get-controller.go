@@ -11,7 +11,7 @@ import (
 )
 
 func (ut0311 *UT0311) getController(rq *messages.GetDeviceRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.driver, scmp.OID_CONTROLLER_ID); err != nil {
+	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
@@ -44,13 +44,13 @@ func (ut0311 *UT0311) getController(rq *messages.GetDeviceRequest) (any, error) 
 			response.MacAddress = []byte(MAC)
 		}
 
-		if version, err := scmp.Get[uint16](ut0311.driver, scmp.OID_CONTROLLER_VERSION); err != nil {
+		if version, err := scmp.Get[uint16](ut0311.breakout, scmp.OID_CONTROLLER_VERSION); err != nil {
 			return nil, err
 		} else {
 			response.Version = types.Version(version)
 		}
 
-		if released, err := scmp.Get[types.Date](ut0311.driver, scmp.OID_CONTROLLER_RELEASED); err != nil {
+		if released, err := scmp.Get[types.Date](ut0311.breakout, scmp.OID_CONTROLLER_RELEASED); err != nil {
 			return nil, err
 		} else {
 			response.Date = released

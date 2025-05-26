@@ -33,11 +33,11 @@ type listener interface {
 }
 
 type UT0311 struct {
-	config *config.Config
-	driver *rpcd.RPC
-	system system.System
-	events *events.Events
-	cards  *cards.Cards
+	config   *config.Config
+	breakout *rpcd.RPC
+	system   system.System
+	events   *events.Events
+	cards    *cards.Cards
 
 	cm   *ConnectionManager
 	udp  *UDP
@@ -73,7 +73,7 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 	if rpc, err := rpcd.NewRPC(c.Driver.RPC.DialAddr, c.Driver.RPC.ListenAddr, c.Driver.Caching, ut0311.onEvent); err != nil {
 		return nil, err
 	} else {
-		ut0311.driver = rpc
+		ut0311.breakout = rpc
 	}
 
 	return &ut0311, nil
@@ -106,7 +106,7 @@ func (ut0311 *UT0311) Run() {
 	// ... start SSMP event trap listener
 	wg.Add(1)
 	go func() {
-		ut0311.driver.Listen()
+		ut0311.breakout.Listen()
 		wg.Done()
 	}()
 
@@ -168,7 +168,7 @@ func (ut0311 *UT0311) Stop() {
 	wg.Add(1)
 	go func() {
 		infof("stopping SSMP event handler")
-		if err := ut0311.driver.Stop(); err != nil {
+		if err := ut0311.breakout.Stop(); err != nil {
 			warnf("%v", err)
 		}
 

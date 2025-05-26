@@ -19,7 +19,7 @@ const errDebug uint16 = 0x4000
 const errUnknown uint16 = 0x8000
 
 func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.driver, scmp.OID_CONTROLLER_ID); err != nil {
+	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
@@ -30,14 +30,14 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			InputState:   0x00,
 		}
 
-		if datetime, err := scmp.Get[types.DateTime](ut0311.driver, scmp.OID_CONTROLLER_DATETIME); err != nil {
+		if datetime, err := scmp.Get[types.DateTime](ut0311.breakout, scmp.OID_CONTROLLER_DATETIME); err != nil {
 			return nil, err
 		} else {
 			response.SystemDate = types.SystemDate(datetime)
 			response.SystemTime = types.SystemTime(datetime)
 		}
 
-		if v, err := scmp.Get[uint16](ut0311.driver, scmp.OID_CONTROLLER_SYSERR); err != nil {
+		if v, err := scmp.Get[uint16](ut0311.breakout, scmp.OID_CONTROLLER_SYSERR); err != nil {
 			return nil, err
 		} else {
 			syserr := uint8(0x00)
@@ -57,7 +57,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			response.SystemError = syserr
 		}
 
-		if v, err := scmp.Get[uint8](ut0311.driver, scmp.OID_CONTROLLER_SYSINFO); err != nil {
+		if v, err := scmp.Get[uint8](ut0311.breakout, scmp.OID_CONTROLLER_SYSINFO); err != nil {
 			return nil, err
 		} else {
 			response.SpecialInfo = v
@@ -70,89 +70,89 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 1
-		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_1_UNLOCKED); err != nil {
+		if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_UNLOCKED); err != nil {
 			return nil, err
 		} else if !locked {
 			response.RelayState |= 0x01
 		}
 
-		if open, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_1_OPEN); err != nil {
+		if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_OPEN); err != nil {
 			return nil, err
 		} else {
 			response.Door1State = open
 		}
 
-		if pressed, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_1_BUTTON); err != nil {
+		if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_BUTTON); err != nil {
 			return nil, err
 		} else {
 			response.Door1Button = pressed
 		}
 
 		// ... door 2
-		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_2_UNLOCKED); err != nil {
+		if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_UNLOCKED); err != nil {
 			return nil, err
 		} else if !locked {
 			response.RelayState |= 0x02
 		}
 
-		if open, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_2_OPEN); err != nil {
+		if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_OPEN); err != nil {
 			return nil, err
 		} else {
 			response.Door2State = open
 		}
 
-		if pressed, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_2_BUTTON); err != nil {
+		if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_BUTTON); err != nil {
 			return nil, err
 		} else {
 			response.Door2Button = pressed
 		}
 
 		// ... door 3
-		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_3_UNLOCKED); err != nil {
+		if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_UNLOCKED); err != nil {
 			return nil, err
 		} else if !locked {
 			response.RelayState |= 0x04
 		}
 
-		if open, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_3_OPEN); err != nil {
+		if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_OPEN); err != nil {
 			return nil, err
 		} else {
 			response.Door3State = open
 		}
 
-		if pressed, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_3_BUTTON); err != nil {
+		if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_BUTTON); err != nil {
 			return nil, err
 		} else {
 			response.Door3Button = pressed
 		}
 
 		// ... door 4
-		if locked, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_4_UNLOCKED); err != nil {
+		if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_UNLOCKED); err != nil {
 			return nil, err
 		} else if !locked {
 			response.RelayState |= 0x08
 		}
 
-		if open, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_4_OPEN); err != nil {
+		if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_OPEN); err != nil {
 			return nil, err
 		} else {
 			response.Door4State = open
 		}
 
-		if pressed, err := scmp.Get[bool](ut0311.driver, scmp.OID_DOORS_4_BUTTON); err != nil {
+		if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_BUTTON); err != nil {
 			return nil, err
 		} else {
 			response.Door4Button = pressed
 		}
 
 		// ... inputs
-		if tampered, err := scmp.Get[bool](ut0311.driver, scmp.OID_ALARMS_TAMPER_DETECT); err != nil {
+		if tampered, err := scmp.Get[bool](ut0311.breakout, scmp.OID_ALARMS_TAMPER_DETECT); err != nil {
 			return nil, err
 		} else if tampered {
 			response.InputState |= 0x01
 		}
 
-		if fire, err := scmp.Get[bool](ut0311.driver, scmp.OID_ALARMS_FIRE_ALARM); err != nil {
+		if fire, err := scmp.Get[bool](ut0311.breakout, scmp.OID_ALARMS_FIRE_ALARM); err != nil {
 			return nil, err
 		} else if fire {
 			response.InputState |= 0x02
