@@ -57,19 +57,23 @@ bool usb_init() {
 void usb_write(const uint8_t *bytes, int len) {
     int ix = 0;
 
-    while (ix < len) {
-        uint32_t N = tud_cdc_n_write(CDC1, &bytes[ix], len - ix);
+    if (USB.connected.usb1) {
+        while (ix < len) {
+            uint32_t N = tud_cdc_n_write(CDC1, &bytes[ix], len - ix);
 
-        if (N == 0) {
-            warnf(LOGTAG, "*** write error %u of %d", ix, len);
-            break;
-        } else {
-            debugf(LOGTAG, "write %u of %d", N, len - ix);
-            ix += N;
+            if (N == 0) {
+                warnf(LOGTAG, "*** write error %u of %d", ix, len);
+                break;
+            } else {
+                debugf(LOGTAG, "write %u of %d", N, len - ix);
+                ix += N;
+            }
         }
-    }
 
-    tud_cdc_n_write_flush(CDC1);
+        tud_cdc_n_write_flush(CDC1);
+    } else {
+        warnf(LOGTAG, "write error: USB not connected");
+    }
 }
 
 bool on_usb_rx(repeating_timer_t *rt) {

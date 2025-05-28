@@ -13,6 +13,8 @@
 
 ### misc
 
+- [ ] PIO I2C
+
 - [x] software RTC
       - [x] use hardware counter/timer
             - [x] get-datetime
@@ -43,7 +45,7 @@
       - (?) reservoir sampling (https://samwho.dev/reservoir-sampling)
 
 - [ ] USB
-    - [ ] `WARN   USB        *** write error 21 of 107`
+    - [x] `WARN   USB        *** write error 21 of 107`
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88
@@ -127,9 +129,6 @@
       - [x] get-event-index
       - [x] set-event-index
       - [x] get-event
-            - [x] event
-            - [x] not found
-            - [x] overwritten
       - [ ] get-time-profiles
       - [ ] set-time-profile
       - [ ] clear-time-profiles
