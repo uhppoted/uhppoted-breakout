@@ -13,39 +13,21 @@
 
 ### misc
 
-- [ ] PIO I2C
-
 - [x] software RTC
-      - [x] use hardware counter/timer
-            - [x] get-datetime
-            - [x] set-datetime
-            - [x] set-date
-            - [x] set-time
-            - [x] dow
-            - [x] big delta on set-date/time
-            - [x] use mutex in set-datetime
-            - [x] remove RTC datetime struct
-            - [x] synchronize with RX8900SA
-                  - [x] clear ready on set and wait for read
-                  - [x] PID
-                  - [x] trace
-                  - [x] CLI trace RTC on/off
-                  - [x] anti-windup
-                  - [x] reduce tick interval to 100ms
-                  - [x] reset if error out of range
-                  - [x] set syserror flag
-                  - [x] ~~set µs from from current epoch~~
 
+- [ ] USB write
+      - [x] `WARN   USB        *** write error 21 of 107`
+      - [ ] guard 
+      - [ ] write queue
+      - [ ] queue events if rpcd is not connected
+      - [ ] flush SSMP::write on connected
+
+- [ ] PIO I2C
 - [ ] make debugf, infof, etc interrupt safe
       - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
       - https://github.com/LukeShu/pico-fmt
 
-- [ ] Rework print queue
-      - (?) setvbuf
-      - (?) reservoir sampling (https://samwho.dev/reservoir-sampling)
-
 - [ ] USB
-    - [x] `WARN   USB        *** write error 21 of 107`
     - [ ] picotool reset
         - https://forums.raspberrypi.com/viewtopic.php?t=366208
         - https://github.com/raspberrypi/picotool/issues/88
@@ -61,20 +43,16 @@
         - https://github.com/hathach/tinyusb/discussions/664
         - https://github.com/piersfinlayson/tinyusb-vendor-example
 
-### SSMP
-    - [ ] guard around write
-          - (?) write queue
+- [ ] Rework print queue
+      - (?) reservoir sampling (https://samwho.dev/reservoir-sampling)
 
+### SSMP
     - [ ] TRAP
-          - [x] translate timestamp to DateTime
-          - [x] use rtcd time if timestamp is invalid
-          - [x] memory leak
-          - [x] UDP event
-          - [x] event item OID
-          - [x] event item value
+          - [ ] swipe
+          - [ ] power on
+          - [ ] reset
+          - [ ] alarm
           - [ ] //FIXME encode all var types
-          - flush SSMP::write on connected
-          - (?) queue if rpcd is not connected
 
     - [ ] set-door
           - [x] mode
