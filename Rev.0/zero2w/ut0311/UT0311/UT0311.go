@@ -58,7 +58,6 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 	ut0311 := UT0311{
 		config: c,
 		system: system.System{},
-		events: events.NewEvents(),
 		cards:  &cards.Cards{},
 
 		cm:   cm,
@@ -74,6 +73,12 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 		return nil, err
 	} else {
 		ut0311.breakout = rpc
+	}
+
+	if eventd, err := events.NewEvents(c.Events.RPC.DialAddr); err != nil {
+		return nil, err
+	} else {
+		ut0311.events = eventd
 	}
 
 	return &ut0311, nil

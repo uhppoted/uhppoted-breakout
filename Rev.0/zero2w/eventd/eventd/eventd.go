@@ -10,8 +10,12 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"eventd/db"
+	"eventd/entities"
 	"eventd/log"
 )
+
+const LOGTAG = "eventd"
 
 type EventD struct {
 	ctx    context.Context
@@ -77,42 +81,32 @@ func (d *EventD) Stop() {
 	d.cancel()
 }
 
-func (d *EventD) Get(oid string, reply *any) error {
-	debugf("get %v", oid)
+func (d *EventD) Add(event entities.Event, reply *uint32) error {
+	debugf("add %v", event)
 
-	// if v, err := r.ssmp.Get(oid); err != nil {
-	//     return err
-	// } else {
-	//     *reply = v
-	//     return nil
-	// }
+	if index, err := db.PutEvent(event); err != nil {
+		return err
+	} else {
+		*reply = index
+
+		return nil
+	}
 
 	return fmt.Errorf("** NOT IMPLEMENTED **")
 }
 
-// func (r *RPCD) Set(kv KV, reply *any) error {
-//     debugf("set %v %v", kv.OID, kv.Value)
-//
-//     if v, err := r.ssmp.Set(kv.OID, kv.Value); err != nil {
-//         return err
-//     } else {
-//         *reply = v
-//         return nil
-//     }
-// }
-
 func debugf(format string, args ...any) {
-	log.Debugf("RPC", format, args...)
+	log.Debugf(LOGTAG, format, args...)
 }
 
 func infof(format string, args ...any) {
-	log.Infof("RPC", format, args...)
+	log.Infof(LOGTAG, format, args...)
 }
 
 func warnf(format string, args ...any) {
-	log.Warnf("RPC", format, args...)
+	log.Warnf(LOGTAG, format, args...)
 }
 
 func errorf(format string, args ...any) {
-	log.Errorf("RPC", format, args...)
+	log.Errorf(LOGTAG, format, args...)
 }

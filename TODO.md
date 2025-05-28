@@ -78,7 +78,12 @@
       - https://github.com/raspberrypi/rpi-image-gen
 
 ### UT0311
-    - [ ] rearchitecture as components
+    - [ ] eventd
+          - [x] add
+          - [ ] get
+          - [ ] remove unnecessary OID stuff
+          - [ ] move entities to shared lib
+
     - [x] store events to SQLite DB
     - [x] rpcd::shutdown RPC listener
     - [ ] open door on PB

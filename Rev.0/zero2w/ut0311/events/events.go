@@ -3,10 +3,11 @@ package events
 import (
 	"errors"
 	"fmt"
+	"net/rpc"
+	"regexp"
 	"sync/atomic"
 
 	"emulator/db"
-	"emulator/driver/rpcd"
 	"emulator/entities"
 	"emulator/log"
 	"emulator/scmp"
@@ -15,37 +16,46 @@ import (
 const LOGTAG = "EVENTS"
 
 type Events struct {
+	dial struct {
+		network string
+		address string
+	}
+
 	recordAll bool
 	index     uint32
 }
 
-func NewEvents() *Events {
-	return &Events{
+func NewEvents(dial string) (*Events, error) {
+	infof("init dial:%v", dial)
+
+	e := Events{
 		recordAll: false,
 	}
+
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(dial); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid RPC 'dial' address (%v)", dial)
+	} else {
+		e.dial.network = matches[1]
+		e.dial.address = matches[2]
+	}
+
+	return &e, nil
 }
 
 var Index atomic.Uint32
 
-func (e *Events) Add(event rpcd.Event) entities.Event {
-	evt := entities.Event{
-		Index:     0,
-		Type:      lookup(event.Var.OID),
-		Granted:   false,
-		Door:      door(event.Var.OID),
-		Direction: 0,
-		Card:      0,
-		Timestamp: event.Timestamp,
-		Reason:    reason(event.Var.OID, event.Var.Value),
-	}
+func (e *Events) Add(event entities.Event) (uint32, error) {
+	debugf("add %v", event)
 
-	if index, err := db.PutEvent(evt); err != nil {
-		warnf("%v", err)
+	var index uint32
+
+	if client, err := rpc.DialHTTP(e.dial.network, e.dial.address); err != nil {
+		return 0, err
+	} else if err := client.Call("EventD.Add", event, &index); err != nil {
+		return 0, err
 	} else {
-		evt.Index = index
+		return index, nil
 	}
-
-	return evt
 }
 
 func (e *Events) Get(index uint32) (entities.Event, error) {

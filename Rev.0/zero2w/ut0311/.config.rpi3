@@ -23,6 +23,10 @@
     },
 
     "events": {
+        "RPC": {
+            "dial": "unix::/tmp/uhppoted/breakout/events.sock"
+        },
+
         "listener": "192.168.1.100:60001",
         "interval": 0
     },

@@ -5,7 +5,7 @@ import (
 	"emulator/scmp"
 )
 
-func lookup(OID string) entities.EventType {
+func Lookup(OID string) entities.EventType {
 	if oid, err := scmp.Parse(OID); err == nil {
 		doors := []scmp.OID{
 			scmp.OID_DOORS_1_OPEN, scmp.OID_DOORS_1_BUTTON, scmp.OID_DOORS_1_UNLOCKED,
@@ -24,7 +24,7 @@ func lookup(OID string) entities.EventType {
 	return entities.EventUnknown
 }
 
-func door(OID string) uint8 {
+func Door(OID string) uint8 {
 	if oid, err := scmp.Parse(OID); err == nil {
 		doors := map[uint8][]scmp.OID{
 			1: {scmp.OID_DOORS_1_OPEN, scmp.OID_DOORS_1_BUTTON, scmp.OID_DOORS_1_UNLOCKED},
@@ -45,7 +45,7 @@ func door(OID string) uint8 {
 	return 0
 }
 
-func reason(OID string, value any) entities.EventReason {
+func Reason(OID string, value any) entities.EventReason {
 	if oid, err := scmp.Parse(OID); err == nil {
 		open := []scmp.OID{
 			scmp.OID_DOORS_1_OPEN,

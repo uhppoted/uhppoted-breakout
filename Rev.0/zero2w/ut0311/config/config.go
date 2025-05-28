@@ -52,6 +52,7 @@ type TLS struct {
 }
 
 type events struct {
+	RPC      rpc            `json:"RPC"`
 	Listener netip.AddrPort `json:"listener"`
 	Interval uint8          `json:"interval"`
 }

@@ -21,10 +21,10 @@ debug: build
 
 
 run-tcp: build
-	./bin/eventd --bind "$(TCP)"
+	./bin/eventd --bind "$(TCP)" --DSN "sqlite3://../workdir/db/sqlite3/ut0311.db"
 
 run-unix: build
-	./bin/eventd --bind "$(UDS)"
+	./bin/eventd --bind "$(UDS)" --DSN "sqlite3://../workdir/db/sqlite3/ut0311.db"
 
 run: run-unix
 
@@ -35,7 +35,7 @@ zero2w-build: format
 
 zero2w-run: zero2w-build
 	scp dist/arm7/eventd breakout:/opt/breakout/eventd
-	ssh breakout "cd /opt/breakout/eventd && ./eventd --bind $(TCP)"
+	ssh breakout "cd /opt/breakout/eventd && ./eventd --bind $(TCP)" --DSN "sqlite3:///var/uhppoted/breakout/db/sqlite3/ut0311.db"
 
 zer02w: zerow2w-run
 
@@ -46,7 +46,7 @@ rpi3-build: format
 
 rpi3-run: rpi3-build
 	scp dist/arm6/rpcd phil:/opt/uhppoted/uhppoted-breakout/eventd
-	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/events && ./eventd --bind $(TCP)"
+	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/events && ./eventd --bind $(TCP)" --DSN "sqlite3:///var/uhppoted/breakout/db/sqlite3/ut0311.db"
 
 rpi3: rpi3-run
 
