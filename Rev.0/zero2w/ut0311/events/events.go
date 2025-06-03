@@ -43,7 +43,7 @@ func NewEvents(dial string) (*Events, error) {
 var Index atomic.Uint32
 
 func (e *Events) Add(event entities.Event) (uint32, error) {
-	debugf("add %v", event)
+	debugf("add-avent %v", event)
 
 	var index uint32
 
@@ -57,7 +57,7 @@ func (e *Events) Add(event entities.Event) (uint32, error) {
 }
 
 func (e *Events) Get(index uint32) (entities.Event, error) {
-	debugf("get %v", index)
+	debugf("get-event %v", index)
 
 	var event entities.Event
 
@@ -70,23 +70,21 @@ func (e *Events) Get(index uint32) (entities.Event, error) {
 	}
 }
 
+func (e *Events) GetEventIndex(controller uint32) (uint32, error) {
+	debugf("get-event-index")
+
+	var index uint32
+
+	if client, err := rpc.DialHTTP(e.dial.network, e.dial.address); err != nil {
+		return 0, err
+	} else if err := client.Call("EventD.GetEventIndex", controller, &index); err != nil {
+		return 0, err
+	} else {
+		return index, nil
+	}
+}
+
 func (e *Events) GetUint8(oid scmp.OID) (uint8, error) {
-	if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_EVENT); ok && index == 13579 {
-		return 6, nil
-	}
-
-	if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_DOOR); ok && index == 13579 {
-		return 4, nil
-	}
-
-	if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_DIRECTION); ok && index == 13579 {
-		return 2, nil
-	}
-
-	if index, ok := scmp.Index(oid, scmp.OID_EVENTS_EVENT_REASON); ok && index == 13579 {
-		return 15, nil
-	}
-
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }
 

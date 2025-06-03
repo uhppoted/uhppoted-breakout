@@ -7,3 +7,7 @@ CREATE TABLE Events (
     Direction    INTEGER  NULL,
     CardNumber   INTEGER  NULL,
     Reason       INTEGER  NULL);
+
+CREATE TABLE EventIndex (
+    Controller INTEGER PRIMARY KEY,
+    EventIndex INTEGER DEFAULT 0);

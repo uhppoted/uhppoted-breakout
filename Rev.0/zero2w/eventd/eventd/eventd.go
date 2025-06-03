@@ -83,7 +83,7 @@ func (d *EventD) Stop() {
 }
 
 func (d *EventD) Add(event entities.Event, reply *uint32) error {
-	debugf("add %v", event)
+	debugf("add-event %v", event)
 
 	if index, err := db.PutEvent(event); err != nil {
 		return err
@@ -95,7 +95,7 @@ func (d *EventD) Add(event entities.Event, reply *uint32) error {
 }
 
 func (d *EventD) Get(index uint32, event *entities.Event) error {
-	debugf("get %v", index)
+	debugf("get-event %v", index)
 
 	get := func(ix uint32) error {
 		if record, err := db.GetEvent(index); err != nil {
@@ -117,7 +117,6 @@ func (d *EventD) Get(index uint32, event *entities.Event) error {
 		return err
 	} else {
 		switch {
-
 		case index == 0:
 			return get(first)
 
@@ -139,6 +138,18 @@ func (d *EventD) Get(index uint32, event *entities.Event) error {
 			return entities.ErrRecordNotFound
 		}
 	}
+}
+
+func (d *EventD) GetEventIndex(controller uint32, index *uint32) error {
+	debugf("get-event-index %v", controller)
+
+	if record, err := db.GetEventIndex(controller); err != nil {
+		return err
+	} else {
+		*index = record
+	}
+
+	return nil
 }
 
 func debugf(format string, args ...any) {

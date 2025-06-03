@@ -12,6 +12,7 @@ type DB interface {
 	GetEvents() (uint32, uint32, error)
 	GetEvent(index uint32) (entities.Event, error)
 	PutEvent(event entities.Event) (uint32, error)
+	GetEventIndex(uint32) (uint32, error)
 }
 
 var db DB
@@ -37,4 +38,8 @@ func GetEvent(index uint32) (entities.Event, error) {
 
 func PutEvent(event entities.Event) (uint32, error) {
 	return db.PutEvent(event)
+}
+
+func GetEventIndex(controller uint32) (uint32, error) {
+	return db.GetEventIndex(controller)
 }

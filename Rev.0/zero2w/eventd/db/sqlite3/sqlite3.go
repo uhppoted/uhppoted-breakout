@@ -195,6 +195,46 @@ func (db impl) PutEvent(event entities.Event) (uint32, error) {
 	}
 }
 
+func (db impl) GetEventIndex(controller uint32) (uint32, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	defer cancel()
+
+	query := fmt.Sprintf(`SELECT EventIndex FROM EventIndex WHERE controller=?;`)
+
+	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+		return 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+	} else if err != nil {
+		return 0, err
+	}
+
+	if dbc, err := db.open(); err != nil {
+		return 0, err
+	} else if dbc == nil {
+		return 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+	} else if prepared, err := dbc.Prepare(query); err != nil {
+		return 0, err
+	} else if rs, err := prepared.QueryContext(ctx, controller); err != nil {
+		return 0, err
+	} else if rs == nil {
+		return 0, fmt.Errorf("invalid resultset (%v)", rs)
+	} else {
+		defer rs.Close()
+
+		for rs.Next() {
+			var index uint32
+
+			if err := rs.Scan(&index); err != nil {
+				return 0, err
+			} else {
+				return index, nil
+			}
+		}
+
+		return 0, nil
+	}
+}
+
 func (db impl) open() (*sql.DB, error) {
 	if dbc, err := sql.Open("sqlite3", db.dsn); err != nil {
 		return nil, err
