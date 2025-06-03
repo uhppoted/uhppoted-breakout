@@ -22,6 +22,11 @@ struct {
         bool usb0;
         bool usb1;
     } connected;
+
+    struct {
+        mutex_t usb0;
+        mutex_t usb1;
+    } guard;
 } USB = {
     .buffers = {
         .cli = {
@@ -39,6 +44,7 @@ struct {
         .usb0 = false,
         .usb1 = false,
     },
+
 };
 
 bool on_usb_rx(repeating_timer_t *rt);
@@ -46,6 +52,9 @@ bool on_usb_rx(repeating_timer_t *rt);
 bool usb_init() {
     USB.connected.usb0 = false;
     USB.connected.usb1 = false;
+
+    mutex_init(&USB.guard.usb0);
+    mutex_init(&USB.guard.usb1);
 
     add_repeating_timer_ms(50, on_usb_rx, NULL, &USB.usb_timer);
 
@@ -55,9 +64,10 @@ bool usb_init() {
 }
 
 void usb_write(const uint8_t *bytes, int len) {
-    int ix = 0;
-
+    mutex_enter_blocking(&USB.guard.usb1);
     if (USB.connected.usb1) {
+
+        int ix = 0;
         while (ix < len) {
             uint32_t N = tud_cdc_n_write(CDC1, &bytes[ix], len - ix);
 
@@ -71,9 +81,11 @@ void usb_write(const uint8_t *bytes, int len) {
         }
 
         tud_cdc_n_write_flush(CDC1);
+
     } else {
         warnf(LOGTAG, "write error: USB not connected");
     }
+    mutex_exit(&USB.guard.usb1);
 }
 
 bool on_usb_rx(repeating_timer_t *rt) {

@@ -1,5 +1,5 @@
 TINYGO = ~/Development/tools/tinygo/bin/tinygo
-TCP = tcp:1234
+TCP = tcp:::1234
 UDS = unix::/tmp/uhppoted/breakout/rpc.sock
 
 .DEFAULT_GOAL := build

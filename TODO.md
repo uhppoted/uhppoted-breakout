@@ -13,12 +13,9 @@
 
 ### misc
 
-- [x] software RTC
-
 - [ ] USB write
       - [x] `WARN   USB        *** write error 21 of 107`
-      - [ ] guard 
-      - [ ] write queue
+      - [x] guard 
       - [ ] queue events if rpcd is not connected
       - [ ] flush SSMP::write on connected
 
@@ -76,6 +73,10 @@
 - [ ] serial logger
 - [ ] custom image
       - https://github.com/raspberrypi/rpi-image-gen
+- [ ] memory FS for Unix domanin sockets
+      - /run
+      - /dev/shm
+      - tmpfs
 
 ### UT0311
     - [ ] eventd
