@@ -2,7 +2,7 @@ package UT0311
 
 import (
 	"github.com/uhppoted/uhppote-core/messages"
-	"github.com/uhppoted/uhppote-core/types"
+	lib "github.com/uhppoted/uhppote-core/types"
 
 	"emulator/scmp"
 )
@@ -25,16 +25,16 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		return nil, nil
 	} else {
 		response := messages.GetStatusResponse{
-			SerialNumber: types.SerialNumber(id),
+			SerialNumber: lib.SerialNumber(id),
 			RelayState:   0x00,
 			InputState:   0x00,
 		}
 
-		if datetime, err := scmp.Get[types.DateTime](ut0311.breakout, scmp.OID_CONTROLLER_DATETIME); err != nil {
+		if datetime, err := scmp.Get[lib.DateTime](ut0311.breakout, scmp.OID_CONTROLLER_DATETIME); err != nil {
 			return nil, err
 		} else {
-			response.SystemDate = types.SystemDate(datetime)
-			response.SystemTime = types.SystemTime(datetime)
+			response.SystemDate = lib.SystemDate(datetime)
+			response.SystemTime = lib.SystemTime(datetime)
 		}
 
 		if v, err := scmp.Get[uint16](ut0311.breakout, scmp.OID_CONTROLLER_SYSERR); err != nil {
@@ -159,52 +159,17 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... event
-		if index, err := scmp.Get[uint32](ut0311.events, scmp.OID_EVENTS_LAST); err != nil {
+		if event, err := ut0311.events.Get(0xffffffff); err != nil {
 			return nil, err
-		} else if index > 0 {
-			response.EventIndex = index
-
-			if event, err := scmp.GetIndexed[uint8](ut0311.events, scmp.OID_EVENTS_EVENT_EVENT, index); err != nil {
-				return nil, err
-			} else {
-				response.EventType = event
-			}
-
-			if granted, err := scmp.GetIndexed[bool](ut0311.events, scmp.OID_EVENTS_EVENT_GRANTED, index); err != nil {
-				return nil, err
-			} else {
-				response.Granted = granted
-			}
-
-			if door, err := scmp.GetIndexed[uint8](ut0311.events, scmp.OID_EVENTS_EVENT_DOOR, index); err != nil {
-				return nil, err
-			} else {
-				response.Door = door
-			}
-
-			if direction, err := scmp.GetIndexed[uint8](ut0311.events, scmp.OID_EVENTS_EVENT_DIRECTION, index); err != nil {
-				return nil, err
-			} else {
-				response.Direction = direction
-			}
-
-			if card, err := scmp.GetIndexed[uint32](ut0311.events, scmp.OID_EVENTS_EVENT_CARD, index); err != nil {
-				return nil, err
-			} else {
-				response.CardNumber = card
-			}
-
-			if timestamp, err := scmp.GetIndexed[types.DateTime](ut0311.events, scmp.OID_EVENTS_EVENT_TIMESTAMP, index); err != nil {
-				return nil, err
-			} else {
-				response.Timestamp = timestamp
-			}
-
-			if reason, err := scmp.GetIndexed[uint8](ut0311.events, scmp.OID_EVENTS_EVENT_REASON, index); err != nil {
-				return nil, err
-			} else {
-				response.Reason = reason
-			}
+		} else {
+			response.EventIndex = event.Index
+			response.EventType = uint8(event.Type)
+			response.Granted = event.Granted
+			response.Door = event.Door
+			response.Direction = event.Direction
+			response.CardNumber = event.Card
+			response.Timestamp = lib.DateTime(event.Timestamp)
+			response.Reason = uint8(event.Reason)
 		}
 
 		return response, nil

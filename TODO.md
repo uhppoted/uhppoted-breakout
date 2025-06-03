@@ -1,5 +1,10 @@
 # TODO
 
+```
+|-────────┼──────────────────────────────────────────────────────────────┼──────┼─────────┼──────┼───────────┼────────────┼────────┤
+│ 34      │ 2006-01-02 15:04:05%!(EXTRA time.Time=2025-01-01 00:05:18 -0 │ 2    │ 0       │ 1    │ 0         │ 0          │ 23     │
+│         │ 800 PST)                                                     │      │         │      │           │            │        │
+```
 ## RPCD
     - [ ] commonalise GET/SET queue handling
     - [ ] daemonize
@@ -108,10 +113,10 @@
       - [x] delete-card
       - [x] delete-all-cards
       - [x] open-door
-      - [x] record-special-events
       - [x] get-event-index
       - [x] set-event-index
       - [x] get-event
+      - [ ] record-special-events
       - [ ] get-time-profiles
       - [ ] set-time-profile
       - [ ] clear-time-profiles

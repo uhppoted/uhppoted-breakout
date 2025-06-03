@@ -98,7 +98,7 @@ func (d *EventD) Get(index uint32, event *entities.Event) error {
 	debugf("get-event %v", index)
 
 	get := func(ix uint32) error {
-		if record, err := db.GetEvent(index); err != nil {
+		if record, err := db.GetEvent(ix); err != nil {
 			return err
 		} else {
 			*event = record

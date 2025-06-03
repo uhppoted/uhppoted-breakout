@@ -1,8 +1,10 @@
 package UT0311
 
 import (
+	"fmt"
+
 	"github.com/uhppoted/uhppote-core/messages"
-	"github.com/uhppoted/uhppote-core/types"
+	// "github.com/uhppoted/uhppote-core/types"
 
 	"emulator/scmp"
 )
@@ -12,12 +14,15 @@ func (ut0311 *UT0311) recordSpecialEvents(rq *messages.RecordSpecialEventsReques
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
-	} else if _, err := scmp.Set(ut0311.events, scmp.OID_EVENTS_RECORD_ALL, rq.Enable); err != nil {
-		return nil, err
+		// } else if _, err := scmp.Set(ut0311.events, scmp.OID_EVENTS_RECORD_ALL, rq.Enable); err != nil {
+		// 	return nil, err
 	} else {
-		return messages.RecordSpecialEventsResponse{
-			SerialNumber: types.SerialNumber(id),
-			Succeeded:    true,
-		}, nil
+		// 	return messages.RecordSpecialEventsResponse{
+		// 		SerialNumber: types.SerialNumber(id),
+		// 		Succeeded:    true,
+		// 	}, nil
+
+		// FIXME
+		return nil, fmt.Errorf("*** NOT IMPLEMENTED ***")
 	}
 }
