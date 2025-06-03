@@ -1,13 +1,11 @@
 package events
 
 import (
-	"errors"
 	"fmt"
 	"net/rpc"
 	"regexp"
 	"sync/atomic"
 
-	"emulator/db"
 	"emulator/entities"
 	"emulator/log"
 	"emulator/scmp"
@@ -59,33 +57,16 @@ func (e *Events) Add(event entities.Event) (uint32, error) {
 }
 
 func (e *Events) Get(index uint32) (entities.Event, error) {
-	get := func(ix uint32) (entities.Event, error) {
-		if record, err := db.GetEvent(ix); err != nil {
-			return entities.Event{}, err
-		} else {
-			return record, nil
-		}
-	}
+	debugf("get %v", index)
 
-	if record, err := get(index); err != nil && !errors.Is(err, entities.ErrRecordNotFound) {
+	var event entities.Event
+
+	if client, err := rpc.DialHTTP(e.dial.network, e.dial.address); err != nil {
 		return entities.Event{}, err
-	} else if err == nil {
-		return record, nil
-	} else if first, last, err := db.GetEvents(); err != nil {
+	} else if err := client.Call("EventD.Get", index, &event); err != nil {
 		return entities.Event{}, err
-	} else if index == 0 {
-		return get(first)
-	} else if index == 0xffffffff {
-		return get(last)
-	} else if index < first {
-		return entities.Event{
-			Index: index,
-			Type:  0xff, // overwritten
-		}, nil
-	} else if index > last {
-		return get(last)
 	} else {
-		return entities.Event{}, entities.ErrRecordNotFound
+		return event, nil
 	}
 }
 

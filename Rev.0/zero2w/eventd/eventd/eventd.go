@@ -2,6 +2,7 @@ package eventd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -91,8 +92,53 @@ func (d *EventD) Add(event entities.Event, reply *uint32) error {
 
 		return nil
 	}
+}
 
-	return fmt.Errorf("** NOT IMPLEMENTED **")
+func (d *EventD) Get(index uint32, event *entities.Event) error {
+	debugf("get %v", index)
+
+	get := func(ix uint32) error {
+		if record, err := db.GetEvent(index); err != nil {
+			return err
+		} else {
+			*event = record
+		}
+
+		return nil
+	}
+
+	if err := get(index); err != nil && !errors.Is(err, entities.ErrRecordNotFound) {
+		return err
+	} else if err == nil {
+		return nil
+	}
+
+	if first, last, err := db.GetEvents(); err != nil {
+		return err
+	} else {
+		switch {
+
+		case index == 0:
+			return get(first)
+
+		case index == 0xffffffff:
+			return get(last)
+
+		case index < first:
+			*event = entities.Event{
+				Index: index,
+				Type:  0xff, // overwritten
+			}
+
+			return nil
+
+		case index > last:
+			return get(last)
+
+		default:
+			return entities.ErrRecordNotFound
+		}
+	}
 }
 
 func debugf(format string, args ...any) {

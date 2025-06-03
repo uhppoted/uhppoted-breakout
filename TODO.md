@@ -1,7 +1,6 @@
 # TODO
 
 ## RPCD
-    - [x] move cache to ut0311
     - [ ] commonalise GET/SET queue handling
     - [ ] daemonize
     - [ ] monitor
