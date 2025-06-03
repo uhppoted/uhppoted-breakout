@@ -235,6 +235,37 @@ func (db impl) GetEventIndex(controller uint32) (uint32, error) {
 	}
 }
 
+func (db impl) SetEventIndex(controller uint32, index uint32) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	defer cancel()
+
+	record := map[string]any{
+		"Controller": controller,
+		"EventIndex": index,
+	}
+
+	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+	} else if err != nil {
+		return err
+	}
+
+	if dbc, err := db.open(); err != nil {
+		return err
+	} else if dbc == nil {
+		return fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
+		return err
+	} else if _, err := db.replace(dbc, tx, "EventIndex", record); err != nil {
+		return err
+	} else if err := tx.Commit(); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
 func (db impl) open() (*sql.DB, error) {
 	if dbc, err := sql.Open("sqlite3", db.dsn); err != nil {
 		return nil, err
@@ -259,6 +290,38 @@ func (db impl) insert(dbc *sql.DB, tx *sql.Tx, table string, record map[string]a
 	}
 
 	sql := fmt.Sprintf("INSERT INTO %v (%v) VALUES (%v);",
+		table,
+		strings.Join(columns, ","),
+		strings.Join(placeholders, ","))
+
+	// ... execute
+	if prepared, err := dbc.Prepare(sql); err != nil {
+		return 0, err
+	} else {
+		if result, err := tx.Stmt(prepared).Exec(values...); err != nil {
+			return 0, err
+		} else if id, err := result.LastInsertId(); err != nil {
+			return 0, err
+		} else {
+			return uint32(id), nil
+		}
+	}
+
+	return 0, nil
+}
+
+func (db impl) replace(dbc *sql.DB, tx *sql.Tx, table string, record map[string]any) (uint32, error) {
+	columns := []string{}
+	placeholders := []string{}
+	values := []any{}
+
+	for k, v := range record {
+		columns = append(columns, k)
+		values = append(values, v)
+		placeholders = append(placeholders, "?")
+	}
+
+	sql := fmt.Sprintf("REPLACE INTO %v (%v) VALUES (%v);",
 		table,
 		strings.Join(columns, ","),
 		strings.Join(placeholders, ","))

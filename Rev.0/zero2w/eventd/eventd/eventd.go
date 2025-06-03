@@ -152,6 +152,19 @@ func (d *EventD) GetEventIndex(controller uint32, index *uint32) error {
 	return nil
 }
 
+func (d *EventD) SetEventIndex(args struct {
+	Controller uint32
+	Index      uint32
+}, _ *any) error {
+	debugf("set-event-index %v %v", args.Controller, args.Index)
+
+	if err := db.SetEventIndex(args.Controller, args.Index); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
 func debugf(format string, args ...any) {
 	log.Debugf(LOGTAG, format, args...)
 }

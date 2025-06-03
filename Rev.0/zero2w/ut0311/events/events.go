@@ -84,6 +84,26 @@ func (e *Events) GetEventIndex(controller uint32) (uint32, error) {
 	}
 }
 
+func (e *Events) SetEventIndex(controller uint32, index uint32) (uint32, error) {
+	debugf("set-event-index")
+
+	var args = struct {
+		Controller uint32
+		Index      uint32
+	}{
+		Controller: controller,
+		Index:      index,
+	}
+
+	if client, err := rpc.DialHTTP(e.dial.network, e.dial.address); err != nil {
+		return 0, err
+	} else if err := client.Call("EventD.SetEventIndex", args, nil); err != nil {
+		return 0, err
+	} else {
+		return index, nil
+	}
+}
+
 func (e *Events) GetUint8(oid scmp.OID) (uint8, error) {
 	return 0, fmt.Errorf("unknown OID %v", oid)
 }

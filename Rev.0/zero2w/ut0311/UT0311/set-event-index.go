@@ -8,21 +8,25 @@ import (
 )
 
 func (ut0311 *UT0311) setEventIndex(rq *messages.SetEventIndexRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
+	if controller, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
-	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
+	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
-	} else {
+	} else if current, err := ut0311.events.GetEventIndex(controller); err != nil {
+		return nil, err
+	} else if current == rq.Index {
 		response := messages.SetEventIndexResponse{
-			SerialNumber: types.SerialNumber(id),
+			SerialNumber: types.SerialNumber(controller),
+			Changed:      false,
 		}
 
-		if previous, err := scmp.Get[uint32](ut0311.events, scmp.OID_EVENTS_INDEX); err != nil {
-			return nil, err
-		} else if index, err := scmp.Set[uint32](ut0311.events, scmp.OID_EVENTS_INDEX, rq.Index); err != nil {
-			return nil, err
-		} else {
-			response.Changed = index != previous
+		return response, nil
+	} else if index, err := ut0311.events.SetEventIndex(controller, rq.Index); err != nil {
+		return nil, err
+	} else {
+		response := messages.SetEventIndexResponse{
+			SerialNumber: types.SerialNumber(controller),
+			Changed:      index != current,
 		}
 
 		return response, nil
