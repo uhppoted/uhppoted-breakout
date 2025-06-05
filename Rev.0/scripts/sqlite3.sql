@@ -1,12 +1,14 @@
 CREATE TABLE Events (
-    EventID      INTEGER PRIMARY KEY AUTOINCREMENT,
+    Controller   INTEGER NOT NULL,
+    EventID      INTEGER NOT NULL,
     Timestamp    DATETIME NULL,
     Type         INTEGER  NULL,
     Granted      INTEGER  NULL,
     Door         INTEGER  NULL,
     Direction    INTEGER  NULL,
     CardNumber   INTEGER  NULL,
-    Reason       INTEGER  NULL);
+    Reason       INTEGER  NULL,
+    PRIMARY KEY (Controller, EventID));
 
 CREATE TABLE Controller (
     Controller          INTEGER PRIMARY KEY,

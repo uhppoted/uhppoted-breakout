@@ -11,7 +11,7 @@ import (
 type DB interface {
 	GetEvents() (uint32, uint32, error)
 	GetEvent(index uint32) (entities.Event, error)
-	PutEvent(event entities.Event) (uint32, error)
+	PutEvent(controller uint32, event entities.Event) (uint32, error)
 	GetEventIndex(uint32) (uint32, error)
 	SetEventIndex(uint32, uint32) error
 	RecordSpecialEvents(uint32, bool) error
@@ -38,8 +38,8 @@ func GetEvent(index uint32) (entities.Event, error) {
 	return db.GetEvent(index)
 }
 
-func PutEvent(event entities.Event) (uint32, error) {
-	return db.PutEvent(event)
+func PutEvent(controller uint32, event entities.Event) (uint32, error) {
+	return db.PutEvent(controller, event)
 }
 
 func GetEventIndex(controller uint32) (uint32, error) {

@@ -2,8 +2,9 @@
 
 - [x] record-special-events
 - [x] event timestamp
+- [x] add controller to events
+- [ ] remove eventsd::sqlite2 replace func
 - [ ] remove ut0311/events/lookup.go
-
 
 ## RPCD
     - [ ] commonalise GET/SET queue handling

@@ -41,14 +41,22 @@ func NewEvents(dial string) (*Events, error) {
 
 var Index atomic.Uint32
 
-func (e *Events) Add(event entities.Event) (uint32, error) {
+func (e *Events) Add(controller uint32, event entities.Event) (uint32, error) {
 	debugf("add-avent %v", event)
+
+	var args = struct {
+		Controller uint32
+		Event      entities.Event
+	}{
+		Controller: controller,
+		Event:      event,
+	}
 
 	var index uint32
 
 	if client, err := rpc.DialHTTP(e.dial.network, e.dial.address); err != nil {
 		return 0, err
-	} else if err := client.Call("EventD.Add", event, &index); err != nil {
+	} else if err := client.Call("EventD.Add", args, &index); err != nil {
 		return 0, err
 	} else {
 		return index, nil

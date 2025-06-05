@@ -16,6 +16,7 @@ func (ut0311 *UT0311) onEvent(event any) {
 	debugf("event %T %v", event, event)
 
 	if v, ok := event.(rpcd.Event); ok {
+		controller := v.ID
 		evt := entities.Event{
 			Index:     0,
 			Type:      events.Lookup(v.Var.OID),
@@ -27,7 +28,7 @@ func (ut0311 *UT0311) onEvent(event any) {
 			Reason:    events.Reason(v.Var.OID, v.Var.Value),
 		}
 
-		if index, err := ut0311.events.Add(evt); err != nil {
+		if index, err := ut0311.events.Add(controller, evt); err != nil {
 			warnf("%v", err)
 		} else {
 			evt.Index = index

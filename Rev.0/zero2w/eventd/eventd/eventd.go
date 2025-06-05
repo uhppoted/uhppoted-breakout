@@ -82,10 +82,14 @@ func (d *EventD) Stop() {
 	d.cancel()
 }
 
-func (d *EventD) Add(event entities.Event, reply *uint32) error {
-	debugf("add-event %v", event)
+func (d *EventD) Add(args struct {
+	Controller uint32
+	Event      entities.Event
+}, reply *uint32) error {
+	debugf("add-event %v %v", args.Controller, args.Event)
 
-	if index, err := db.PutEvent(event); err != nil {
+	if index, err := db.PutEvent(args.Controller, args.Event); err != nil {
+		warnf("add-event (%v)", err)
 		return err
 	} else {
 		*reply = index
@@ -108,12 +112,14 @@ func (d *EventD) Get(index uint32, event *entities.Event) error {
 	}
 
 	if err := get(index); err != nil && !errors.Is(err, entities.ErrRecordNotFound) {
+		warnf("get-event (%v)", err)
 		return err
 	} else if err == nil {
 		return nil
 	}
 
 	if first, last, err := db.GetEvents(); err != nil {
+		warnf("get-event (%v)", err)
 		return err
 	} else {
 		switch {
@@ -144,6 +150,7 @@ func (d *EventD) GetEventIndex(controller uint32, index *uint32) error {
 	debugf("get-event-index %v", controller)
 
 	if record, err := db.GetEventIndex(controller); err != nil {
+		warnf("get-event-index (%v)", err)
 		return err
 	} else {
 		*index = record
@@ -159,10 +166,11 @@ func (d *EventD) SetEventIndex(args struct {
 	debugf("set-event-index %v %v", args.Controller, args.Index)
 
 	if err := db.SetEventIndex(args.Controller, args.Index); err != nil {
+		warnf("set-event-index (%v)", err)
 		return err
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 func (d *EventD) RecordSpecialEvents(args struct {
@@ -172,10 +180,11 @@ func (d *EventD) RecordSpecialEvents(args struct {
 	debugf("record-special-events %v %v", args.Controller, args.Enabled)
 
 	if err := db.RecordSpecialEvents(args.Controller, args.Enabled); err != nil {
+		warnf("record-special-events (%v)", err)
 		return err
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 func debugf(format string, args ...any) {

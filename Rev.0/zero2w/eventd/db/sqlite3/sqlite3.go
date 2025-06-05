@@ -159,19 +159,28 @@ func (db impl) GetEvents() (uint32, uint32, error) {
 	}
 }
 
-func (db impl) PutEvent(event entities.Event) (uint32, error) {
+func (db impl) PutEvent(controller uint32, event entities.Event) (uint32, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
 	defer cancel()
 
-	record := map[string]any{
-		"Timestamp":  event.Timestamp.Format("2006-01-02 15:04:05"),
-		"Type":       event.Type,
-		"Granted":    event.Granted,
-		"Door":       event.Door,
-		"Direction":  event.Direction,
-		"CardNumber": event.Card,
-		"Reason":     event.Reason,
+	sql := `INSERT INTO Events (Controller, EventID, Timestamp, Type, Granted, Door, Direction, CardNumber, Reason)
+                   SELECT ?,
+                   COALESCE(MAX(EventID), 0) + 1,
+                   ?, ?, ?, ?, ?, ?, ?
+                   FROM Events
+                   WHERE Controller = ?;`
+
+	values := []any{
+		controller,
+		event.Timestamp.Format("2006-01-02 15:04:05"),
+		event.Type,
+		event.Granted,
+		event.Door,
+		event.Direction,
+		event.Card,
+		event.Reason,
+		controller,
 	}
 
 	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
@@ -186,15 +195,19 @@ func (db impl) PutEvent(event entities.Event) (uint32, error) {
 		return 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
 		return 0, err
-	} else if id, err := db.insert(dbc, tx, tableEvents, record); err != nil {
+	} else if prepared, err := dbc.Prepare(sql); err != nil {
+		return 0, err
+	} else if result, err := tx.Stmt(prepared).Exec(values...); err != nil {
 		return 0, err
 	} else if err := tx.Commit(); err != nil {
 		return 0, err
+	} else if id, err := result.LastInsertId(); err != nil {
+		return 0, err
 	} else {
-		event.Index = id
+		event.Index = uint32(id)
 		infof("stored event %v", event)
 
-		return id, nil
+		return uint32(id), nil
 	}
 }
 
@@ -310,38 +323,6 @@ func (db impl) open() (*sql.DB, error) {
 
 		return dbc, nil
 	}
-}
-
-func (db impl) insert(dbc *sql.DB, tx *sql.Tx, table string, record map[string]any) (uint32, error) {
-	columns := []string{}
-	placeholders := []string{}
-	values := []any{}
-
-	for k, v := range record {
-		columns = append(columns, k)
-		values = append(values, v)
-		placeholders = append(placeholders, "?")
-	}
-
-	sql := fmt.Sprintf("INSERT INTO %[1]v (%[2]v) VALUES (%[3]v);",
-		table,
-		strings.Join(columns, ","),
-		strings.Join(placeholders, ","))
-
-	// ... execute
-	if prepared, err := dbc.Prepare(sql); err != nil {
-		return 0, err
-	} else {
-		if result, err := tx.Stmt(prepared).Exec(values...); err != nil {
-			return 0, err
-		} else if id, err := result.LastInsertId(); err != nil {
-			return 0, err
-		} else {
-			return uint32(id), nil
-		}
-	}
-
-	return 0, nil
 }
 
 func (db impl) replace(dbc *sql.DB, tx *sql.Tx, table string, record map[string]any) (uint32, error) {
