@@ -5,6 +5,7 @@
 - [x] add controller to events
 - [ ] remove eventsd::sqlite2 replace func
 - [ ] remove ut0311/events/lookup.go
+- [ ] rename ut0311 package to ut0311
 
 ## RPCD
     - [ ] commonalise GET/SET queue handling
@@ -18,11 +19,9 @@
 
 ### misc
 
-- [ ] USB write
+- [x] USB write
       - [x] `WARN   USB        *** write error 21 of 107`
       - [x] guard 
-      - [ ] queue events if rpcd is not connected
-      - [ ] flush SSMP::write on connected
 
 - [ ] PIO I2C
 - [ ] make debugf, infof, etc interrupt safe
@@ -50,16 +49,16 @@
 
 ### SSMP
     - [ ] TRAP
+          - [ ] inputs
           - [ ] swipe
           - [ ] power on
           - [ ] reset
           - [ ] alarm
           - [ ] //FIXME encode all var types
+          - (?) change to INFORM
 
-    - [ ] set-door
-          - [x] mode
-          - [x] delay
-          - [ ] save to flash
+    - [ ] save to flash
+          - [ ] door delay/mode
 
     - [ ] `DEBUG  DOORS  settings saved` on `set-time`
           - only save if OID in 'save list'
@@ -86,7 +85,7 @@
 ### UT0311
     - [ ] eventd
           - [x] add
-          - [ ] get
+          - [x] get
           - [ ] remove unnecessary OID stuff
           - [ ] move entities to shared lib
 
@@ -117,7 +116,7 @@
       - [x] get-event-index
       - [x] set-event-index
       - [x] get-event
-      - [ ] record-special-events
+      - [x] record-special-events
       - [ ] get-time-profiles
       - [ ] set-time-profile
       - [ ] clear-time-profiles

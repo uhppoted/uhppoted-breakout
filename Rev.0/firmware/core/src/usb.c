@@ -63,16 +63,18 @@ bool usb_init() {
     return true;
 }
 
-void usb_write(const uint8_t *bytes, int len) {
-    mutex_enter_blocking(&USB.guard.usb1);
-    if (USB.connected.usb1) {
+bool usb_write(const uint8_t *bytes, int len) {
+    bool ok = true;
 
-        int ix = 0;
-        while (ix < len) {
+    mutex_enter_blocking(&USB.guard.usb1);
+
+    if (USB.connected.usb1) {
+        for (int ix = 0; ix < len;) {
             uint32_t N = tud_cdc_n_write(CDC1, &bytes[ix], len - ix);
 
             if (N == 0) {
                 warnf(LOGTAG, "*** write error %u of %d", ix, len);
+                ok = false;
                 break;
             } else {
                 debugf(LOGTAG, "write %u of %d", N, len - ix);
@@ -83,9 +85,13 @@ void usb_write(const uint8_t *bytes, int len) {
         tud_cdc_n_write_flush(CDC1);
 
     } else {
+        ok = false;
         warnf(LOGTAG, "write error: USB not connected");
     }
+
     mutex_exit(&USB.guard.usb1);
+
+    return ok;
 }
 
 bool on_usb_rx(repeating_timer_t *rt) {

@@ -42,7 +42,7 @@ void SSMP_touched();
 void SSMP_get(const char *community, int64_t rqid, const char *OID);
 bool SSMP_set(const char *community, int64_t rqid, const char *OID, const value val);
 void SSMP_err(const char *community, int64_t rqid, const char *OID, int64_t error, int64_t index);
-void SSMP_write(const uint8_t *buffer, int N);
+bool SSMP_write(const uint8_t *buffer, int N);
 
 struct {
     circular_buffer buffer;
@@ -300,8 +300,6 @@ bool SSMP_set(const char *community, int64_t rqid, const char *OID, const value 
  *
  */
 void SSMP_trap(EVENT event) {
-    debugf(LOGTAG, ">>>> EVENT %d", event);
-
     if (event == EVENT_UNKNOWN) {
         return;
     }
@@ -355,8 +353,6 @@ void SSMP_trap(EVENT event) {
     slice packed = ssmp_encode(trap);
     slice encoded = bisync_encode(NULL, 0, packed.bytes, packed.length);
 
-    debugf(LOGTAG, ">> TRAP %d", packed.length);
-
     SSMP_write(encoded.bytes, encoded.length);
 
     slice_free(&encoded);
@@ -395,10 +391,10 @@ void SSMP_err(const char *community, int64_t rqid, const char *OID, int64_t erro
 /* SSMP write
  *
  */
-void SSMP_write(const uint8_t *buffer, int N) {
+bool SSMP_write(const uint8_t *buffer, int N) {
     if (ssmp.USB) {
-        usb_write(buffer, N);
+        return usb_write(buffer, N);
     } else {
-        uart1_write(buffer, N);
+        return uart1_write(buffer, N);
     }
 }

@@ -64,6 +64,8 @@ void on_uart1_rx() {
     push(qmsg);
 }
 
-void uart1_write(const uint8_t *bytes, int N) {
+bool uart1_write(const uint8_t *bytes, int N) {
     uart_write_blocking(uart1, bytes, N);
+
+    return true;
 }
