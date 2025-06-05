@@ -10,7 +10,7 @@ build: format
 	python3 -m compileall .
 
 debug:
-	python3 main.py get-door --controller $(CONTROLLER) --door $(DOOR)
+	python3 main.py set-event-index --controller $(CONTROLLER) --index 23
 
 get-controller:
 	python3 main.py get-controller
@@ -67,13 +67,13 @@ delete-all-cards:
 	python3 main.py delete-all-cards
 
 record-special-events:
-	python3 main.py record-special-events
+	python3 main.py record-special-events --controller $(CONTROLLER) --enabled true
 
 get-event-index:
-	python3 main.py get-event-index
+	python3 main.py get-event-index --controller $(CONTROLLER)
 
 set-event-index:
-	python3 main.py set-event-index
+	python3 main.py set-event-index --controller $(CONTROLLER) --index 37
 
 get-event:
 	python3 main.py get-event --controller $(CONTROLLER) --event 13

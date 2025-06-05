@@ -1,28 +1,23 @@
 package UT0311
 
 import (
-	"fmt"
-
 	"github.com/uhppoted/uhppote-core/messages"
-	// "github.com/uhppoted/uhppote-core/types"
+	lib "github.com/uhppoted/uhppote-core/types"
 
 	"emulator/scmp"
 )
 
 func (ut0311 *UT0311) recordSpecialEvents(rq *messages.RecordSpecialEventsRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
+	if controller, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
-	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
+	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
-		// } else if _, err := scmp.Set(ut0311.events, scmp.OID_EVENTS_RECORD_ALL, rq.Enable); err != nil {
-		// 	return nil, err
+	} else if err := ut0311.events.RecordSpecialEvents(controller, rq.Enable); err != nil {
+		return nil, err
 	} else {
-		// 	return messages.RecordSpecialEventsResponse{
-		// 		SerialNumber: types.SerialNumber(id),
-		// 		Succeeded:    true,
-		// 	}, nil
-
-		// FIXME
-		return nil, fmt.Errorf("*** NOT IMPLEMENTED ***")
+		return messages.RecordSpecialEventsResponse{
+			SerialNumber: lib.SerialNumber(controller),
+			Succeeded:    true,
+		}, nil
 	}
 }

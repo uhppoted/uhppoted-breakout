@@ -83,7 +83,7 @@ func (e *Events) GetEventIndex(controller uint32) (uint32, error) {
 	}
 }
 
-func (e *Events) SetEventIndex(controller uint32, index uint32) (uint32, error) {
+func (e *Events) SetEventIndex(controller uint32, index uint32) error {
 	debugf("set-event-index")
 
 	var args = struct {
@@ -95,11 +95,31 @@ func (e *Events) SetEventIndex(controller uint32, index uint32) (uint32, error) 
 	}
 
 	if client, err := rpc.DialHTTP(e.dial.network, e.dial.address); err != nil {
-		return 0, err
+		return err
 	} else if err := client.Call("EventD.SetEventIndex", args, nil); err != nil {
-		return 0, err
+		return err
 	} else {
-		return index, nil
+		return nil
+	}
+}
+
+func (e *Events) RecordSpecialEvents(controller uint32, enabled bool) error {
+	debugf("record-special-events")
+
+	var args = struct {
+		Controller uint32
+		Enabled    bool
+	}{
+		Controller: controller,
+		Enabled:    enabled,
+	}
+
+	if client, err := rpc.DialHTTP(e.dial.network, e.dial.address); err != nil {
+		return err
+	} else if err := client.Call("EventD.RecordSpecialEvents", args, nil); err != nil {
+		return err
+	} else {
+		return nil
 	}
 }
 

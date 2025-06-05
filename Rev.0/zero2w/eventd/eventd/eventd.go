@@ -155,10 +155,23 @@ func (d *EventD) GetEventIndex(controller uint32, index *uint32) error {
 func (d *EventD) SetEventIndex(args struct {
 	Controller uint32
 	Index      uint32
-}, _ *any) error {
+}, _ *uint32) error {
 	debugf("set-event-index %v %v", args.Controller, args.Index)
 
 	if err := db.SetEventIndex(args.Controller, args.Index); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+func (d *EventD) RecordSpecialEvents(args struct {
+	Controller uint32
+	Enabled    bool
+}, _ *bool) error {
+	debugf("record-special-events %v %v", args.Controller, args.Enabled)
+
+	if err := db.RecordSpecialEvents(args.Controller, args.Enabled); err != nil {
 		return err
 	} else {
 		return nil

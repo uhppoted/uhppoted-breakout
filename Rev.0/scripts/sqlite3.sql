@@ -8,6 +8,7 @@ CREATE TABLE Events (
     CardNumber   INTEGER  NULL,
     Reason       INTEGER  NULL);
 
-CREATE TABLE EventIndex (
-    Controller INTEGER PRIMARY KEY,
-    EventIndex INTEGER DEFAULT 0);
+CREATE TABLE Controller (
+    Controller          INTEGER PRIMARY KEY,
+    EventIndex          INTEGER DEFAULT 0,
+    RecordSpecialEvents INTEGER DEFAULT 0);

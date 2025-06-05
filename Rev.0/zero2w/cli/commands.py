@@ -18,7 +18,6 @@ MODE = 2
 DELAY = 10
 CARD = 10058400
 CARD_INDEX = 17
-EVENT_INDEX = 37
 TIME_PROFILE_ID = 29
 AUTO_SEND = 15
 
@@ -279,21 +278,21 @@ def get_event(u, dest, timeout, args, protocol='udp'):
 
 
 def get_event_index(u, dest, timeout, args, protocol='udp'):
-    controller = (CONTROLLER, dest, protocol)
+    controller = (args.controller, dest, protocol)
 
     return u.get_event_index(controller, timeout=timeout)
 
 
 def set_event_index(u, dest, timeout, args, protocol='udp'):
-    controller = (CONTROLLER, dest, protocol)
-    index = EVENT_INDEX
+    controller = (args.controller, dest, protocol)
+    index = args.index
 
     return u.set_event_index(controller, index, timeout=timeout)
 
 
 def record_special_events(u, dest, timeout, args, protocol='udp'):
     controller = (CONTROLLER, dest, protocol)
-    enabled = True
+    enabled = args.enabled
 
     return u.record_special_events(controller, enabled, timeout=timeout)
 

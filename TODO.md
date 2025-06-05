@@ -1,10 +1,10 @@
 # TODO
 
-```
-|-────────┼──────────────────────────────────────────────────────────────┼──────┼─────────┼──────┼───────────┼────────────┼────────┤
-│ 34      │ 2006-01-02 15:04:05%!(EXTRA time.Time=2025-01-01 00:05:18 -0 │ 2    │ 0       │ 1    │ 0         │ 0          │ 23     │
-│         │ 800 PST)                                                     │      │         │      │           │            │        │
-```
+- [x] record-special-events
+- [x] event timestamp
+- [ ] remove ut0311/events/lookup.go
+
+
 ## RPCD
     - [ ] commonalise GET/SET queue handling
     - [ ] daemonize

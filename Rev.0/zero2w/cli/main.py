@@ -173,6 +173,11 @@ def parse_args():
                                  default=CONTROLLER,
                                  help='controller serial number, e.g. 405419896')
 
+    set_event_index.add_argument('--index',
+                                 type=int,
+                                 default=1,
+                                 help='event index, e.g. 12345')
+
     # ... get-event
     get_event = parsers['get-event']
     get_event.add_argument('--controller',
@@ -190,6 +195,10 @@ def parse_args():
                                        type=int,
                                        default=CONTROLLER,
                                        help='controller serial number, e.g. 405419896')
+    record_special_events.add_argument('--enabled',
+                                       type=bool,
+                                       default=True,
+                                       help='enables door and button events if true')
 
     # ... get-time-profile
     get_time_profile = parsers['get-time-profile']

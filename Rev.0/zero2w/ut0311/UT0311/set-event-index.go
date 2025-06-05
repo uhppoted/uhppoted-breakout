@@ -21,12 +21,12 @@ func (ut0311 *UT0311) setEventIndex(rq *messages.SetEventIndexRequest) (any, err
 		}
 
 		return response, nil
-	} else if index, err := ut0311.events.SetEventIndex(controller, rq.Index); err != nil {
+	} else if err := ut0311.events.SetEventIndex(controller, rq.Index); err != nil {
 		return nil, err
 	} else {
 		response := messages.SetEventIndexResponse{
 			SerialNumber: types.SerialNumber(controller),
-			Changed:      index != current,
+			Changed:      true,
 		}
 
 		return response, nil

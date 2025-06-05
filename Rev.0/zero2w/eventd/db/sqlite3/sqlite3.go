@@ -20,6 +20,9 @@ const MaxIdle = 2
 const MaxOpen = 5
 const LogTag = "sqlite3"
 
+const tableEvents = "Events"
+const tableController = "Controller"
+
 type impl struct {
 	dsn         string
 	maxLifetime time.Duration
@@ -41,7 +44,7 @@ func (db impl) GetEvent(index uint32) (entities.Event, error) {
 
 	defer cancel()
 
-	query := fmt.Sprintf(`SELECT CAST(Timestamp AS VARCHAR),Type,Granted,Door,Direction,CardNumber,Reason FROM Events WHERE EventID=?;`)
+	query := fmt.Sprintf(`SELECT CAST(Timestamp AS VARCHAR),Type,Granted,Door,Direction,CardNumber,Reason FROM %[1]v WHERE EventID=?;`, tableEvents)
 
 	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
 		return entities.Event{}, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
@@ -120,7 +123,7 @@ func (db impl) GetEvents() (uint32, uint32, error) {
 
 	defer cancel()
 
-	query := fmt.Sprintf(`SELECT MIN(EventID) AS First,MAX(EventID) AS Last FROM Events;`)
+	query := fmt.Sprintf(`SELECT MIN(EventID) AS First,MAX(EventID) AS Last FROM %[1]v;`, tableEvents)
 
 	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
 		return 0, 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
@@ -162,7 +165,7 @@ func (db impl) PutEvent(event entities.Event) (uint32, error) {
 	defer cancel()
 
 	record := map[string]any{
-		"Timestamp":  fmt.Sprintf("2006-01-02 15:04:05", event.Timestamp),
+		"Timestamp":  event.Timestamp.Format("2006-01-02 15:04:05"),
 		"Type":       event.Type,
 		"Granted":    event.Granted,
 		"Door":       event.Door,
@@ -183,7 +186,7 @@ func (db impl) PutEvent(event entities.Event) (uint32, error) {
 		return 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
 		return 0, err
-	} else if id, err := db.insert(dbc, tx, "events", record); err != nil {
+	} else if id, err := db.insert(dbc, tx, tableEvents, record); err != nil {
 		return 0, err
 	} else if err := tx.Commit(); err != nil {
 		return 0, err
@@ -200,7 +203,7 @@ func (db impl) GetEventIndex(controller uint32) (uint32, error) {
 
 	defer cancel()
 
-	query := fmt.Sprintf(`SELECT EventIndex FROM EventIndex WHERE controller=?;`)
+	query := fmt.Sprintf(`SELECT EventIndex FROM %[1]v WHERE controller=?;`, tableController)
 
 	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
 		return 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
@@ -257,7 +260,38 @@ func (db impl) SetEventIndex(controller uint32, index uint32) error {
 		return fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
 		return err
-	} else if _, err := db.replace(dbc, tx, "EventIndex", record); err != nil {
+	} else if _, err := db.replace(dbc, tx, tableController, record); err != nil {
+		return err
+	} else if err := tx.Commit(); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+func (db impl) RecordSpecialEvents(controller uint32, enabled bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	defer cancel()
+
+	record := map[string]any{
+		"Controller":          controller,
+		"RecordSpecialEvents": enabled,
+	}
+
+	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+	} else if err != nil {
+		return err
+	}
+
+	if dbc, err := db.open(); err != nil {
+		return err
+	} else if dbc == nil {
+		return fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
+		return err
+	} else if _, err := db.replace(dbc, tx, tableController, record); err != nil {
 		return err
 	} else if err := tx.Commit(); err != nil {
 		return err
@@ -289,7 +323,7 @@ func (db impl) insert(dbc *sql.DB, tx *sql.Tx, table string, record map[string]a
 		placeholders = append(placeholders, "?")
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %v (%v) VALUES (%v);",
+	sql := fmt.Sprintf("INSERT INTO %[1]v (%[2]v) VALUES (%[3]v);",
 		table,
 		strings.Join(columns, ","),
 		strings.Join(placeholders, ","))
@@ -321,7 +355,7 @@ func (db impl) replace(dbc *sql.DB, tx *sql.Tx, table string, record map[string]
 		placeholders = append(placeholders, "?")
 	}
 
-	sql := fmt.Sprintf("REPLACE INTO %v (%v) VALUES (%v);",
+	sql := fmt.Sprintf("REPLACE INTO %[1]v (%[2]v) VALUES (%[3]v);",
 		table,
 		strings.Join(columns, ","),
 		strings.Join(placeholders, ","))
