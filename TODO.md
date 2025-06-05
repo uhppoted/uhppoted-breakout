@@ -3,7 +3,7 @@
 - [x] record-special-events
 - [x] event timestamp
 - [x] add controller to events
-- [ ] remove eventsd::sqlite2 replace func
+- [x] remove eventsd::sqlite2 replace func
 - [ ] remove ut0311/events/lookup.go
 - [ ] rename ut0311 package to ut0311
 

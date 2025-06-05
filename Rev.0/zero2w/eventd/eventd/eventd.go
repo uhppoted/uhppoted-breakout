@@ -92,6 +92,8 @@ func (d *EventD) Add(args struct {
 		warnf("add-event (%v)", err)
 		return err
 	} else {
+		infof("add-event stored %v @%v", args.Event, index)
+
 		*reply = index
 
 		return nil

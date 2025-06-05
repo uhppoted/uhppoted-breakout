@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -22,6 +21,19 @@ const LogTag = "sqlite3"
 
 const tableEvents = "Events"
 const tableController = "Controller"
+
+const sqlPutEvent = `INSERT INTO Events (Controller, EventID, Timestamp, Type, Granted, Door, Direction, CardNumber, Reason)
+                           SELECT ?, COALESCE(MAX(EventID), 0) + 1, ?, ?, ?, ?, ?, ?, ?
+                           FROM Events
+                           WHERE Controller = ?;`
+
+const sqlSetEventIndex = `INSERT INTO Controller (Controller, EventIndex) VALUES (?, ?)
+                                 ON CONFLICT(Controller)
+                                    DO UPDATE SET EventIndex = excluded.EventIndex;`
+
+const sqlRecordSpecialEvents = `INSERT INTO Controller (Controller, RecordSpecialEvents) VALUES (?, ?) 
+                                       ON CONFLICT(Controller)
+                                          DO UPDATE SET RecordSpecialEvents = excluded.RecordSpecialEvents;`
 
 type impl struct {
 	dsn         string
@@ -160,17 +172,6 @@ func (db impl) GetEvents() (uint32, uint32, error) {
 }
 
 func (db impl) PutEvent(controller uint32, event entities.Event) (uint32, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	sql := `INSERT INTO Events (Controller, EventID, Timestamp, Type, Granted, Door, Direction, CardNumber, Reason)
-                   SELECT ?,
-                   COALESCE(MAX(EventID), 0) + 1,
-                   ?, ?, ?, ?, ?, ?, ?
-                   FROM Events
-                   WHERE Controller = ?;`
-
 	values := []any{
 		controller,
 		event.Timestamp.Format("2006-01-02 15:04:05"),
@@ -183,30 +184,9 @@ func (db impl) PutEvent(controller uint32, event entities.Event) (uint32, error)
 		controller,
 	}
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return 0, err
-	}
-
-	if dbc, err := db.open(); err != nil {
-		return 0, err
-	} else if dbc == nil {
-		return 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
-	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
-		return 0, err
-	} else if prepared, err := dbc.Prepare(sql); err != nil {
-		return 0, err
-	} else if result, err := tx.Stmt(prepared).Exec(values...); err != nil {
-		return 0, err
-	} else if err := tx.Commit(); err != nil {
-		return 0, err
-	} else if id, err := result.LastInsertId(); err != nil {
+	if id, err := db.insert(sqlPutEvent, values...); err != nil {
 		return 0, err
 	} else {
-		event.Index = uint32(id)
-		infof("stored event %v", event)
-
 		return uint32(id), nil
 	}
 }
@@ -252,65 +232,11 @@ func (db impl) GetEventIndex(controller uint32) (uint32, error) {
 }
 
 func (db impl) SetEventIndex(controller uint32, index uint32) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	record := map[string]any{
-		"Controller": controller,
-		"EventIndex": index,
-	}
-
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return err
-	}
-
-	if dbc, err := db.open(); err != nil {
-		return err
-	} else if dbc == nil {
-		return fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
-	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
-		return err
-	} else if _, err := db.replace(dbc, tx, tableController, record); err != nil {
-		return err
-	} else if err := tx.Commit(); err != nil {
-		return err
-	} else {
-		return nil
-	}
+	return db.update(sqlSetEventIndex, controller, index)
 }
 
 func (db impl) RecordSpecialEvents(controller uint32, enabled bool) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	record := map[string]any{
-		"Controller":          controller,
-		"RecordSpecialEvents": enabled,
-	}
-
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return err
-	}
-
-	if dbc, err := db.open(); err != nil {
-		return err
-	} else if dbc == nil {
-		return fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
-	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
-		return err
-	} else if _, err := db.replace(dbc, tx, tableController, record); err != nil {
-		return err
-	} else if err := tx.Commit(); err != nil {
-		return err
-	} else {
-		return nil
-	}
+	return db.update(sqlRecordSpecialEvents, controller, enabled)
 }
 
 func (db impl) open() (*sql.DB, error) {
@@ -325,36 +251,66 @@ func (db impl) open() (*sql.DB, error) {
 	}
 }
 
-func (db impl) replace(dbc *sql.DB, tx *sql.Tx, table string, record map[string]any) (uint32, error) {
-	columns := []string{}
-	placeholders := []string{}
-	values := []any{}
+func (db impl) insert(sql string, values ...any) (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
-	for k, v := range record {
-		columns = append(columns, k)
-		values = append(values, v)
-		placeholders = append(placeholders, "?")
+	defer cancel()
+
+	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+		return 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+	} else if err != nil {
+		return 0, err
 	}
 
-	sql := fmt.Sprintf("REPLACE INTO %[1]v (%[2]v) VALUES (%[3]v);",
-		table,
-		strings.Join(columns, ","),
-		strings.Join(placeholders, ","))
-
-	// ... execute
-	if prepared, err := dbc.Prepare(sql); err != nil {
+	if dbc, err := db.open(); err != nil {
+		return 0, err
+	} else if dbc == nil {
+		return 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
 		return 0, err
 	} else {
-		if result, err := tx.Stmt(prepared).Exec(values...); err != nil {
+		defer tx.Rollback()
+
+		if result, err := tx.ExecContext(ctx, sql, values...); err != nil {
+			return 0, err
+		} else if err := tx.Commit(); err != nil {
 			return 0, err
 		} else if id, err := result.LastInsertId(); err != nil {
 			return 0, err
 		} else {
-			return uint32(id), nil
+			return id, nil
 		}
 	}
+}
 
-	return 0, nil
+func (db impl) update(sql string, values ...any) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	defer cancel()
+
+	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+	} else if err != nil {
+		return err
+	}
+
+	if dbc, err := db.open(); err != nil {
+		return err
+	} else if dbc == nil {
+		return fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
+		return err
+	} else {
+		defer tx.Rollback()
+
+		if _, err := tx.ExecContext(ctx, sql, values...); err != nil {
+			return err
+		} else if err := tx.Commit(); err != nil {
+			return err
+		} else {
+			return nil
+		}
+	}
 }
 
 func debugf(format string, args ...any) {
