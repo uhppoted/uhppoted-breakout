@@ -18,18 +18,18 @@ debug: build
 	go test ./... -run TestOIDEqual
 
 run-tcp: build
-	./bin/emulator --config .config.localhost
+	./bin/ut0311 --config .config.localhost
 
 run-unix: build
-	./bin/emulator --config .config.unix
+	./bin/ut0311 --config .config.unix
 
 run-breakout: build
-	./bin/emulator --config .config.zero2w
+	./bin/ut0311 --config .config.zero2w
 
 run: run-unix
 
 stub: build
-	./bin/emulator --config .config.stub
+	./bin/ut0311 --config .config.stub
 
 rpi3: build
-	./bin/emulator --config .config.rpi3
+	./bin/ut0311 --config .config.rpi3

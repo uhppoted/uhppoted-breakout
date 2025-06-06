@@ -4,8 +4,7 @@
 - [x] event timestamp
 - [x] add controller to events
 - [x] remove eventsd::sqlite2 replace func
-- [ ] remove ut0311/events/lookup.go
-- [ ] rename ut0311 package to ut0311
+- [x] rename ut0311 package to ut0311
 
 ## RPCD
     - [ ] commonalise GET/SET queue handling
