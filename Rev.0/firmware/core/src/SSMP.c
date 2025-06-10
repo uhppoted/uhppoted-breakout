@@ -333,20 +333,32 @@ void SSMP_trap(EVENT event) {
     };
 
     // ... append event var(s)
-    if (event == EVENT_DOOR_1_OPEN) {
-        trap.trap.var.OID = strdup(MIB_DOORS_1_OPEN.OID);
-        trap.trap.var.value = (value){
-            .tag = VALUE_BOOLEAN,
-            .boolean = true,
-        };
-    }
+    static const struct {
+        EVENT event;
+        const MIBItem *const mib;
+        bool value;
+    } traps[] = {
+        {EVENT_DOOR_1_OPEN, &MIB_DOORS_1_OPEN, true},
+        {EVENT_DOOR_1_CLOSE, &MIB_DOORS_1_OPEN, false},
+        {EVENT_DOOR_2_OPEN, &MIB_DOORS_2_OPEN, true},
+        {EVENT_DOOR_2_CLOSE, &MIB_DOORS_2_OPEN, false},
+        {EVENT_DOOR_3_OPEN, &MIB_DOORS_3_OPEN, true},
+        {EVENT_DOOR_3_CLOSE, &MIB_DOORS_3_OPEN, false},
+        {EVENT_DOOR_4_OPEN, &MIB_DOORS_4_OPEN, true},
+        {EVENT_DOOR_4_CLOSE, &MIB_DOORS_4_OPEN, false},
+    };
 
-    if (event == EVENT_DOOR_1_CLOSE) {
-        trap.trap.var.OID = strdup(MIB_DOORS_1_OPEN.OID);
-        trap.trap.var.value = (value){
-            .tag = VALUE_BOOLEAN,
-            .boolean = false,
-        };
+    int N = sizeof(traps) / sizeof(traps[0]);
+
+    // ... ... door open / close
+    for (int i = 0; i < N; i++) {
+        if (event == traps[i].event) {
+            trap.trap.var.OID = strdup(traps[i].mib->OID);
+            trap.trap.var.value = (value){
+                .tag = VALUE_BOOLEAN,
+                .boolean = traps[i].value,
+            };
+        }
     }
 
     // ... encode

@@ -230,23 +230,40 @@ void U3_process(uint8_t data) {
     if (inputs != U3x.inputs.state) {
         uint8_t old = U3x.inputs.state;
         U3x.inputs.state = inputs;
-        EVENT event = EVENT_UNKNOWN;
-
-        if (((U3x.inputs.state & 0x01) == 0x00) && ((old & 0x01) == 0x01)) {
-            event = EVENT_DOOR_1_OPEN;
-        } else if (((U3x.inputs.state & 0x01) == 0x0001) && ((old & 0x01) == 0x00)) {
-            event = EVENT_DOOR_1_CLOSE;
-        }
-
-        message qmsg = {
-            .message = MSG_EVENT,
-            .tag = MESSAGE_EVENT,
-            .event = event,
-        };
-
-        push(qmsg);
 
         debugf(LOGTAG, "inputs   %08b (%08b)", U3x.inputs.state, U3x.stable.state);
+
+        static const struct {
+            uint8_t mask;
+            EVENT open;
+            EVENT close;
+        } events[] = {
+            {0x01, EVENT_DOOR_1_OPEN, EVENT_DOOR_1_CLOSE},
+            {0x02, EVENT_DOOR_2_OPEN, EVENT_DOOR_2_CLOSE},
+            {0x04, EVENT_DOOR_3_OPEN, EVENT_DOOR_3_CLOSE},
+            {0x08, EVENT_DOOR_4_OPEN, EVENT_DOOR_4_CLOSE},
+        };
+
+        // ... door open/close
+        for (int i = 0; i < 4; i++) {
+            uint8_t mask = events[i].mask;
+
+            if (((U3x.inputs.state & mask) == 0x00) && ((old & mask) == mask)) {
+                push((message){
+                    .message = MSG_EVENT,
+                    .tag = MESSAGE_EVENT,
+                    .event = events[i].open,
+                });
+            }
+
+            if (((U3x.inputs.state & mask) == mask) && ((old & mask) == 0x00)) {
+                push((message){
+                    .message = MSG_EVENT,
+                    .tag = MESSAGE_EVENT,
+                    .event = events[i].close,
+                });
+            }
+        }
     }
 
     if (stable != U3x.stable.state) {

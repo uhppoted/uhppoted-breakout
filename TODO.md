@@ -1,11 +1,5 @@
 # TODO
 
-- [x] record-special-events
-- [x] event timestamp
-- [x] add controller to events
-- [x] remove eventsd::sqlite2 replace func
-- [x] rename ut0311 package to ut0311
-
 ## RPCD
     - [ ] commonalise GET/SET queue handling
     - [ ] daemonize
@@ -17,10 +11,6 @@
 ## breakout
 
 ### misc
-
-- [x] USB write
-      - [x] `WARN   USB        *** write error 21 of 107`
-      - [x] guard 
 
 - [ ] PIO I2C
 - [ ] make debugf, infof, etc interrupt safe
@@ -49,6 +39,14 @@
 ### SSMP
     - [ ] TRAP
           - [ ] inputs
+                - [x] door 1 open
+                - [x] door 2 open
+                - [x] door 3 open
+                - [x] door 4 open
+                - [ ] door 1 button
+                - [ ] door 2 button
+                - [ ] door 3 button
+                - [ ] door 4 button
           - [ ] swipe
           - [ ] power on
           - [ ] reset
