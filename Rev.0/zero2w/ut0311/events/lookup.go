@@ -54,6 +54,13 @@ func Reason(OID string, value any) entities.EventReason {
 			scmp.OID_DOORS_4_OPEN,
 		}
 
+		button := []scmp.OID{
+			scmp.OID_DOORS_1_BUTTON,
+			scmp.OID_DOORS_2_BUTTON,
+			scmp.OID_DOORS_3_BUTTON,
+			scmp.OID_DOORS_4_BUTTON,
+		}
+
 		for _, v := range open {
 			if scmp.Equal(oid, v) {
 				if b, ok := value.(bool); ok {
@@ -61,6 +68,18 @@ func Reason(OID string, value any) entities.EventReason {
 						return entities.ReasonDoorOpen
 					} else {
 						return entities.ReasonDoorClosed
+					}
+				}
+			}
+		}
+
+		for _, v := range button {
+			if scmp.Equal(oid, v) {
+				if b, ok := value.(bool); ok {
+					if b {
+						return entities.ReasonDoorPushButton
+					} else {
+						return entities.ReasonDoorPushButton
 					}
 				}
 			}

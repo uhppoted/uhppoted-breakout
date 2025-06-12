@@ -340,12 +340,23 @@ void SSMP_trap(EVENT event) {
     } traps[] = {
         {EVENT_DOOR_1_OPEN, &MIB_DOORS_1_OPEN, true},
         {EVENT_DOOR_1_CLOSE, &MIB_DOORS_1_OPEN, false},
+        {EVENT_DOOR_1_PRESSED, &MIB_DOORS_1_BUTTON, true},
+        {EVENT_DOOR_1_RELEASED, &MIB_DOORS_1_BUTTON, false},
+
         {EVENT_DOOR_2_OPEN, &MIB_DOORS_2_OPEN, true},
         {EVENT_DOOR_2_CLOSE, &MIB_DOORS_2_OPEN, false},
+        {EVENT_DOOR_2_PRESSED, &MIB_DOORS_2_BUTTON, true},
+        {EVENT_DOOR_2_RELEASED, &MIB_DOORS_2_BUTTON, false},
+
         {EVENT_DOOR_3_OPEN, &MIB_DOORS_3_OPEN, true},
         {EVENT_DOOR_3_CLOSE, &MIB_DOORS_3_OPEN, false},
+        {EVENT_DOOR_3_PRESSED, &MIB_DOORS_3_BUTTON, true},
+        {EVENT_DOOR_3_RELEASED, &MIB_DOORS_3_BUTTON, false},
+
         {EVENT_DOOR_4_OPEN, &MIB_DOORS_4_OPEN, true},
         {EVENT_DOOR_4_CLOSE, &MIB_DOORS_4_OPEN, false},
+        {EVENT_DOOR_4_PRESSED, &MIB_DOORS_4_BUTTON, true},
+        {EVENT_DOOR_4_RELEASED, &MIB_DOORS_4_BUTTON, false},
     };
 
     int N = sizeof(traps) / sizeof(traps[0]);

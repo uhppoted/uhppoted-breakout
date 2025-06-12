@@ -236,16 +236,23 @@ void U3_process(uint8_t data) {
         static const struct {
             uint8_t mask;
             EVENT open;
-            EVENT close;
+            EVENT closed;
         } events[] = {
             {0x01, EVENT_DOOR_1_OPEN, EVENT_DOOR_1_CLOSE},
             {0x02, EVENT_DOOR_2_OPEN, EVENT_DOOR_2_CLOSE},
             {0x04, EVENT_DOOR_3_OPEN, EVENT_DOOR_3_CLOSE},
             {0x08, EVENT_DOOR_4_OPEN, EVENT_DOOR_4_CLOSE},
+
+            {0x10, EVENT_DOOR_1_PRESSED, EVENT_DOOR_1_RELEASED},
+            {0x20, EVENT_DOOR_2_PRESSED, EVENT_DOOR_2_RELEASED},
+            {0x40, EVENT_DOOR_3_PRESSED, EVENT_DOOR_3_RELEASED},
+            {0x80, EVENT_DOOR_4_PRESSED, EVENT_DOOR_4_RELEASED},
         };
 
-        // ... door open/close
-        for (int i = 0; i < 4; i++) {
+        // ... door open/close/pressed/released
+        int N = sizeof(events) / sizeof(events[0]);
+
+        for (int i = 0; i < N; i++) {
             uint8_t mask = events[i].mask;
 
             if (((U3x.inputs.state & mask) == 0x00) && ((old & mask) == mask)) {
@@ -260,7 +267,7 @@ void U3_process(uint8_t data) {
                 push((message){
                     .message = MSG_EVENT,
                     .tag = MESSAGE_EVENT,
-                    .event = events[i].close,
+                    .event = events[i].closed,
                 });
             }
         }

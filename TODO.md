@@ -38,18 +38,18 @@
 
 ### SSMP
     - [ ] TRAP
-          - [ ] inputs
+          - [x] inputs
                 - [x] door 1 open
                 - [x] door 2 open
                 - [x] door 3 open
                 - [x] door 4 open
-                - [ ] door 1 button
-                - [ ] door 2 button
-                - [ ] door 3 button
-                - [ ] door 4 button
-          - [ ] swipe
+                - [x] door 1 button
+                - [x] door 2 button
+                - [x] door 3 button
+                - [x] door 4 button
           - [ ] power on
           - [ ] reset
+          - [ ] swipe
           - [ ] alarm
           - [ ] //FIXME encode all var types
           - (?) change to INFORM
