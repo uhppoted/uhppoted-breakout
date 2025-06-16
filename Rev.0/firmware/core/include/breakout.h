@@ -41,6 +41,7 @@ extern const struct I2C U5;
 
 typedef enum {
     ERR_OK,
+    ERR_RESTART,
     ERR_MEMORY,
     ERR_I2C,
     ERR_QUEUE,
@@ -56,6 +57,10 @@ typedef enum {
 
 typedef enum {
     EVENT_UNKNOWN,
+
+    EVENT_SYS_START,
+    EVENT_SYS_RESET,
+
     EVENT_DOOR_1_OPEN,
     EVENT_DOOR_1_CLOSE,
     EVENT_DOOR_1_PRESSED,

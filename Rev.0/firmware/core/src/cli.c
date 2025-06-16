@@ -453,10 +453,11 @@ void debug() {
 }
 
 void show_state() {
+    infof(LOGTAG, ">>> restart  %s", syserr_get(ERR_RESTART) ? "error" : "ok");
     infof(LOGTAG, ">>> I2C      %s", syserr_get(ERR_I2C) ? "error" : "ok");
     infof(LOGTAG, ">>> queue    %s", syserr_get(ERR_QUEUE) ? "error" : "ok");
     infof(LOGTAG, ">>> memory   %s", syserr_get(ERR_MEMORY) ? "error" : "ok");
-    infof(LOGTAG, ">>> watchdog %s", syserr_get(ERR_WATCHDOG) ? "error" : "ok");
+    infof(LOGTAG, ">>> watchdog %s %s", syserr_get(ERR_WATCHDOG) ? "error" : "ok", strcmp(WATCHDOG, "disabled") == 0 ? "disabled" : "enabled");
     infof(LOGTAG, ">>> RTC      %s", syserr_get(ERR_RX8900SA) ? "error" : "ok");
     infof(LOGTAG, ">>> U2       %s", syserr_get(ERR_U2) ? "error" : "ok");
     infof(LOGTAG, ">>> U3       %s", syserr_get(ERR_U3) ? "error" : "ok");
@@ -475,6 +476,7 @@ void clear_errors() {
         ERR_U3,
         ERR_U4,
         ERR_WATCHDOG,
+        ERR_RESTART,
         ERR_DEBUG,
         ERR_UNKNOWN,
     };

@@ -61,72 +61,79 @@ const MIBItem MIB_CONTROLLER_SYSERROR = {
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_MEMORY = {
+const MIBItem MIB_CONTROLLER_SYSERROR_RESTART = {
     .hash = 4216871990,
     .OID = "0.1.3.6.1.4.1.65536.2.9.1",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_I2C = {
+const MIBItem MIB_CONTROLLER_SYSERROR_MEMORY = {
     .hash = 4216871991,
     .OID = "0.1.3.6.1.4.1.65536.2.9.2",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_QUEUE = {
+const MIBItem MIB_CONTROLLER_SYSERROR_I2C = {
     .hash = 4216871992,
     .OID = "0.1.3.6.1.4.1.65536.2.9.3",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_RX8900SA = {
+const MIBItem MIB_CONTROLLER_SYSERROR_QUEUE = {
     .hash = 4216871993,
     .OID = "0.1.3.6.1.4.1.65536.2.9.4",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_U2 = {
+const MIBItem MIB_CONTROLLER_SYSERROR_RX8900SA = {
     .hash = 4216871994,
     .OID = "0.1.3.6.1.4.1.65536.2.9.5",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_U3 = {
+const MIBItem MIB_CONTROLLER_SYSERROR_U2 = {
     .hash = 4216871995,
     .OID = "0.1.3.6.1.4.1.65536.2.9.6",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_U4 = {
+const MIBItem MIB_CONTROLLER_SYSERROR_U3 = {
     .hash = 4216871996,
     .OID = "0.1.3.6.1.4.1.65536.2.9.7",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_WATCHDOG = {
+const MIBItem MIB_CONTROLLER_SYSERROR_U4 = {
     .hash = 4216871997,
     .OID = "0.1.3.6.1.4.1.65536.2.9.8",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_DEBUG = {
+const MIBItem MIB_CONTROLLER_SYSERROR_WATCHDOG = {
     .hash = 4216871998,
     .OID = "0.1.3.6.1.4.1.65536.2.9.9",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
 
-const MIBItem MIB_CONTROLLER_SYSERROR_UNKNOWN = {
+const MIBItem MIB_CONTROLLER_SYSERROR_DEBUG = {
     .hash = 1717822246,
     .OID = "0.1.3.6.1.4.1.65536.2.9.10",
+    .get = MIB_get_controller_syserror,
+    .set = MIB_set_controller_syserror,
+};
+
+const MIBItem MIB_CONTROLLER_SYSERROR_UNKNOWN = {
+    .hash = 1717822247,
+    .OID = "0.1.3.6.1.4.1.65536.2.9.11",
     .get = MIB_get_controller_syserror,
     .set = MIB_set_controller_syserror,
 };
@@ -277,13 +284,14 @@ const MIBItem MIB_ALARMS_FIRE_ALARM = {
     .get = MIB_get_alarm_fire_alarm,
 };
 
-const MIBItem OIDs[39] = {
+const MIBItem OIDs[40] = {
     MIB_SYS_BOARD_ID,
     MIB_CONTROLLER_ID,
     MIB_CONTROLLER_VERSION,
     MIB_CONTROLLER_RELEASED,
     MIB_CONTROLLER_DATETIME,
     MIB_CONTROLLER_SYSERROR,
+    MIB_CONTROLLER_SYSERROR_RESTART,
     MIB_CONTROLLER_SYSERROR_MEMORY,
     MIB_CONTROLLER_SYSERROR_I2C,
     MIB_CONTROLLER_SYSERROR_QUEUE,

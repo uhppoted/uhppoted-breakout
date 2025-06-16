@@ -14,6 +14,7 @@ const uint16_t BITMASK_ERR_U2 = 0x0010;
 const uint16_t BITMASK_ERR_U3 = 0x0020;
 const uint16_t BITMASK_ERR_U4 = 0x0040;
 const uint16_t BITMASK_ERR_WATCHDOG = 0x0080;
+const uint16_t BITMASK_ERR_RESTART = 0x0100;
 const uint16_t BITMASK_ERR_DEBUG = 0x4000;
 const uint16_t BITMASK_ERR_UNKNOWN = 0x8000;
 
@@ -37,6 +38,7 @@ typedef struct _state {
         _err U3;
         _err U4;
         _err watchdog;
+        _err restart;
         _err debug;
         _err unknown;
     } errors;
@@ -116,6 +118,15 @@ _state STATE = {
             .interval = 0,
             .mask = BITMASK_ERR_WATCHDOG,
         },
+        .restart = {
+            .id = ERR_RESTART,
+            .value = false,
+            .counter = 0,
+            .timer = 0,
+            .count = 1,
+            .interval = 0,
+            .mask = BITMASK_ERR_RESTART,
+        },
         .debug = {
             .id = ERR_DEBUG,
             .value = false,
@@ -183,6 +194,7 @@ _err *_find(err error) {
         &STATE.errors.U3,
         &STATE.errors.U4,
         &STATE.errors.watchdog,
+        &STATE.errors.restart,
         &STATE.errors.debug,
         &STATE.errors.unknown,
     };
@@ -210,6 +222,7 @@ void syserr_tick() {
         ERR_U3,
         ERR_U4,
         ERR_WATCHDOG,
+        ERR_RESTART,
         ERR_DEBUG,
         ERR_UNKNOWN,
     };
@@ -273,6 +286,7 @@ uint16_t syserr_bitmask() {
         &STATE.errors.U3,
         &STATE.errors.U4,
         &STATE.errors.watchdog,
+        &STATE.errors.restart,
         &STATE.errors.debug,
         &STATE.errors.unknown,
     };

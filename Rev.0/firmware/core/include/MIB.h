@@ -17,6 +17,7 @@ extern const MIBItem MIB_CONTROLLER_VERSION;
 extern const MIBItem MIB_CONTROLLER_RELEASED;
 extern const MIBItem MIB_CONTROLLER_DATETIME;
 extern const MIBItem MIB_CONTROLLER_SYSERROR;
+extern const MIBItem MIB_CONTROLLER_SYSERROR_RESTART;
 extern const MIBItem MIB_CONTROLLER_SYSERROR_MEMORY;
 extern const MIBItem MIB_CONTROLLER_SYSERROR_I2C;
 extern const MIBItem MIB_CONTROLLER_SYSERROR_QUEUE;
@@ -51,4 +52,4 @@ extern const MIBItem MIB_DOORS_4_BUTTON;
 extern const MIBItem MIB_ALARMS_TAMPER_DETECT;
 extern const MIBItem MIB_ALARMS_FIRE_ALARM;
 
-extern const MIBItem OIDs[39];
+extern const MIBItem OIDs[40];

@@ -39,16 +39,10 @@
 ### SSMP
    - [ ] TRAP
       - [x] inputs
-         - [x] door 1 open
-         - [x] door 2 open
-         - [x] door 3 open
-         - [x] door 4 open
-         - [x] door 1 button
-         - [x] door 2 button
-         - [x] door 3 button
-         - [x] door 4 button
       - [ ] power on
+         - (?) queue
       - [ ] reset
+         - (?) queue
       - [ ] swipe
       - [ ] alarm
       - [ ] //FIXME encode all var types
@@ -126,6 +120,9 @@
       - [ ] get-anti-passback
       - [ ] set-anti-passback
       - [ ] restore-default-parameters
+
+   - [ ] events
+      - [ ] forced open
 
    - [ ] RPC
       - https://go.dev/blog/protobuf-opaque

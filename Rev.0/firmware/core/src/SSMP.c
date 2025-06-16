@@ -35,6 +35,39 @@ const int64_t SSMP_ERROR_COMMIT_FAILED = 14;
 const int64_t SSMP_ERROR_AUTHORIZATION = 16;
 const int64_t SSMP_ERROR_NOT_WRITABLE = 17;
 
+typedef struct TRAP {
+    EVENT event;
+    const MIBItem *const mib;
+    bool value;
+} TRAP;
+
+static const TRAP TRAPS[] = {
+    // ... POR
+    {EVENT_SYS_START, &MIB_CONTROLLER_SYSERROR_RESTART, true},
+    {EVENT_SYS_RESET, &MIB_CONTROLLER_SYSERROR_WATCHDOG, true},
+
+    // ... door open/close, button press/release
+    {EVENT_DOOR_1_OPEN, &MIB_DOORS_1_OPEN, true},
+    {EVENT_DOOR_1_CLOSE, &MIB_DOORS_1_OPEN, false},
+    {EVENT_DOOR_1_PRESSED, &MIB_DOORS_1_BUTTON, true},
+    {EVENT_DOOR_1_RELEASED, &MIB_DOORS_1_BUTTON, false},
+
+    {EVENT_DOOR_2_OPEN, &MIB_DOORS_2_OPEN, true},
+    {EVENT_DOOR_2_CLOSE, &MIB_DOORS_2_OPEN, false},
+    {EVENT_DOOR_2_PRESSED, &MIB_DOORS_2_BUTTON, true},
+    {EVENT_DOOR_2_RELEASED, &MIB_DOORS_2_BUTTON, false},
+
+    {EVENT_DOOR_3_OPEN, &MIB_DOORS_3_OPEN, true},
+    {EVENT_DOOR_3_CLOSE, &MIB_DOORS_3_OPEN, false},
+    {EVENT_DOOR_3_PRESSED, &MIB_DOORS_3_BUTTON, true},
+    {EVENT_DOOR_3_RELEASED, &MIB_DOORS_3_BUTTON, false},
+
+    {EVENT_DOOR_4_OPEN, &MIB_DOORS_4_OPEN, true},
+    {EVENT_DOOR_4_CLOSE, &MIB_DOORS_4_OPEN, false},
+    {EVENT_DOOR_4_PRESSED, &MIB_DOORS_4_BUTTON, true},
+    {EVENT_DOOR_4_RELEASED, &MIB_DOORS_4_BUTTON, false},
+};
+
 void SSMP_rxchar(uint8_t ch);
 void SSMP_enq();
 void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, int data_len);
@@ -333,41 +366,16 @@ void SSMP_trap(EVENT event) {
     };
 
     // ... append event var(s)
-    static const struct {
-        EVENT event;
-        const MIBItem *const mib;
-        bool value;
-    } traps[] = {
-        {EVENT_DOOR_1_OPEN, &MIB_DOORS_1_OPEN, true},
-        {EVENT_DOOR_1_CLOSE, &MIB_DOORS_1_OPEN, false},
-        {EVENT_DOOR_1_PRESSED, &MIB_DOORS_1_BUTTON, true},
-        {EVENT_DOOR_1_RELEASED, &MIB_DOORS_1_BUTTON, false},
+    int N = sizeof(TRAPS) / sizeof(TRAP);
 
-        {EVENT_DOOR_2_OPEN, &MIB_DOORS_2_OPEN, true},
-        {EVENT_DOOR_2_CLOSE, &MIB_DOORS_2_OPEN, false},
-        {EVENT_DOOR_2_PRESSED, &MIB_DOORS_2_BUTTON, true},
-        {EVENT_DOOR_2_RELEASED, &MIB_DOORS_2_BUTTON, false},
-
-        {EVENT_DOOR_3_OPEN, &MIB_DOORS_3_OPEN, true},
-        {EVENT_DOOR_3_CLOSE, &MIB_DOORS_3_OPEN, false},
-        {EVENT_DOOR_3_PRESSED, &MIB_DOORS_3_BUTTON, true},
-        {EVENT_DOOR_3_RELEASED, &MIB_DOORS_3_BUTTON, false},
-
-        {EVENT_DOOR_4_OPEN, &MIB_DOORS_4_OPEN, true},
-        {EVENT_DOOR_4_CLOSE, &MIB_DOORS_4_OPEN, false},
-        {EVENT_DOOR_4_PRESSED, &MIB_DOORS_4_BUTTON, true},
-        {EVENT_DOOR_4_RELEASED, &MIB_DOORS_4_BUTTON, false},
-    };
-
-    int N = sizeof(traps) / sizeof(traps[0]);
-
-    // ... ... door open / close
     for (int i = 0; i < N; i++) {
-        if (event == traps[i].event) {
-            trap.trap.var.OID = strdup(traps[i].mib->OID);
+        if (event == TRAPS[i].event) {
+            TRAP v = TRAPS[i];
+
+            trap.trap.var.OID = strdup(v.mib->OID);
             trap.trap.var.value = (value){
                 .tag = VALUE_BOOLEAN,
-                .boolean = traps[i].value,
+                .boolean = v.value,
             };
         }
     }

@@ -49,12 +49,6 @@ int main() {
     // ... kernel
     stdio_init_all();
 
-    if (watchdog_caused_reboot()) {
-        syserr_set(ERR_WATCHDOG, LOGTAG, "watchdog reboot");
-    } else if (strcmp(WATCHDOG, "disabled") != 0) {
-        watchdog_enable(WATCHDOG_TIMEOUT, true);
-    }
-
     queue_init(&queue, sizeof(uint32_t), 64);
     alarm_pool_init_default();
 
@@ -67,6 +61,16 @@ int main() {
     if (!sys_init()) {
         warnf(LOGTAG, "*** ERROR INITIALISING SYSTEM");
         return -1;
+    }
+
+    syserr_set(ERR_RESTART, LOGTAG, "power-on");
+
+    if (watchdog_caused_reboot()) {
+        syserr_set(ERR_WATCHDOG, LOGTAG, "watchdog reboot");
+    }
+
+    if (strcmp(WATCHDOG, "disabled") != 0) {
+        watchdog_enable(WATCHDOG_TIMEOUT, true);
     }
 
     // ... initialise FIFO, timers and I2C
@@ -86,6 +90,21 @@ int main() {
     RTC_start();
     IOX_start();
     SSMP_start();
+
+    // ... POR events
+    push((message){
+        .message = MSG_EVENT,
+        .tag = MESSAGE_EVENT,
+        .event = EVENT_SYS_START,
+    });
+
+    if (watchdog_caused_reboot()) {
+        push((message){
+            .message = MSG_EVENT,
+            .tag = MESSAGE_EVENT,
+            .event = EVENT_SYS_RESET,
+        });
+    }
 
     // ... run loop
     while (true) {

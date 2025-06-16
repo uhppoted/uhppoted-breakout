@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class MIBItem:
     name: str
@@ -10,27 +11,42 @@ class MIBItem:
     get: Optional[str] = None
     set: Optional[str] = None
 
+
 OIDs = [
     # sys
     MIBItem('MIB_SYS_BOARD_ID', '0.1.3.6.1.4.1.65536.1.1', 'MIB_get_sys_board_id'),
 
     # controller
-    MIBItem('MIB_CONTROLLER_ID',                '0.1.3.6.1.4.1.65536.2.1',    'MIB_get_controller_id'),
-    MIBItem('MIB_CONTROLLER_VERSION',           '0.1.3.6.1.4.1.65536.2.2',    'MIB_get_controller_version'),
-    MIBItem('MIB_CONTROLLER_RELEASED',          '0.1.3.6.1.4.1.65536.2.3',    'MIB_get_controller_released'),
-    MIBItem('MIB_CONTROLLER_DATETIME',          '0.1.3.6.1.4.1.65536.2.8',    'MIB_get_controller_datetime', 'MIB_set_controller_datetime'),
-    MIBItem('MIB_CONTROLLER_SYSERROR',          '0.1.3.6.1.4.1.65536.2.9',    'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_MEMORY',   '0.1.3.6.1.4.1.65536.2.9.1',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_I2C',      '0.1.3.6.1.4.1.65536.2.9.2',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_QUEUE',    '0.1.3.6.1.4.1.65536.2.9.3',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_RX8900SA', '0.1.3.6.1.4.1.65536.2.9.4',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_U2',       '0.1.3.6.1.4.1.65536.2.9.5',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_U3',       '0.1.3.6.1.4.1.65536.2.9.6',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_U4',       '0.1.3.6.1.4.1.65536.2.9.7',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_WATCHDOG', '0.1.3.6.1.4.1.65536.2.9.8',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_DEBUG',    '0.1.3.6.1.4.1.65536.2.9.9',  'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSERROR_UNKNOWN',  '0.1.3.6.1.4.1.65536.2.9.10', 'MIB_get_controller_syserror', 'MIB_set_controller_syserror'),
-    MIBItem('MIB_CONTROLLER_SYSINFO',           '0.1.3.6.1.4.1.65536.2.10',   'MIB_get_controller_sysinfo'),
+    MIBItem('MIB_CONTROLLER_ID', '0.1.3.6.1.4.1.65536.2.1', 'MIB_get_controller_id'),
+    MIBItem('MIB_CONTROLLER_VERSION', '0.1.3.6.1.4.1.65536.2.2', 'MIB_get_controller_version'),
+    MIBItem('MIB_CONTROLLER_RELEASED', '0.1.3.6.1.4.1.65536.2.3', 'MIB_get_controller_released'),
+    MIBItem('MIB_CONTROLLER_DATETIME', '0.1.3.6.1.4.1.65536.2.8', 'MIB_get_controller_datetime',
+            'MIB_set_controller_datetime'),
+    MIBItem('MIB_CONTROLLER_SYSERROR', '0.1.3.6.1.4.1.65536.2.9', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_RESTART', '0.1.3.6.1.4.1.65536.2.9.1', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_MEMORY', '0.1.3.6.1.4.1.65536.2.9.2', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_I2C', '0.1.3.6.1.4.1.65536.2.9.3', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_QUEUE', '0.1.3.6.1.4.1.65536.2.9.4', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_RX8900SA', '0.1.3.6.1.4.1.65536.2.9.5', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_U2', '0.1.3.6.1.4.1.65536.2.9.6', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_U3', '0.1.3.6.1.4.1.65536.2.9.7', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_U4', '0.1.3.6.1.4.1.65536.2.9.8', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_WATCHDOG', '0.1.3.6.1.4.1.65536.2.9.9', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_DEBUG', '0.1.3.6.1.4.1.65536.2.9.10', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSERROR_UNKNOWN', '0.1.3.6.1.4.1.65536.2.9.11', 'MIB_get_controller_syserror',
+            'MIB_set_controller_syserror'),
+    MIBItem('MIB_CONTROLLER_SYSINFO', '0.1.3.6.1.4.1.65536.2.10', 'MIB_get_controller_sysinfo'),
 
     # door mode
     MIBItem('MIB_DOORS_1_MODE', '0.1.3.6.1.4.1.65536.3.1.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
@@ -67,11 +83,13 @@ OIDs = [
     MIBItem('MIB_ALARMS_FIRE_ALARM', '0.1.3.6.1.4.1.65536.4.2', 'MIB_get_alarm_fire_alarm'),
 ]
 
+
 def djb2(s):
     hash = 5381
     for c in s:
         hash = ((hash << 5) + hash) + ord(c)
     return hash & 0x00ffffffff
+
 
 with open('../core/include/MIB.h', 'w') as f:
     f.write('#pragma once\n')
