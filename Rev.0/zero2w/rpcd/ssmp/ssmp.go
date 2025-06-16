@@ -229,47 +229,7 @@ func (s *SSMP) Get(oid string) (any, error) {
 		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
 		} else {
-			debugf("pending queue: %v", len(s.pending.m))
-
-			pipe := make(chan BER.GetResponse, 1)
-
-			f := func() {
-				s.pending.put(rq.RequestID, func(packet BER.GetResponse) {
-					pipe <- packet
-				})
-
-				select {
-				case s.requests <- encoded:
-					return
-
-				case <-time.After(2500 * time.Millisecond):
-					return
-				}
-			}
-
-			defer close(pipe)
-			defer s.pending.delete(rq.RequestID)
-
-			select {
-			case s.queue <- f:
-				// pending
-
-			case <-time.After(2500 * time.Millisecond):
-				return nil, fmt.Errorf("timeout")
-			}
-
-			select {
-			case response := <-pipe:
-				debugf("response %v", response)
-				if response.Error != 0 {
-					return nil, fmt.Errorf("error code %v (%v) at index %v", response.Error, lookup(response.Error), response.ErrorIndex)
-				} else {
-					return response.Value, nil
-				}
-
-			case <-time.After(2500 * time.Millisecond):
-				return nil, fmt.Errorf("timeout")
-			}
+			return s.send(rq.RequestID, encoded)
 		}
 	}
 }
@@ -293,47 +253,52 @@ func (s *SSMP) Set(oid string, value any) (any, error) {
 		} else if encoded, err := bisync.Encode(nil, packet); err != nil {
 			return nil, err
 		} else {
-			debugf("pending queue: %v", len(s.pending.m))
-
-			pipe := make(chan BER.GetResponse, 1)
-
-			f := func() {
-				s.pending.put(rq.RequestID, func(packet BER.GetResponse) {
-					pipe <- packet
-				})
-
-				select {
-				case s.requests <- encoded:
-					return
-
-				case <-time.After(2500 * time.Millisecond):
-					return
-				}
-			}
-
-			defer close(pipe)
-			defer s.pending.delete(rq.RequestID)
-
-			select {
-			case s.queue <- f:
-				// pending
-
-			case <-time.After(2500 * time.Millisecond):
-				return nil, fmt.Errorf("timeout")
-			}
-
-			select {
-			case <-time.After(2500 * time.Millisecond):
-				return nil, fmt.Errorf("timeout")
-
-			case response := <-pipe:
-				if response.Error != 0 {
-					return nil, fmt.Errorf("error code %v (%v) at index %v", response.Error, lookup(response.Error), response.ErrorIndex)
-				} else {
-					return response.Value, nil
-				}
-			}
+			return s.send(rq.RequestID, encoded)
 		}
+	}
+}
+
+func (s *SSMP) send(rqId uint32, encoded []byte) (any, error) {
+	debugf("pending queue: %v", len(s.pending.m))
+
+	pipe := make(chan BER.GetResponse, 1)
+
+	f := func() {
+		s.pending.put(rqId, func(packet BER.GetResponse) {
+			pipe <- packet
+		})
+
+		select {
+		case s.requests <- encoded:
+			return
+
+		case <-time.After(2500 * time.Millisecond):
+			return
+		}
+	}
+
+	defer close(pipe)
+	defer s.pending.delete(rqId)
+
+	select {
+	case s.queue <- f:
+		// pending
+
+	case <-time.After(2500 * time.Millisecond):
+		return nil, fmt.Errorf("timeout")
+	}
+
+	select {
+	case response := <-pipe:
+		debugf("response %v", response)
+		if response.Error != 0 {
+			return nil, fmt.Errorf("error code %v (%v) at index %v", response.Error, lookup(response.Error), response.ErrorIndex)
+		} else {
+			return response.Value, nil
+		}
+
+	case <-time.After(2500 * time.Millisecond):
+		return nil, fmt.Errorf("timeout")
 	}
 }
 

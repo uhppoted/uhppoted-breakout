@@ -1,7 +1,7 @@
 # TODO
 
 ## RPCD
-   - [ ] commonalise GET/SET queue handling
+   - [x] commonalise GET/SET queue handling
    - [ ] daemonize
    - [ ] monitor
    - (?) Context.WithTimeout 
@@ -39,9 +39,7 @@
 ### SSMP
    - [ ] TRAP
       - [x] inputs
-      - [ ] power on
-         - (?) queue
-      - [ ] reset
+      - [ ] power on/reset
          - (?) queue
       - [ ] swipe
       - [ ] alarm
