@@ -1,12 +1,12 @@
 # TODO
 
 ## RPCD
-    - [ ] commonalise GET/SET queue handling
-    - [ ] daemonize
-    - [ ] monitor
-    - (?) Context.WithTimeout 
-    - (?) https://go.dev/blog/synctest
-    - socat: https://tinkering.xyz/async-serial/
+   - [ ] commonalise GET/SET queue handling
+   - [ ] daemonize
+   - [ ] monitor
+   - (?) Context.WithTimeout 
+   - (?) https://go.dev/blog/synctest
+   - socat: https://tinkering.xyz/async-serial/
 
 ## breakout
 
@@ -14,8 +14,8 @@
 
 - [ ] PIO I2C
 - [ ] make debugf, infof, etc interrupt safe
-      - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
-      - https://github.com/LukeShu/pico-fmt
+   - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
+   - https://github.com/LukeShu/pico-fmt
 
 - [ ] USB
     - [ ] picotool reset
@@ -37,34 +37,34 @@
       - (?) reservoir sampling (https://samwho.dev/reservoir-sampling)
 
 ### SSMP
-    - [ ] TRAP
-          - [x] inputs
-                - [x] door 1 open
-                - [x] door 2 open
-                - [x] door 3 open
-                - [x] door 4 open
-                - [x] door 1 button
-                - [x] door 2 button
-                - [x] door 3 button
-                - [x] door 4 button
-          - [ ] power on
-          - [ ] reset
-          - [ ] swipe
-          - [ ] alarm
-          - [ ] //FIXME encode all var types
-          - (?) change to INFORM
+   - [ ] TRAP
+      - [x] inputs
+         - [x] door 1 open
+         - [x] door 2 open
+         - [x] door 3 open
+         - [x] door 4 open
+         - [x] door 1 button
+         - [x] door 2 button
+         - [x] door 3 button
+         - [x] door 4 button
+      - [ ] power on
+      - [ ] reset
+      - [ ] swipe
+      - [ ] alarm
+      - [ ] //FIXME encode all var types
+      - (?) change to INFORM
 
-    - [ ] save to flash
-          - [ ] door delay/mode
+   - [ ] save to flash
+      - [ ] door delay/mode
 
-    - [ ] `DEBUG  DOORS  settings saved` on `set-time`
-          - only save if OID in 'save list'
-          - // FIXME check OID save list
+   - [ ] `DEBUG  DOORS  settings saved` on `set-time`
+      - only save if OID in 'save list'
+      - // FIXME check OID save list
 
-    - [ ] GET: multiple OIDs
-    - [ ] MIB_find (returns const *MIBItem)
-    - [ ] Use 'perfect' hash function
-          - ref. https://www.gnu.org/software/gperf
+   - [ ] GET: multiple OIDs
+   - [ ] MIB_find (returns const *MIBItem)
+   - [ ] Use 'perfect' hash function
+      - ref. https://www.gnu.org/software/gperf
 
 ### ACL
 - [ ] open door on PB
@@ -80,19 +80,19 @@
       - tmpfs
 
 ### UT0311
-    - [ ] eventd
-          - [x] add
-          - [x] get
-          - [ ] remove unnecessary OID stuff
-          - [ ] move entities to shared lib
+   - [ ] eventd
+      - [x] add
+      - [x] get
+      - [ ] remove unnecessary OID stuff
+      - [ ] move entities to shared lib
 
-    - [x] store events to SQLite DB
-    - [x] rpcd::shutdown RPC listener
-    - [ ] open door on PB
-    - [ ] open door on card swipe
-    - [ ] rework with text tags
+   - [x] store events to SQLite DB
+   - [x] rpcd::shutdown RPC listener
+   - [ ] open door on PB
+   - [ ] open door on card swipe
+   - [ ] rework with text tags
 
-    - [ ] API
+   - [ ] API
       - [x] get-controller
       - [x] set-address
       - [x] get-listener
@@ -136,33 +136,33 @@
       - [ ] TCP/IP
       - [ ] grpc
 
-    - [ ] monitor
-    - [ ] daemonize
-    - [ ] idle poll
-    - [ ] cache
-    - [ ] tinygo
-          - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
+   - [ ] monitor
+   - [ ] daemonize
+   - [ ] idle poll
+   - [ ] cache
+   - [ ] tinygo
+      - https://di-marco.net/blog/it/2020-06-06-raspberry_pi_3_4_and_0_w_serial_port_usage/
 
 ### MIB
-    - [ ] RP2040 ID
-          - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
-    - [ ] system errors
-    - [ ] system error messages
-    - [ ] use DATETIME, BOOLEAN, ENUMERATED etc
+   - [ ] RP2040 ID
+      - https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#rpip2aed586200427c10f67f
+   - [ ] system errors
+   - [ ] system error messages
+   - [ ] use DATETIME, BOOLEAN, ENUMERATED etc
 
 ## PiZeroW
-    - [ ] Reduce power consumption
-          - https://hackaday.com/2024/10/03/pi-zero-power-optimization-leaves-no-stone-unturned
-          - https://kittenlabs.de/blog/2024/09/01/extreme-pi-boot-optimization
-    - [ ] NB: 24/7 operation - Cam said to ask him
-    - (?) Use Nerves
-    - https://hackaday.com/2025/03/26/build-customized-raspberry-pi-os-images-with-rpi-image-gen/
+   - [ ] Reduce power consumption
+      - https://hackaday.com/2024/10/03/pi-zero-power-optimization-leaves-no-stone-unturned
+      - https://kittenlabs.de/blog/2024/09/01/extreme-pi-boot-optimization
+   - [ ] NB: 24/7 operation - Cam said to ask him
+   - (?) Use Nerves
+   - https://hackaday.com/2025/03/26/build-customized-raspberry-pi-os-images-with-rpi-image-gen/
 
 ### OTA
-    - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
-    - https://www.youtube.com/watch?v=4-dle5L9REs
-    - https://monocypher.org
-    - https://groupgets.com/products/pureconnect
+   - https://blog.usedbytes.com/2021/12/pico-serial-bootloader/
+   - https://www.youtube.com/watch?v=4-dle5L9REs
+   - https://monocypher.org
+   - https://groupgets.com/products/pureconnect
 
 ## R&D
 - Nerves
@@ -170,21 +170,21 @@
 - https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 - https://pwy.io/posts/marching-events/
 - [ ] Pinout diagram
-     - (?) [WireViz] https://github.com/formatc1702/WireViz
-     - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator
-     - (?) https://pinouts.vercel.app/board/nodemcu-v2
-     - (?) https://electronics.stackexchange.com/questions/73780/program-to-draw-pinouts-and-easily-visualize-pins-multiplexed-functions
-     - (?) https://www.youtube.com/watch?v=ndVs1UvK6AE
-     - (?) TeX
-     - (?) https://www.sparkfun.com/news/1947
-     - (?) https://www.flickr.com/photos/28521811@N04/
-     - (?) https://github.com/stevenj/GenPinoutSVG
-     - (?) https://yaqwsx.github.io/Pinion/
-     - (?) https://github.com/splitbrain/pinoutleaf
+   - (?) [WireViz] https://github.com/formatc1702/WireViz
+   - (?) https://github.com/cmfcmf/ic-pinout-diagram-generator
+   - (?) https://pinouts.vercel.app/board/nodemcu-v2
+   - (?) https://electronics.stackexchange.com/questions/73780/program-to-draw-pinouts-and-easily-visualize-pins-multiplexed-functions
+   - (?) https://www.youtube.com/watch?v=ndVs1UvK6AE
+   - (?) TeX
+   - (?) https://www.sparkfun.com/news/1947
+   - (?) https://www.flickr.com/photos/28521811@N04/
+   - (?) https://github.com/stevenj/GenPinoutSVG
+   - (?) https://yaqwsx.github.io/Pinion/
+   - (?) https://github.com/splitbrain/pinoutleaf
 - OCDSP
-  - https://github.com/bytedreamer/Aporta
+   - https://github.com/bytedreamer/Aporta
 - Mongoose Wizard
-  - https://mongoose.ws/wizard/#/
+   - https://mongoose.ws/wizard/#/
 
 ### Rust
 - https://rtic.rs/1/book/en/preface.html
@@ -199,7 +199,7 @@
 6. https://www.proto-advantage.com/store/product_info.php?products_id=2200040
 11. https://hackaday.com/2024/05/04/giving-your-kicad-pcb-repository-pretty-pictures/
 12. External flash
-    - https://mcuoneclipse.com/2022/12/04/add-extra-storage-to-the-raspberry-pi-pico-with-w25q128-and-littlefs
+   - https://mcuoneclipse.com/2022/12/04/add-extra-storage-to-the-raspberry-pi-pico-with-w25q128-and-littlefs
 13. https://forums.raspberrypi.com/viewtopic.php?t=327189
 14. https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 15, https://github.com/raspberrypi/pico-sdk/issues/224
