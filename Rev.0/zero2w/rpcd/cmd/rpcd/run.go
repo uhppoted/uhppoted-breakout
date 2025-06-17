@@ -18,10 +18,6 @@ type run struct {
 	dial   string
 }
 
-const DEFAULT_DEVICE = ""
-const DEFAULT_BIND = "tcp:::1234"
-const DEFAULT_DIAL = "tcp:::4321"
-
 func makeRun() (run, error) {
 	r := run{
 		device: DEFAULT_DEVICE,
@@ -30,8 +26,8 @@ func makeRun() (run, error) {
 	}
 
 	flag.StringVar(&r.device, "device", r.device, "serial device ID")
-	flag.StringVar(&options.bind, "bind", r.bind, "bind address (in the format network::address:port e.g. tcp::0.0.0.0:12345")
-	flag.StringVar(&options.dial, "dial", r.dial, "dial address (for events, in the format network::address:port e.g. tcp::0.0.0.0:12345")
+	flag.StringVar(&r.bind, "bind", r.bind, "bind address (in the format network::address:port e.g. tcp::0.0.0.0:12345")
+	flag.StringVar(&r.dial, "dial", r.dial, "dial address (for events, in the format network::address:port e.g. tcp::0.0.0.0:12345")
 	flag.Parse()
 
 	if r.device == "" {
@@ -42,7 +38,7 @@ func makeRun() (run, error) {
 }
 
 func (r run) exec() error {
-	if rpc, err := rpcd.NewRPCD(options.device, options.bind, options.dial); err != nil {
+	if rpc, err := rpcd.NewRPCD(r.device, r.bind, r.dial); err != nil {
 		return err
 	} else if rpc == nil {
 		return fmt.Errorf("invalid RPCD (%v)", rpc)

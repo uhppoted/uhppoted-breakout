@@ -24,14 +24,13 @@ debug: build
 	go test -v -timeout 500ms ./... -run TestEncodeSetUint8Request
 
 
-run-tcp: build
-	./bin/rpcd --bind "$(TCP)" --device stub
+# run-tcp: build
+# 	./bin/rpcd --bind "$(TCP)" --device stub
 
-run-unix: build
-	./bin/rpcd --bind "$(UDS)" --device stub
+# run-unix: build
+# 	./bin/rpcd --bind "$(UDS)" --device stub
 
-run: run-unix
-
+# run: run-unix
 
 zero2w-build: format
 	mkdir -p dist/arm7
@@ -55,6 +54,21 @@ rpi3-run: rpi3-build
 	                   --dial tcp::192.168.1.100:4321 \
 	                   --device /dev/serial/by-id/usb-uhppoted_breakout_E6625C05E7415B25-if02"
 
-rpi3: rpi3-run
+rpi3-daemonize: rpi3-build
+	scp dist/arm6/rpcd phil:/opt/uhppoted/uhppoted-breakout/rpcd
+	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/rpcd && \
+	            sudo ./rpcd daemonize \
+	                   --bind "$(TCP)" \
+	                   --dial tcp::192.168.1.100:4321 \
+	                   --device /dev/serial/by-id/usb-uhppoted_breakout_E6625C05E7415B25-if02"
 
+rpi3-undaemonize: rpi3-build
+	scp dist/arm6/rpcd phil:/opt/uhppoted/uhppoted-breakout/rpcd
+	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/rpcd && \
+	            ./rpcd undaemonize"
 
+run: rpi3-run
+
+daemonize: rpi3-daemonize
+
+undaemonize: rpi3-undaemonize

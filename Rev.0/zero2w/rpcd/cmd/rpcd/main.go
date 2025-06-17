@@ -8,16 +8,11 @@ import (
 )
 
 const VERSION = "v0.0.0"
+const SERVICE = `uhppoted-breakout-rpcd`
 
-var options = struct {
-	device string
-	bind   string
-	dial   string
-}{
-	device: "",
-	bind:   "tcp:::1234",
-	dial:   "tcp:::4321",
-}
+const DEFAULT_DEVICE = ""
+const DEFAULT_BIND = "tcp:::1234"
+const DEFAULT_DIAL = "tcp:::4321"
 
 func main() {
 	fmt.Printf("SSMP RPC DRIVER %v\n", VERSION)
@@ -32,16 +27,17 @@ func main() {
 }
 
 func parse() (command, error) {
-	// var cmd commands.Command = nil
-	// var err error = nil
+	if len(os.Args) > 1 {
+		cmd := os.Args[1]
 
-	// if len(os.Args) > 1 {
-	// 	for _, c := range cli {
-	// 		if c.CLI() == flag.Arg(0) {
-	// 			cmd = c
-	// 		}
-	// 	}
-	// }
+		switch cmd {
+		case "daemonize":
+			return makeDaemonize()
+
+		case "undaemonize":
+			return makeUndaemonize()
+		}
+	}
 
 	return makeRun()
 }
