@@ -1,16 +1,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
-	"os/signal"
-	"sync"
-	"syscall"
-	"time"
 
 	"ssmp/log"
-	"ssmp/rpcd"
 )
 
 const VERSION = "v0.0.0"
@@ -28,54 +22,28 @@ var options = struct {
 func main() {
 	fmt.Printf("SSMP RPC DRIVER %v\n", VERSION)
 
-	flag.StringVar(&options.device, "device", options.device, "serial device ID")
-	flag.StringVar(&options.bind, "bind", options.bind, "bind address (in the format network::address:port e.g. tcp::0.0.0.0:12345")
-	flag.StringVar(&options.dial, "dial", options.dial, "dial address (for events, in the format network::address:port e.g. tcp::0.0.0.0:12345")
-	flag.Parse()
-
-	if options.device == "" {
-		errorf("missing --device arg")
+	if cmd, err := parse(); err != nil {
+		errorf("%v", err)
 		os.Exit(1)
-	} else {
-		if r, err := rpcd.NewRPCD(options.device, options.bind, options.dial); err != nil {
-			errorf("%v", err)
-			os.Exit(1)
-		} else if r == nil {
-			errorf("invalid RPCD (%v)", r)
-			os.Exit(1)
-		} else {
-			var wg sync.WaitGroup
-
-			wg.Add(1)
-			go func() {
-				r.Run()
-				wg.Done()
-			}()
-
-			terminated := make(chan struct{})
-			interrupt := make(chan os.Signal, 1)
-
-			signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-			<-interrupt
-
-			r.Stop()
-
-			go func() {
-				wg.Wait()
-				terminated <- struct{}{}
-			}()
-
-			timeout := time.Duration(5000) * time.Millisecond
-
-			select {
-			case <-terminated:
-				infof("terminated")
-			case <-time.After(timeout):
-				warnf("shutdown timeout")
-			}
-		}
+	} else if err := cmd.exec(); err != nil {
+		errorf("%v", err)
+		os.Exit(1)
 	}
+}
+
+func parse() (command, error) {
+	// var cmd commands.Command = nil
+	// var err error = nil
+
+	// if len(os.Args) > 1 {
+	// 	for _, c := range cli {
+	// 		if c.CLI() == flag.Arg(0) {
+	// 			cmd = c
+	// 		}
+	// 	}
+	// }
+
+	return makeRun()
 }
 
 func infof(format string, args ...any) {
