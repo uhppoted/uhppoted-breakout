@@ -69,7 +69,7 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 		closing: false,
 	}
 
-	if rpc, err := rpcd.NewRPC(c.Driver.RPC.DialAddr, c.Driver.RPC.ListenAddr, c.Driver.Caching, ut0311.onEvent); err != nil {
+	if rpc, err := rpcd.NewRPC(c.Driver.RPC.DialAddr, c.Driver.RPC.ListenAddr, c.Driver.Caching, ut0311.onTrap); err != nil {
 		return nil, err
 	} else {
 		ut0311.breakout = rpc

@@ -38,13 +38,16 @@
 
 ### SSMP
    - [ ] TRAP
+      - [ ] restructure
+            - traps update ut0311 state and state generates events
+            - poll for current state
       - [x] inputs
+         - generalize as input state change
       - [ ] power on/reset
-         - (?) queue
+         - generalize as system state change
       - [ ] swipe
       - [ ] alarm
       - [ ] //FIXME encode all var types
-      - (?) change to INFORM
 
    - [ ] save to flash
       - [ ] door delay/mode
