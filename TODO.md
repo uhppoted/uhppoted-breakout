@@ -3,11 +3,10 @@
 ## RPCD
    - [x] commonalise GET/SET queue handling
    - [x] daemonize
-   - [ ] undaemonize
+   - [x] undaemonize
    - [ ] monitor
    - (?) Context.WithTimeout 
    - (?) https://go.dev/blog/synctest
-   - socat: https://tinkering.xyz/async-serial/
 
 ## breakout
 

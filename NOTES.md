@@ -110,6 +110,7 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 - https://tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html
 - https://stackoverflow.com/questions/10564491/function-to-calculate-a-crc16-checksum
 - https://stackoverflow.com/questions/76367736/uart-tx-produce-endless-interrupts-how-to-acknowlage-the-interrupt
+- socat: https://tinkering.xyz/async-serial/
 
 ## Crypto
 - https://www.jstage.jst.go.jp/article/transinf/E99.D/8/E99.D_2015INP0013/_article

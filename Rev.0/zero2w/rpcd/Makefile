@@ -55,6 +55,7 @@ rpi3-run: rpi3-build
 	                   --device /dev/serial/by-id/usb-uhppoted_breakout_E6625C05E7415B25-if02"
 
 rpi3-daemonize: rpi3-build
+	ssh -t phil "sudo systemctl stop uhppoted-breakout-rpcd"
 	scp dist/arm6/rpcd phil:/opt/uhppoted/uhppoted-breakout/rpcd
 	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/rpcd && \
 	            sudo ./rpcd daemonize \
@@ -63,9 +64,10 @@ rpi3-daemonize: rpi3-build
 	                   --device /dev/serial/by-id/usb-uhppoted_breakout_E6625C05E7415B25-if02"
 
 rpi3-undaemonize: rpi3-build
+	ssh -t phil "sudo systemctl stop uhppoted-breakout-rpcd"
 	scp dist/arm6/rpcd phil:/opt/uhppoted/uhppoted-breakout/rpcd
 	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/rpcd && \
-	            ./rpcd undaemonize"
+	            sudo ./rpcd undaemonize"
 
 run: rpi3-run
 

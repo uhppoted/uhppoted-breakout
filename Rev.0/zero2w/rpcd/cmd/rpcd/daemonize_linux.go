@@ -5,12 +5,18 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"os/user"
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"text/template"
 )
+
+const LOGDIR = "/var/log/uhppoted/breakout"
+const WORKDIR = "/var/uhppoted/breakout"
+const ETC = "/usr/local/etc/uhppoted/breakout/rpcd"
 
 type daemonize struct {
 	usergroup string
@@ -18,6 +24,9 @@ type daemonize struct {
 	device    string
 	bind      string
 	dial      string
+
+	logdir  string
+	workdir string
 }
 
 type info struct {
@@ -73,10 +82,13 @@ const logRotateTemplate = `{{range .LogFiles}}{{. }} {{end}}{
 func makeDaemonize() (daemonize, error) {
 	d := daemonize{
 		usergroup: "uhppoted:uhppoted",
-		etc:       "/usr/local/etc/uhppoted/breakout/rpcd",
+		etc:       ETC,
 		device:    DEFAULT_DEVICE,
 		bind:      DEFAULT_BIND,
 		dial:      DEFAULT_DIAL,
+
+		logdir:  LOGDIR,
+		workdir: WORKDIR,
 	}
 
 	flagset := flag.NewFlagSet("daemonize", flag.ExitOnError)
@@ -114,13 +126,13 @@ func (d daemonize) exec() error {
 			Description:   "uhppoted-breakout RPCD service/daemon ",
 			Documentation: "https://github.com/uhppoted/uhppoted-breakout",
 			Executable:    executable,
-			PID:           fmt.Sprintf("/var/uhppoted/breakout/%s.pid", SERVICE),
+			PID:           filepath.Join(d.workdir, fmt.Sprintf("%v.pid", SERVICE)),
 			User:          "uhppoted",
 			Group:         "uhppoted",
 			Uid:           uid,
 			Gid:           gid,
 			LogFiles: []string{
-				fmt.Sprintf("/var/log/uhppoted/breakout/%s.log", SERVICE),
+				filepath.Join(d.logdir, fmt.Sprintf("%v.log", d.logdir, SERVICE)),
 			},
 			Vars: struct {
 				Port     string
@@ -156,6 +168,18 @@ func (d daemonize) exec() error {
 			return err
 		}
 
+		// ... reload daemons
+		fmt.Printf("   ... reloading daemons\n")
+		command := exec.Command("systemctl", "daemon-reload")
+		out, err := command.CombinedOutput()
+		if strings.TrimSpace(string(out)) != "" {
+			fmt.Printf("   > %s\n", out)
+		}
+		if err != nil {
+			return fmt.Errorf("failed to reload services (%v)", err)
+		}
+
+		// ... all done!
 		fmt.Printf("   ... %s registered as a systemd service\n", SERVICE)
 		fmt.Println()
 		fmt.Println("   The daemon will start automatically on the next system restart - to start it manually, execute the following command:")
@@ -200,9 +224,9 @@ func (d daemonize) systemd(i info) error {
 
 func (d daemonize) mkdirs(i info) error {
 	directories := []string{
-		"/usr/local/etc/uhppoted/breakout/rpcd",
-		"/var/uhppoted/breakout/rpcd",
-		"/var/log/uhppoted/breakout",
+		d.etc,
+		d.logdir,
+		d.workdir,
 	}
 
 	for _, dir := range directories {
