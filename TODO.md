@@ -2,9 +2,7 @@
 
 ## RPCD
    - [x] commonalise GET/SET queue handling
-   - [ ] daemonize
-      - args
-         - https://superuser.com/questions/728951/systemd-giving-my-service-multiple-arguments
+   - [x] daemonize
    - [ ] undaemonize
    - [ ] monitor
    - (?) Context.WithTimeout 

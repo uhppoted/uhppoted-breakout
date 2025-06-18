@@ -84,6 +84,7 @@ struct {
     .mode = MODE_NONE,
     .reboot = false,
     .queue = {
+        .connected = false,
         .head = 0,
         .tail = 0,
     },

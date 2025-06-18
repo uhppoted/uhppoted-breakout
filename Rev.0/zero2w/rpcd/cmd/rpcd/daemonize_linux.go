@@ -30,6 +30,11 @@ type info struct {
 	Uid           int
 	Gid           int
 	LogFiles      []string
+	Vars          struct {
+		Port     string
+		BindAddr string
+		DialAddr string
+	}
 }
 
 const serviceTemplate = `[Unit]
@@ -40,7 +45,7 @@ Wants=syslog.target network-online.target
 
 [Service]
 Type=simple
-ExecStart={{.Executable}}
+ExecStart={{.Executable}} --device {{.Vars.Port}} --bind {{.Vars.BindAddr}} --dial {{.Vars.DialAddr}}
 PIDFile={{.PID}}
 User={{.User}}
 Group={{.Group}}
@@ -116,6 +121,15 @@ func (d daemonize) exec() error {
 			Gid:           gid,
 			LogFiles: []string{
 				fmt.Sprintf("/var/log/uhppoted/breakout/%s.log", SERVICE),
+			},
+			Vars: struct {
+				Port     string
+				BindAddr string
+				DialAddr string
+			}{
+				Port:     d.device,
+				BindAddr: d.bind,
+				DialAddr: d.dial,
 			},
 		}
 
