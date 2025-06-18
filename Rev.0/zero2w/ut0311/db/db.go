@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"emulator/db/sqlite3"
-	"emulator/entities"
+	"ut0311/db/sqlite3"
+	"ut0311/entities"
 )
 
 type DB interface {

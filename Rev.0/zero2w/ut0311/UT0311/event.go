@@ -4,8 +4,8 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 	lib "github.com/uhppoted/uhppote-core/types"
 
-	"emulator/entities"
-	"emulator/scmp"
+	"ut0311/entities"
+	"ut0311/scmp"
 )
 
 func (ut0311 *UT0311) makeListenEvent(controller uint32, event entities.Event) messages.Event {

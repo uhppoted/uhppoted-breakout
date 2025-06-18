@@ -9,10 +9,10 @@ import (
 	"syscall"
 	"time"
 
-	"emulator/UT0311"
-	"emulator/config"
-	"emulator/db"
-	"emulator/log"
+	"ut0311/UT0311"
+	"ut0311/config"
+	"ut0311/db"
+	"ut0311/log"
 )
 
 const VERSION = "v0.0"

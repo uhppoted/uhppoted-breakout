@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"emulator/scmp"
+	"ut0311/scmp"
 )
 
 type Config struct {

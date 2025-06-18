@@ -1,7 +1,7 @@
 package UT0311
 
 import (
-	"emulator/scmp"
+	"ut0311/scmp"
 )
 
 var lookup = struct {

@@ -11,8 +11,8 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"emulator/entities"
-	"emulator/log"
+	"ut0311/entities"
+	"ut0311/log"
 )
 
 const MaxLifetime = 5 * time.Minute

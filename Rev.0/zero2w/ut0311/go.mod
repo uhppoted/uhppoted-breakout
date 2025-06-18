@@ -1,4 +1,4 @@
-module emulator
+module ut0311
 
 go 1.23
 

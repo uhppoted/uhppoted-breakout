@@ -13,12 +13,12 @@ import (
 
 	"github.com/uhppoted/uhppote-core/messages"
 
-	"emulator/cards"
-	"emulator/config"
-	"emulator/driver/rpcd"
-	"emulator/events"
-	"emulator/log"
-	"emulator/system"
+	"ut0311/cards"
+	"ut0311/config"
+	"ut0311/driver/rpcd"
+	"ut0311/events"
+	"ut0311/log"
+	"ut0311/system"
 )
 
 const BACKOFF = 500 * time.Millisecond

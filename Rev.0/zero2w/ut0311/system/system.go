@@ -3,8 +3,8 @@ package system
 import (
 	"fmt"
 
-	"emulator/log"
-	"emulator/scmp"
+	"ut0311/log"
+	"ut0311/scmp"
 )
 
 type System struct {

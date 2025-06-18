@@ -4,7 +4,7 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 	"github.com/uhppoted/uhppote-core/types"
 
-	"emulator/scmp"
+	"ut0311/scmp"
 )
 
 func (ut0311 *UT0311) openDoor(rq *messages.OpenDoorRequest) (any, error) {

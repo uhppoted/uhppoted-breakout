@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"emulator/scmp"
+	"ut0311/scmp"
 )
 
 type entry struct {

@@ -4,7 +4,7 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 	lib "github.com/uhppoted/uhppote-core/types"
 
-	"emulator/scmp"
+	"ut0311/scmp"
 )
 
 const errMemory uint16 = 0x0001

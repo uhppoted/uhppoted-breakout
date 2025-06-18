@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"sync/atomic"
 
-	"emulator/entities"
-	"emulator/log"
+	"ut0311/entities"
+	"ut0311/log"
 )
 
 const LOGTAG = "EVENTS"

@@ -1,8 +1,8 @@
 package events
 
 import (
-	"emulator/entities"
-	"emulator/scmp"
+	"ut0311/entities"
+	"ut0311/scmp"
 )
 
 func Lookup(OID string) entities.EventType {

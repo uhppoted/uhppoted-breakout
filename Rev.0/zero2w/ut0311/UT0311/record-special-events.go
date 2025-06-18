@@ -4,7 +4,7 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 	lib "github.com/uhppoted/uhppote-core/types"
 
-	"emulator/scmp"
+	"ut0311/scmp"
 )
 
 func (ut0311 *UT0311) recordSpecialEvents(rq *messages.RecordSpecialEventsRequest) (any, error) {

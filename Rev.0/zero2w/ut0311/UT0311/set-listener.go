@@ -4,8 +4,8 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 	"github.com/uhppoted/uhppote-core/types"
 
-	"emulator/config"
-	"emulator/scmp"
+	"ut0311/config"
+	"ut0311/scmp"
 )
 
 func (ut0311 *UT0311) setListener(rq *messages.SetListenerRequest) (any, error) {

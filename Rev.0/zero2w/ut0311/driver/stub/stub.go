@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"emulator/log"
-	"emulator/scmp"
+	"ut0311/log"
+	"ut0311/scmp"
 )
 
 type Stub struct {

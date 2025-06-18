@@ -3,10 +3,10 @@ package UT0311
 import (
 	"net/netip"
 
-	"emulator/driver/rpcd"
-	"emulator/entities"
-	"emulator/events"
-	"emulator/scmp"
+	"ut0311/driver/rpcd"
+	"ut0311/entities"
+	"ut0311/events"
+	"ut0311/scmp"
 )
 
 func (ut0311 *UT0311) onTrap(event any) {
