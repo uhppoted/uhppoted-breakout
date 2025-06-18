@@ -32,7 +32,7 @@ type RPC struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
 	wg      sync.WaitGroup
-	onEvent func(event any)
+	onEvent func(uint32, time.Time, string, any)
 }
 
 type KV struct {
@@ -49,7 +49,7 @@ type Event struct {
 	}
 }
 
-func NewRPC(dial string, listen string, caching map[string]time.Duration, onEvent func(event any)) (*RPC, error) {
+func NewRPC(dial string, listen string, caching map[string]time.Duration, onEvent func(uint32, time.Time, string, any)) (*RPC, error) {
 	infof("init dial:%v", dial)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -171,10 +171,19 @@ func (r RPC) set(oid scmp.OID, value any) (any, error) {
 func (r *RPC) Trap(event Event, reply *any) error {
 	debugf("trap %v", event)
 
-	if r.onEvent != nil {
-		go func() {
-			r.onEvent(event)
-		}()
+	if tag, err := scmp.Oid2Tag(event.Var.OID); err != nil {
+		warnf("%v (%v)", event.Var.OID)
+	} else {
+		controller := event.ID
+		timestamp := event.Timestamp
+		value := event.Var.Value
+
+		// FIXME use pipe
+		if r.onEvent != nil {
+			go func() {
+				r.onEvent(controller, timestamp, tag, value)
+			}()
+		}
 	}
 
 	*reply = true

@@ -41,6 +41,8 @@
       - [ ] restructure
             - traps update ut0311 state and state generates events
             - poll for current state
+            - (?) map controller IDs to state
+            - (?) replace callback with pipe
       - [x] inputs
          - generalize as input state change
       - [ ] power on/reset

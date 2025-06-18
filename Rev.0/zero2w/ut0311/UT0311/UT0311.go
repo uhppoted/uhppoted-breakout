@@ -45,6 +45,8 @@ type UT0311 struct {
 	tls  *TLS
 	rate *rate.Limiter
 
+	state *state
+
 	closing bool
 }
 
@@ -65,6 +67,8 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 		tcp:  makeTCP(cm),
 		tls:  makeTLS(c.TLS.Certificate, c.TLS.CA, cm),
 		rate: rate.NewLimiter(REQUEST_RATE_LIMIT, REQUEST_BURST_LIMIT),
+
+		state: &state{},
 
 		closing: false,
 	}
@@ -317,6 +321,12 @@ func (ut0311 UT0311) dispatch(ctx context.Context, request any) (any, error) {
 	}
 
 	return nil, nil
+}
+
+func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string, value any) {
+	debugf("trap %v %v %v %v", controller, timestamp, tag, value)
+
+	ut0311.state.update(timestamp, tag, value)
 }
 
 func isnil(v any) bool {
