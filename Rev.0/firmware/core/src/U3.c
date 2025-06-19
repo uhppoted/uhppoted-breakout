@@ -243,10 +243,10 @@ void U3_process(uint8_t data) {
             {0x04, EVENT_DOOR_3_OPEN, EVENT_DOOR_3_CLOSE},
             {0x08, EVENT_DOOR_4_OPEN, EVENT_DOOR_4_CLOSE},
 
-            {0x10, EVENT_DOOR_1_PRESSED, EVENT_DOOR_1_RELEASED},
-            {0x20, EVENT_DOOR_2_PRESSED, EVENT_DOOR_2_RELEASED},
-            {0x40, EVENT_DOOR_3_PRESSED, EVENT_DOOR_3_RELEASED},
-            {0x80, EVENT_DOOR_4_PRESSED, EVENT_DOOR_4_RELEASED},
+            {0x10, EVENT_DOOR_1_RELEASED, EVENT_DOOR_1_PRESSED},
+            {0x20, EVENT_DOOR_2_RELEASED, EVENT_DOOR_2_PRESSED},
+            {0x40, EVENT_DOOR_3_RELEASED, EVENT_DOOR_3_PRESSED},
+            {0x80, EVENT_DOOR_4_RELEASED, EVENT_DOOR_4_PRESSED},
         };
 
         // ... door open/close/pressed/released

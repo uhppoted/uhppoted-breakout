@@ -23,7 +23,7 @@ type TCP struct {
 	closing     bool
 }
 
-func makeTCP(cm *ConnectionManager) *TCP {
+func newTCP(cm *ConnectionManager) *TCP {
 	return &TCP{
 		cm:          cm,
 		readTimeout: TCP_READ_TIMEOUT,

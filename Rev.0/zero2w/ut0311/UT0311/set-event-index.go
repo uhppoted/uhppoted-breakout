@@ -12,7 +12,7 @@ func (ut0311 *UT0311) setEventIndex(rq *messages.SetEventIndexRequest) (any, err
 		return nil, err
 	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
-	} else if current, err := ut0311.events.GetEventIndex(controller); err != nil {
+	} else if current, err := ut0311.eventd.GetEventIndex(controller); err != nil {
 		return nil, err
 	} else if current == rq.Index {
 		response := messages.SetEventIndexResponse{
@@ -21,7 +21,7 @@ func (ut0311 *UT0311) setEventIndex(rq *messages.SetEventIndexRequest) (any, err
 		}
 
 		return response, nil
-	} else if err := ut0311.events.SetEventIndex(controller, rq.Index); err != nil {
+	} else if err := ut0311.eventd.SetEventIndex(controller, rq.Index); err != nil {
 		return nil, err
 	} else {
 		response := messages.SetEventIndexResponse{

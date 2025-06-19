@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/netip"
 	"reflect"
 	"sync"
 	"time"
@@ -15,9 +16,10 @@ import (
 
 	"ut0311/cards"
 	"ut0311/config"
-	"ut0311/events"
+	"ut0311/eventd"
 	"ut0311/log"
 	"ut0311/rpcd"
+	"ut0311/scmp"
 	"ut0311/system"
 )
 
@@ -36,7 +38,7 @@ type UT0311 struct {
 	config   *config.Config
 	breakout *rpcd.RPC
 	system   system.System
-	events   *events.Events
+	eventd   *eventd.Events
 	cards    *cards.Cards
 
 	cm   *ConnectionManager
@@ -63,12 +65,12 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 		cards:  &cards.Cards{},
 
 		cm:   cm,
-		udp:  makeUDP(cm),
-		tcp:  makeTCP(cm),
-		tls:  makeTLS(c.TLS.Certificate, c.TLS.CA, cm),
+		udp:  newUDP(cm),
+		tcp:  newTCP(cm),
+		tls:  newTLS(c.TLS.Certificate, c.TLS.CA, cm),
 		rate: rate.NewLimiter(REQUEST_RATE_LIMIT, REQUEST_BURST_LIMIT),
 
-		state: &state{},
+		state: newState(),
 
 		closing: false,
 	}
@@ -79,10 +81,10 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 		ut0311.breakout = rpc
 	}
 
-	if eventd, err := events.NewEvents(c.Events.RPC.DialAddr); err != nil {
+	if rpc, err := eventd.NewEvents(c.Events.RPC.DialAddr); err != nil {
 		return nil, err
 	} else {
-		ut0311.events = eventd
+		ut0311.eventd = rpc
 	}
 
 	return &ut0311, nil
@@ -323,10 +325,23 @@ func (ut0311 UT0311) dispatch(ctx context.Context, request any) (any, error) {
 	return nil, nil
 }
 
+	// FIXME use pipes?
 func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string, value any) {
 	debugf("trap %v %v %v %v", controller, timestamp, tag, value)
 
-	ut0311.state.update(timestamp, tag, value)
+	if event := ut0311.state.update(timestamp, controller, tag, value); event != nil {
+		if index, err := ut0311.eventd.Add(controller, *event); err != nil {
+			warnf("%v", err)
+		} else {
+			event.Index = index
+
+			if listener, err := scmp.Get[netip.AddrPort](ut0311.config, scmp.OID_CONTROLLER_EVENT_LISTENER); err == nil && listener.IsValid() {
+				evt := ut0311.makeListenEvent(controller, *event)
+
+				ut0311.udp.sendto(listener, evt)
+			}
+		}
+	}
 }
 
 func isnil(v any) bool {

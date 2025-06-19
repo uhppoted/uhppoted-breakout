@@ -28,7 +28,7 @@ type TLS struct {
 	closing     bool
 }
 
-func makeTLS(certificate string, ca string, cm *ConnectionManager) *TLS {
+func newTLS(certificate string, ca string, cm *ConnectionManager) *TLS {
 	return &TLS{
 		Certificate: certificate,
 		CA:          ca,

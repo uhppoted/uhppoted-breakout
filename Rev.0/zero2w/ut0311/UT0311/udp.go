@@ -16,7 +16,7 @@ type UDP struct {
 	closing bool
 }
 
-func makeUDP(cm *ConnectionManager) *UDP {
+func newUDP(cm *ConnectionManager) *UDP {
 	return &UDP{
 		cm: cm,
 	}
