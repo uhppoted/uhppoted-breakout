@@ -1,8 +1,10 @@
-package scmp
+package MIB
 
 import (
-	"ut0311/entities"
+	"errors"
 )
+
+var ErrUnknownOID = errors.New("unknown OID")
 
 var m = map[string]string{
 	"controller.door.4.button": "0.1.3.6.1.4.1.65536.3.4.6",
@@ -17,5 +19,5 @@ func Oid2Tag(oid string) (string, error) {
 		return tag, nil
 	}
 
-	return "", entities.ErrUnknownOID
+	return "", ErrUnknownOID
 }

@@ -1,9 +1,6 @@
 # TODO
 
 ## RPCD
-   - [x] commonalise GET/SET queue handling
-   - [x] daemonize
-   - [x] undaemonize
    - [ ] monitor
    - (?) Context.WithTimeout 
    - (?) https://go.dev/blog/synctest

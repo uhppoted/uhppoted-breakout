@@ -40,13 +40,11 @@ type KV struct {
 	Value any
 }
 
-type Event struct {
+type Trap struct {
 	Timestamp time.Time
 	ID        uint32
-	Var       struct {
-		OID   string
-		Value any
-	}
+	Tag       string
+	Value     any
 }
 
 func NewRPC(dial string, listen string, caching map[string]time.Duration, onEvent func(uint32, time.Time, string, any)) (*RPC, error) {
@@ -168,22 +166,14 @@ func (r RPC) set(oid scmp.OID, value any) (any, error) {
 	}
 }
 
-func (r *RPC) Trap(event Event, reply *any) error {
-	debugf("trap %v", event)
+func (r *RPC) Trap(trap Trap, reply *any) error {
+	debugf("trap %v", trap)
 
-	if tag, err := scmp.Oid2Tag(event.Var.OID); err != nil {
-		warnf("%v (%v)", event.Var.OID)
-	} else {
-		controller := event.ID
-		timestamp := event.Timestamp
-		value := event.Var.Value
-
-		// FIXME use pipe
-		if r.onEvent != nil {
-			go func() {
-				r.onEvent(controller, timestamp, tag, value)
-			}()
-		}
+	// FIXME use pipe
+	if r.onEvent != nil {
+		go func() {
+			r.onEvent(trap.ID, trap.Timestamp, trap.Tag, trap.Value)
+		}()
 	}
 
 	*reply = true

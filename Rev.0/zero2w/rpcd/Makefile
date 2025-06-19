@@ -48,6 +48,7 @@ rpi3-build: format
 	env GOOS=linux GOARCH=arm GOARM=6 GOWORK=off go build -trimpath -o dist/arm6 ./...
 
 rpi3-run: rpi3-build
+	ssh -t phil "sudo systemctl stop uhppoted-breakout-rpcd"
 	scp dist/arm6/rpcd phil:/opt/uhppoted/uhppoted-breakout/rpcd
 	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/rpcd && \
 	            ./rpcd --bind "$(TCP)" \
