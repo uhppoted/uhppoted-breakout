@@ -38,8 +38,8 @@
    - [ ] TRAP
       - [ ] restructure
             - [x] traps update ut0311 state and state generates events
-            - [ ] get event info from state
             - [ ] poll for current state
+            - [ ] get event info from state
             - [ ] replace callbacks with pipe
             - (?) map controller IDs to state
       - [x] inputs

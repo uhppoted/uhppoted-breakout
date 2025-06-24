@@ -121,6 +121,13 @@ func (ut0311 *UT0311) Run() {
 		wg.Done()
 	}()
 
+	// ... start state poll
+	wg.Add(1)
+	go func() {
+		ut0311.state.poll()
+		wg.Done()
+	}()
+
 	// ... 'k, done
 
 	wg.Wait()
@@ -180,6 +187,16 @@ func (ut0311 *UT0311) Stop() {
 	go func() {
 		infof("stopping SSMP event handler")
 		if err := ut0311.breakout.Stop(); err != nil {
+			warnf("%v", err)
+		}
+
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		infof("stopping state poll")
+		if err := ut0311.state.stop(); err != nil {
 			warnf("%v", err)
 		}
 

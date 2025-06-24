@@ -1,6 +1,7 @@
 package UT0311
 
 import (
+	"sync"
 	"time"
 
 	"ut0311/entities"
@@ -8,6 +9,9 @@ import (
 
 type state struct {
 	state map[string]any
+
+	wg   sync.WaitGroup
+	done chan bool
 }
 
 func newState() *state {
@@ -26,7 +30,37 @@ func newState() *state {
 			"controller.door.3.button": false,
 			"controller.door.4.button": false,
 		},
+
+		done: make(chan bool),
 	}
+}
+
+func (s *state) poll() {
+	s.wg.Add(1)
+
+	defer func() {
+		s.wg.Done()
+	}()
+
+	tick := time.Tick(5 * time.Second)
+
+loop:
+	for {
+		select {
+		case <-s.done:
+			break loop
+
+		case <-tick:
+			println(" >>> poll")
+		}
+	}
+}
+
+func (s *state) stop() error {
+	s.done <- true
+	s.wg.Wait()
+
+	return nil
 }
 
 func (s *state) update(timestamp time.Time, controller uint32, tag string, value any) *entities.Event {
