@@ -325,7 +325,7 @@ func (ut0311 UT0311) dispatch(ctx context.Context, request any) (any, error) {
 	return nil, nil
 }
 
-	// FIXME use pipes?
+// FIXME use pipes?
 func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string, value any) {
 	debugf("trap %v %v %v %v", controller, timestamp, tag, value)
 

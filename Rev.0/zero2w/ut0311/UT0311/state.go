@@ -13,6 +13,9 @@ type state struct {
 func newState() *state {
 	return &state{
 		state: map[string]any{
+			"controller.system.errors.restart":  false,
+			"controller.system.errors.watchdog": false,
+
 			"controller.door.1.open": false,
 			"controller.door.2.open": false,
 			"controller.door.3.open": false,
@@ -34,7 +37,7 @@ func (s *state) update(timestamp time.Time, controller uint32, tag string, value
 	} else if old != value {
 		s.state[tag] = value
 
-		if t := entities.LookupEvent(tag); t != entities.EventUnknown {
+		if t := entities.LookupEvent(tag, value); t != entities.EventUnknown {
 			return &entities.Event{
 				Index:     0,
 				Type:      t,

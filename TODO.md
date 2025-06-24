@@ -29,6 +29,7 @@
         - https://github.com/tomas-pecserke/pico_tusb_reset_interface
         - https://github.com/hathach/tinyusb/discussions/664
         - https://github.com/piersfinlayson/tinyusb-vendor-example
+        - https://github.com/Veyniac/Pico-Audio-Interface
 
 - [ ] Rework print queue
       - (?) reservoir sampling (https://samwho.dev/reservoir-sampling)
@@ -37,6 +38,7 @@
    - [ ] TRAP
       - [ ] restructure
             - [x] traps update ut0311 state and state generates events
+            - [ ] get event info from state
             - [ ] poll for current state
             - [ ] replace callbacks with pipe
             - (?) map controller IDs to state

@@ -2,16 +2,32 @@ package entities
 
 import ()
 
-var events = map[string]EventType{
-	"controller.door.1.open": EventDoor,
-	"controller.door.2.open": EventDoor,
-	"controller.door.3.open": EventDoor,
-	"controller.door.4.open": EventDoor,
+var events = map[struct {
+	tag   string
+	value any
+}]EventType{
+	{"controller.system.errors.restart", true}:  EventSystem,
+	{"controller.system.errors.watchdog", true}: EventSystem,
 
-	"controller.door.1.button": EventDoor,
-	"controller.door.2.button": EventDoor,
-	"controller.door.3.button": EventDoor,
-	"controller.door.4.button": EventDoor,
+	{"controller.door.1.open", false}: EventDoor,
+	{"controller.door.2.open", false}: EventDoor,
+	{"controller.door.3.open", false}: EventDoor,
+	{"controller.door.4.open", false}: EventDoor,
+
+	{"controller.door.1.open", true}: EventDoor,
+	{"controller.door.2.open", true}: EventDoor,
+	{"controller.door.3.open", true}: EventDoor,
+	{"controller.door.4.open", true}: EventDoor,
+
+	{"controller.door.1.button", false}: EventDoor,
+	{"controller.door.2.button", false}: EventDoor,
+	{"controller.door.3.button", false}: EventDoor,
+	{"controller.door.4.button", false}: EventDoor,
+
+	{"controller.door.1.button", true}: EventDoor,
+	{"controller.door.2.button", true}: EventDoor,
+	{"controller.door.3.button", true}: EventDoor,
+	{"controller.door.4.button", true}: EventDoor,
 }
 
 var doors = map[string]uint8{
@@ -30,6 +46,9 @@ var reasons = map[struct {
 	tag   string
 	value any
 }]EventReason{
+	{"controller.system.errors.restart", true}:  ReasonControllerPowerOn,
+	{"controller.system.errors.watchdog", true}: ReasonControllerReset,
+
 	{"controller.door.1.open", false}: ReasonDoorClosed,
 	{"controller.door.2.open", false}: ReasonDoorClosed,
 	{"controller.door.3.open", false}: ReasonDoorClosed,
@@ -51,8 +70,16 @@ var reasons = map[struct {
 	{"controller.door.4.button", true}: ReasonDoorPushButton,
 }
 
-func LookupEvent(tag string) EventType {
-	if v, ok := events[tag]; ok {
+func LookupEvent(tag string, value any) EventType {
+	key := struct {
+		tag   string
+		value any
+	}{
+		tag:   tag,
+		value: value,
+	}
+
+	if v, ok := events[key]; ok {
 		return v
 	}
 

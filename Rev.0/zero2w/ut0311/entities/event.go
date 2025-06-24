@@ -23,6 +23,7 @@ const (
 	EventCard    EventType = 1
 	EventDoor    EventType = 2
 	EventAlarm   EventType = 3
+	EventSystem  EventType = 4
 )
 
 const (

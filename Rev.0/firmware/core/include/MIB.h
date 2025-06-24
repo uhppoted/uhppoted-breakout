@@ -7,7 +7,7 @@
 typedef struct MIBItem {
     uint32_t hash;
     const char *OID;
-    int64_t (*get)(const char *OID, value *);
+    int64_t (*get)(const char *OID,value *);
     int64_t (*set)(const char *OID, const value, value *);
 } MIBItem;
 
@@ -53,3 +53,4 @@ extern const MIBItem MIB_ALARMS_TAMPER_DETECT;
 extern const MIBItem MIB_ALARMS_FIRE_ALARM;
 
 extern const MIBItem OIDs[40];
+
