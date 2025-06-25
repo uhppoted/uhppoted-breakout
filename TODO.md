@@ -5,6 +5,12 @@
    - (?) Context.WithTimeout 
    - (?) https://go.dev/blog/synctest
 
+## eventd
+   - [ ] RPC over TCP/IP
+   - [ ] daemonize
+   - [ ] undaemonize
+   - [ ] monitor
+
 ## breakout
 
 ### misc

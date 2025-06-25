@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"eventd/db/sqlite"
 	"eventd/db/sqlite3"
 	"eventd/entities"
 )
@@ -23,6 +24,10 @@ func Init(dsn string) error {
 	switch {
 	case strings.HasPrefix(dsn, "sqlite3://"):
 		db = sqlite3.NewDB(dsn[10:])
+		return nil
+
+	case strings.HasPrefix(dsn, "sqlite://"):
+		db = sqlite.NewDB(dsn[9:])
 		return nil
 
 	default:

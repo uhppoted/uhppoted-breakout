@@ -45,8 +45,8 @@ rpi3-build: format
 	env GOOS=linux GOARCH=arm GOARM=6 GOWORK=off go build -trimpath -o dist/arm6 ./...
 
 rpi3-run: rpi3-build
-	scp dist/arm6/rpcd phil:/opt/uhppoted/uhppoted-breakout/eventd
-	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/events && ./eventd --bind $(TCP)" --DSN "sqlite3:///var/uhppoted/breakout/db/sqlite3/ut0311.db"
+	scp dist/arm6/eventd phil:/opt/uhppoted/uhppoted-breakout/eventd
+	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/eventd && ./eventd --bind $(TCP)" --DSN "sqlite:///var/uhppoted/breakout/db/sqlite3/ut0311.db"
 
 rpi3: rpi3-run
 
