@@ -3,25 +3,25 @@
 #include <MIB.h>
 #include <crypt/hash/djb2.h>
 
-extern int64_t MIB_get_sys_board_id(const char *,value *);
-extern int64_t MIB_get_controller_id(const char *,value *);
-extern int64_t MIB_get_controller_version(const char *,value *);
-extern int64_t MIB_get_controller_released(const char *,value *);
-extern int64_t MIB_get_controller_datetime(const char *,value *);
-extern int64_t MIB_get_controller_syserror(const char *,value *);
-extern int64_t MIB_get_controller_sysinfo(const char *,value *);
-extern int64_t MIB_get_door_mode(const char *,value *);
-extern int64_t MIB_get_door_delay(const char *,value *);
-extern int64_t MIB_get_door_unlocked(const char *,value *);
-extern int64_t MIB_get_door_open(const char *,value *);
-extern int64_t MIB_get_door_pushbutton(const char *,value *);
-extern int64_t MIB_get_alarm_tamper_dete,ct(const char *,value *);
-extern int64_t MIB_get_alarm_fire_alarm(const char *,value *);
+extern int64_t MIB_get_sys_board_id(const char *, value *);
+extern int64_t MIB_get_controller_id(const char *, value *);
+extern int64_t MIB_get_controller_version(const char *, value *);
+extern int64_t MIB_get_controller_released(const char *, value *);
+extern int64_t MIB_get_controller_datetime(const char *, value *);
+extern int64_t MIB_get_controller_syserror(const char *, value *);
+extern int64_t MIB_get_controller_sysinfo(const char *, value *);
+extern int64_t MIB_get_door_mode(const char *, value *);
+extern int64_t MIB_get_door_delay(const char *, value *);
+extern int64_t MIB_get_door_unlocked(const char *, value *);
+extern int64_t MIB_get_door_open(const char *, value *);
+extern int64_t MIB_get_door_pushbutton(const char *, value *);
+extern int64_t MIB_get_alarm_tamper_detect(const char *, value *);
+extern int64_t MIB_get_alarm_fire_alarm(const char *, value *);
 
-extern int64_t MIB_set_controller_datetime(const char *,const value,value *);
-extern int64_t MIB_set_controller_syserror(const char *,const value,value *);
-extern int64_t MIB_set_door_mode(const char *,const value,value *);
-extern int64_t MIB_set_door_delay(const char *,const value,value *);
+extern int64_t MIB_set_controller_datetime(const char *, const value, value *);
+extern int64_t MIB_set_controller_syserror(const char *, const value, value *);
+extern int64_t MIB_set_door_mode(const char *, const value, value *);
+extern int64_t MIB_set_door_delay(const char *, const value, value *);
 
 const MIBItem MIB_SYS_BOARD_ID = {
     .hash = 2957893646,
@@ -275,7 +275,7 @@ const MIBItem MIB_DOORS_4_BUTTON = {
 const MIBItem MIB_ALARMS_TAMPER_DETECT = {
     .hash = 2957896913,
     .OID = "0.1.3.6.1.4.1.65536.4.1",
-    .get = MIB_get_alarm_tamper_dete,ct,
+    .get = MIB_get_alarm_tamper_detect,
 };
 
 const MIBItem MIB_ALARMS_FIRE_ALARM = {
@@ -283,7 +283,6 @@ const MIBItem MIB_ALARMS_FIRE_ALARM = {
     .OID = "0.1.3.6.1.4.1.65536.4.2",
     .get = MIB_get_alarm_fire_alarm,
 };
-
 
 const MIBItem OIDs[40] = {
     MIB_SYS_BOARD_ID,
@@ -331,4 +330,3 @@ const MIBItem OIDs[40] = {
 bool equal(const char *OID, const MIBItem oid) {
     return (djb2(OID) == oid.hash) && (strcmp(OID, oid.OID) == 0);
 }
-

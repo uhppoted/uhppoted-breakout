@@ -42,7 +42,7 @@ func NewEvents(dial string) (*Events, error) {
 var Index atomic.Uint32
 
 func (e *Events) Add(controller uint32, event entities.Event) (uint32, error) {
-	debugf("add-avent %v", event)
+	debugf("add-event %v", event)
 
 	var args = struct {
 		Controller uint32

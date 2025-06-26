@@ -16,14 +16,13 @@ import (
 
 const LOGDIR = "/var/log/uhppoted/breakout"
 const WORKDIR = "/var/uhppoted/breakout"
-const ETC = "/usr/local/etc/uhppoted/breakout/rpcd"
+const ETC = "/usr/local/etc/uhppoted/breakout/eventd"
 
 type daemonize struct {
 	usergroup string
 	etc       string
-	device    string
 	bind      string
-	dial      string
+	DSN       string
 
 	logdir  string
 	workdir string
@@ -41,9 +40,8 @@ type info struct {
 	Gid           int
 	LogFiles      []string
 	Vars          struct {
-		Port     string
 		BindAddr string
-		DialAddr string
+		DSN      string
 	}
 }
 
@@ -55,7 +53,7 @@ Wants=syslog.target network-online.target
 
 [Service]
 Type=simple
-ExecStart={{.Executable}} --device {{.Vars.Port}} --bind {{.Vars.BindAddr}} --dial {{.Vars.DialAddr}}
+ExecStart={{.Executable}} --bind {{.Vars.BindAddr}} --DSN {{.Vars.DSN}}
 PIDFile={{.PID}}
 User={{.User}}
 Group={{.Group}}
@@ -84,9 +82,8 @@ func makeDaemonize() (daemonize, error) {
 	d := daemonize{
 		usergroup: "uhppoted:uhppoted",
 		etc:       ETC,
-		device:    DEFAULT_DEVICE,
 		bind:      DEFAULT_BIND,
-		dial:      DEFAULT_DIAL,
+		DSN:       DEFAULT_DSN,
 
 		logdir:  LOGDIR,
 		workdir: WORKDIR,
@@ -94,13 +91,12 @@ func makeDaemonize() (daemonize, error) {
 
 	flagset := flag.NewFlagSet("daemonize", flag.ExitOnError)
 	flagset.StringVar(&d.usergroup, "user", d.usergroup, "user:group for rpcd service")
-	flagset.StringVar(&d.device, "device", d.device, "serial device ID")
 	flagset.StringVar(&d.bind, "bind", d.bind, "bind address (in the format network::address:port e.g. tcp::0.0.0.0:12345")
-	flagset.StringVar(&d.dial, "dial", d.dial, "dial address (for events, in the format network::address:port e.g. tcp::0.0.0.0:12345")
+	flagset.StringVar(&d.DSN, "DSN", d.DSN, "DB DSN e.g. sqlite3:///var/uhppoted/breakout/db/sqlite3/ut0311.db")
 	flagset.Parse(os.Args[2:])
 
-	if d.device == "" {
-		return daemonize{}, fmt.Errorf("missing --device arg")
+	if d.DSN == "" {
+		return daemonize{}, fmt.Errorf("missing --DSN arg")
 	}
 
 	return d, nil
@@ -125,7 +121,7 @@ func (d daemonize) exec() error {
 
 		info := info{
 			Service:       SERVICE,
-			Description:   "uhppoted-breakout-rpcd service/daemon ",
+			Description:   "uhppoted-breakout-eventd service/daemon ",
 			Documentation: "https://github.com/uhppoted/uhppoted-breakout",
 			Executable:    executable,
 			PID:           filepath.Join(d.workdir, fmt.Sprintf("%v.pid", SERVICE)),
@@ -137,13 +133,11 @@ func (d daemonize) exec() error {
 				filepath.Join(d.logdir, fmt.Sprintf("%v.log", d.logdir, SERVICE)),
 			},
 			Vars: struct {
-				Port     string
 				BindAddr string
-				DialAddr string
+				DSN      string
 			}{
-				Port:     d.device,
 				BindAddr: d.bind,
-				DialAddr: d.dial,
+				DSN:      d.DSN,
 			},
 		}
 
@@ -172,11 +166,14 @@ func (d daemonize) exec() error {
 
 		// ... reload daemons
 		fmt.Printf("   ... reloading daemons\n")
+
 		command := exec.Command("systemctl", "daemon-reload")
 		out, err := command.CombinedOutput()
+
 		if strings.TrimSpace(string(out)) != "" {
 			fmt.Printf("   > %s\n", out)
 		}
+
 		if err != nil {
 			return fmt.Errorf("failed to reload services (%v)", err)
 		}

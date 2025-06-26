@@ -1,5 +1,6 @@
 TCP = tcp:::12346
 UDS = unix::/tmp/uhppoted/breakout/events.sock
+SQLITE = sqlite:///var/uhppoted/breakout/db/sqlite3/ut0311.db
 
 .DEFAULT_GOAL := build
 
@@ -26,8 +27,6 @@ run-tcp: build
 run-unix: build
 	./bin/eventd --bind "$(UDS)" --DSN "sqlite3://../workdir/db/sqlite3/ut0311.db"
 
-run: run-unix
-
 
 zero2w-build: format
 	mkdir -p dist/arm7
@@ -50,4 +49,19 @@ rpi3-run: rpi3-build
 
 rpi3: rpi3-run
 
+rpi3-daemonize: rpi3-build
+	ssh -t phil "sudo systemctl stop uhppoted-breakout-eventd"
+	scp dist/arm6/eventd phil:/opt/uhppoted/uhppoted-breakout/eventd
+	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/eventd && sudo ./eventd daemonize --bind $(TCP) --DSN $(SQLITE)"
+
+rpi3-undaemonize: rpi3-build
+	ssh -t phil "sudo systemctl stop uhppoted-breakout-eventd"
+	scp dist/arm6/eventd phil:/opt/uhppoted/uhppoted-breakout/eventd
+	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/eventd && sudo ./eventd undaemonize"
+
+run: rpi3-run
+
+daemonize: rpi3-daemonize
+
+undaemonize: rpi3-undaemonize
 

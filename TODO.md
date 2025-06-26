@@ -6,9 +6,9 @@
    - (?) https://go.dev/blog/synctest
 
 ## eventd
-   - [ ] RPC over TCP/IP
-   - [ ] daemonize
-   - [ ] undaemonize
+   - [x] RPC over TCP/IP
+   - [x] daemonize
+   - [x] undaemonize
    - [ ] monitor
 
 ## breakout
