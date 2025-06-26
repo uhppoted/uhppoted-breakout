@@ -87,3 +87,44 @@ func (s *state) update(timestamp time.Time, controller uint32, tag string, value
 
 	return nil
 }
+
+func (s *state) DateTime() (time.Time, error) {
+	return time.Now(), nil
+}
+
+func (s *state) SystemError(flags ...uint16) (bool, error) {
+	tags := map[uint16]string{
+		entities.ErrMemory:   "controller.system.error.memory",
+		entities.ErrQueue:    "controller.system.error.queue",
+		entities.ErrI2C:      "controller.system.error.I2C",
+		entities.ErrRX8900:   "controller.system.error.RX8900",
+		entities.ErrU2:       "controller.system.error.U2",
+		entities.ErrU3:       "controller.system.error.U3",
+		entities.ErrU4:       "controller.system.error.U4",
+		entities.ErrWatchdog: "controller.system.error.watchdog",
+		entities.ErrDebug:    "controller.system.error.debug",
+		entities.ErrUnknown:  "controller.system.error.unknown ",
+	}
+
+	for _, f := range flags {
+		if tag, ok := tags[f]; ok {
+			if v, ok := s.state[tag]; ok {
+				if err, ok := v.(bool); ok && err {
+					return true, nil
+				}
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// func (s *state) DateTime() (time.Time, error) {
+// 	if v, ok := s.state["controller.system.datetime"]; !ok {
+// 		return time.Time{}, fmt.Errorf("controller.system.datetime not cached")
+// 	} else if datetime, ok := v.(time.Time); !ok {
+// 		return time.Time{}, fmt.Errorf("controller.system.datetime invalid")
+// 	} else {
+// 		return datetime, nil
+// 	}
+// }

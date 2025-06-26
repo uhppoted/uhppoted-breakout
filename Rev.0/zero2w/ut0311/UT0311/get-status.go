@@ -4,19 +4,9 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 	lib "github.com/uhppoted/uhppote-core/types"
 
+	"ut0311/entities"
 	"ut0311/scmp"
 )
-
-const errMemory uint16 = 0x0001
-const errQueue uint16 = 0x0002
-const errI2C uint16 = 0x0004
-const errRX8900 uint16 = 0x0008
-const errU2 uint16 = 0x0010
-const errU3 uint16 = 0x0020
-const errU4 uint16 = 0x0040
-const errWatchdog uint16 = 0x0080
-const errDebug uint16 = 0x4000
-const errUnknown uint16 = 0x8000
 
 func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
@@ -30,31 +20,31 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			InputState:   0x00,
 		}
 
-		if datetime, err := scmp.Get[lib.DateTime](ut0311.breakout, scmp.OID_CONTROLLER_DATETIME); err != nil {
-			return nil, err
+		if v, err := ut0311.state.DateTime(); err != nil {
+			warnf("%v", err)
 		} else {
-			response.SystemDate = lib.SystemDate(datetime)
-			response.SystemTime = lib.SystemTime(datetime)
+			response.SystemDate = lib.SystemDate(v)
+			response.SystemTime = lib.SystemTime(v)
 		}
 
-		if v, err := scmp.Get[uint16](ut0311.breakout, scmp.OID_CONTROLLER_SYSERR); err != nil {
-			return nil, err
-		} else {
-			syserr := uint8(0x00)
+		// ... system errors
+		errs := []uint16{entities.ErrMemory, entities.ErrQueue, entities.ErrI2C, entities.ErrRX8900, entities.ErrU2, entities.ErrU3, entities.ErrU4}
+		if v, err := ut0311.state.SystemError(errs...); err != nil {
+			warnf("%v", err)
+		} else if v {
+			response.SystemError |= 0x01
+		}
 
-			if (v & (errMemory | errQueue | errI2C | errRX8900 | errU2 | errU3 | errU4)) != 0x0000 {
-				syserr |= 0x01
-			}
+		if v, err := ut0311.state.SystemError(entities.ErrWatchdog); err != nil {
+			warnf("%v", err)
+		} else if v {
+			response.SystemError |= 0x02
+		}
 
-			if (v & errWatchdog) != 0x0000 {
-				syserr |= 0x02
-			}
-
-			if (v & errUnknown) != 0x0000 {
-				syserr |= 0x08
-			}
-
-			response.SystemError = syserr
+		if v, err := ut0311.state.SystemError(entities.ErrUnknown); err != nil {
+			warnf("%v", err)
+		} else if v {
+			response.SystemError |= 0x08
 		}
 
 		if v, err := scmp.Get[uint8](ut0311.breakout, scmp.OID_CONTROLLER_SYSINFO); err != nil {

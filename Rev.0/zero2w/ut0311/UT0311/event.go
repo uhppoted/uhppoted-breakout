@@ -23,32 +23,31 @@ func (ut0311 *UT0311) makeListenEvent(controller uint32, event entities.Event) m
 	}
 
 	// ... system date/time
-	if datetime, err := scmp.Get[lib.DateTime](ut0311.breakout, scmp.OID_CONTROLLER_DATETIME); err != nil {
+	if v, err := ut0311.state.DateTime(); err != nil {
 		warnf("%v", err)
 	} else {
-		evt.SystemDate = lib.SystemDate(datetime)
-		evt.SystemTime = lib.SystemTime(datetime)
+		evt.SystemDate = lib.SystemDate(v)
+		evt.SystemTime = lib.SystemTime(v)
 	}
 
 	// ... system errors
-	if v, err := scmp.Get[uint16](ut0311.breakout, scmp.OID_CONTROLLER_SYSERR); err != nil {
+	errs := []uint16{entities.ErrMemory, entities.ErrQueue, entities.ErrI2C, entities.ErrRX8900, entities.ErrU2, entities.ErrU3, entities.ErrU4}
+	if v, err := ut0311.state.SystemError(errs...); err != nil {
 		warnf("%v", err)
-	} else {
-		syserr := uint8(0x00)
+	} else if v {
+		evt.SystemError |= 0x01
+	}
 
-		if (v & (errMemory | errQueue | errI2C | errRX8900 | errU2 | errU3 | errU4)) != 0x0000 {
-			syserr |= 0x01
-		}
+	if v, err := ut0311.state.SystemError(entities.ErrWatchdog); err != nil {
+		warnf("%v", err)
+	} else if v {
+		evt.SystemError |= 0x02
+	}
 
-		if (v & errWatchdog) != 0x0000 {
-			syserr |= 0x02
-		}
-
-		if (v & errUnknown) != 0x0000 {
-			syserr |= 0x08
-		}
-
-		evt.SystemError = syserr
+	if v, err := ut0311.state.SystemError(entities.ErrUnknown); err != nil {
+		warnf("%v", err)
+	} else if v {
+		evt.SystemError |= 0x08
 	}
 
 	// ... special info

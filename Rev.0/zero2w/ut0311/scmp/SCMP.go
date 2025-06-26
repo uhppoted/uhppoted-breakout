@@ -118,14 +118,14 @@ func Get[T any](scmp GetV, oid OID) (T, error) {
 			return any(date).(T), nil
 		}
 
-	case lib.DateTime:
-		if v, err := scmp.GetString(oid); err != nil {
-			return zero, err
-		} else if datetime, err := lib.ParseDateTime(v); err != nil {
-			return zero, err
-		} else {
-			return any(datetime).(T), nil
-		}
+		// case lib.DateTime:
+		// 	if v, err := scmp.GetString(oid); err != nil {
+		// 		return zero, err
+		// 	} else if datetime, err := lib.ParseDateTime(v); err != nil {
+		// 		return zero, err
+		// 	} else {
+		// 		return any(datetime).(T), nil
+		// 	}
 	}
 
 	return zero, fmt.Errorf("unknown type %T", zero)
