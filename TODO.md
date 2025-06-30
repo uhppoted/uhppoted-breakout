@@ -170,6 +170,7 @@
    - https://groupgets.com/products/pureconnect
 
 ## R&D
+- https://mazzo.li/posts/fast-pipes.html
 - Nerves
 - Embassy (Rust)
 - https://interrupt.memfault.com/blog/diving-into-jtag-part-6
