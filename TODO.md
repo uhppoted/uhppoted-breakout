@@ -173,6 +173,7 @@
 - https://mazzo.li/posts/fast-pipes.html
 - Nerves
 - Embassy (Rust)
+- [protothreads](https://dunkels.com/adam/pt/index.html)
 - https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 - https://pwy.io/posts/marching-events/
 - [ ] Pinout diagram

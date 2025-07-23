@@ -55,7 +55,7 @@ int main() {
 
     if (watchdog_caused_reboot()) {
         syserr_set(ERR_WATCHDOG, LOGTAG, "watchdog reboot");
-    } 
+    }
 
     if (strcmp(WATCHDOG, "disabled") != 0) {
         watchdog_enable(WATCHDOG_TIMEOUT, true);

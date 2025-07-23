@@ -48,10 +48,6 @@ bool sys_init() {
         return false;
     }
 
-    if (!uart1_init()) {
-        return false;
-    }
-
     log_init();
     cli_init();
     stdout_connected(true);

@@ -88,14 +88,17 @@ struct {
         .head = 0,
         .tail = 0,
     },
+
     .cli = {
         .touched = 0,
     },
+
     .trace = {
         .RTC = true,
         .interval = (float)TRACE,
         .touched = 0,
-    }};
+    },
+};
 
 void _push(const char *);
 void _flush();
