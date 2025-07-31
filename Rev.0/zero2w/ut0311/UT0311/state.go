@@ -1,6 +1,7 @@
 package UT0311
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -19,6 +20,8 @@ func newState() *state {
 		state: map[string]any{
 			"controller.system.errors.restart":  false,
 			"controller.system.errors.watchdog": false,
+			"controller.system.special-info":    uint8(0),
+			"controller.system.sequence-number": uint32(0),
 
 			"controller.door.1.open": false,
 			"controller.door.2.open": false,
@@ -119,12 +122,22 @@ func (s *state) SystemError(flags ...uint16) (bool, error) {
 	return false, nil
 }
 
-// func (s *state) DateTime() (time.Time, error) {
-// 	if v, ok := s.state["controller.system.datetime"]; !ok {
-// 		return time.Time{}, fmt.Errorf("controller.system.datetime not cached")
-// 	} else if datetime, ok := v.(time.Time); !ok {
-// 		return time.Time{}, fmt.Errorf("controller.system.datetime invalid")
-// 	} else {
-// 		return datetime, nil
-// 	}
-// }
+func (s *state) SpecialInfo() (uint8, error) {
+	if v, ok := s.state["controller.system.special-info"]; !ok {
+		return 0, fmt.Errorf("controller.system.special-info not cached")
+	} else if u8, ok := v.(uint8); !ok {
+		return 0, fmt.Errorf("controller.system.special-info invalid value")
+	} else {
+		return u8, nil
+	}
+}
+
+func (s *state) SequenceNo() (uint32, error) {
+	if v, ok := s.state["controller.system.sequence-number"]; !ok {
+		return 0, fmt.Errorf("controller.system.sequence-number not cached")
+	} else if u32, ok := v.(uint32); !ok {
+		return 0, fmt.Errorf("controller.system.sequence-number invalid value")
+	} else {
+		return u32, nil
+	}
+}

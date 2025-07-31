@@ -18,6 +18,8 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			SerialNumber: lib.SerialNumber(id),
 			RelayState:   0x00,
 			InputState:   0x00,
+			SystemError:  0x00,
+			SequenceId:   0,
 		}
 
 		if v, err := ut0311.state.DateTime(); err != nil {
@@ -47,14 +49,16 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			response.SystemError |= 0x08
 		}
 
-		if v, err := scmp.Get[uint8](ut0311.breakout, scmp.OID_CONTROLLER_SYSINFO); err != nil {
-			return nil, err
+		// ... special info
+		if v, err := ut0311.state.SpecialInfo(); err != nil {
+			warnf("%v", err)
 		} else {
 			response.SpecialInfo = v
 		}
 
-		if v, err := scmp.Get[uint32](ut0311.system, scmp.OID_CONTROLLER_SEQUENCE_NUMBER); err != nil {
-			return nil, err
+		// ... sequence no.
+		if v, err := ut0311.state.SequenceNo(); err != nil {
+			warnf("%v", err)
 		} else {
 			response.SequenceId = v
 		}

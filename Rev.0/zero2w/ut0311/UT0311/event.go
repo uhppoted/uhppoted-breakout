@@ -51,14 +51,14 @@ func (ut0311 *UT0311) makeListenEvent(controller uint32, event entities.Event) m
 	}
 
 	// ... special info
-	if v, err := scmp.Get[uint8](ut0311.breakout, scmp.OID_CONTROLLER_SYSINFO); err != nil {
+	if v, err := ut0311.state.SpecialInfo(); err != nil {
 		warnf("%v", err)
 	} else {
 		evt.SpecialInfo = v
 	}
 
 	// ... sequence no.
-	if v, err := scmp.Get[uint32](ut0311.system, scmp.OID_CONTROLLER_SEQUENCE_NUMBER); err != nil {
+	if v, err := ut0311.state.SequenceNo(); err != nil {
 		warnf("%v", err)
 	} else {
 		evt.SequenceId = v

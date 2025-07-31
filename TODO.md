@@ -1,5 +1,11 @@
 # TODO
 
+- [ ] _get-status_
+   - [ ] use cached values
+   - [ ] poll
+
+- [ ] swipe events
+
 ## RPCD
    - [ ] monitor
    - (?) Context.WithTimeout 
@@ -76,7 +82,7 @@
 - [ ] serial logger
 - [ ] custom image
       - https://github.com/raspberrypi/rpi-image-gen
-- [ ] memory FS for Unix domanin sockets
+- [ ] memory FS for Unix domain sockets
       - /run
       - /dev/shm
       - tmpfs
