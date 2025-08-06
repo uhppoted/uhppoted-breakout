@@ -19,6 +19,7 @@
 #include <cli.h>
 #include <doors.h>
 #include <log.h>
+#include <mempool.h>
 #include <sys.h>
 #include <types/buffer.h>
 #include <types/fields.h>
@@ -449,7 +450,22 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    syserr_set(ERR_DEBUG, LOGTAG, "<<< DEBUG");
+    swipe *swipe = swipe_alloc();
+
+    if (swipe != NULL) {
+        swipe->door = 4;
+        snprintf(swipe->card, sizeof(swipe->card), "%-03u%-05u", 100, 85400);
+
+        message msg = {
+            .message = MSG_SWIPE,
+            .tag = MESSAGE_SWIPE,
+            .swipe = swipe,
+        };
+
+        if (!push(msg)) {
+            swipe_free(swipe);
+        }
+    }
 }
 
 void show_state() {

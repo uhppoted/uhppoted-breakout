@@ -64,10 +64,19 @@ slice ssmp_encode_trap(packet p) {
     };
 
     // FIXME encode all var types
-    field item_value = {
-        .tag = FIELD_BOOLEAN,
-        .boolean.value = p.trap.var.value.boolean,
-    };
+    field item_value;
+    switch (p.trap.var.value.tag) {
+    case VALUE_BOOLEAN:
+        item_value.tag = FIELD_BOOLEAN;
+        item_value.boolean.value = p.trap.var.value.boolean;
+        break;
+
+    case VALUE_OCTET_STRING:
+        item_value.tag = FIELD_OCTET_STRING;
+        item_value.octets.length = p.trap.var.value.octets.length;
+        item_value.octets.octets = strdup(p.trap.var.value.octets.bytes);
+        break;
+    }
 
     field var = {
         .tag = FIELD_SEQUENCE,

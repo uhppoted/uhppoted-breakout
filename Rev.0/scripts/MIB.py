@@ -149,6 +149,12 @@ OIDs = [
     MIBItem('controller.door.3.button','MIB_DOORS_3_BUTTON', '0.1.3.6.1.4.1.65536.3.3.6', 'MIB_get_door_pushbutton'),
     MIBItem('controller.door.4.button','MIB_DOORS_4_BUTTON', '0.1.3.6.1.4.1.65536.3.4.6', 'MIB_get_door_pushbutton'),
 
+    # card swipes
+    MIBItem('controller.door.1.swipe','MIB_DOORS_1_SWIPE', '0.1.3.6.1.4.1.65536.3.1.7'),
+    MIBItem('controller.door.2.swipe','MIB_DOORS_2_SWIPE', '0.1.3.6.1.4.1.65536.3.2.7'),
+    MIBItem('controller.door.3.swipe','MIB_DOORS_3_SWIPE', '0.1.3.6.1.4.1.65536.3.3.7'),
+    MIBItem('controller.door.4.swipe','MIB_DOORS_4_SWIPE', '0.1.3.6.1.4.1.65536.3.4.7'),
+
     # alarms
     MIBItem('controller.alarm.tamper',
             'MIB_ALARMS_TAMPER_DETECT', 

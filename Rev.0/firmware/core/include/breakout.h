@@ -80,6 +80,11 @@ typedef enum {
     EVENT_DOOR_4_CLOSE,
     EVENT_DOOR_4_PRESSED,
     EVENT_DOOR_4_RELEASED,
+
+    EVENT_DOOR_1_SWIPE,
+    EVENT_DOOR_2_SWIPE,
+    EVENT_DOOR_3_SWIPE,
+    EVENT_DOOR_4_SWIPE,
 } EVENT;
 
 typedef enum {

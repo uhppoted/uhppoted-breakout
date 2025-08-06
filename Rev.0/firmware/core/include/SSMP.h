@@ -7,7 +7,7 @@ struct circular_buffer;
 extern void SSMP_init();
 extern void SSMP_start();
 extern void SSMP_reset();
-extern void SSMP_trap(EVENT);
+extern void SSMP_trap(EVENT, void *);
 extern void SSMP_rx(struct circular_buffer *);
 
 extern const int64_t SSMP_ERROR_NONE;

@@ -35,37 +35,51 @@ const int64_t SSMP_ERROR_COMMIT_FAILED = 14;
 const int64_t SSMP_ERROR_AUTHORIZATION = 16;
 const int64_t SSMP_ERROR_NOT_WRITABLE = 17;
 
+typedef enum {
+    TRAP_INPUT,
+    TRAP_CARD,
+    TRAP_UNKNOWN,
+} trap_type;
+
 typedef struct TRAP {
     EVENT event;
     const MIBItem *const mib;
-    bool value;
+    trap_type tag;
+    union {
+        bool input;
+        char *card;
+    };
 } TRAP;
 
 static const TRAP TRAPS[] = {
     // ... POR
-    {EVENT_SYS_START, &MIB_CONTROLLER_SYSERROR_RESTART, true},
-    {EVENT_SYS_RESET, &MIB_CONTROLLER_SYSERROR_WATCHDOG, true},
+    {EVENT_SYS_START, &MIB_CONTROLLER_SYSERROR_RESTART, TRAP_INPUT, true},
+    {EVENT_SYS_RESET, &MIB_CONTROLLER_SYSERROR_WATCHDOG, TRAP_INPUT, true},
 
     // ... door open/close, button press/release
-    {EVENT_DOOR_1_OPEN, &MIB_DOORS_1_OPEN, true},
-    {EVENT_DOOR_1_CLOSE, &MIB_DOORS_1_OPEN, false},
-    {EVENT_DOOR_1_PRESSED, &MIB_DOORS_1_BUTTON, true},
-    {EVENT_DOOR_1_RELEASED, &MIB_DOORS_1_BUTTON, false},
+    {EVENT_DOOR_1_OPEN, &MIB_DOORS_1_OPEN, TRAP_INPUT, true},
+    {EVENT_DOOR_1_CLOSE, &MIB_DOORS_1_OPEN, TRAP_INPUT, false},
+    {EVENT_DOOR_1_PRESSED, &MIB_DOORS_1_BUTTON, TRAP_INPUT, true},
+    {EVENT_DOOR_1_RELEASED, &MIB_DOORS_1_BUTTON, TRAP_INPUT, false},
+    {EVENT_DOOR_1_SWIPE, &MIB_DOORS_1_SWIPE, TRAP_CARD},
 
-    {EVENT_DOOR_2_OPEN, &MIB_DOORS_2_OPEN, true},
-    {EVENT_DOOR_2_CLOSE, &MIB_DOORS_2_OPEN, false},
-    {EVENT_DOOR_2_PRESSED, &MIB_DOORS_2_BUTTON, true},
-    {EVENT_DOOR_2_RELEASED, &MIB_DOORS_2_BUTTON, false},
+    {EVENT_DOOR_2_OPEN, &MIB_DOORS_2_OPEN, TRAP_INPUT, true},
+    {EVENT_DOOR_2_CLOSE, &MIB_DOORS_2_OPEN, TRAP_INPUT, false},
+    {EVENT_DOOR_2_PRESSED, &MIB_DOORS_2_BUTTON, TRAP_INPUT, true},
+    {EVENT_DOOR_2_RELEASED, &MIB_DOORS_2_BUTTON, TRAP_INPUT, false},
+    {EVENT_DOOR_2_SWIPE, &MIB_DOORS_2_SWIPE, TRAP_CARD},
 
-    {EVENT_DOOR_3_OPEN, &MIB_DOORS_3_OPEN, true},
-    {EVENT_DOOR_3_CLOSE, &MIB_DOORS_3_OPEN, false},
-    {EVENT_DOOR_3_PRESSED, &MIB_DOORS_3_BUTTON, true},
-    {EVENT_DOOR_3_RELEASED, &MIB_DOORS_3_BUTTON, false},
+    {EVENT_DOOR_3_OPEN, &MIB_DOORS_3_OPEN, TRAP_INPUT, true},
+    {EVENT_DOOR_3_CLOSE, &MIB_DOORS_3_OPEN, TRAP_INPUT, false},
+    {EVENT_DOOR_3_PRESSED, &MIB_DOORS_3_BUTTON, TRAP_INPUT, true},
+    {EVENT_DOOR_3_RELEASED, &MIB_DOORS_3_BUTTON, TRAP_INPUT, false},
+    {EVENT_DOOR_3_SWIPE, &MIB_DOORS_3_SWIPE, TRAP_CARD},
 
-    {EVENT_DOOR_4_OPEN, &MIB_DOORS_4_OPEN, true},
-    {EVENT_DOOR_4_CLOSE, &MIB_DOORS_4_OPEN, false},
-    {EVENT_DOOR_4_PRESSED, &MIB_DOORS_4_BUTTON, true},
-    {EVENT_DOOR_4_RELEASED, &MIB_DOORS_4_BUTTON, false},
+    {EVENT_DOOR_4_OPEN, &MIB_DOORS_4_OPEN, TRAP_INPUT, true},
+    {EVENT_DOOR_4_CLOSE, &MIB_DOORS_4_OPEN, TRAP_INPUT, false},
+    {EVENT_DOOR_4_PRESSED, &MIB_DOORS_4_BUTTON, TRAP_INPUT, true},
+    {EVENT_DOOR_4_RELEASED, &MIB_DOORS_4_BUTTON, TRAP_INPUT, false},
+    {EVENT_DOOR_4_SWIPE, &MIB_DOORS_4_SWIPE, TRAP_CARD},
 };
 
 void SSMP_rxchar(uint8_t ch);
@@ -332,7 +346,7 @@ bool SSMP_set(const char *community, int64_t rqid, const char *OID, const value 
 /* SSMP event TRAP implementation.
  *
  */
-void SSMP_trap(EVENT event) {
+void SSMP_trap(EVENT event, void *data) {
     if (event == EVENT_UNKNOWN) {
         return;
     }
@@ -373,10 +387,26 @@ void SSMP_trap(EVENT event) {
             TRAP v = TRAPS[i];
 
             trap.trap.var.OID = strdup(v.mib->OID);
-            trap.trap.var.value = (value){
-                .tag = VALUE_BOOLEAN,
-                .boolean = v.value,
-            };
+
+            switch (v.tag) {
+            case TRAP_INPUT:
+                trap.trap.var.value = (value){
+                    .tag = VALUE_BOOLEAN,
+                    .boolean = v.input,
+                };
+                break;
+
+            case TRAP_CARD:
+                trap.trap.var.value = (value){
+                    .tag = VALUE_OCTET_STRING,
+                    .octets = {
+                        .length = strlen((char *)data),
+                        .bytes = strdup((char *)data),
+                    },
+
+                };
+                break;
+            }
         }
     }
 

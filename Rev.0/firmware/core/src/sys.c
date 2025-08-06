@@ -303,6 +303,24 @@ void dispatch(uint32_t v) {
 
         infof(LOGTAG, "READER %d  CARD %s", swipe->door, swipe->card);
 
+        switch (swipe->door) {
+        case 1:
+            SSMP_trap(EVENT_DOOR_1_SWIPE, swipe->card);
+            break;
+
+        case 2:
+            SSMP_trap(EVENT_DOOR_2_SWIPE, swipe->card);
+            break;
+
+        case 3:
+            SSMP_trap(EVENT_DOOR_3_SWIPE, swipe->card);
+            break;
+
+        case 4:
+            SSMP_trap(EVENT_DOOR_1_SWIPE, swipe->card);
+            break;
+        }
+
         swipe_free(swipe);
     }
 
@@ -374,7 +392,7 @@ void dispatch(uint32_t v) {
     if ((v & MSG) == MSG_EVENT) {
         EVENT event = (EVENT)(v & 0x0fffffff);
 
-        SSMP_trap(event);
+        SSMP_trap(event, NULL);
     }
 
     if ((v & MSG) == MSG_LOG) {
