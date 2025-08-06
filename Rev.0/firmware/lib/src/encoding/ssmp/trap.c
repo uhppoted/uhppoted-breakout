@@ -64,7 +64,10 @@ slice ssmp_encode_trap(packet p) {
     };
 
     // FIXME encode all var types
-    field item_value;
+    field item_value = {
+        .tag = FIELD_UNKNOWN,
+    };
+
     switch (p.trap.var.value.tag) {
     case VALUE_BOOLEAN:
         item_value.tag = FIELD_BOOLEAN;
