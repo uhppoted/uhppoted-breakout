@@ -1,6 +1,8 @@
 package entities
 
-import ()
+import (
+	"fmt"
+)
 
 var events = map[struct {
 	tag   string
@@ -28,6 +30,11 @@ var events = map[struct {
 	{"controller.door.2.button", true}: EventDoor,
 	{"controller.door.3.button", true}: EventDoor,
 	{"controller.door.4.button", true}: EventDoor,
+
+	{"controller.door.1.swipe", nil}: EventCard,
+	{"controller.door.2.swipe", nil}: EventCard,
+	{"controller.door.3.swipe", nil}: EventCard,
+	{"controller.door.4.swipe", nil}: EventCard,
 }
 
 var doors = map[string]uint8{
@@ -40,6 +47,11 @@ var doors = map[string]uint8{
 	"controller.door.2.button": 2,
 	"controller.door.3.button": 3,
 	"controller.door.4.button": 4,
+
+	"controller.door.1.swipe": 1,
+	"controller.door.2.swipe": 2,
+	"controller.door.3.swipe": 3,
+	"controller.door.4.swipe": 4,
 }
 
 var reasons = map[struct {
@@ -68,9 +80,15 @@ var reasons = map[struct {
 	{"controller.door.2.button", true}: ReasonDoorPushButton,
 	{"controller.door.3.button", true}: ReasonDoorPushButton,
 	{"controller.door.4.button", true}: ReasonDoorPushButton,
+
+	{"controller.door.1.swipe", nil}: ReasonCardOk,
+	{"controller.door.2.swipe", nil}: ReasonCardOk,
+	{"controller.door.3.swipe", nil}: ReasonCardOk,
+	{"controller.door.4.swipe", nil}: ReasonCardOk,
 }
 
 func LookupEvent(tag string, value any) EventType {
+	fmt.Printf(">>>> LookupEvent %v::%v\n", tag, value)
 	key := struct {
 		tag   string
 		value any
@@ -79,7 +97,10 @@ func LookupEvent(tag string, value any) EventType {
 		value: value,
 	}
 
-	if v, ok := events[key]; ok {
+	v, ok := events[key]
+	fmt.Printf(">>>> LookupEvent/X %v  %v,%v\n", key, v, ok)
+
+	if ok {
 		return v
 	}
 

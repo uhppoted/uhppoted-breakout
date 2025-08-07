@@ -317,7 +317,7 @@ void dispatch(uint32_t v) {
             break;
 
         case 4:
-            SSMP_trap(EVENT_DOOR_1_SWIPE, swipe->card);
+            SSMP_trap(EVENT_DOOR_4_SWIPE, swipe->card);
             break;
         }
 
