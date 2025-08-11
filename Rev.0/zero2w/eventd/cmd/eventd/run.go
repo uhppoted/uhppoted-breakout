@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"eventd/db"
-	"eventd/eventd"
+	"eventd/rpc"
 )
 
 type run struct {
@@ -36,7 +36,7 @@ func makeRun() (run, error) {
 }
 
 func (r run) exec() error {
-	if rpc, err := eventd.NewEventD(r.bind); err != nil {
+	if rpc, err := rpc.NewRPCD(r.bind); err != nil {
 		return err
 	} else if rpc == nil {
 		return fmt.Errorf("invalid RPC (%v)", rpc)

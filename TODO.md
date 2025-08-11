@@ -1,10 +1,12 @@
 # TODO
 
+- [ ] swipe events
+   - (?) trap handlers
+   - [ ] put-card: store to db
+
 - [ ] _get-status_
    - [ ] use cached values
    - [ ] poll
-
-- [ ] swipe events
 
 ## RPCD
    - [ ] monitor

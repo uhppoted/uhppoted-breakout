@@ -12,7 +12,7 @@ func (ut0311 *UT0311) recordSpecialEvents(rq *messages.RecordSpecialEventsReques
 		return nil, err
 	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
-	} else if err := ut0311.eventd.RecordSpecialEvents(controller, rq.Enable); err != nil {
+	} else if err := ut0311.db.RecordSpecialEvents(controller, rq.Enable); err != nil {
 		return nil, err
 	} else {
 		return messages.RecordSpecialEventsResponse{

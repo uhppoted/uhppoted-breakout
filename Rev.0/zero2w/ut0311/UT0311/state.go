@@ -54,7 +54,7 @@ loop:
 			break loop
 
 		case <-tick:
-			println(" >>> poll")
+			// println(" >>> poll")
 		}
 	}
 }

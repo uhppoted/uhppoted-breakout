@@ -1,6 +1,6 @@
 TCP = tcp:::12346
 UDS = unix::/tmp/uhppoted/breakout/events.sock
-SQLITE = sqlite:///var/uhppoted/breakout/db/sqlite3/ut0311.db
+SQLITE = sqlite:///var/uhppoted/breakout/db/sqlite3/ut0311.db?_journal_mode=WAL
 
 .DEFAULT_GOAL := build
 
@@ -34,7 +34,7 @@ zero2w-build: format
 
 zero2w-run: zero2w-build
 	scp dist/arm7/eventd breakout:/opt/breakout/eventd
-	ssh breakout "cd /opt/breakout/eventd && ./eventd --bind $(TCP)" --DSN "sqlite3:///var/uhppoted/breakout/db/sqlite3/ut0311.db"
+	ssh breakout "cd /opt/breakout/eventd && ./eventd --bind "$(TCP)" --DSN "sqlite3:///var/uhppoted/breakout/db/sqlite3/ut0311.db"
 
 zer02w: zerow2w-run
 
@@ -45,7 +45,7 @@ rpi3-build: format
 
 rpi3-run: rpi3-build
 	scp dist/arm6/eventd phil:/opt/uhppoted/uhppoted-breakout/eventd
-	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/eventd && ./eventd --bind $(TCP)" --DSN "sqlite:///var/uhppoted/breakout/db/sqlite3/ut0311.db"
+	ssh -t phil "cd /opt/uhppoted/uhppoted-breakout/eventd && ./eventd --bind $(TCP) --DSN 'sqlite:///var/uhppoted/breakout/db/sqlite3/ut0311.db?_journal_mode=WAL'"
 
 rpi3: rpi3-run
 
