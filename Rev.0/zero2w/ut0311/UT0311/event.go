@@ -90,53 +90,53 @@ func (ut0311 *UT0311) makeListenEvent(controller uint32, event entities.Event) m
 	}
 
 	// ... door states
-	if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_OPEN); err != nil {
+	if open, err := ut0311.state.DoorOpen(1); err != nil {
 		warnf("%v", err)
 	} else {
 		evt.Door1State = open
 	}
 
-	if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_OPEN); err != nil {
+	if open, err := ut0311.state.DoorOpen(2); err != nil {
 		warnf("%v", err)
 	} else {
 		evt.Door2State = open
 	}
 
-	if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_OPEN); err != nil {
+	if open, err := ut0311.state.DoorOpen(3); err != nil {
 		warnf("%v", err)
 	} else {
 		evt.Door3State = open
 	}
 
-	if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_OPEN); err != nil {
+	if open, err := ut0311.state.DoorOpen(4); err != nil {
 		warnf("%v", err)
 	} else {
 		evt.Door4State = open
 	}
 
 	// ... door buttons
-	if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_BUTTON); err != nil {
+	if button, err := ut0311.state.DoorButton(1); err != nil {
 		warnf("%v", err)
 	} else {
-		evt.Door1Button = pressed
+		evt.Door1Button = button
 	}
 
-	if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_BUTTON); err != nil {
+	if button, err := ut0311.state.DoorButton(2); err != nil {
 		warnf("%v", err)
 	} else {
-		evt.Door2Button = pressed
+		evt.Door2Button = button
 	}
 
-	if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_BUTTON); err != nil {
+	if button, err := ut0311.state.DoorButton(3); err != nil {
 		warnf("%v", err)
 	} else {
-		evt.Door3Button = pressed
+		evt.Door3Button = button
 	}
 
-	if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_BUTTON); err != nil {
+	if button, err := ut0311.state.DoorButton(4); err != nil {
 		warnf("%v", err)
 	} else {
-		evt.Door4Button = pressed
+		evt.Door4Button = button
 	}
 
 	// ... inputs

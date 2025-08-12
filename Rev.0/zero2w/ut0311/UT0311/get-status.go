@@ -70,16 +70,16 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			response.RelayState |= 0x01
 		}
 
-		if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_OPEN); err != nil {
+		if open, err := ut0311.state.DoorOpen(1); err != nil {
 			return nil, err
 		} else {
 			response.Door1State = open
 		}
 
-		if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_BUTTON); err != nil {
+		if button, err := ut0311.state.DoorButton(1); err != nil {
 			return nil, err
 		} else {
-			response.Door1Button = pressed
+			response.Door1Button = button
 		}
 
 		// ... door 2
@@ -89,16 +89,16 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			response.RelayState |= 0x02
 		}
 
-		if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_OPEN); err != nil {
+		if open, err := ut0311.state.DoorOpen(2); err != nil {
 			return nil, err
 		} else {
 			response.Door2State = open
 		}
 
-		if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_BUTTON); err != nil {
+		if button, err := ut0311.state.DoorButton(2); err != nil {
 			return nil, err
 		} else {
-			response.Door2Button = pressed
+			response.Door2Button = button
 		}
 
 		// ... door 3
@@ -108,16 +108,16 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			response.RelayState |= 0x04
 		}
 
-		if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_OPEN); err != nil {
+		if open, err := ut0311.state.DoorOpen(3); err != nil {
 			return nil, err
 		} else {
 			response.Door3State = open
 		}
 
-		if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_BUTTON); err != nil {
+		if button, err := ut0311.state.DoorButton(3); err != nil {
 			return nil, err
 		} else {
-			response.Door3Button = pressed
+			response.Door3Button = button
 		}
 
 		// ... door 4
@@ -127,16 +127,16 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			response.RelayState |= 0x08
 		}
 
-		if open, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_OPEN); err != nil {
+		if open, err := ut0311.state.DoorOpen(4); err != nil {
 			return nil, err
 		} else {
 			response.Door4State = open
 		}
 
-		if pressed, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_BUTTON); err != nil {
+		if button, err := ut0311.state.DoorButton(4); err != nil {
 			return nil, err
 		} else {
-			response.Door4Button = pressed
+			response.Door4Button = button
 		}
 
 		// ... inputs

@@ -141,3 +141,27 @@ func (s *state) SequenceNo() (uint32, error) {
 		return u32, nil
 	}
 }
+
+func (s *state) DoorOpen(door uint8) (bool, error) {
+	tag := fmt.Sprintf("controller.door.%v.open", door)
+
+	if v, ok := s.state[tag]; !ok {
+		return false, fmt.Errorf("%v not cached", tag)
+	} else if b, ok := v.(bool); !ok {
+		return false, fmt.Errorf("%v invalid value", tag)
+	} else {
+		return b, nil
+	}
+}
+
+func (s *state) DoorButton(door uint8) (bool, error) {
+	tag := fmt.Sprintf("controller.door.%v.button", door)
+
+	if v, ok := s.state[tag]; !ok {
+		return false, fmt.Errorf("%v not cached", tag)
+	} else if b, ok := v.(bool); !ok {
+		return false, fmt.Errorf("%v invalid value", tag)
+	} else {
+		return b, nil
+	}
+}
