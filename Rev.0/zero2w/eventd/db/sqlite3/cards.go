@@ -12,9 +12,9 @@ import (
 	"eventd/entities"
 )
 
-const sqlGetCard = `SELECT Card, CAST(StartDate AS VARCHAR), CAST(EndDate AS VARCHAR),Door1, Door2, Door3, Door4, PIN FROM Cards WHERE Card=?;`
+const sqlGetCard = `SELECT Card, CAST(StartDate AS VARCHAR), CAST(EndDate AS VARCHAR),Door1, Door2, Door3, Door4, PIN FROM Cards WHERE Controller=? AND Card=?;`
 
-func (db impl) GetCard(card uint32) (entities.Card, error) {
+func (db impl) GetCard(controller uint32, card uint32) (entities.Card, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
 	defer cancel()
@@ -34,7 +34,7 @@ func (db impl) GetCard(card uint32) (entities.Card, error) {
 		return zero, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if prepared, err := dbc.Prepare(query); err != nil {
 		return zero, err
-	} else if rs, err := prepared.QueryContext(ctx, card); err != nil {
+	} else if rs, err := prepared.QueryContext(ctx, controller, card); err != nil {
 		return zero, err
 	} else if rs == nil {
 		return zero, fmt.Errorf("invalid resultset (%v)", rs)

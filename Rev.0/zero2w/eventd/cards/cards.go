@@ -11,10 +11,13 @@ const LOGTAG = "cards"
 type CardD struct {
 }
 
-func (d *CardD) GetCard(card uint32, record *entities.Card) error {
-	debugf("get-card %v", card)
+func (d *CardD) GetCard(args struct {
+	Controller uint32
+	Card       uint32
+}, record *entities.Card) error {
+	debugf("get-card %v %v", args.Controller, args.Card)
 
-	if v, err := db.GetCard(card); err != nil {
+	if v, err := db.GetCard(args.Controller, args.Card); err != nil {
 		return err
 	} else {
 		*record = v

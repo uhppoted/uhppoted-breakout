@@ -10,7 +10,7 @@ import (
 )
 
 type DB interface {
-	GetCard(card uint32) (entities.Card, error)
+	GetCard(controller uint32, card uint32) (entities.Card, error)
 
 	GetEvents() (uint32, uint32, error)
 	GetEvent(index uint32) (entities.Event, error)
@@ -37,8 +37,8 @@ func Init(dsn string) error {
 	}
 }
 
-func GetCard(card uint32) (entities.Card, error) {
-	return db.GetCard(card)
+func GetCard(controller uint32, card uint32) (entities.Card, error) {
+	return db.GetCard(controller, card)
 }
 
 func GetEvents() (uint32, uint32, error) {

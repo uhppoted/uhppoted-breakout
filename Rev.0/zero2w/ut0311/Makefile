@@ -26,10 +26,10 @@ run-unix: build
 run-breakout: build
 	./bin/ut0311 --config .config.zero2w
 
-run: run-unix
-
 stub: build
 	./bin/ut0311 --config .config.stub
 
 rpi3: build
 	./bin/ut0311 --config .config.rpi3
+
+run: rpi3

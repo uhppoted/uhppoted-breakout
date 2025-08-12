@@ -19,6 +19,7 @@ import (
 	"ut0311/UT0311/actions"
 	"ut0311/cards"
 	"ut0311/config"
+	"ut0311/entities"
 	"ut0311/eventd"
 	"ut0311/log"
 	"ut0311/rpcd"
@@ -351,24 +352,31 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 
 	re := regexp.MustCompile(`controller\.door\.([1-4]).swipe`)
 	match := re.FindStringSubmatch(tag)
-
 	if len(match) > 1 {
 		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			actions.Swipe(ut0311.db, value, uint8(door))
+			if e := actions.Swipe(timestamp, controller, value, uint8(door), ut0311.db); e != nil {
+				ut0311.event(controller, e)
+			}
+
+			return
 		}
 	}
 
-	if event := ut0311.state.update(timestamp, controller, tag, value); event != nil {
-		if index, err := ut0311.db.Add(controller, *event); err != nil {
-			warnf("%v", err)
-		} else {
-			event.Index = index
+	if e := ut0311.state.update(timestamp, controller, tag, value); e != nil {
+		ut0311.event(controller, e)
+	}
+}
 
-			if listener, err := scmp.Get[netip.AddrPort](ut0311.config, scmp.OID_CONTROLLER_EVENT_LISTENER); err == nil && listener.IsValid() {
-				evt := ut0311.makeListenEvent(controller, *event)
+func (ut0311 *UT0311) event(controller uint32, event *entities.Event) {
+	if index, err := ut0311.db.Add(controller, *event); err != nil {
+		warnf("%v", err)
+	} else {
+		event.Index = index
 
-				ut0311.udp.sendto(listener, evt)
-			}
+		if listener, err := scmp.Get[netip.AddrPort](ut0311.config, scmp.OID_CONTROLLER_EVENT_LISTENER); err == nil && listener.IsValid() {
+			evt := ut0311.makeListenEvent(controller, *event)
+
+			ut0311.udp.sendto(listener, evt)
 		}
 	}
 }

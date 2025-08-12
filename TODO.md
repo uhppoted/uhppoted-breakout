@@ -2,6 +2,7 @@
 
 - [ ] swipe events
    - (?) trap handlers
+   - (?) use pipes
    - [ ] put-card: store to db
 
 - [ ] _get-status_

@@ -39,7 +39,9 @@ func NewDB(dsn string) impl {
 }
 
 func (db impl) open() (*sql.DB, error) {
-	if dbc, err := sql.Open("sqlite", db.dsn); err != nil {
+	dsn := fmt.Sprintf("%v?_journal_mode=WAL", db.dsn)
+
+	if dbc, err := sql.Open("sqlite", dsn); err != nil {
 		return nil, err
 	} else {
 		dbc.SetConnMaxLifetime(db.maxLifetime)
