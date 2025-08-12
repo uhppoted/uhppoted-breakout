@@ -2,6 +2,7 @@ package cards
 
 import (
 	"fmt"
+	"regexp"
 	"slices"
 
 	"github.com/uhppoted/uhppote-core/types"
@@ -11,7 +12,27 @@ import (
 )
 
 type Cards struct {
+	dial struct {
+		network string
+		address string
+	}
+
 	cards []scmp.Card
+}
+
+func NewCards(dial string) (*Cards, error) {
+	infof("init dial:%v", dial)
+
+	c := Cards{}
+
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(dial); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid RPC 'dial' address (%v)", dial)
+	} else {
+		c.dial.network = matches[1]
+		c.dial.address = matches[2]
+	}
+
+	return &c, nil
 }
 
 func (c Cards) GetUint8(oid scmp.OID) (uint8, error) {

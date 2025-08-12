@@ -20,7 +20,7 @@ import (
 	"ut0311/cards"
 	"ut0311/config"
 	"ut0311/entities"
-	"ut0311/eventd"
+	"ut0311/events"
 	"ut0311/log"
 	"ut0311/rpcd"
 	"ut0311/scmp"
@@ -42,7 +42,7 @@ type UT0311 struct {
 	config   *config.Config
 	breakout *rpcd.RPC
 	system   system.System
-	db       *eventd.Events
+	events   *events.Events
 	cards    *cards.Cards
 
 	cm   *ConnectionManager
@@ -66,7 +66,6 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 	ut0311 := UT0311{
 		config: c,
 		system: system.System{},
-		cards:  &cards.Cards{},
 
 		cm:   cm,
 		udp:  newUDP(cm),
@@ -85,10 +84,16 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 		ut0311.breakout = rpc
 	}
 
-	if rpc, err := eventd.NewEvents(c.Events.RPC.DialAddr); err != nil {
+	if rpc, err := events.NewEvents(c.Events.RPC.DialAddr); err != nil {
 		return nil, err
 	} else {
-		ut0311.db = rpc
+		ut0311.events = rpc
+	}
+
+	if rpc, err := cards.NewCards(c.Cards.RPC.DialAddr); err != nil {
+		return nil, err
+	} else {
+		ut0311.cards = rpc
 	}
 
 	return &ut0311, nil
@@ -354,7 +359,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 	match := re.FindStringSubmatch(tag)
 	if len(match) > 1 {
 		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			if e := actions.Swipe(timestamp, controller, value, uint8(door), ut0311.db); e != nil {
+			if e := actions.Swipe(timestamp, controller, value, uint8(door), ut0311.cards); e != nil {
 				ut0311.event(controller, e)
 			}
 
@@ -368,7 +373,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 }
 
 func (ut0311 *UT0311) event(controller uint32, event *entities.Event) {
-	if index, err := ut0311.db.Add(controller, *event); err != nil {
+	if index, err := ut0311.events.Add(controller, *event); err != nil {
 		warnf("%v", err)
 	} else {
 		event.Index = index

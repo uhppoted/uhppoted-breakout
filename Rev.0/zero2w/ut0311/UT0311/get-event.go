@@ -12,7 +12,7 @@ func (ut0311 *UT0311) getEvent(rq *messages.GetEventRequest) (any, error) {
 		return nil, err
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
-	} else if event, err := ut0311.db.Get(rq.Index); err != nil {
+	} else if event, err := ut0311.events.Get(rq.Index); err != nil {
 		return nil, err
 	} else {
 		response := messages.GetEventResponse{

@@ -153,7 +153,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... event
-		if event, err := ut0311.db.Get(0xffffffff); err != nil {
+		if event, err := ut0311.events.Get(0xffffffff); err != nil {
 			return nil, err
 		} else {
 			response.EventIndex = event.Index

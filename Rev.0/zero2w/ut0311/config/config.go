@@ -18,6 +18,7 @@ type Config struct {
 	filepath string  `json:"-"`
 	Driver   driver  `json:"driver"`
 	Network  network `json:"network"`
+	Cards    cards   `json:"cards"`
 	Events   events  `json:"events"`
 	TLS      TLS     `json:"TLS"`
 }
@@ -48,6 +49,10 @@ type IPv4 struct {
 type TLS struct {
 	Certificate string `json:"certificate"`
 	CA          string `json:"CA"`
+}
+
+type cards struct {
+	RPC rpc `json:"RPC"`
 }
 
 type events struct {

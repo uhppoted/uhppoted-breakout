@@ -1,4 +1,4 @@
-package eventd
+package events
 
 import (
 	"fmt"
