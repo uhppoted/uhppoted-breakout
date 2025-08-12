@@ -9,7 +9,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"eventd/entities"
+	"dbd/entities"
 )
 
 const sqlGetEvent = `SELECT CAST(Timestamp AS VARCHAR),Type,Granted,Door,Direction,CardNumber,Reason FROM Events WHERE EventID=?;`

@@ -10,7 +10,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"eventd/log"
+	"dbd/log"
 )
 
 const MaxLifetime = 5 * time.Minute

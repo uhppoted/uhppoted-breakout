@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"eventd/db/sqlite"
-	"eventd/db/sqlite3"
-	"eventd/entities"
+	"dbd/db/sqlite"
+	"dbd/db/sqlite3"
+	"dbd/entities"
 )
 
 type DB interface {

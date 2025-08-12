@@ -1,9 +1,9 @@
 package cards
 
 import (
-	"eventd/db"
-	"eventd/entities"
-	"eventd/log"
+	"dbd/db"
+	"dbd/entities"
+	"dbd/log"
 )
 
 const LOGTAG = "cards"

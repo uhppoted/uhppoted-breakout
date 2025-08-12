@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"eventd/log"
+	"dbd/log"
 )
 
-const SERVICE = "uhppoted-breakout-eventd"
+const SERVICE = "uhppoted-breakout-dbd"
 const VERSION = "v0.0.0"
-const LOGTAG = "eventd"
+const LOGTAG = "dbd"
 
 const DEFAULT_BIND = "tcp:::12346"
 const DEFAULT_DSN = ""

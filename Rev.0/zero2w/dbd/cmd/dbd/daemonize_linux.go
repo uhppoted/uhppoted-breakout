@@ -16,7 +16,7 @@ import (
 
 const LOGDIR = "/var/log/uhppoted/breakout"
 const WORKDIR = "/var/uhppoted/breakout"
-const ETC = "/usr/local/etc/uhppoted/breakout/eventd"
+const ETC = "/usr/local/etc/uhppoted/breakout/dbd"
 
 type daemonize struct {
 	usergroup string
@@ -121,7 +121,7 @@ func (d daemonize) exec() error {
 
 		info := info{
 			Service:       SERVICE,
-			Description:   "uhppoted-breakout-eventd service/daemon ",
+			Description:   "uhppoted-breakout-dbd service/daemon ",
 			Documentation: "https://github.com/uhppoted/uhppoted-breakout",
 			Executable:    executable,
 			PID:           filepath.Join(d.workdir, fmt.Sprintf("%v.pid", SERVICE)),

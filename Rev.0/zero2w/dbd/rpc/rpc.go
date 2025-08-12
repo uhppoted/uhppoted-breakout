@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"eventd/cards"
-	"eventd/events"
-	"eventd/log"
+	"dbd/cards"
+	"dbd/events"
+	"dbd/log"
 )
 
 const LOGTAG = "rpc"

@@ -10,7 +10,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"eventd/log"
+	"dbd/log"
 )
 
 const MaxLifetime = 5 * time.Minute

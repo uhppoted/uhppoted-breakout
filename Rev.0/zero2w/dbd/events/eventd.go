@@ -3,12 +3,12 @@ package events
 import (
 	"errors"
 
-	"eventd/db"
-	"eventd/entities"
-	"eventd/log"
+	"dbd/db"
+	"dbd/entities"
+	"dbd/log"
 )
 
-const LOGTAG = "eventd"
+const LOGTAG = "events"
 
 type EventD struct {
 }

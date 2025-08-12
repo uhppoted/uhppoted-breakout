@@ -1,4 +1,4 @@
-package sqlite3
+package sqlite
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"eventd/entities"
+	"dbd/entities"
 )
 
 const sqlGetCard = `SELECT Card, CAST(StartDate AS VARCHAR), CAST(EndDate AS VARCHAR),Door1, Door2, Door3, Door4, PIN FROM Cards WHERE Controller=? AND Card=?;`
@@ -80,6 +80,8 @@ func (db impl) GetCard(controller uint32, card uint32) (entities.Card, error) {
 				} else {
 					endDate = v
 				}
+
+				println(">>> debug/woot")
 
 				return entities.Card{
 					Card:      record.card,

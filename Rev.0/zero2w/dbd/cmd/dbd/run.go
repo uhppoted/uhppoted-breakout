@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"eventd/db"
-	"eventd/rpc"
+	"dbd/db"
+	"dbd/rpc"
 )
 
 type run struct {
