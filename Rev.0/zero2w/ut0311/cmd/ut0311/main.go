@@ -11,7 +11,6 @@ import (
 
 	"ut0311/UT0311"
 	"ut0311/config"
-	"ut0311/db"
 	"ut0311/log"
 )
 
@@ -30,9 +29,6 @@ func main() {
 	flag.Parse()
 
 	if cfg, hash, err := config.Load(options.config); err != nil {
-		errorf("%v", err)
-		os.Exit(1)
-	} else if err := db.Init(cfg.DB.DSN); err != nil {
 		errorf("%v", err)
 		os.Exit(1)
 	} else if ut0311, err := UT0311.NewUT0311(&cfg); err != nil {

@@ -20,7 +20,6 @@ type Config struct {
 	Network  network `json:"network"`
 	Events   events  `json:"events"`
 	TLS      TLS     `json:"TLS"`
-	DB       db      `json:"db"`
 }
 
 type driver struct {
@@ -55,10 +54,6 @@ type events struct {
 	RPC      rpc            `json:"RPC"`
 	Listener netip.AddrPort `json:"listener"`
 	Interval uint8          `json:"interval"`
-}
-
-type db struct {
-	DSN string `json:"DSN"`
 }
 
 type caching map[string]time.Duration
