@@ -14,6 +14,17 @@ import (
 
 const sqlGetCard = `SELECT Card, CAST(StartDate AS VARCHAR), CAST(EndDate AS VARCHAR),Door1, Door2, Door3, Door4, PIN FROM Cards WHERE Controller=? AND Card=?;`
 
+const sqlPutCard = `INSERT INTO Cards (Controller, Card, StartDate, EndDate, Door1, Door2, Door3, Door4, PIN)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(Controller, Card) DO UPDATE SET
+        StartDate = excluded.StartDate,
+        EndDate   = excluded.EndDate,
+        Door1     = excluded.Door1,
+        Door2     = excluded.Door2,
+        Door3     = excluded.Door3,
+        Door4     = excluded.Door4,
+        PIN       = excluded.PIN;`
+
 func (db impl) GetCard(controller uint32, card uint32) (entities.Card, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
@@ -68,20 +79,18 @@ func (db impl) GetCard(controller uint32, card uint32) (entities.Card, error) {
 				return zero, err
 			} else {
 				startDate := time.Time{}
-				if v, err := time.ParseInLocation("2006-01-02", record.startDate, time.Local); err != nil {
+				if v, err := time.ParseInLocation(time.DateOnly, record.startDate[:10], time.Local); err != nil {
 					warnf("%v", err)
 				} else {
 					startDate = v
 				}
 
 				endDate := time.Time{}
-				if v, err := time.ParseInLocation("2006-01-02", record.endDate, time.Local); err != nil {
+				if v, err := time.ParseInLocation(time.DateOnly, record.endDate[:10], time.Local); err != nil {
 					warnf("%v", err)
 				} else {
 					endDate = v
 				}
-
-				println(">>> debug/woot")
 
 				return entities.Card{
 					Card:      record.card,
@@ -99,5 +108,25 @@ func (db impl) GetCard(controller uint32, card uint32) (entities.Card, error) {
 		}
 
 		return zero, entities.ErrRecordNotFound
+	}
+}
+
+func (db impl) PutCard(controller uint32, card entities.Card) (uint32, error) {
+	values := []any{
+		controller,
+		card.Card,
+		card.StartDate.Format(time.DateOnly),
+		card.EndDate.Format(time.DateOnly),
+		card.Permissions[1],
+		card.Permissions[2],
+		card.Permissions[3],
+		card.Permissions[4],
+		card.PIN,
+	}
+
+	if id, err := db.insert(sqlPutCard, values...); err != nil {
+		return 0, err
+	} else {
+		return uint32(id), nil
 	}
 }

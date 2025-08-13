@@ -79,7 +79,7 @@ func (db impl) GetEvent(index uint32) (entities.Event, error) {
 				return zero, err
 			} else {
 				timestamp := time.Time{}
-				if v, err := time.ParseInLocation("2006-01-02 15:04:05", record.timestamp[0:19], time.Local); err != nil {
+				if v, err := time.ParseInLocation(time.DateTime, record.timestamp[0:19], time.Local); err != nil {
 					warnf("%v", err)
 				} else {
 					timestamp = v
@@ -151,7 +151,7 @@ func (db impl) GetEvents() (uint32, uint32, error) {
 func (db impl) PutEvent(controller uint32, event entities.Event) (uint32, error) {
 	values := []any{
 		controller,
-		event.Timestamp.Format("2006-01-02 15:04:05"),
+		event.Timestamp.Format(time.DateTime),
 		event.Type,
 		event.Granted,
 		event.Door,

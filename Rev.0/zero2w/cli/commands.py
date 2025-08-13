@@ -240,13 +240,13 @@ def get_card_by_index(u, dest, timeout, args, protocol='udp'):
 def put_card(u, dest, timeout, args, protocol='udp'):
     controller = (CONTROLLER, dest, protocol)
     card = CARD
-    start = datetime.datetime.strptime("2024-01-01", '%Y-%m-%d').date()
-    end = datetime.datetime.strptime("2024-12-31", '%Y-%m-%d').date()
+    start = datetime.datetime.strptime("2025-01-01", '%Y-%m-%d').date()
+    end = datetime.datetime.strptime("2025-12-31", '%Y-%m-%d').date()
     door1 = 0  # no access
     door2 = 1  # 24/7 access
-    door3 = 29  # time_profile
-    door4 = 0  # no access
-    PIN = 7531
+    door3 = 29 # time_profile
+    door4 = 1  # 24/7 access
+    PIN = 0
 
     return u.put_card(controller, card, start, end, door1, door2, door3, door4, PIN, timeout=timeout)
 

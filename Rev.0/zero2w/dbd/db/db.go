@@ -11,6 +11,7 @@ import (
 
 type DB interface {
 	GetCard(controller uint32, card uint32) (entities.Card, error)
+	PutCard(controller uint32, card entities.Card) (uint32, error)
 
 	GetEvents() (uint32, uint32, error)
 	GetEvent(index uint32) (entities.Event, error)
@@ -39,6 +40,10 @@ func Init(dsn string) error {
 
 func GetCard(controller uint32, card uint32) (entities.Card, error) {
 	return db.GetCard(controller, card)
+}
+
+func PutCard(controller uint32, card entities.Card) (uint32, error) {
+	return db.PutCard(controller, card)
 }
 
 func GetEvents() (uint32, uint32, error) {

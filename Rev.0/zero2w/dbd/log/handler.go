@@ -14,7 +14,7 @@ func (h *handler) Enabled(ctx context.Context, level slog.Level) bool {
 }
 
 func (h *handler) Handle(ctx context.Context, record slog.Record) error {
-	timestamp := record.Time.Format("2006-01-02 15:04:05")
+	timestamp := record.Time.Format(time.DateTime)
 
 	fmt.Printf("%v %-5v  %v\n", timestamp, record.Level, record.Message)
 

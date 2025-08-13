@@ -1,6 +1,8 @@
 package cards
 
 import (
+	"time"
+
 	"dbd/db"
 	"dbd/entities"
 	"dbd/log"
@@ -21,6 +23,41 @@ func (d *CardD) GetCard(args struct {
 		return err
 	} else {
 		*record = v
+	}
+
+	return nil
+}
+
+func (d *CardD) PutCard(args struct {
+	Controller uint32
+	Card       uint32
+	StartDate  time.Time
+	EndDate    time.Time
+	Door1      uint8
+	Door2      uint8
+	Door3      uint8
+	Door4      uint8
+	PIN        uint32
+}, index *uint32) error {
+	debugf("put-card %v %v", args.Controller, args.Card)
+
+	card := entities.Card{
+		Card:      args.Card,
+		StartDate: args.StartDate,
+		EndDate:   args.EndDate,
+		Permissions: map[uint8]uint8{
+			1: args.Door1,
+			2: args.Door2,
+			3: args.Door3,
+			4: args.Door4,
+		},
+		PIN: args.PIN,
+	}
+
+	if ix, err := db.PutCard(args.Controller, card); err != nil {
+		return err
+	} else {
+		*index = ix
 	}
 
 	return nil

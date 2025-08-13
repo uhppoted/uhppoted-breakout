@@ -3,7 +3,8 @@
 - [ ] swipe events
    - (?) trap handlers
    - (?) use pipes
-   - [ ] put-card: store to db
+   - [x] put-card: store to db
+   - [ ] swipe: unlock door
 
 - [ ] _get-status_
    - [ ] use cached values

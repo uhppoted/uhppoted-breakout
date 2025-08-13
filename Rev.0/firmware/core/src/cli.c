@@ -454,7 +454,7 @@ void debug() {
 
     if (swipe != NULL) {
         swipe->door = 4;
-        snprintf(swipe->card, sizeof(swipe->card), "%-03u%-05u", 100, 85400);
+        snprintf(swipe->card, sizeof(swipe->card), "%-03u%-05u", 100, 58400);
 
         message msg = {
             .message = MSG_SWIPE,

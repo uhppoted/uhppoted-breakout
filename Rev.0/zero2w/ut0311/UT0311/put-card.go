@@ -1,9 +1,12 @@
 package UT0311
 
 import (
+	"time"
+
 	"github.com/uhppoted/uhppote-core/messages"
 	"github.com/uhppoted/uhppote-core/types"
 
+	"ut0311/entities"
 	"ut0311/scmp"
 )
 
@@ -13,14 +16,10 @@ func (ut0311 *UT0311) putCard(rq *messages.PutCardRequest) (any, error) {
 	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
 		return nil, nil
 	} else {
-		response := messages.PutCardResponse{
-			SerialNumber: types.SerialNumber(id),
-		}
-
-		card := scmp.Card{
+		card := entities.Card{
 			Card:      rq.CardNumber,
-			StartDate: rq.From,
-			EndDate:   rq.To,
+			StartDate: time.Time(rq.From),
+			EndDate:   time.Time(rq.To),
 			Permissions: map[uint8]uint8{
 				1: rq.Door1,
 				2: rq.Door2,
@@ -30,12 +29,14 @@ func (ut0311 *UT0311) putCard(rq *messages.PutCardRequest) (any, error) {
 			PIN: uint32(rq.PIN),
 		}
 
-		if _, err := scmp.SetIndexed[scmp.Card](ut0311.cards, scmp.OID_CARDS_CARD, rq.CardNumber, card); err != nil {
-			return nil, err
-		} else {
-			response.Succeeded = true
+		err := ut0311.cards.PutCard(id, card)
+		if err != nil {
+			warnf("put-card failed (%v)", err)
 		}
 
-		return response, nil
+		return messages.PutCardResponse{
+			SerialNumber: types.SerialNumber(id),
+			Succeeded:    err == nil,
+		}, nil
 	}
 }
