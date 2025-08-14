@@ -4,6 +4,13 @@
    - (?) trap handlers
    - (?) use pipes
    - [x] put-card: store to db
+   - [ ] db:
+         - [ ] get-cards
+         - [x] get-card
+         - [ ] get-card-by-index
+         - [x] put-card
+         - [ ] delete-card
+         - [ ] delete-all-cards
    - [ ] swipe: unlock door
 
 - [ ] _get-status_

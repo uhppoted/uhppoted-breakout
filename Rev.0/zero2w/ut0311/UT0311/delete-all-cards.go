@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/uhppoted/uhppote-core/messages"
-	"github.com/uhppoted/uhppote-core/types"
+	// "github.com/uhppoted/uhppote-core/types"
 
 	"ut0311/scmp"
 )
@@ -17,16 +17,18 @@ func (ut0311 *UT0311) deleteAllCards(rq *messages.DeleteCardsRequest) (any, erro
 	} else if rq.MagicWord != 0x55aaaa55 {
 		return nil, fmt.Errorf("not authorised")
 	} else {
-		response := messages.DeleteCardsResponse{
-			SerialNumber: types.SerialNumber(id),
-		}
+		// response := messages.DeleteCardsResponse{
+		// 	SerialNumber: types.SerialNumber(id),
+		// }
+		//
+		// if deleted, err := scmp.DeleteIndexed[scmp.Card](ut0311.cards, scmp.OID_CARDS_CARD, 0xffffffff); err != nil {
+		// 	return nil, err
+		// } else {
+		// 	response.Succeeded = deleted
+		// }
+		//
+		// return response, nil
 
-		if deleted, err := scmp.DeleteIndexed[scmp.Card](ut0311.cards, scmp.OID_CARDS_CARD, 0xffffffff); err != nil {
-			return nil, err
-		} else {
-			response.Succeeded = deleted
-		}
-
-		return response, nil
+		return nil, fmt.Errorf("-- NOT IMPLEMENTED --")
 	}
 }

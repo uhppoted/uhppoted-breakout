@@ -11,9 +11,9 @@ import (
 )
 
 func (ut0311 *UT0311) putCard(rq *messages.PutCardRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
+	if controller, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
-	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
+	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
 	} else {
 		card := entities.Card{
@@ -29,13 +29,13 @@ func (ut0311 *UT0311) putCard(rq *messages.PutCardRequest) (any, error) {
 			PIN: uint32(rq.PIN),
 		}
 
-		err := ut0311.cards.PutCard(id, card)
+		err := ut0311.cards.PutCard(controller, card)
 		if err != nil {
 			warnf("put-card failed (%v)", err)
 		}
 
 		return messages.PutCardResponse{
-			SerialNumber: types.SerialNumber(id),
+			SerialNumber: types.SerialNumber(controller),
 			Succeeded:    err == nil,
 		}, nil
 	}
