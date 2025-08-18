@@ -8,22 +8,16 @@ import (
 )
 
 func (ut0311 *UT0311) getCards(rq *messages.GetCardsRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
+	if controller, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
-	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
+	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
+	} else if N, err := ut0311.cards.GetCards(controller); err != nil {
+		return nil, err
 	} else {
-		response := messages.GetCardsResponse{
-			SerialNumber: types.SerialNumber(id),
-			Records:      0,
-		}
-
-		if N, err := scmp.Get[uint32](ut0311.cards, scmp.OID_CARDS_COUNT); err != nil {
-			return nil, err
-		} else {
-			response.Records = N
-		}
-
-		return response, nil
+		return messages.GetCardsResponse{
+			SerialNumber: types.SerialNumber(controller),
+			Records:      N,
+		}, nil
 	}
 }

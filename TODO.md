@@ -3,9 +3,8 @@
 - [ ] swipe events
    - (?) trap handlers
    - (?) use pipes
-   - [x] put-card: store to db
    - [ ] db:
-         - [ ] get-cards
+         - [x] get-cards
          - [x] get-card
          - [ ] get-card-by-index
          - [x] put-card
@@ -29,6 +28,9 @@
    - [ ] monitor
 
 ## breakout
+
+- [] U4 seems a bit erratic ??? 
+     - works ok if there's a printf in U4_write(..) ???
 
 ### misc
 
@@ -187,6 +189,7 @@
    - https://groupgets.com/products/pureconnect
 
 ## R&D
+- https://embeddedgo.github.io/2025/08/17/news.html
 - https://mazzo.li/posts/fast-pipes.html
 - Nerves
 - Embassy (Rust)

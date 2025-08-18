@@ -7,6 +7,20 @@ import (
 	"ut0311/entities"
 )
 
+func (c *Cards) GetCards(controller uint32) (uint32, error) {
+	debugf("get-cards")
+
+	var cards uint32
+
+	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
+		return 0, err
+	} else if err := client.Call("CardD.GetCards", controller, &cards); err != nil {
+		return 0, err
+	} else {
+		return cards, nil
+	}
+}
+
 func (c *Cards) GetCard(controller uint32, card uint32) (entities.Card, error) {
 	debugf("get-card %v", card)
 

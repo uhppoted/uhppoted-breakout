@@ -10,6 +10,7 @@ import (
 )
 
 type DB interface {
+	GetCards(controller uint32) (uint32, error)
 	GetCard(controller uint32, card uint32) (entities.Card, error)
 	PutCard(controller uint32, card entities.Card) (uint32, error)
 
@@ -36,6 +37,10 @@ func Init(dsn string) error {
 	default:
 		return fmt.Errorf("unsupported DSN (%v)", dsn)
 	}
+}
+
+func GetCards(controller uint32) (uint32, error) {
+	return db.GetCards(controller)
 }
 
 func GetCard(controller uint32, card uint32) (entities.Card, error) {

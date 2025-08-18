@@ -7,8 +7,6 @@ import (
 	"os"
 	"time"
 
-	_ "modernc.org/sqlite"
-
 	"dbd/entities"
 )
 

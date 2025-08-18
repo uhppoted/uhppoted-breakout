@@ -73,11 +73,7 @@ func (c Cards) GetIndexedUint16(oid scmp.OID, index uint32) (uint16, error) {
 }
 
 func (c Cards) GetUint32(oid scmp.OID) (uint32, error) {
-	if scmp.Is(oid, scmp.OID_CARDS_COUNT) {
-		return 29, nil
-	}
-
-	return 0, fmt.Errorf("unknown OID %v", oid)
+	return 0, fmt.Errorf("** NOT IMPLEMENTED")
 }
 
 func (c Cards) GetIndexedUint32(oid scmp.OID, index uint32) (uint32, error) {

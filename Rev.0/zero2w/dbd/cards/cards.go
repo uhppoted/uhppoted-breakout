@@ -13,6 +13,18 @@ const LOGTAG = "cards"
 type CardD struct {
 }
 
+func (d *CardD) GetCards(controller uint32, cards *uint32) error {
+	debugf("get-cards %v", controller)
+
+	if v, err := db.GetCards(controller); err != nil {
+		return err
+	} else {
+		*cards = v
+	}
+
+	return nil
+}
+
 func (d *CardD) GetCard(args struct {
 	Controller uint32
 	Card       uint32
