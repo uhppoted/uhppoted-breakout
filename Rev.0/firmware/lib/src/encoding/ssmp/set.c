@@ -39,6 +39,9 @@ packet *ssmp_decode_set(int64_t version, char *community, vector *pdu) {
 
                 if (rq->size > 1 && rq->fields[1]->tag == FIELD_NULL) {
                     value.tag = VALUE_NULL;
+                } else if (rq->size > 1 && rq->fields[1]->tag == FIELD_BOOLEAN) {
+                    value.tag = VALUE_BOOLEAN;
+                    value.boolean = rq->fields[1]->boolean.value;
                 } else if (rq->size > 1 && rq->fields[1]->tag == FIELD_INTEGER) {
                     value.tag = VALUE_UINT32;
                     value.integer = rq->fields[1]->integer.value;

@@ -264,7 +264,7 @@ int64_t MIB_get_door_unlocked(const char *OID, value *v) {
 
     if (doors_get_unlocked(door, &unlocked)) {
         v->tag = VALUE_BOOLEAN;
-        v->boolean = unlocked;
+        v->boolean = !unlocked;
         return SSMP_ERROR_NONE;
     }
 

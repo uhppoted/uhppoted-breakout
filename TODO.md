@@ -10,10 +10,17 @@
          - [x] put-card
          - [ ] delete-card
          - [ ] delete-all-cards
-   - [ ] swipe: unlock door
+   - [ ] swipe
+      - [x] unlock door
+      - [ ] ReasonCardDeniedDoorNormallyClosed
+      - [ ] ReasonCardDeniedDoorInterLock
+      - [ ] ReasonCardDeniedAntiPassback
+
+   - [ ] swipe + PIN
+   - [ ] passcode
 
 - [ ] _get-status_
-   - [ ] use cached values
+   - [ ] use cached values for door locks
    - [ ] poll
 
 ## RPCD

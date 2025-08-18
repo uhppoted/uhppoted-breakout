@@ -217,3 +217,37 @@ int64_t MIB_set_door_delay(const char *OID, const value u, value *v) {
 
     return SSMP_ERROR_NO_ACCESS;
 }
+
+int64_t MIB_set_door_unlock(const char *OID, const value u, value *v) {
+    if (u.tag != VALUE_BOOLEAN) {
+        return SSMP_ERROR_WRONG_TYPE;
+    }
+
+    bool unlock = (bool)u.boolean;
+    uint8_t door;
+    bool unlocked;
+
+    if (equal(OID, MIB_DOORS_1_UNLOCKED)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOORS_2_UNLOCKED)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOORS_3_UNLOCKED)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOORS_4_UNLOCKED)) {
+        door = 4;
+    }
+
+    if (unlock && !doors_unlock(door)) {
+        return SSMP_ERROR_COMMIT_FAILED;
+    } else if (!unlock && !doors_lock(door)) {
+        return SSMP_ERROR_COMMIT_FAILED;
+    }
+
+    if (doors_get_unlocked(door, &unlocked)) {
+        v->tag = VALUE_BOOLEAN;
+        v->boolean = !unlocked;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}

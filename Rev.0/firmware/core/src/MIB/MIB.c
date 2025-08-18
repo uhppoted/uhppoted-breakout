@@ -22,6 +22,7 @@ extern int64_t MIB_set_controller_datetime(const char *, const value, value *);
 extern int64_t MIB_set_controller_syserror(const char *, const value, value *);
 extern int64_t MIB_set_door_mode(const char *, const value, value *);
 extern int64_t MIB_set_door_delay(const char *, const value, value *);
+extern int64_t MIB_set_door_unlock(const char *, const value, value *);
 
 const MIBItem MIB_SYS_BOARD_ID = {
     .hash = 2957893646,
@@ -204,24 +205,28 @@ const MIBItem MIB_DOORS_1_UNLOCKED = {
     .hash = 4218049202,
     .OID = "0.1.3.6.1.4.1.65536.3.1.4",
     .get = MIB_get_door_unlocked,
+    .set = MIB_set_door_unlock,
 };
 
 const MIBItem MIB_DOORS_2_UNLOCKED = {
     .hash = 4218050291,
     .OID = "0.1.3.6.1.4.1.65536.3.2.4",
     .get = MIB_get_door_unlocked,
+    .set = MIB_set_door_unlock,
 };
 
 const MIBItem MIB_DOORS_3_UNLOCKED = {
     .hash = 4218051380,
     .OID = "0.1.3.6.1.4.1.65536.3.3.4",
     .get = MIB_get_door_unlocked,
+    .set = MIB_set_door_unlock,
 };
 
 const MIBItem MIB_DOORS_4_UNLOCKED = {
     .hash = 4218052469,
     .OID = "0.1.3.6.1.4.1.65536.3.4.4",
     .get = MIB_get_door_unlocked,
+    .set = MIB_set_door_unlock,
 };
 
 const MIBItem MIB_DOORS_1_OPEN = {

@@ -14,19 +14,12 @@ func (ut0311 *UT0311) openDoor(rq *messages.OpenDoorRequest) (any, error) {
 		return nil, nil
 	} else if door := rq.Door; door < 1 || door > 4 {
 		return nil, nil
+	} else if ok, err := ut0311.breakout.UnlockDoor(door); err != nil {
+		return nil, err
 	} else {
-		response := messages.OpenDoorResponse{
+		return messages.OpenDoorResponse{
 			SerialNumber: types.SerialNumber(id),
-		}
-
-		if oid, ok := lookup.lock[door]; !ok {
-			return nil, nil
-		} else if locked, err := scmp.Set[bool](ut0311.breakout, oid, false); err != nil {
-			return nil, err
-		} else {
-			response.Succeeded = locked == false
-		}
-
-		return response, nil
+			Succeeded:    ok,
+		}, nil
 	}
 }

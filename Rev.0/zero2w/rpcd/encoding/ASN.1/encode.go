@@ -222,6 +222,13 @@ func EncodeSetRequest(rq SetRequest) ([]byte, error) {
 
 	// ... value
 	switch val := rq.Value.(type) {
+	case bool:
+		if v, err := pack_bool(val); err != nil {
+			return nil, err
+		} else {
+			varbind = append(varbind, v)
+		}
+
 	case uint8:
 		if v, err := pack_integer(int64(val)); err != nil {
 			return nil, err
@@ -277,6 +284,31 @@ func EncodeSetRequest(rq SetRequest) ([]byte, error) {
 	}
 
 	return pack_sequence(packet...)
+}
+
+func pack_bool(bval bool) ([]byte, error) {
+	var b bytes.Buffer
+	var u8 uint8 = 0
+
+	if bval {
+		u8 = 1
+	}
+
+	if err := b.WriteByte(tagBoolean); err != nil {
+		return nil, err
+	}
+
+	if l, err := pack_varuint(uint32(1)); err != nil {
+		return nil, err
+	} else if _, err := b.Write(l); err != nil {
+		return nil, err
+	}
+
+	if err := b.WriteByte(u8); err != nil {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
 }
 
 func pack_integer(ival int64) ([]byte, error) {

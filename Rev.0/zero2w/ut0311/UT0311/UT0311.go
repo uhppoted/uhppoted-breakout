@@ -359,7 +359,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 	match := re.FindStringSubmatch(tag)
 	if len(match) > 1 {
 		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			if e := actions.Swipe(timestamp, controller, value, uint8(door), ut0311.cards); e != nil {
+			if e := actions.Swipe(timestamp, controller, value, uint8(door), ut0311.cards, ut0311.breakout); e != nil {
 				ut0311.event(controller, e)
 			}
 

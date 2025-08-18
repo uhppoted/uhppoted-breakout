@@ -6,6 +6,7 @@
 #include <log.h>
 
 // clang-format off
+field *unpack_boolean    (const uint8_t *, int, int *);
 field *unpack_integer    (const uint8_t *, int, int *);
 field *unpack_octets     (const uint8_t *, int, int *);
 field *unpack_null       (const uint8_t *, int, int *);
@@ -36,6 +37,12 @@ vector *unpack(const uint8_t *bytes, int N) {
             uint8_t tag = bytes[ix++];
 
             switch (tag) {
+            case FIELD_BOOLEAN:
+                if ((f = unpack_boolean(bytes, N, &ix)) != NULL) {
+                    v = vector_add(v, f);
+                }
+                break;
+
             case FIELD_INTEGER:
                 if ((f = unpack_integer(bytes, N, &ix)) != NULL) {
                     v = vector_add(v, f);
@@ -86,6 +93,38 @@ vector *unpack(const uint8_t *bytes, int N) {
     }
 
     return v;
+}
+
+field *unpack_boolean(const uint8_t *message, int N, int *ix) {
+    uint32_t length = unpack_length(message, N, ix);
+    field *f = (field *)calloc(1, sizeof(field));
+
+    if (f != NULL) {
+        int64_t value = 0;
+
+        if (length <= 8) {
+            for (int i = 0; i < length; i++) {
+                uint8_t u8 = message[*ix + i];
+                value = ((u8 & 0x80) == 0x80) ? -1 : 0;
+                value <<= 8;
+                value |= message[*ix + i] & 0x00ff;
+                break;
+            }
+
+            for (int i = 1; i < length; i++) {
+                value <<= 8;
+                value |= message[*ix + i] & 0x00ff;
+            }
+        }
+
+        f->dynamic = true;
+        f->tag = FIELD_BOOLEAN;
+        f->boolean.value = value == 1 ? true : false;
+    }
+
+    *ix += length;
+
+    return f;
 }
 
 field *unpack_integer(const uint8_t *message, int N, int *ix) {

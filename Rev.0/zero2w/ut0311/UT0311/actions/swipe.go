@@ -6,17 +6,18 @@ import (
 
 	"ut0311/cards"
 	"ut0311/entities"
+	"ut0311/rpcd"
 )
 
-func Swipe(timestamp time.Time, controller uint32, card any, door uint8, db *cards.Cards) *entities.Event {
+func Swipe(timestamp time.Time, controller uint32, card any, door uint8, db *cards.Cards, breakout *rpcd.RPC) *entities.Event {
 	switch v := card.(type) {
 	case string:
 		if c, err := strconv.ParseUint(v, 10, 32); err == nil {
-			return swipe(timestamp, controller, uint32(c), door, db)
+			return swipe(timestamp, controller, uint32(c), door, db, breakout)
 		}
 
 	case uint32:
-		return swipe(timestamp, controller, v, door, db)
+		return swipe(timestamp, controller, v, door, db, breakout)
 	}
 
 	warnf("CARD", "invalid card swipe  controller:%v, card:%v, door:%v,", controller, card, door)
@@ -24,7 +25,7 @@ func Swipe(timestamp time.Time, controller uint32, card any, door uint8, db *car
 	return nil
 }
 
-func swipe(timestamp time.Time, controller uint32, card uint32, door uint8, db *cards.Cards) *entities.Event {
+func swipe(timestamp time.Time, controller uint32, card uint32, door uint8, db *cards.Cards, breakout *rpcd.RPC) *entities.Event {
 	infof("CARD", "swipe  controller:%v, card:%v, door:%v,", controller, card, door)
 
 	validate := func(record entities.Card) entities.EventReason {
@@ -71,6 +72,21 @@ func swipe(timestamp time.Time, controller uint32, card uint32, door uint8, db *
 			Card:      card,
 			Timestamp: timestamp,
 			Reason:    reason,
+		}
+	} else if ok, err := breakout.UnlockDoor(door); err != nil {
+		warnf("CARD", "error unlocking door controller:%v card:%v door:%v (%v)", controller, card, door, err)
+	} else if !ok {
+		warnf("CARD", "failed to unlock door controller:%v card:%v door:%v (%v)", controller, card, door, ok)
+
+		return &entities.Event{
+			Index:     0,
+			Type:      entities.EventCard,
+			Granted:   false,
+			Door:      door,
+			Direction: 1,
+			Card:      card,
+			Timestamp: timestamp,
+			Reason:    entities.ReasonUnknown,
 		}
 	} else {
 		infof("CARD", "access granted  controller:%v card:%v door:%v", controller, card, door)

@@ -163,6 +163,15 @@ bool doors_get_pushbutton(uint8_t door, bool *pressed) {
     return false;
 }
 
+bool doors_lock(uint8_t door) {
+    if (door < 1 || door > 4) {
+        return false;
+    }
+
+    U4_clear_relay(door);
+    return true;
+}
+
 bool doors_unlock(uint8_t door) {
     if (door < 1 || door > 4) {
         return false;
