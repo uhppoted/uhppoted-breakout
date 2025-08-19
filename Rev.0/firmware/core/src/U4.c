@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
@@ -98,6 +100,7 @@ typedef struct LED {
 } LED;
 
 struct {
+    uint16_t state;
     uint16_t outputs;
     uint16_t polarity;
     int32_t tock;
@@ -116,6 +119,7 @@ struct {
     repeating_timer_t timer;
     mutex_t guard;
 } U4x = {
+    .state = 0x0000,
     .outputs = 0x0000,
     .polarity = 0x0700, // SYS, IN and ERR LEDs are inverted
     .tock = U4_TOCK,
@@ -294,6 +298,8 @@ void U4_write(void *data) {
     operation *op = (operation *)data;
 
     uint16_t outputs = op->write.outputs;
+    uint16_t state = U4x.state;
+    uint16_t relays = 0x0055;
     int err;
 
     if ((err = PCAL6416A_write(U4, outputs & MASK)) != ERR_OK) {
@@ -305,6 +311,44 @@ void U4_write(void *data) {
     }
 
     operation_free(op);
+
+    // ... door lock events
+    static const struct {
+        uint16_t mask;
+        EVENT unlocked;
+        EVENT locked;
+    } events[] = {
+        {0x0001, EVENT_DOOR_1_UNLOCKED, EVENT_DOOR_1_LOCKED},
+        {0x0004, EVENT_DOOR_2_UNLOCKED, EVENT_DOOR_2_LOCKED},
+        {0x0010, EVENT_DOOR_3_UNLOCKED, EVENT_DOOR_3_LOCKED},
+        {0x0040, EVENT_DOOR_4_UNLOCKED, EVENT_DOOR_4_LOCKED},
+    };
+
+    if ((outputs & relays) != state) {
+        U4x.state = outputs & relays;
+
+        int N = sizeof(events) / sizeof(events[0]);
+
+        for (int i = 0; i < N; i++) {
+            uint8_t mask = events[i].mask;
+
+            if (((outputs & mask) == 0x00) && ((state & mask) == mask)) {
+                push((message){
+                    .message = MSG_EVENT,
+                    .tag = MESSAGE_EVENT,
+                    .event = events[i].locked,
+                });
+            }
+
+            if (((outputs & mask) == mask) && ((state & mask) == 0x00)) {
+                push((message){
+                    .message = MSG_EVENT,
+                    .tag = MESSAGE_EVENT,
+                    .event = events[i].unlocked,
+                });
+            }
+        }
+    }
 }
 
 /*

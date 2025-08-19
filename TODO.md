@@ -12,6 +12,7 @@
          - [ ] delete-all-cards
    - [ ] swipe
       - [x] unlock door
+      - [ ] door lock events
       - [ ] ReasonCardDeniedDoorNormallyClosed
       - [ ] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback
