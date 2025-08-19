@@ -75,6 +75,21 @@ func (d *CardD) PutCard(args struct {
 	return nil
 }
 
+func (d *CardD) DeleteCard(args struct {
+	Controller uint32
+	Card       uint32
+}, ok *bool) error {
+	debugf("delete-card %v %v", args.Controller, args.Card)
+
+	if v, err := db.DeleteCard(args.Controller, args.Card); err != nil {
+		return err
+	} else {
+		*ok = v
+	}
+
+	return nil
+}
+
 func debugf(format string, args ...any) {
 	log.Debugf(LOGTAG, format, args...)
 }

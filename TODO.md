@@ -8,7 +8,7 @@
          - [x] get-card
          - [ ] get-card-by-index
          - [x] put-card
-         - [ ] delete-card
+         - [x] delete-card
          - [ ] delete-all-cards
    - [ ] swipe
       - [x] unlock door

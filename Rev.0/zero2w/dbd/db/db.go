@@ -13,6 +13,7 @@ type DB interface {
 	GetCards(controller uint32) (uint32, error)
 	GetCard(controller uint32, card uint32) (entities.Card, error)
 	PutCard(controller uint32, card entities.Card) (uint32, error)
+	DeleteCard(controller uint32, card uint32) (bool, error)
 
 	GetEvents() (uint32, uint32, error)
 	GetEvent(index uint32) (entities.Event, error)
@@ -49,6 +50,10 @@ func GetCard(controller uint32, card uint32) (entities.Card, error) {
 
 func PutCard(controller uint32, card entities.Card) (uint32, error) {
 	return db.PutCard(controller, card)
+}
+
+func DeleteCard(controller uint32, card uint32) (bool, error) {
+	return db.DeleteCard(controller, card)
 }
 
 func GetEvents() (uint32, uint32, error) {

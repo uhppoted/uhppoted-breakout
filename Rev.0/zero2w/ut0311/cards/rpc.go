@@ -78,3 +78,25 @@ func (c *Cards) PutCard(controller uint32, card entities.Card) error {
 		return nil
 	}
 }
+
+func (c *Cards) DeleteCard(controller uint32, card uint32) (bool, error) {
+	debugf("delete-card %v", card)
+
+	var args = struct {
+		Controller uint32
+		Card       uint32
+	}{
+		Controller: controller,
+		Card:       card,
+	}
+
+	var ok bool
+
+	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
+		return false, err
+	} else if err := client.Call("CardD.DeleteCard", args, &ok); err != nil {
+		return false, err
+	} else {
+		return ok, nil
+	}
+}
