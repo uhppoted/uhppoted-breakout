@@ -32,6 +32,11 @@ func newState() *state {
 			"controller.door.2.button": false,
 			"controller.door.3.button": false,
 			"controller.door.4.button": false,
+
+			"controller.door.1.unlocked": false,
+			"controller.door.2.unlocked": false,
+			"controller.door.3.unlocked": false,
+			"controller.door.4.unlocked": false,
 		},
 
 		done: make(chan bool),

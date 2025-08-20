@@ -12,7 +12,7 @@
          - [x] delete-all-cards
    - [ ] swipe
       - [x] unlock door
-      - [ ] door lock events
+      - [x] door unlock events
       - [ ] ReasonCardDeniedDoorNormallyClosed
       - [ ] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback
@@ -38,7 +38,7 @@
 ## breakout
 
 - [] U4 seems a bit erratic ??? 
-     - works ok if there's a printf in U4_write(..) ???
+     - (sometimes) works ok if there's a printf in U4_write(..) ???
 
 ### misc
 

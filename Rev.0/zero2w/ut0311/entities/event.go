@@ -60,4 +60,8 @@ const (
 	ReasonAlarmEmergencyCall                         = 43
 	ReasonRemoteOpenDoor                             = 44
 	ReasonRemoteOpenDoorUSBReader                    = 45
+
+	// ... custom events
+	ReasonDoorUnlocked = 201
+	ReasonDoorLocked   = 202
 )

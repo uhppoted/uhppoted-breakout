@@ -31,6 +31,16 @@ var events = map[struct {
 	{"controller.door.3.button", true}: EventDoor,
 	{"controller.door.4.button", true}: EventDoor,
 
+	{"controller.door.1.unlocked", false}: EventDoor,
+	{"controller.door.2.unlocked", false}: EventDoor,
+	{"controller.door.3.unlocked", false}: EventDoor,
+	{"controller.door.4.unlocked", false}: EventDoor,
+
+	{"controller.door.1.unlocked", true}: EventDoor,
+	{"controller.door.2.unlocked", true}: EventDoor,
+	{"controller.door.3.unlocked", true}: EventDoor,
+	{"controller.door.4.unlocked", true}: EventDoor,
+
 	{"controller.door.1.swipe", nil}: EventCard,
 	{"controller.door.2.swipe", nil}: EventCard,
 	{"controller.door.3.swipe", nil}: EventCard,
@@ -47,6 +57,11 @@ var doors = map[string]uint8{
 	"controller.door.2.button": 2,
 	"controller.door.3.button": 3,
 	"controller.door.4.button": 4,
+
+	"controller.door.1.unlocked": 1,
+	"controller.door.2.unlocked": 2,
+	"controller.door.3.unlocked": 3,
+	"controller.door.4.unlocked": 4,
 
 	"controller.door.1.swipe": 1,
 	"controller.door.2.swipe": 2,
@@ -80,6 +95,16 @@ var reasons = map[struct {
 	{"controller.door.2.button", true}: ReasonDoorPushButton,
 	{"controller.door.3.button", true}: ReasonDoorPushButton,
 	{"controller.door.4.button", true}: ReasonDoorPushButton,
+
+	{"controller.door.1.unlocked", true}: ReasonDoorUnlocked,
+	{"controller.door.2.unlocked", true}: ReasonDoorUnlocked,
+	{"controller.door.3.unlocked", true}: ReasonDoorUnlocked,
+	{"controller.door.4.unlocked", true}: ReasonDoorUnlocked,
+
+	{"controller.door.1.unlocked", false}: ReasonDoorLocked,
+	{"controller.door.2.unlocked", false}: ReasonDoorLocked,
+	{"controller.door.3.unlocked", false}: ReasonDoorLocked,
+	{"controller.door.4.unlocked", false}: ReasonDoorLocked,
 
 	{"controller.door.1.swipe", nil}: ReasonCardOk,
 	{"controller.door.2.swipe", nil}: ReasonCardOk,
