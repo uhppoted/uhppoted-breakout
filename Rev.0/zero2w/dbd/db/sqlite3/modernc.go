@@ -1,4 +1,4 @@
-package sqlite
+package sqlite3
 
 import (
 	"context"
@@ -9,36 +9,16 @@ import (
 	"time"
 
 	_ "modernc.org/sqlite"
-
-	"dbd/log"
 )
 
-const MaxLifetime = 5 * time.Minute
-const MaxIdle = 2
-const MaxOpen = 5
-const LogTag = "sqlite3"
-
-const tableCards = "Cards"
-const tableEvents = "Events"
-const tableController = "Controller"
-
-type impl struct {
+type modernc struct {
 	dsn         string
 	maxLifetime time.Duration
 	maxOpen     int
 	maxIdle     int
 }
 
-func NewDB(dsn string) impl {
-	return impl{
-		dsn:         dsn,
-		maxLifetime: MaxLifetime,
-		maxIdle:     MaxIdle,
-		maxOpen:     MaxOpen,
-	}
-}
-
-func (db impl) open() (*sql.DB, error) {
+func (db modernc) open() (*sql.DB, error) {
 	dsn := fmt.Sprintf("%v?_journal_mode=WAL", db.dsn)
 
 	if dbc, err := sql.Open("sqlite", dsn); err != nil {
@@ -52,7 +32,7 @@ func (db impl) open() (*sql.DB, error) {
 	}
 }
 
-func (db impl) insert(sql string, values ...any) (int64, error) {
+func (db modernc) insert(sql string, values ...any) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
 	defer cancel()
@@ -84,7 +64,7 @@ func (db impl) insert(sql string, values ...any) (int64, error) {
 	}
 }
 
-func (db impl) update(sql string, values ...any) error {
+func (db modernc) update(sql string, values ...any) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
 	defer cancel()
@@ -112,20 +92,4 @@ func (db impl) update(sql string, values ...any) error {
 			return nil
 		}
 	}
-}
-
-func debugf(format string, args ...any) {
-	log.Debugf(LogTag, format, args...)
-}
-
-func infof(format string, args ...any) {
-	log.Infof(LogTag, format, args...)
-}
-
-func warnf(format string, args ...any) {
-	log.Warnf(LogTag, format, args...)
-}
-
-func errorf(format string, args ...any) {
-	log.Errorf(LogTag, format, args...)
 }

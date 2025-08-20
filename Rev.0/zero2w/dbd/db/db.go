@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"dbd/db/sqlite"
 	"dbd/db/sqlite3"
 	"dbd/entities"
 )
@@ -14,6 +13,7 @@ type DB interface {
 	GetCard(controller uint32, card uint32) (entities.Card, error)
 	PutCard(controller uint32, card entities.Card) (uint32, error)
 	DeleteCard(controller uint32, card uint32) (bool, error)
+	DeleteAllCards(controller uint32) (bool, error)
 
 	GetEvents() (uint32, uint32, error)
 	GetEvent(index uint32) (entities.Event, error)
@@ -28,11 +28,11 @@ var db DB
 func Init(dsn string) error {
 	switch {
 	case strings.HasPrefix(dsn, "sqlite3://"):
-		db = sqlite3.NewDB(dsn[10:])
+		db = sqlite3.Mattn(dsn[10:])
 		return nil
 
 	case strings.HasPrefix(dsn, "sqlite://"):
-		db = sqlite.NewDB(dsn[9:])
+		db = sqlite3.ModernC(dsn[9:])
 		return nil
 
 	default:
@@ -54,6 +54,10 @@ func PutCard(controller uint32, card entities.Card) (uint32, error) {
 
 func DeleteCard(controller uint32, card uint32) (bool, error) {
 	return db.DeleteCard(controller, card)
+}
+
+func DeleteAllCards(controller uint32) (bool, error) {
+	return db.DeleteAllCards(controller)
 }
 
 func GetEvents() (uint32, uint32, error) {

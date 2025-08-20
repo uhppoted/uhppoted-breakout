@@ -13,9 +13,7 @@ func (ut0311 *UT0311) deleteCard(rq *messages.DeleteCardRequest) (any, error) {
 	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
 	} else if ok, err := ut0311.cards.DeleteCard(controller, rq.CardNumber); err != nil {
-		warnf("delete-card controller:%v card:%v (%v)", controller, rq.CardNumber, err)
-
-		return nil, nil
+		return nil, err
 	} else {
 		return messages.DeleteCardResponse{
 			SerialNumber: types.SerialNumber(controller),

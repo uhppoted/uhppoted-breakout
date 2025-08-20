@@ -9,7 +9,7 @@
          - [ ] get-card-by-index
          - [x] put-card
          - [x] delete-card
-         - [ ] delete-all-cards
+         - [x] delete-all-cards
    - [ ] swipe
       - [x] unlock door
       - [ ] door lock events

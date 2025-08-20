@@ -26,6 +26,7 @@ const sqlPutCard = `INSERT INTO Cards (Controller, Card, StartDate, EndDate, Doo
         PIN       = excluded.PIN;`
 
 const sqlDeleteCard = `DELETE FROM Cards WHERE Controller=? AND Card=?;`
+const sqlDeleteAllCards = `DELETE FROM Cards WHERE Controller=?;`
 
 func (db impl) GetCards(controller uint32) (uint32, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
@@ -208,5 +209,36 @@ func (db impl) DeleteCard(controller uint32, card uint32) (bool, error) {
 		return zero, fmt.Errorf("invalid resultset (%v)", rs)
 	} else {
 		return rows > 0, nil
+	}
+}
+
+func (db impl) DeleteAllCards(controller uint32) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	defer cancel()
+
+	zero := false
+	query := sqlDeleteAllCards
+
+	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+		return zero, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+	} else if err != nil {
+		return zero, err
+	}
+
+	if dbc, err := db.open(); err != nil {
+		return zero, err
+	} else if dbc == nil {
+		return zero, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+	} else if prepared, err := dbc.Prepare(query); err != nil {
+		return zero, err
+	} else if rs, err := prepared.ExecContext(ctx, controller); err != nil {
+		return zero, err
+	} else if rs == nil {
+		return zero, fmt.Errorf("invalid resultset (%v)", rs)
+	} else if _, err := rs.RowsAffected(); err != nil {
+		return zero, fmt.Errorf("invalid resultset (%v)", rs)
+	} else {
+		return true, nil
 	}
 }

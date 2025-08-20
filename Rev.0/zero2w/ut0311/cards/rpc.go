@@ -8,7 +8,7 @@ import (
 )
 
 func (c *Cards) GetCards(controller uint32) (uint32, error) {
-	debugf("get-cards")
+	debugf("get-cards %v", controller)
 
 	var cards uint32
 
@@ -22,7 +22,7 @@ func (c *Cards) GetCards(controller uint32) (uint32, error) {
 }
 
 func (c *Cards) GetCard(controller uint32, card uint32) (entities.Card, error) {
-	debugf("get-card %v", card)
+	debugf("get-card %v %v", controller, card)
 
 	var args = struct {
 		Controller uint32
@@ -44,7 +44,7 @@ func (c *Cards) GetCard(controller uint32, card uint32) (entities.Card, error) {
 }
 
 func (c *Cards) PutCard(controller uint32, card entities.Card) error {
-	debugf("put-card %v", card)
+	debugf("put-card %v %v", controller, card)
 
 	var args = struct {
 		Controller uint32
@@ -80,7 +80,7 @@ func (c *Cards) PutCard(controller uint32, card entities.Card) error {
 }
 
 func (c *Cards) DeleteCard(controller uint32, card uint32) (bool, error) {
-	debugf("delete-card %v", card)
+	debugf("delete-card %v %v", controller, card)
 
 	var args = struct {
 		Controller uint32
@@ -95,6 +95,20 @@ func (c *Cards) DeleteCard(controller uint32, card uint32) (bool, error) {
 	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
 		return false, err
 	} else if err := client.Call("CardD.DeleteCard", args, &ok); err != nil {
+		return false, err
+	} else {
+		return ok, nil
+	}
+}
+
+func (c *Cards) DeleteAllCards(controller uint32) (bool, error) {
+	debugf("delete-all-cards %v", controller)
+
+	var ok bool
+
+	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
+		return false, err
+	} else if err := client.Call("CardD.DeleteAllCards", controller, &ok); err != nil {
 		return false, err
 	} else {
 		return ok, nil

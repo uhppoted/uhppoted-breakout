@@ -90,6 +90,18 @@ func (d *CardD) DeleteCard(args struct {
 	return nil
 }
 
+func (d *CardD) DeleteAllCards(controller uint32, ok *bool) error {
+	debugf("delete-all-cards %v", controller)
+
+	if v, err := db.DeleteAllCards(controller); err != nil {
+		return err
+	} else {
+		*ok = v
+	}
+
+	return nil
+}
+
 func debugf(format string, args ...any) {
 	log.Debugf(LOGTAG, format, args...)
 }
