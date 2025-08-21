@@ -7,6 +7,24 @@ import (
 	"ut0311/entities"
 )
 
+const service = "cards"
+
+var api = struct {
+	getCards       string
+	getCard        string
+	getCardByIndex string
+	putCard        string
+	deleteCard     string
+	deleteAllCards string
+}{
+	getCards:       service + ".GetCards",
+	getCard:        service + ".GetCard",
+	getCardByIndex: service + ".GetCardByIndex",
+	putCard:        service + ".PutCard",
+	deleteCard:     service + ".DeleteCard",
+	deleteAllCards: service + ".DeleteAllCards",
+}
+
 func (c *Cards) GetCards(controller uint32) (uint32, error) {
 	debugf("get-cards %v", controller)
 
@@ -14,7 +32,7 @@ func (c *Cards) GetCards(controller uint32) (uint32, error) {
 
 	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
 		return 0, err
-	} else if err := client.Call("CardD.GetCards", controller, &cards); err != nil {
+	} else if err := client.Call(api.getCards, controller, &cards); err != nil {
 		return 0, err
 	} else {
 		return cards, nil
@@ -36,7 +54,29 @@ func (c *Cards) GetCard(controller uint32, card uint32) (entities.Card, error) {
 
 	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
 		return entities.Card{}, err
-	} else if err := client.Call("CardD.GetCard", args, &record); err != nil {
+	} else if err := client.Call(api.getCard, args, &record); err != nil {
+		return entities.Card{}, err
+	} else {
+		return record, nil
+	}
+}
+
+func (c *Cards) GetCardByIndex(controller uint32, index uint32) (entities.Card, error) {
+	debugf("get-card-by-index %v %v", controller, index)
+
+	var args = struct {
+		Controller uint32
+		Index      uint32
+	}{
+		Controller: controller,
+		Index:      index,
+	}
+
+	var record entities.Card
+
+	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
+		return entities.Card{}, err
+	} else if err := client.Call(api.getCardByIndex, args, &record); err != nil {
 		return entities.Card{}, err
 	} else {
 		return record, nil
@@ -72,7 +112,7 @@ func (c *Cards) PutCard(controller uint32, card entities.Card) error {
 
 	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
 		return err
-	} else if err := client.Call("CardD.PutCard", args, &index); err != nil {
+	} else if err := client.Call(api.putCard, args, &index); err != nil {
 		return err
 	} else {
 		return nil
@@ -94,7 +134,7 @@ func (c *Cards) DeleteCard(controller uint32, card uint32) (bool, error) {
 
 	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
 		return false, err
-	} else if err := client.Call("CardD.DeleteCard", args, &ok); err != nil {
+	} else if err := client.Call(api.deleteCard, args, &ok); err != nil {
 		return false, err
 	} else {
 		return ok, nil
@@ -108,7 +148,7 @@ func (c *Cards) DeleteAllCards(controller uint32) (bool, error) {
 
 	if client, err := rpc.DialHTTP(c.dial.network, c.dial.address); err != nil {
 		return false, err
-	} else if err := client.Call("CardD.DeleteAllCards", controller, &ok); err != nil {
+	} else if err := client.Call(api.deleteAllCards, controller, &ok); err != nil {
 		return false, err
 	} else {
 		return ok, nil

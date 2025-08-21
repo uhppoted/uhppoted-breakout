@@ -10,10 +10,10 @@ import (
 
 const LOGTAG = "cards"
 
-type CardD struct {
+type Cards struct {
 }
 
-func (d *CardD) GetCards(controller uint32, cards *uint32) error {
+func (d *Cards) GetCards(controller uint32, cards *uint32) error {
 	debugf("get-cards %v", controller)
 
 	if v, err := db.GetCards(controller); err != nil {
@@ -25,7 +25,7 @@ func (d *CardD) GetCards(controller uint32, cards *uint32) error {
 	return nil
 }
 
-func (d *CardD) GetCard(args struct {
+func (d *Cards) GetCard(args struct {
 	Controller uint32
 	Card       uint32
 }, record *entities.Card) error {
@@ -40,7 +40,22 @@ func (d *CardD) GetCard(args struct {
 	return nil
 }
 
-func (d *CardD) PutCard(args struct {
+func (d *Cards) GetCardByIndex(args struct {
+	Controller uint32
+	Index      uint32
+}, record *entities.Card) error {
+	debugf("get-card-by-index %v %v", args.Controller, args.Index)
+
+	if v, err := db.GetCardByIndex(args.Controller, args.Index); err != nil {
+		return err
+	} else {
+		*record = v
+	}
+
+	return nil
+}
+
+func (d *Cards) PutCard(args struct {
 	Controller uint32
 	Card       uint32
 	StartDate  time.Time
@@ -75,7 +90,7 @@ func (d *CardD) PutCard(args struct {
 	return nil
 }
 
-func (d *CardD) DeleteCard(args struct {
+func (d *Cards) DeleteCard(args struct {
 	Controller uint32
 	Card       uint32
 }, ok *bool) error {
@@ -90,7 +105,7 @@ func (d *CardD) DeleteCard(args struct {
 	return nil
 }
 
-func (d *CardD) DeleteAllCards(controller uint32, ok *bool) error {
+func (d *Cards) DeleteAllCards(controller uint32, ok *bool) error {
 	debugf("delete-all-cards %v", controller)
 
 	if v, err := db.DeleteAllCards(controller); err != nil {

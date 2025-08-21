@@ -1,21 +1,25 @@
 # TODO
 
-- [ ] swipe events
-   - (?) trap handlers
-   - (?) use pipes
+- [ ] card swipe
    - [ ] db:
          - [x] get-cards
          - [x] get-card
-         - [ ] get-card-by-index
+         - [x] get-card-by-index
          - [x] put-card
          - [x] delete-card
          - [x] delete-all-cards
+         - [ ] card not found
+         - [ ] card deleted
+
    - [ ] swipe
       - [x] unlock door
       - [x] door unlock events
+      - [ ] swipe event
       - [ ] ReasonCardDeniedDoorNormallyClosed
       - [ ] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback
+   - (?) use pipes
+   - (?) trap handlers
 
    - [ ] swipe + PIN
    - [ ] passcode
@@ -39,6 +43,7 @@
 
 - [] U4 seems a bit erratic ??? 
      - (sometimes) works ok if there's a printf in U4_write(..) ???
+     - https://community.nxp.com/t5/Other-NXP-Products/Unable-to-write-Port-1-in-PCAL6416A/m-p/1219480#M10322
 
 ### misc
 

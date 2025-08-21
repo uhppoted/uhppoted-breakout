@@ -11,6 +11,7 @@ import (
 type DB interface {
 	GetCards(controller uint32) (uint32, error)
 	GetCard(controller uint32, card uint32) (entities.Card, error)
+	GetCardByIndex(controller uint32, index uint32) (entities.Card, error)
 	PutCard(controller uint32, card entities.Card) (uint32, error)
 	DeleteCard(controller uint32, card uint32) (bool, error)
 	DeleteAllCards(controller uint32) (bool, error)
@@ -46,6 +47,10 @@ func GetCards(controller uint32) (uint32, error) {
 
 func GetCard(controller uint32, card uint32) (entities.Card, error) {
 	return db.GetCard(controller, card)
+}
+
+func GetCardByIndex(controller uint32, index uint32) (entities.Card, error) {
+	return db.GetCardByIndex(controller, index)
 }
 
 func PutCard(controller uint32, card entities.Card) (uint32, error) {

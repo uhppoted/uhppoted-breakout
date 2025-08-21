@@ -21,8 +21,8 @@ type rpcd struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	events events.EventD
-	cards  cards.CardD
+	events events.Events
+	cards  cards.Cards
 
 	listen struct {
 		network string
@@ -37,8 +37,8 @@ func NewRPCD(listen string) (*rpcd, error) {
 		ctx:    ctx,
 		cancel: cancel,
 
-		events: events.EventD{},
-		cards:  cards.CardD{},
+		events: events.Events{},
+		cards:  cards.Cards{},
 	}
 
 	// ... set 'listen' address:port
@@ -58,8 +58,8 @@ func NewRPCD(listen string) (*rpcd, error) {
 }
 
 func (r *rpcd) Run() {
-	lib.RegisterName("EventD", &r.events)
-	lib.RegisterName("CardD", &r.cards)
+	lib.RegisterName("events", &r.events)
+	lib.RegisterName("cards", &r.cards)
 
 	lib.HandleHTTP()
 

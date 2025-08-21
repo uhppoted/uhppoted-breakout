@@ -10,28 +10,10 @@ import (
 
 const LOGTAG = "events"
 
-type EventD struct {
+type Events struct {
 }
 
-func (d *EventD) Add(args struct {
-	Controller uint32
-	Event      entities.Event
-}, reply *uint32) error {
-	debugf("add-event %v %v", args.Controller, args.Event)
-
-	if index, err := db.PutEvent(args.Controller, args.Event); err != nil {
-		warnf("add-event (%v)", err)
-		return err
-	} else {
-		infof("add-event stored %v @%v", args.Event, index)
-
-		*reply = index
-
-		return nil
-	}
-}
-
-func (d *EventD) Get(index uint32, event *entities.Event) error {
+func (d *Events) GetEvent(index uint32, event *entities.Event) error {
 	debugf("get-event %v", index)
 
 	get := func(ix uint32) error {
@@ -79,7 +61,25 @@ func (d *EventD) Get(index uint32, event *entities.Event) error {
 	}
 }
 
-func (d *EventD) GetEventIndex(controller uint32, index *uint32) error {
+func (d *Events) PutEvent(args struct {
+	Controller uint32
+	Event      entities.Event
+}, reply *uint32) error {
+	debugf("add-event %v %v", args.Controller, args.Event)
+
+	if index, err := db.PutEvent(args.Controller, args.Event); err != nil {
+		warnf("add-event (%v)", err)
+		return err
+	} else {
+		infof("add-event stored %v @%v", args.Event, index)
+
+		*reply = index
+
+		return nil
+	}
+}
+
+func (d *Events) GetEventIndex(controller uint32, index *uint32) error {
 	debugf("get-event-index %v", controller)
 
 	if record, err := db.GetEventIndex(controller); err != nil {
@@ -92,7 +92,7 @@ func (d *EventD) GetEventIndex(controller uint32, index *uint32) error {
 	return nil
 }
 
-func (d *EventD) SetEventIndex(args struct {
+func (d *Events) SetEventIndex(args struct {
 	Controller uint32
 	Index      uint32
 }, _ *uint32) error {
@@ -106,7 +106,7 @@ func (d *EventD) SetEventIndex(args struct {
 	return nil
 }
 
-func (d *EventD) RecordSpecialEvents(args struct {
+func (d *Events) RecordSpecialEvents(args struct {
 	Controller uint32
 	Enabled    bool
 }, _ *bool) error {

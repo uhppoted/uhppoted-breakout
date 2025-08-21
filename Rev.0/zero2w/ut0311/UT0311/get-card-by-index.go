@@ -8,30 +8,28 @@ import (
 )
 
 func (ut0311 *UT0311) getCardByIndex(rq *messages.GetCardByIndexRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
+	if controller, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
-	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
+	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
+	} else if record, err := ut0311.cards.GetCardByIndex(controller, rq.Index); err != nil {
+		warnf("get-card-by-index controller:%v card:%v (%v)", controller, rq.Index, err)
+
+		return messages.GetCardByIndexResponse{
+			SerialNumber: types.SerialNumber(controller),
+			CardNumber:   0,
+		}, nil
 	} else {
-		response := messages.GetCardByIndexResponse{
-			SerialNumber: types.SerialNumber(id),
-		}
-
-		if index := rq.Index; index > 0 {
-			if card, err := scmp.GetIndexed[scmp.Card](ut0311.cards, scmp.OID_CARDS_INDEX, index); err != nil {
-				return nil, err
-			} else {
-				response.CardNumber = card.Card
-				response.From = card.StartDate
-				response.To = card.EndDate
-				response.Door1 = card.Permissions[1]
-				response.Door2 = card.Permissions[2]
-				response.Door3 = card.Permissions[3]
-				response.Door4 = card.Permissions[4]
-				response.PIN = types.PIN(card.PIN)
-			}
-		}
-
-		return response, nil
+		return messages.GetCardByIndexResponse{
+			SerialNumber: types.SerialNumber(controller),
+			CardNumber:   record.Card,
+			From:         types.Date(record.StartDate),
+			To:           types.Date(record.EndDate),
+			Door1:        record.Permissions[1],
+			Door2:        record.Permissions[2],
+			Door3:        record.Permissions[3],
+			Door4:        record.Permissions[4],
+			PIN:          types.PIN(record.PIN),
+		}, nil
 	}
 }

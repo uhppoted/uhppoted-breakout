@@ -16,13 +16,14 @@ CREATE TABLE Events (
     PRIMARY KEY (Controller, EventID));
 
 CREATE TABLE Cards (
-    Controller   INTEGER NOT NULL,
-    Card         INTEGER NOT NULL,
-    StartDate    DATE NULL,
-    EndDate      DATE NULL,
-    Door1        INTEGER DEFAULT 0,
-    Door2        INTEGER DEFAULT 0,
-    Door3        INTEGER DEFAULT 0,
-    Door4        INTEGER DEFAULT 0,
+    id         INTEGER PRIMARY KEY,
+    Controller INTEGER NOT NULL,
+    Card       INTEGER NOT NULL,
+    StartDate  DATE NULL,
+    EndDate    DATE NULL,
+    Door1      INTEGER DEFAULT 0,
+    Door2      INTEGER DEFAULT 0,
+    Door3      INTEGER DEFAULT 0,
+    Door4      INTEGER DEFAULT 0,
     PIN        INTEGER DEFAULT 0,
-    PRIMARY KEY (Controller, Card));
+    UNIQUE (Controller, Card));
