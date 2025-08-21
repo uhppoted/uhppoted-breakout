@@ -77,30 +77,29 @@ func (db impl) GetCards(controller uint32) (uint32, error) {
 	}
 }
 
-func (db impl) GetCard(controller uint32, card uint32) (entities.Card, error) {
+func (db impl) GetCard(controller uint32, card uint32) (*entities.Card, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
 	defer cancel()
 
-	zero := entities.Card{}
 	query := sqlGetCard
 
 	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return zero, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+		return nil, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
 	} else if err != nil {
-		return zero, err
+		return nil, err
 	}
 
 	if dbc, err := db.open(); err != nil {
-		return zero, err
+		return nil, err
 	} else if dbc == nil {
-		return zero, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+		return nil, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if prepared, err := dbc.Prepare(query); err != nil {
-		return zero, err
+		return nil, err
 	} else if rs, err := prepared.QueryContext(ctx, controller, card); err != nil {
-		return zero, err
+		return nil, err
 	} else if rs == nil {
-		return zero, fmt.Errorf("invalid resultset (%v)", rs)
+		return nil, fmt.Errorf("invalid resultset (%v)", rs)
 	} else {
 		defer rs.Close()
 
@@ -128,65 +127,64 @@ func (db impl) GetCard(controller uint32, card uint32) (entities.Card, error) {
 			}
 
 			if err := rs.Scan(pointers...); err != nil {
-				return zero, err
-			} else {
-				startDate := time.Time{}
-				if v, err := time.ParseInLocation(time.DateOnly, record.startDate[:10], time.Local); err != nil {
-					warnf("%v", err)
-				} else {
-					startDate = v
-				}
-
-				endDate := time.Time{}
-				if v, err := time.ParseInLocation(time.DateOnly, record.endDate[:10], time.Local); err != nil {
-					warnf("%v", err)
-				} else {
-					endDate = v
-				}
-
-				return entities.Card{
-					Card:      record.card,
-					StartDate: startDate,
-					EndDate:   endDate,
-					Permissions: map[uint8]uint8{
-						1: record.door1,
-						2: record.door2,
-						3: record.door3,
-						4: record.door4,
-					},
-					PIN: record.PIN,
-				}, nil
+				return nil, err
 			}
+
+			startDate := time.Time{}
+			if v, err := time.ParseInLocation(time.DateOnly, record.startDate[:10], time.Local); err != nil {
+				warnf("%v", err)
+			} else {
+				startDate = v
+			}
+
+			endDate := time.Time{}
+			if v, err := time.ParseInLocation(time.DateOnly, record.endDate[:10], time.Local); err != nil {
+				warnf("%v", err)
+			} else {
+				endDate = v
+			}
+
+			return &entities.Card{
+				Card:      record.card,
+				StartDate: startDate,
+				EndDate:   endDate,
+				Permissions: map[uint8]uint8{
+					1: record.door1,
+					2: record.door2,
+					3: record.door3,
+					4: record.door4,
+				},
+				PIN: record.PIN,
+			}, nil
 		}
 
-		return zero, entities.ErrRecordNotFound
+		return nil, nil
 	}
 }
 
-func (db impl) GetCardByIndex(controller uint32, index uint32) (entities.Card, error) {
+func (db impl) GetCardByIndex(controller uint32, index uint32) (*entities.Card, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
 	defer cancel()
 
-	zero := entities.Card{}
 	query := sqlGetCardByIndex
 
 	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return zero, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+		return nil, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
 	} else if err != nil {
-		return zero, err
+		return nil, err
 	}
 
 	if dbc, err := db.open(); err != nil {
-		return zero, err
+		return nil, err
 	} else if dbc == nil {
-		return zero, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
+		return nil, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if prepared, err := dbc.Prepare(query); err != nil {
-		return zero, err
+		return nil, err
 	} else if rs, err := prepared.QueryContext(ctx, controller, index); err != nil {
-		return zero, err
+		return nil, err
 	} else if rs == nil {
-		return zero, fmt.Errorf("invalid resultset (%v)", rs)
+		return nil, fmt.Errorf("invalid resultset (%v)", rs)
 	} else {
 		defer rs.Close()
 
@@ -214,38 +212,37 @@ func (db impl) GetCardByIndex(controller uint32, index uint32) (entities.Card, e
 			}
 
 			if err := rs.Scan(pointers...); err != nil {
-				return zero, err
-			} else {
-				startDate := time.Time{}
-				if v, err := time.ParseInLocation(time.DateOnly, record.startDate[:10], time.Local); err != nil {
-					warnf("%v", err)
-				} else {
-					startDate = v
-				}
-
-				endDate := time.Time{}
-				if v, err := time.ParseInLocation(time.DateOnly, record.endDate[:10], time.Local); err != nil {
-					warnf("%v", err)
-				} else {
-					endDate = v
-				}
-
-				return entities.Card{
-					Card:      record.card,
-					StartDate: startDate,
-					EndDate:   endDate,
-					Permissions: map[uint8]uint8{
-						1: record.door1,
-						2: record.door2,
-						3: record.door3,
-						4: record.door4,
-					},
-					PIN: record.PIN,
-				}, nil
+				return nil, err
 			}
+			startDate := time.Time{}
+			if v, err := time.ParseInLocation(time.DateOnly, record.startDate[:10], time.Local); err != nil {
+				warnf("%v", err)
+			} else {
+				startDate = v
+			}
+
+			endDate := time.Time{}
+			if v, err := time.ParseInLocation(time.DateOnly, record.endDate[:10], time.Local); err != nil {
+				warnf("%v", err)
+			} else {
+				endDate = v
+			}
+
+			return &entities.Card{
+				Card:      record.card,
+				StartDate: startDate,
+				EndDate:   endDate,
+				Permissions: map[uint8]uint8{
+					1: record.door1,
+					2: record.door2,
+					3: record.door3,
+					4: record.door4,
+				},
+				PIN: record.PIN,
+			}, nil
 		}
 
-		return zero, entities.ErrRecordNotFound
+		return nil, nil
 	}
 }
 

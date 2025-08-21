@@ -33,8 +33,8 @@ func (d *Cards) GetCard(args struct {
 
 	if v, err := db.GetCard(args.Controller, args.Card); err != nil {
 		return err
-	} else {
-		*record = v
+	} else if v != nil {
+		*record = *v
 	}
 
 	return nil
@@ -48,8 +48,8 @@ func (d *Cards) GetCardByIndex(args struct {
 
 	if v, err := db.GetCardByIndex(args.Controller, args.Index); err != nil {
 		return err
-	} else {
-		*record = v
+	} else if v != nil {
+		*record = *v
 	}
 
 	return nil

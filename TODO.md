@@ -8,8 +8,8 @@
          - [x] put-card
          - [x] delete-card
          - [x] delete-all-cards
-         - [ ] card not found
-         - [ ] card deleted
+         - [x] card not found
+         - [x] ~~card deleted~~
 
    - [ ] swipe
       - [x] unlock door

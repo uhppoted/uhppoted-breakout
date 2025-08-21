@@ -13,8 +13,8 @@ func (ut0311 *UT0311) getCardByIndex(rq *messages.GetCardByIndexRequest) (any, e
 	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
 	} else if record, err := ut0311.cards.GetCardByIndex(controller, rq.Index); err != nil {
-		warnf("get-card-by-index controller:%v card:%v (%v)", controller, rq.Index, err)
-
+		return nil, err
+	} else if record.Card == 0 {
 		return messages.GetCardByIndexResponse{
 			SerialNumber: types.SerialNumber(controller),
 			CardNumber:   0,

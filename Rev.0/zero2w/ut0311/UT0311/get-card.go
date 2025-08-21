@@ -13,8 +13,8 @@ func (ut0311 *UT0311) getCard(rq *messages.GetCardByIDRequest) (any, error) {
 	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
 	} else if record, err := ut0311.cards.GetCard(controller, rq.CardNumber); err != nil {
-		warnf("get-card controller:%v card:%v (%v)", controller, rq.CardNumber, err)
-
+		return nil, err
+	} else if record.Card == 0 {
 		return messages.GetCardByIDResponse{
 			SerialNumber: types.SerialNumber(controller),
 			CardNumber:   0,
