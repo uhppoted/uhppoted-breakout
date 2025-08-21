@@ -7,7 +7,7 @@ import (
 	"ut0311/log"
 )
 
-const LOGTAG = "EVENTD"
+const LOGTAG = "events"
 
 type Events struct {
 	dial struct {
