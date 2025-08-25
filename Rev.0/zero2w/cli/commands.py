@@ -202,7 +202,7 @@ def get_status(u, dest, timeout, args, protocol='udp'):
 
 def open_door(u, dest, timeout, args, protocol='udp'):
     controller = (CONTROLLER, dest, protocol)
-    door = DOOR
+    door = 4 # DOOR
 
     return u.open_door(controller, door, timeout=timeout)
 

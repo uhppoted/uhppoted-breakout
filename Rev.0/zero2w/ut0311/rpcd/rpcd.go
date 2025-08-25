@@ -40,6 +40,11 @@ type KV struct {
 	Value any
 }
 
+type TV struct {
+	Tag   string
+	Value any
+}
+
 type Trap struct {
 	Timestamp time.Time
 	ID        uint32

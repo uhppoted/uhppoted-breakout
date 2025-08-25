@@ -13,3 +13,11 @@ func Oid2Tag(oid string) (string, error) {
 
 	return "", ErrUnknownOID
 }
+
+func Tag2Oid(tag string) (string, error) {
+	if oid, ok := m[tag]; ok {
+		return oid, nil
+	}
+
+	return "", ErrUnknownOID
+}

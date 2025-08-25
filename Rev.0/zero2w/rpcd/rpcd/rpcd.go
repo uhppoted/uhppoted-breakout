@@ -34,7 +34,7 @@ type RPCD struct {
 }
 
 type KV struct {
-	OID   string
+	Tag   string
 	Value any
 }
 
@@ -129,9 +129,11 @@ func (r *RPCD) Get(oid string, reply *any) error {
 }
 
 func (r *RPCD) Set(kv KV, reply *any) error {
-	debugf("set %v %v", kv.OID, kv.Value)
+	debugf("set %v %v", kv.Tag, kv.Value)
 
-	if v, err := r.ssmp.Set(kv.OID, kv.Value); err != nil {
+	if oid, err := MIB.Tag2Oid(kv.Tag); err != nil {
+		return err
+	} else if v, err := r.ssmp.Set(oid, kv.Value); err != nil {
 		return err
 	} else {
 		*reply = v

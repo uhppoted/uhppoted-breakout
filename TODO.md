@@ -14,11 +14,15 @@
 
    - [ ] swipe + PIN
    - [ ] passcode
-   - [ ] open-door
 
 - [ ] _get-status_
    - [ ] use cached values for door locks
    - [ ] poll
+
+- [ ] open-door
+      - [ ] event
+      - [ ] ReasonCardDeniedDoorNormallyClosed
+      - [ ] ReasonCardDeniedDoorInterLock
 
 ## RPCD
    - [ ] monitor
