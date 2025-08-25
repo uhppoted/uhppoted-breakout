@@ -132,10 +132,10 @@ OIDs = [
     MIBItem('controller.door.4.delay','MIB_DOORS_4_DELAY', '0.1.3.6.1.4.1.65536.3.4.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
 
     # door locks
-    MIBItem('controller.door.1.lock','MIB_DOORS_1_UNLOCKED', '0.1.3.6.1.4.1.65536.3.1.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
-    MIBItem('controller.door.2.lock','MIB_DOORS_2_UNLOCKED', '0.1.3.6.1.4.1.65536.3.2.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
-    MIBItem('controller.door.3.lock','MIB_DOORS_3_UNLOCKED', '0.1.3.6.1.4.1.65536.3.3.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
-    MIBItem('controller.door.4.lock','MIB_DOORS_4_UNLOCKED', '0.1.3.6.1.4.1.65536.3.4.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
+    MIBItem('controller.door.1.unlocked','MIB_DOORS_1_UNLOCKED', '0.1.3.6.1.4.1.65536.3.1.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
+    MIBItem('controller.door.2.unlocked','MIB_DOORS_2_UNLOCKED', '0.1.3.6.1.4.1.65536.3.2.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
+    MIBItem('controller.door.3.unlocked','MIB_DOORS_3_UNLOCKED', '0.1.3.6.1.4.1.65536.3.3.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
+    MIBItem('controller.door.4.unlocked','MIB_DOORS_4_UNLOCKED', '0.1.3.6.1.4.1.65536.3.4.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
 
     # door sensors
     MIBItem('controller.door.1.open','MIB_DOORS_1_OPEN', '0.1.3.6.1.4.1.65536.3.1.5', 'MIB_get_door_open'),

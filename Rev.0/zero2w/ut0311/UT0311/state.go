@@ -170,3 +170,15 @@ func (s *state) DoorButton(door uint8) (bool, error) {
 		return b, nil
 	}
 }
+
+func (s *state) DoorUnlocked(door uint8) (bool, error) {
+	tag := fmt.Sprintf("controller.door.%v.unlocked", door)
+
+	if v, ok := s.state[tag]; !ok {
+		return false, fmt.Errorf("%v not cached", tag)
+	} else if b, ok := v.(bool); !ok {
+		return false, fmt.Errorf("%v invalid value", tag)
+	} else {
+		return b, nil
+	}
+}

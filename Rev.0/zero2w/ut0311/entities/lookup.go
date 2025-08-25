@@ -1,8 +1,6 @@
 package entities
 
-import (
-	"fmt"
-)
+import ()
 
 var events = map[struct {
 	tag   string
@@ -113,7 +111,6 @@ var reasons = map[struct {
 }
 
 func LookupEvent(tag string, value any) EventType {
-	fmt.Printf(">>>> LookupEvent %v::%v\n", tag, value)
 	key := struct {
 		tag   string
 		value any
@@ -122,10 +119,7 @@ func LookupEvent(tag string, value any) EventType {
 		value: value,
 	}
 
-	v, ok := events[key]
-	fmt.Printf(">>>> LookupEvent/X %v  %v,%v\n", key, v, ok)
-
-	if ok {
+	if v, ok := events[key]; ok {
 		return v
 	}
 

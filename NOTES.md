@@ -33,6 +33,7 @@
 23. https://electronics.stackexchange.com/questions/742062/robust-communication-between-%c2%b5p-board-and-i-o-expander-over-3-5-meters
 24. [OTA/UART](https://pfister.dev/blog/2025/rp2350-uart-bl.html)
 
+
 ## WaveShare RP2040-Tiny
 1. https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero
 ```
@@ -62,6 +63,9 @@ On some boards, the XOSC can take longer than usual to stabilize. On such boards
 
 ## RX8900SA
 1. https://github.com/citriena/RX8900RTC/blob/master/src/RX8900RTC.cpp
+
+## PCAL6416A
+- https://community.nxp.com/t5/Other-NXP-Products/Unable-to-write-Port-1-in-PCAL6416A/m-p/1219480#M10322
 
 ## SPI
    - https://learn.sparkfun.com/tutorials/raspberry-pi-spi-and-i2c-tutorial/all#spi-on-pi

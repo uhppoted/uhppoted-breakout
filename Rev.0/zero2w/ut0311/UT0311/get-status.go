@@ -19,6 +19,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 			RelayState:   0x00,
 			InputState:   0x00,
 			SystemError:  0x00,
+			SpecialInfo:  0x00,
 			SequenceId:   0,
 		}
 
@@ -64,9 +65,9 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 1
-		if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_UNLOCKED); err != nil {
-			return nil, err
-		} else if !locked {
+		if unlocked, err := ut0311.state.DoorUnlocked(1); err != nil {
+			warnf("%v", err)
+		} else if unlocked {
 			response.RelayState |= 0x01
 		}
 
@@ -83,9 +84,9 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 2
-		if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_UNLOCKED); err != nil {
-			return nil, err
-		} else if !locked {
+		if unlocked, err := ut0311.state.DoorUnlocked(2); err != nil {
+			warnf("%v", err)
+		} else if unlocked {
 			response.RelayState |= 0x02
 		}
 
@@ -102,9 +103,9 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 3
-		if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_UNLOCKED); err != nil {
-			return nil, err
-		} else if !locked {
+		if unlocked, err := ut0311.state.DoorUnlocked(3); err != nil {
+			warnf("%v", err)
+		} else if unlocked {
 			response.RelayState |= 0x04
 		}
 
@@ -121,9 +122,9 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... door 4
-		if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_UNLOCKED); err != nil {
-			return nil, err
-		} else if !locked {
+		if unlocked, err := ut0311.state.DoorUnlocked(4); err != nil {
+			warnf("%v", err)
+		} else if unlocked {
 			response.RelayState |= 0x08
 		}
 

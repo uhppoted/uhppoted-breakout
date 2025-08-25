@@ -59,6 +59,7 @@
     - Jumper to disable
     - https://www.ganssle.com/watchdogs.htm
 45. 470 ohm protective resistors on inputs
+46. PCAL6416A: tie unused outputs to ground via 10k
 
 (?) RS-485 for serial I/O (multidrop)
 (?) Maybe put GND on pin 1 of UART/SPI header

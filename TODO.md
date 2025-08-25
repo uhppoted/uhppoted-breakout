@@ -1,16 +1,7 @@
 # TODO
 
 - [ ] card swipe
-   - [ ] db:
-         - [x] get-cards
-         - [x] get-card
-         - [x] get-card-by-index
-         - [x] put-card
-         - [x] delete-card
-         - [x] delete-all-cards
-         - [x] card not found
-         - [x] ~~card deleted~~
-
+   - [x] db
    - [ ] swipe
       - [x] unlock door
       - [x] door unlock events
@@ -23,6 +14,7 @@
 
    - [ ] swipe + PIN
    - [ ] passcode
+   - [ ] open-door
 
 - [ ] _get-status_
    - [ ] use cached values for door locks
@@ -34,16 +26,11 @@
    - (?) https://go.dev/blog/synctest
 
 ## eventd
-   - [x] RPC over TCP/IP
-   - [x] daemonize
-   - [x] undaemonize
    - [ ] monitor
 
 ## breakout
-
-- [] U4 seems a bit erratic ??? 
-     - (sometimes) works ok if there's a printf in U4_write(..) ???
-     - https://community.nxp.com/t5/Other-NXP-Products/Unable-to-write-Port-1-in-PCAL6416A/m-p/1219480#M10322
+- [] U4 seems a bit erratic
+   - configure unused outputs as inputs/open-collector
 
 ### misc
 

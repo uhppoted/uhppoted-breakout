@@ -12,14 +12,19 @@ func (ut0311 *UT0311) makeListenEvent(controller uint32, event entities.Event) m
 	evt := messages.Event{
 		SerialNumber: lib.SerialNumber(controller),
 
-		EventIndex: event.Index,
-		EventType:  uint8(event.Type),
-		Reason:     uint8(event.Reason),
-		Timestamp:  lib.DateTime(event.Timestamp),
-		CardNumber: event.Card,
-		Granted:    event.Granted,
-		Door:       event.Door,
-		Direction:  event.Direction,
+		EventIndex:  event.Index,
+		EventType:   uint8(event.Type),
+		Reason:      uint8(event.Reason),
+		Timestamp:   lib.DateTime(event.Timestamp),
+		CardNumber:  event.Card,
+		Granted:     event.Granted,
+		Door:        event.Door,
+		Direction:   event.Direction,
+		RelayState:  0x00,
+		InputState:  0x00,
+		SystemError: 0x00,
+		SpecialInfo: 0x00,
+		SequenceId:  0,
 	}
 
 	// ... system date/time
@@ -65,27 +70,27 @@ func (ut0311 *UT0311) makeListenEvent(controller uint32, event entities.Event) m
 	}
 
 	// ... door locks
-	if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_1_UNLOCKED); err != nil {
+	if unlocked, err := ut0311.state.DoorUnlocked(1); err != nil {
 		warnf("%v", err)
-	} else if !locked {
+	} else if unlocked {
 		evt.RelayState |= 0x01
 	}
 
-	if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_2_UNLOCKED); err != nil {
+	if unlocked, err := ut0311.state.DoorUnlocked(2); err != nil {
 		warnf("%v", err)
-	} else if !locked {
+	} else if unlocked {
 		evt.RelayState |= 0x02
 	}
 
-	if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_3_UNLOCKED); err != nil {
+	if unlocked, err := ut0311.state.DoorUnlocked(3); err != nil {
 		warnf("%v", err)
-	} else if !locked {
+	} else if unlocked {
 		evt.RelayState |= 0x04
 	}
 
-	if locked, err := scmp.Get[bool](ut0311.breakout, scmp.OID_DOORS_4_UNLOCKED); err != nil {
+	if unlocked, err := ut0311.state.DoorUnlocked(4); err != nil {
 		warnf("%v", err)
-	} else if !locked {
+	} else if unlocked {
 		evt.RelayState |= 0x08
 	}
 
