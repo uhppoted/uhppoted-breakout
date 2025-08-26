@@ -16,20 +16,34 @@ type mattn struct {
 	maxLifetime time.Duration
 	maxOpen     int
 	maxIdle     int
+
+	dbc *sql.DB
 }
 
-func (db mattn) open() (*sql.DB, error) {
-	dsn := fmt.Sprintf("%v?_journal_mode=WAL", db.dsn)
+func (db *mattn) open() (*sql.DB, error) {
+	if db.dbc == nil {
+		dsn := fmt.Sprintf("%v?_journal_mode=WAL&_busy_timeout=5000", db.dsn)
 
-	if dbc, err := sql.Open("sqlite3", dsn); err != nil {
-		return nil, err
-	} else {
-		dbc.SetConnMaxLifetime(db.maxLifetime)
-		dbc.SetMaxOpenConns(db.maxOpen)
-		dbc.SetMaxIdleConns(db.maxIdle)
+		if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
+			return nil, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
+		} else if err != nil {
+			return nil, err
+		}
 
-		return dbc, nil
+		if dbc, err := sql.Open("sqlite", dsn); err != nil {
+			return nil, err
+		} else if dbc == nil {
+			return nil, fmt.Errorf("invalid sqlite3 DB connection (%v)", dbc)
+		} else {
+			dbc.SetConnMaxLifetime(db.maxLifetime)
+			dbc.SetMaxOpenConns(db.maxOpen)
+			dbc.SetMaxIdleConns(db.maxIdle)
+
+			db.dbc = dbc
+		}
 	}
+
+	return db.dbc, nil
 }
 
 func (db mattn) insert(sql string, values ...any) (int64, error) {
@@ -37,16 +51,8 @@ func (db mattn) insert(sql string, values ...any) (int64, error) {
 
 	defer cancel()
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return 0, err
-	}
-
 	if dbc, err := db.open(); err != nil {
 		return 0, err
-	} else if dbc == nil {
-		return 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
 		return 0, err
 	} else {
@@ -69,16 +75,8 @@ func (db mattn) update(sql string, values ...any) error {
 
 	defer cancel()
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return err
-	}
-
 	if dbc, err := db.open(); err != nil {
 		return err
-	} else if dbc == nil {
-		return fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if tx, err := dbc.BeginTx(ctx, nil); err != nil {
 		return err
 	} else {

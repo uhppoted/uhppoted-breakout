@@ -2,9 +2,7 @@ package sqlite3
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"dbd/entities"
@@ -31,12 +29,6 @@ func (db impl) GetEvent(index uint32) (entities.Event, error) {
 	defer cancel()
 
 	query := sqlGetEvent
-
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return entities.Event{}, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return entities.Event{}, err
-	}
 
 	if dbc, err := db.open(); err != nil {
 		return entities.Event{}, err
@@ -111,12 +103,6 @@ func (db impl) GetEvents() (uint32, uint32, error) {
 
 	query := fmt.Sprintf(`SELECT MIN(EventID) AS First,MAX(EventID) AS Last FROM %[1]v;`, tableEvents)
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return 0, 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return 0, 0, err
-	}
-
 	if dbc, err := db.open(); err != nil {
 		return 0, 0, err
 	} else if dbc == nil {
@@ -171,12 +157,6 @@ func (db impl) GetEventIndex(controller uint32) (uint32, error) {
 	defer cancel()
 
 	query := fmt.Sprintf(`SELECT EventIndex FROM %[1]v WHERE controller=?;`, tableController)
-
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return 0, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return 0, err
-	}
 
 	if dbc, err := db.open(); err != nil {
 		return 0, err

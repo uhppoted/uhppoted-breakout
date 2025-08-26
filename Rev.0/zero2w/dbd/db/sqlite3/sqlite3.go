@@ -30,7 +30,7 @@ type impl struct {
 func Mattn(dsn string) impl {
 	return impl{
 		dsn: dsn,
-		driver: mattn{
+		driver: &mattn{
 			dsn:         dsn,
 			maxLifetime: MaxLifetime,
 			maxIdle:     MaxIdle,
@@ -42,7 +42,7 @@ func Mattn(dsn string) impl {
 func ModernC(dsn string) impl {
 	return impl{
 		dsn: dsn,
-		driver: modernc{
+		driver: &modernc{
 			dsn:         dsn,
 			maxLifetime: MaxLifetime,
 			maxIdle:     MaxIdle,
@@ -50,6 +50,7 @@ func ModernC(dsn string) impl {
 		},
 	}
 }
+
 func (db impl) open() (*sql.DB, error) {
 	return db.driver.open()
 }

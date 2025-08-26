@@ -2,9 +2,7 @@ package sqlite3
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"dbd/entities"
@@ -38,16 +36,8 @@ func (db impl) GetCards(controller uint32) (uint32, error) {
 	zero := uint32(0)
 	query := sqlGetCards
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return zero, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return zero, err
-	}
-
 	if dbc, err := db.open(); err != nil {
 		return zero, err
-	} else if dbc == nil {
-		return zero, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if prepared, err := dbc.Prepare(query); err != nil {
 		return zero, err
 	} else if rs, err := prepared.QueryContext(ctx, controller); err != nil {
@@ -84,16 +74,8 @@ func (db impl) GetCard(controller uint32, card uint32) (*entities.Card, error) {
 
 	query := sqlGetCard
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return nil, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return nil, err
-	}
-
 	if dbc, err := db.open(); err != nil {
 		return nil, err
-	} else if dbc == nil {
-		return nil, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if prepared, err := dbc.Prepare(query); err != nil {
 		return nil, err
 	} else if rs, err := prepared.QueryContext(ctx, controller, card); err != nil {
@@ -169,16 +151,8 @@ func (db impl) GetCardByIndex(controller uint32, index uint32) (*entities.Card, 
 
 	query := sqlGetCardByIndex
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return nil, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return nil, err
-	}
-
 	if dbc, err := db.open(); err != nil {
 		return nil, err
-	} else if dbc == nil {
-		return nil, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if prepared, err := dbc.Prepare(query); err != nil {
 		return nil, err
 	} else if rs, err := prepared.QueryContext(ctx, controller, index); err != nil {
@@ -274,16 +248,8 @@ func (db impl) DeleteCard(controller uint32, card uint32) (bool, error) {
 	zero := false
 	query := sqlDeleteCard
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return zero, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return zero, err
-	}
-
 	if dbc, err := db.open(); err != nil {
 		return zero, err
-	} else if dbc == nil {
-		return zero, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if prepared, err := dbc.Prepare(query); err != nil {
 		return zero, err
 	} else if rs, err := prepared.ExecContext(ctx, controller, card); err != nil {
@@ -305,16 +271,8 @@ func (db impl) DeleteAllCards(controller uint32) (bool, error) {
 	zero := false
 	query := sqlDeleteAllCards
 
-	if _, err := os.Stat(db.dsn); errors.Is(err, os.ErrNotExist) {
-		return zero, fmt.Errorf("sqlite3 database %v does not exist", db.dsn)
-	} else if err != nil {
-		return zero, err
-	}
-
 	if dbc, err := db.open(); err != nil {
 		return zero, err
-	} else if dbc == nil {
-		return zero, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
 	} else if prepared, err := dbc.Prepare(query); err != nil {
 		return zero, err
 	} else if rs, err := prepared.ExecContext(ctx, controller); err != nil {

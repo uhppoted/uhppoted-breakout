@@ -9,14 +9,14 @@
       - [ ] ReasonCardDeniedDoorNormallyClosed
       - [ ] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback
+   - [ ] swipe + PIN
+   - [ ] passcode
    - (?) use pipes
    - (?) trap handlers
 
-   - [ ] swipe + PIN
-   - [ ] passcode
-
 - [ ] _get-status_
-   - [ ] use cached values for door locks
+   - [x] use cached values for door locks
+   - [ ] use cached values for alarms 
    - [ ] poll
 
 - [ ] open-door
@@ -25,12 +25,15 @@
       - [ ] ReasonCardDeniedDoorInterLock
 
 ## RPCD
-   - [ ] monitor
+   - [ ] monitor interface
    - (?) Context.WithTimeout 
    - (?) https://go.dev/blog/synctest
 
 ## eventd
-   - [ ] monitor
+   - [ ] monitor interface
+   - [ ] wrap DBC in struct that invalidate dbc on fatal error
+   - [ ] commonalise _query_
+   - [ ] commonalise _delete_
 
 ## breakout
 - [] U4 seems a bit erratic
