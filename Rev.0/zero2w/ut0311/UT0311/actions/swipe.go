@@ -1,23 +1,25 @@
 package actions
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
+	"ut0311/UT0311/state"
 	"ut0311/cards"
 	"ut0311/entities"
 	"ut0311/rpcd"
 )
 
-func Swipe(timestamp time.Time, controller uint32, card any, door uint8, db *cards.Cards, breakout *rpcd.RPC) *entities.Event {
+func Swipe(timestamp time.Time, controller uint32, card any, door uint8, db *cards.Cards, breakout *rpcd.RPC, state *state.State) *entities.Event {
 	switch v := card.(type) {
 	case string:
 		if c, err := strconv.ParseUint(v, 10, 32); err == nil {
-			return swipe(timestamp, controller, uint32(c), door, db, breakout)
+			return swipe(timestamp, controller, uint32(c), door, db, breakout, state)
 		}
 
 	case uint32:
-		return swipe(timestamp, controller, v, door, db, breakout)
+		return swipe(timestamp, controller, v, door, db, breakout, state)
 	}
 
 	warnf("CARD", "invalid card swipe  controller:%v, card:%v, door:%v,", controller, card, door)
@@ -25,7 +27,7 @@ func Swipe(timestamp time.Time, controller uint32, card any, door uint8, db *car
 	return nil
 }
 
-func swipe(timestamp time.Time, controller uint32, card uint32, door uint8, db *cards.Cards, breakout *rpcd.RPC) *entities.Event {
+func swipe(timestamp time.Time, controller uint32, card uint32, door uint8, db *cards.Cards, breakout *rpcd.RPC, state *state.State) *entities.Event {
 	infof("CARD", "swipe  controller:%v, card:%v, door:%v,", controller, card, door)
 
 	validate := func(record entities.Card) entities.EventReason {
@@ -90,6 +92,10 @@ func swipe(timestamp time.Time, controller uint32, card uint32, door uint8, db *
 		}
 	} else {
 		infof("CARD", "access granted  controller:%v card:%v door:%v", controller, card, door)
+
+		tag := fmt.Sprintf("controller.door.%v.unlocked", door)
+
+		state.Set(timestamp, controller, tag, true)
 
 		return &entities.Event{
 			Index:     0,

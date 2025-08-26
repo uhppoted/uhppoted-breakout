@@ -5,7 +5,7 @@
    - [ ] swipe
       - [x] unlock door
       - [x] door unlock events
-      - [ ] swipe event
+      - [x] swipe event
       - [ ] ReasonCardDeniedDoorNormallyClosed
       - [ ] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback

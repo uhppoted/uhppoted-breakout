@@ -17,6 +17,7 @@ import (
 	"github.com/uhppoted/uhppote-core/messages"
 
 	"ut0311/UT0311/actions"
+	"ut0311/UT0311/state"
 	"ut0311/cards"
 	"ut0311/config"
 	"ut0311/entities"
@@ -51,7 +52,7 @@ type UT0311 struct {
 	tls  *TLS
 	rate *rate.Limiter
 
-	state *state
+	state *state.State
 
 	closing bool
 }
@@ -73,7 +74,7 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 		tls:  newTLS(c.TLS.Certificate, c.TLS.CA, cm),
 		rate: rate.NewLimiter(REQUEST_RATE_LIMIT, REQUEST_BURST_LIMIT),
 
-		state: newState(),
+		state: state.NewState(),
 
 		closing: false,
 	}
@@ -133,7 +134,7 @@ func (ut0311 *UT0311) Run() {
 	// ... start state poll
 	wg.Add(1)
 	go func() {
-		ut0311.state.poll()
+		ut0311.state.Poll()
 		wg.Done()
 	}()
 
@@ -205,7 +206,7 @@ func (ut0311 *UT0311) Stop() {
 	wg.Add(1)
 	go func() {
 		infof("stopping state poll")
-		if err := ut0311.state.stop(); err != nil {
+		if err := ut0311.state.Stop(); err != nil {
 			warnf("%v", err)
 		}
 
@@ -359,7 +360,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 	match := re.FindStringSubmatch(tag)
 	if len(match) > 1 {
 		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			if e := actions.Swipe(timestamp, controller, value, uint8(door), ut0311.cards, ut0311.breakout); e != nil {
+			if e := actions.Swipe(timestamp, controller, value, uint8(door), ut0311.cards, ut0311.breakout, ut0311.state); e != nil {
 				ut0311.event(controller, e)
 			}
 
@@ -367,7 +368,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 		}
 	}
 
-	if e := ut0311.state.update(timestamp, controller, tag, value); e != nil {
+	if e := ut0311.state.Update(timestamp, controller, tag, value); e != nil {
 		ut0311.event(controller, e)
 	}
 }

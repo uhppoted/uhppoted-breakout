@@ -1,4 +1,4 @@
-package UT0311
+package state
 
 import (
 	"fmt"
@@ -6,17 +6,18 @@ import (
 	"time"
 
 	"ut0311/entities"
+	"ut0311/log"
 )
 
-type state struct {
+type State struct {
 	state map[string]any
 
 	wg   sync.WaitGroup
 	done chan bool
 }
 
-func newState() *state {
-	return &state{
+func NewState() *State {
+	return &State{
 		state: map[string]any{
 			"controller.system.errors.restart":  false,
 			"controller.system.errors.watchdog": false,
@@ -43,7 +44,7 @@ func newState() *state {
 	}
 }
 
-func (s *state) poll() {
+func (s *State) Poll() {
 	s.wg.Add(1)
 
 	defer func() {
@@ -64,14 +65,20 @@ loop:
 	}
 }
 
-func (s *state) stop() error {
+func (s *State) Stop() error {
 	s.done <- true
 	s.wg.Wait()
 
 	return nil
 }
 
-func (s *state) update(timestamp time.Time, controller uint32, tag string, value any) *entities.Event {
+func (s *State) Set(timestamp time.Time, controller uint32, tag string, value any) {
+	debugf("set %v %v %v", timestamp, tag, value)
+
+	s.state[tag] = value
+}
+
+func (s *State) Update(timestamp time.Time, controller uint32, tag string, value any) *entities.Event {
 	debugf("update %v %v %v", timestamp, tag, value)
 
 	if old, ok := s.state[tag]; !ok {
@@ -96,11 +103,11 @@ func (s *state) update(timestamp time.Time, controller uint32, tag string, value
 	return nil
 }
 
-func (s *state) DateTime() (time.Time, error) {
+func (s *State) DateTime() (time.Time, error) {
 	return time.Now(), nil
 }
 
-func (s *state) SystemError(flags ...uint16) (bool, error) {
+func (s *State) SystemError(flags ...uint16) (bool, error) {
 	tags := map[uint16]string{
 		entities.ErrMemory:   "controller.system.error.memory",
 		entities.ErrQueue:    "controller.system.error.queue",
@@ -127,7 +134,7 @@ func (s *state) SystemError(flags ...uint16) (bool, error) {
 	return false, nil
 }
 
-func (s *state) SpecialInfo() (uint8, error) {
+func (s *State) SpecialInfo() (uint8, error) {
 	if v, ok := s.state["controller.system.special-info"]; !ok {
 		return 0, fmt.Errorf("controller.system.special-info not cached")
 	} else if u8, ok := v.(uint8); !ok {
@@ -137,7 +144,7 @@ func (s *state) SpecialInfo() (uint8, error) {
 	}
 }
 
-func (s *state) SequenceNo() (uint32, error) {
+func (s *State) SequenceNo() (uint32, error) {
 	if v, ok := s.state["controller.system.sequence-number"]; !ok {
 		return 0, fmt.Errorf("controller.system.sequence-number not cached")
 	} else if u32, ok := v.(uint32); !ok {
@@ -147,7 +154,7 @@ func (s *state) SequenceNo() (uint32, error) {
 	}
 }
 
-func (s *state) DoorOpen(door uint8) (bool, error) {
+func (s *State) DoorOpen(door uint8) (bool, error) {
 	tag := fmt.Sprintf("controller.door.%v.open", door)
 
 	if v, ok := s.state[tag]; !ok {
@@ -159,7 +166,7 @@ func (s *state) DoorOpen(door uint8) (bool, error) {
 	}
 }
 
-func (s *state) DoorButton(door uint8) (bool, error) {
+func (s *State) DoorButton(door uint8) (bool, error) {
 	tag := fmt.Sprintf("controller.door.%v.button", door)
 
 	if v, ok := s.state[tag]; !ok {
@@ -171,7 +178,7 @@ func (s *state) DoorButton(door uint8) (bool, error) {
 	}
 }
 
-func (s *state) DoorUnlocked(door uint8) (bool, error) {
+func (s *State) DoorUnlocked(door uint8) (bool, error) {
 	tag := fmt.Sprintf("controller.door.%v.unlocked", door)
 
 	if v, ok := s.state[tag]; !ok {
@@ -181,4 +188,20 @@ func (s *state) DoorUnlocked(door uint8) (bool, error) {
 	} else {
 		return b, nil
 	}
+}
+
+func debugf(format string, args ...any) {
+	log.Debugf("state", format, args...)
+}
+
+func infof(format string, args ...any) {
+	log.Infof("state", format, args...)
+}
+
+func warnf(format string, args ...any) {
+	log.Warnf("state", format, args...)
+}
+
+func errorf(format string, args ...any) {
+	log.Errorf("state", format, args...)
 }
