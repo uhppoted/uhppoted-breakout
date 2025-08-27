@@ -3,6 +3,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+extern const uint8_t NORMALLY_OPEN;
+extern const uint8_t NORMALLY_CLOSED;
+extern const uint8_t CONTROLLED;
+
 bool doors_get_mode(uint8_t door, uint8_t *mode);
 bool doors_get_delay(uint8_t door, uint8_t *delay);
 bool doors_get_unlocked(uint8_t door, bool *unlocked);

@@ -5,6 +5,10 @@
 
 #define LOGTAG "DOORS"
 
+const uint8_t NORMALLY_OPEN = 1;
+const uint8_t NORMALLY_CLOSED = 2;
+const uint8_t CONTROLLED = 3;
+
 bool doors_get_mode(uint8_t door, uint8_t *mode) {
     switch (door) {
     case 1:

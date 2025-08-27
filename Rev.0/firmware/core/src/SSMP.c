@@ -34,6 +34,7 @@ const int64_t SSMP_ERROR_WRONG_TYPE = 7;
 const int64_t SSMP_ERROR_COMMIT_FAILED = 14;
 const int64_t SSMP_ERROR_AUTHORIZATION = 16;
 const int64_t SSMP_ERROR_NOT_WRITABLE = 17;
+const int64_t SSMP_ERROR_INTERNAL = 255;
 
 typedef enum {
     TRAP_INPUT,

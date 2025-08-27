@@ -1,7 +1,6 @@
 # TODO
 
 - [ ] card swipe
-   - [x] db
    - [ ] swipe
       - [x] unlock door
       - [x] door unlock events
@@ -18,11 +17,13 @@
    - [x] use cached values for door locks
    - [ ] use cached values for alarms 
    - [ ] poll
+   - [ ] clear watchdog error after logging it
+   - (?) maybe use state tags like 'controller.405419896.xxxx....'
 
 - [ ] open-door
       - [ ] event
-      - [ ] ReasonCardDeniedDoorNormallyClosed
-      - [ ] ReasonCardDeniedDoorInterLock
+      - [ ] ReasonOpenDeniedDoorNormallyClosed
+      - [ ] ReasonOpenDeniedDoorInterLock
 
 ## RPCD
    - [ ] monitor interface
@@ -31,7 +32,7 @@
 
 ## eventd
    - [ ] monitor interface
-   - [ ] wrap DBC in struct that invalidate dbc on fatal error
+   - [ ] wrap DBC in struct that invalidates dbc on fatal error
    - [ ] commonalise _query_
    - [ ] commonalise _delete_
 
@@ -71,7 +72,7 @@
       - [ ] restructure
             - [x] traps update ut0311 state and state generates events
             - [ ] poll for current state
-            - [ ] get event info from state
+            - [x] get event info from state
             - [ ] replace callbacks with pipe
             - (?) map controller IDs to state
       - [x] inputs
@@ -94,10 +95,6 @@
    - [ ] Use 'perfect' hash function
       - ref. https://www.gnu.org/software/gperf
 
-### ACL
-- [ ] open door on PB
-- [ ] open door on card swipe
-
 ## Zero2W
 - [ ] serial logger
 - [ ] custom image
@@ -108,17 +105,14 @@
       - tmpfs
 
 ### UT0311
+   - [x] open door on card swipe
+   - [ ] open door on PB
+   - [ ] rework with text tags
+
+
    - [ ] eventd
-      - [x] add
-      - [x] get
       - [ ] remove unnecessary OID stuff
       - [ ] move entities to shared lib
-
-   - [x] store events to SQLite DB
-   - [x] rpcd::shutdown RPC listener
-   - [ ] open door on PB
-   - [ ] open door on card swipe
-   - [ ] rework with text tags
 
    - [ ] API
       - [x] get-controller

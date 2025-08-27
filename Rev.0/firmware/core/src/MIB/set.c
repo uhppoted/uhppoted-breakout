@@ -225,7 +225,6 @@ int64_t MIB_set_door_unlock(const char *OID, const value u, value *v) {
 
     bool unlock = (bool)u.boolean;
     uint8_t door;
-    bool unlocked;
 
     if (equal(OID, MIB_DOORS_1_UNLOCKED)) {
         door = 1;
@@ -235,17 +234,31 @@ int64_t MIB_set_door_unlock(const char *OID, const value u, value *v) {
         door = 3;
     } else if (equal(OID, MIB_DOORS_4_UNLOCKED)) {
         door = 4;
+    } else {
+        return SSMP_ERROR_NO_SUCH_OBJECT;
     }
 
+    // ... normally closed?
+    uint8_t mode;
+    if (!doors_get_mode(door, &mode)) {
+        return SSMP_ERROR_INTERNAL;
+    } else if (unlock && mode != NORMALLY_OPEN && mode != CONTROLLED) {
+        return SSMP_ERROR_BAD_VALUE;
+    }
+
+    // ... unlock
     if (unlock && !doors_unlock(door)) {
         return SSMP_ERROR_COMMIT_FAILED;
     } else if (!unlock && !doors_lock(door)) {
         return SSMP_ERROR_COMMIT_FAILED;
     }
 
+    // ... read back
+    bool unlocked;
     if (doors_get_unlocked(door, &unlocked)) {
         v->tag = VALUE_BOOLEAN;
         v->boolean = !unlocked;
+
         return SSMP_ERROR_NONE;
     }
 

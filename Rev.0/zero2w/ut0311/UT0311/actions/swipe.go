@@ -95,7 +95,7 @@ func swipe(timestamp time.Time, controller uint32, card uint32, door uint8, db *
 
 		tag := fmt.Sprintf("controller.door.%v.unlocked", door)
 
-		state.Set(timestamp, controller, tag, true)
+		state.Set(controller, tag, true)
 
 		return &entities.Event{
 			Index:     0,

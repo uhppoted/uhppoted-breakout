@@ -72,8 +72,8 @@ func (s *State) Stop() error {
 	return nil
 }
 
-func (s *State) Set(timestamp time.Time, controller uint32, tag string, value any) {
-	debugf("set %v %v %v", timestamp, tag, value)
+func (s *State) Set(controller uint32, tag string, value any) {
+	debugf("set %v %v %v", controller, tag, value)
 
 	s.state[tag] = value
 }
