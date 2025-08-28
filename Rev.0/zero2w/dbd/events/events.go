@@ -13,11 +13,14 @@ const LOGTAG = "events"
 type Events struct {
 }
 
-func (d *Events) GetEvent(index uint32, event *entities.Event) error {
-	debugf("get-event %v", index)
+func (d *Events) GetEvent(args struct {
+	Controller uint32
+	Index      uint32
+}, event *entities.Event) error {
+	debugf("get-event %v %v", args.Controller, args.Index)
 
 	get := func(ix uint32) error {
-		if record, err := db.GetEvent(ix); err != nil {
+		if record, err := db.GetEvent(args.Controller, args.Index); err != nil {
 			return err
 		} else {
 			*event = record
@@ -26,33 +29,33 @@ func (d *Events) GetEvent(index uint32, event *entities.Event) error {
 		return nil
 	}
 
-	if err := get(index); err != nil && !errors.Is(err, entities.ErrRecordNotFound) {
+	if err := get(args.Index); err != nil && !errors.Is(err, entities.ErrRecordNotFound) {
 		warnf("get-event (%v)", err)
 		return err
 	} else if err == nil {
 		return nil
 	}
 
-	if first, last, err := db.GetEvents(); err != nil {
+	if first, last, err := db.GetEvents(args.Controller); err != nil {
 		warnf("get-event (%v)", err)
 		return err
 	} else {
 		switch {
-		case index == 0:
+		case args.Index == 0:
 			return get(first)
 
-		case index == 0xffffffff:
+		case args.Index == 0xffffffff:
 			return get(last)
 
-		case index < first:
+		case args.Index < first:
 			*event = entities.Event{
-				Index: index,
+				Index: args.Index,
 				Type:  0xff, // overwritten
 			}
 
 			return nil
 
-		case index > last:
+		case args.Index > last:
 			return get(last)
 
 		default:

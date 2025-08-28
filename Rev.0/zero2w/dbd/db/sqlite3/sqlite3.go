@@ -18,6 +18,7 @@ const tableEvents = "Events"
 
 type driver interface {
 	open() (*sql.DB, error)
+	query(sql string, args ...any) (*sql.Rows, error)
 	insert(sql string, values ...any) (int64, error)
 	update(sql string, values ...any) error
 }
@@ -53,6 +54,10 @@ func ModernC(dsn string) impl {
 
 func (db impl) open() (*sql.DB, error) {
 	return db.driver.open()
+}
+
+func (db impl) query(sql string, args ...any) (*sql.Rows, error) {
+	return db.driver.query(sql, args...)
 }
 
 func (db impl) insert(sql string, values ...any) (int64, error) {

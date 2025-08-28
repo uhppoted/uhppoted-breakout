@@ -1,19 +1,21 @@
 package sqlite3
 
 import (
-	"context"
-	"fmt"
 	"time"
 
 	"dbd/entities"
 )
 
-const sqlGetEvent = `SELECT CAST(Timestamp AS VARCHAR),Type,Granted,Door,Direction,CardNumber,Reason FROM Events WHERE EventID=?;`
+const sqlGetEvent = `SELECT CAST(Timestamp AS VARCHAR),Type,Granted,Door,Direction,CardNumber,Reason FROM Events WHERE Controller=? AND EventID=?;`
+
+const sqlGetEvents = `SELECT MIN(EventID) AS First,MAX(EventID) AS Last FROM Events WHERE Controller=?;`
 
 const sqlPutEvent = `INSERT INTO Events (Controller, EventID, Timestamp, Type, Granted, Door, Direction, CardNumber, Reason)
                            SELECT ?, COALESCE(MAX(EventID), 0) + 1, ?, ?, ?, ?, ?, ?, ?
                            FROM Events
                            WHERE Controller = ?;`
+
+const sqlGetEventIndex = `SELECT EventIndex FROM Controller WHERE Controller=?;`
 
 const sqlSetEventIndex = `INSERT INTO Controller (Controller, EventIndex) VALUES (?, ?)
                                  ON CONFLICT(Controller)
@@ -23,23 +25,9 @@ const sqlRecordSpecialEvents = `INSERT INTO Controller (Controller, RecordSpecia
                                        ON CONFLICT(Controller)
                                           DO UPDATE SET RecordSpecialEvents = excluded.RecordSpecialEvents;`
 
-func (db impl) GetEvent(index uint32) (entities.Event, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	query := sqlGetEvent
-
-	if dbc, err := db.open(); err != nil {
+func (db impl) GetEvent(controller uint32, index uint32) (entities.Event, error) {
+	if rs, err := db.query(sqlGetEvent, controller, index); err != nil {
 		return entities.Event{}, err
-	} else if dbc == nil {
-		return entities.Event{}, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
-	} else if prepared, err := dbc.Prepare(query); err != nil {
-		return entities.Event{}, err
-	} else if rs, err := prepared.QueryContext(ctx, index); err != nil {
-		return entities.Event{}, err
-	} else if rs == nil {
-		return entities.Event{}, fmt.Errorf("invalid resultset (%v)", rs)
 	} else {
 		defer rs.Close()
 
@@ -96,23 +84,9 @@ func (db impl) GetEvent(index uint32) (entities.Event, error) {
 	}
 }
 
-func (db impl) GetEvents() (uint32, uint32, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	query := fmt.Sprintf(`SELECT MIN(EventID) AS First,MAX(EventID) AS Last FROM %[1]v;`, tableEvents)
-
-	if dbc, err := db.open(); err != nil {
+func (db impl) GetEvents(controller uint32) (uint32, uint32, error) {
+	if rs, err := db.query(sqlGetEvents, controller); err != nil {
 		return 0, 0, err
-	} else if dbc == nil {
-		return 0, 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
-	} else if prepared, err := dbc.Prepare(query); err != nil {
-		return 0, 0, err
-	} else if rs, err := prepared.QueryContext(ctx); err != nil {
-		return 0, 0, err
-	} else if rs == nil {
-		return 0, 0, fmt.Errorf("invalid resultset (%v)", rs)
 	} else {
 		defer rs.Close()
 
@@ -152,22 +126,8 @@ func (db impl) PutEvent(controller uint32, event entities.Event) (uint32, error)
 }
 
 func (db impl) GetEventIndex(controller uint32) (uint32, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	query := fmt.Sprintf(`SELECT EventIndex FROM %[1]v WHERE controller=?;`, tableController)
-
-	if dbc, err := db.open(); err != nil {
+	if rs, err := db.query(sqlGetEventIndex, controller); err != nil {
 		return 0, err
-	} else if dbc == nil {
-		return 0, fmt.Errorf("invalid sqlite3 DB (%v)", dbc)
-	} else if prepared, err := dbc.Prepare(query); err != nil {
-		return 0, err
-	} else if rs, err := prepared.QueryContext(ctx, controller); err != nil {
-		return 0, err
-	} else if rs == nil {
-		return 0, fmt.Errorf("invalid resultset (%v)", rs)
 	} else {
 		defer rs.Close()
 

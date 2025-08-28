@@ -29,21 +29,8 @@ const sqlDeleteCard = `DELETE FROM Cards WHERE Controller=? AND Card=?;`
 const sqlDeleteAllCards = `DELETE FROM Cards WHERE Controller=?;`
 
 func (db impl) GetCards(controller uint32) (uint32, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	zero := uint32(0)
-	query := sqlGetCards
-
-	if dbc, err := db.open(); err != nil {
-		return zero, err
-	} else if prepared, err := dbc.Prepare(query); err != nil {
-		return zero, err
-	} else if rs, err := prepared.QueryContext(ctx, controller); err != nil {
-		return zero, err
-	} else if rs == nil {
-		return zero, fmt.Errorf("invalid resultset (%v)", rs)
+	if rs, err := db.query(sqlGetCards, controller); err != nil {
+		return 0, err
 	} else {
 		defer rs.Close()
 
@@ -57,31 +44,19 @@ func (db impl) GetCards(controller uint32) (uint32, error) {
 			}
 
 			if err := rs.Scan(pointers...); err != nil {
-				return zero, err
+				return 0, err
 			} else {
 				return record.cards, nil
 			}
 		}
 
-		return zero, entities.ErrRecordNotFound
+		return 0, entities.ErrRecordNotFound
 	}
 }
 
 func (db impl) GetCard(controller uint32, card uint32) (*entities.Card, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	query := sqlGetCard
-
-	if dbc, err := db.open(); err != nil {
+	if rs, err := db.query(sqlGetCard, controller, card); err != nil {
 		return nil, err
-	} else if prepared, err := dbc.Prepare(query); err != nil {
-		return nil, err
-	} else if rs, err := prepared.QueryContext(ctx, controller, card); err != nil {
-		return nil, err
-	} else if rs == nil {
-		return nil, fmt.Errorf("invalid resultset (%v)", rs)
 	} else {
 		defer rs.Close()
 
@@ -145,20 +120,8 @@ func (db impl) GetCard(controller uint32, card uint32) (*entities.Card, error) {
 }
 
 func (db impl) GetCardByIndex(controller uint32, index uint32) (*entities.Card, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-
-	defer cancel()
-
-	query := sqlGetCardByIndex
-
-	if dbc, err := db.open(); err != nil {
+	if rs, err := db.query(sqlGetCardByIndex, controller, index); err != nil {
 		return nil, err
-	} else if prepared, err := dbc.Prepare(query); err != nil {
-		return nil, err
-	} else if rs, err := prepared.QueryContext(ctx, controller, index); err != nil {
-		return nil, err
-	} else if rs == nil {
-		return nil, fmt.Errorf("invalid resultset (%v)", rs)
 	} else {
 		defer rs.Close()
 

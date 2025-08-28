@@ -46,6 +46,24 @@ func (db *modernc) open() (*sql.DB, error) {
 	return db.dbc, nil
 }
 
+func (db modernc) query(sql string, args ...any) (*sql.Rows, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	defer cancel()
+
+	if dbc, err := db.open(); err != nil {
+		return nil, err
+	} else if prepared, err := dbc.Prepare(sql); err != nil {
+		return nil, err
+	} else if rs, err := prepared.QueryContext(ctx, args...); err != nil {
+		return nil, err
+	} else if rs == nil {
+		return nil, fmt.Errorf("invalid resultset (%v)", rs)
+	} else {
+		return rs, nil
+	}
+}
+
 func (db modernc) insert(sql string, values ...any) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 

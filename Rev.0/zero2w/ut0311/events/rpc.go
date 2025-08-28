@@ -47,14 +47,22 @@ func (e *Events) Add(controller uint32, event entities.Event) (uint32, error) {
 	}
 }
 
-func (e *Events) Get(index uint32) (entities.Event, error) {
+func (e *Events) Get(controller uint32, index uint32) (entities.Event, error) {
 	debugf("get-event %v", index)
+
+	var args = struct {
+		Controller uint32
+		Index      uint32
+	}{
+		Controller: controller,
+		Index:      index,
+	}
 
 	var event entities.Event
 
 	if client, err := rpc.DialHTTP(e.dial.network, e.dial.address); err != nil {
 		return entities.Event{}, err
-	} else if err := client.Call(api.getEvent, index, &event); err != nil {
+	} else if err := client.Call(api.getEvent, args, &event); err != nil {
 		return entities.Event{}, err
 	} else {
 		return event, nil

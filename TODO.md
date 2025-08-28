@@ -25,6 +25,9 @@
       - [ ] ReasonOpenDeniedDoorNormallyClosed
       - [ ] ReasonOpenDeniedDoorInterLock
 
+- [ ] uhppote-cli::get-events
+
+
 ## RPCD
    - [ ] monitor interface
    - (?) Context.WithTimeout 

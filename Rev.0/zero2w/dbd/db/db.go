@@ -9,6 +9,8 @@ import (
 )
 
 type DB interface {
+	GetDoor(controller uint32, door uint8) (*entities.Door, error)
+
 	GetCards(controller uint32) (uint32, error)
 	GetCard(controller uint32, card uint32) (*entities.Card, error)
 	GetCardByIndex(controller uint32, index uint32) (*entities.Card, error)
@@ -16,12 +18,12 @@ type DB interface {
 	DeleteCard(controller uint32, card uint32) (bool, error)
 	DeleteAllCards(controller uint32) (bool, error)
 
-	GetEvents() (uint32, uint32, error)
-	GetEvent(index uint32) (entities.Event, error)
+	GetEvents(controller uint32) (uint32, uint32, error)
+	GetEvent(copntroller uint32, index uint32) (entities.Event, error)
 	PutEvent(controller uint32, event entities.Event) (uint32, error)
-	GetEventIndex(uint32) (uint32, error)
-	SetEventIndex(uint32, uint32) error
-	RecordSpecialEvents(uint32, bool) error
+	GetEventIndex(controller uint32) (uint32, error)
+	SetEventIndex(controller uint32, index uint32) error
+	RecordSpecialEvents(controller uint32, enabled bool) error
 }
 
 var db DB
@@ -39,6 +41,10 @@ func Init(dsn string) error {
 	default:
 		return fmt.Errorf("unsupported DSN (%v)", dsn)
 	}
+}
+
+func GetDoor(controller uint32, door uint8) (*entities.Door, error) {
+	return db.GetDoor(controller, door)
 }
 
 func GetCards(controller uint32) (uint32, error) {
@@ -65,12 +71,12 @@ func DeleteAllCards(controller uint32) (bool, error) {
 	return db.DeleteAllCards(controller)
 }
 
-func GetEvents() (uint32, uint32, error) {
-	return db.GetEvents()
+func GetEvents(controller uint32) (uint32, uint32, error) {
+	return db.GetEvents(controller)
 }
 
-func GetEvent(index uint32) (entities.Event, error) {
-	return db.GetEvent(index)
+func GetEvent(controller uint32, index uint32) (entities.Event, error) {
+	return db.GetEvent(controller, index)
 }
 
 func PutEvent(controller uint32, event entities.Event) (uint32, error) {

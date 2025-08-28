@@ -9,13 +9,13 @@ import (
 )
 
 func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
+	if controller, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
-	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
+	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
 	} else {
 		response := messages.GetStatusResponse{
-			SerialNumber: lib.SerialNumber(id),
+			SerialNumber: lib.SerialNumber(controller),
 			RelayState:   0x00,
 			InputState:   0x00,
 			SystemError:  0x00,
@@ -154,7 +154,7 @@ func (ut0311 *UT0311) getStatus(rq *messages.GetStatusRequest) (any, error) {
 		}
 
 		// ... event
-		if event, err := ut0311.events.Get(0xffffffff); err != nil {
+		if event, err := ut0311.events.Get(controller, 0xffffffff); err != nil {
 			return nil, err
 		} else {
 			response.EventIndex = event.Index

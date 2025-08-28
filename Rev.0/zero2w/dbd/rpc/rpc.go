@@ -13,6 +13,7 @@ import (
 	"dbd/cards"
 	"dbd/events"
 	"dbd/log"
+	"dbd/system"
 )
 
 const LOGTAG = "rpc"
@@ -21,8 +22,9 @@ type rpcd struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	events events.Events
+	system system.System
 	cards  cards.Cards
+	events events.Events
 
 	listen struct {
 		network string
@@ -37,8 +39,9 @@ func NewRPCD(listen string) (*rpcd, error) {
 		ctx:    ctx,
 		cancel: cancel,
 
-		events: events.Events{},
+		system: system.System{},
 		cards:  cards.Cards{},
+		events: events.Events{},
 	}
 
 	// ... set 'listen' address:port
@@ -58,8 +61,9 @@ func NewRPCD(listen string) (*rpcd, error) {
 }
 
 func (r *rpcd) Run() {
-	lib.RegisterName("events", &r.events)
+	lib.RegisterName("system", &r.system)
 	lib.RegisterName("cards", &r.cards)
+	lib.RegisterName("events", &r.events)
 
 	lib.HandleHTTP()
 

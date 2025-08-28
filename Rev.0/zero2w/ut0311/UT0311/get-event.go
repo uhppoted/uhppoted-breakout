@@ -8,15 +8,15 @@ import (
 )
 
 func (ut0311 *UT0311) getEvent(rq *messages.GetEventRequest) (any, error) {
-	if id, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
+	if controller, err := scmp.Get[uint32](ut0311.breakout, scmp.OID_CONTROLLER_ID); err != nil {
 		return nil, err
-	} else if id == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != id) {
+	} else if controller == 0 || (rq.SerialNumber != 0 && uint32(rq.SerialNumber) != controller) {
 		return nil, nil
-	} else if event, err := ut0311.events.Get(rq.Index); err != nil {
+	} else if event, err := ut0311.events.Get(controller, rq.Index); err != nil {
 		return nil, err
 	} else {
 		response := messages.GetEventResponse{
-			SerialNumber: types.SerialNumber(id),
+			SerialNumber: types.SerialNumber(controller),
 			Index:        event.Index,
 			Type:         uint8(event.Type),
 			Granted:      event.Granted,
