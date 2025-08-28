@@ -16,7 +16,6 @@ import (
 
 	"github.com/uhppoted/uhppote-core/messages"
 
-	"ut0311/UT0311/actions"
 	"ut0311/UT0311/state"
 	"ut0311/cards"
 	"ut0311/config"
@@ -42,7 +41,7 @@ type listener interface {
 type UT0311 struct {
 	config   *config.Config
 	breakout *rpcd.RPC
-	system   system.System
+	system   *system.System
 	events   *events.Events
 	cards    *cards.Cards
 
@@ -66,7 +65,6 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 
 	ut0311 := UT0311{
 		config: c,
-		system: system.System{},
 
 		cm:   cm,
 		udp:  newUDP(cm),
@@ -79,22 +77,28 @@ func NewUT0311(c *config.Config) (*UT0311, error) {
 		closing: false,
 	}
 
-	if rpc, err := rpcd.NewRPC(c.Driver.RPC.DialAddr, c.Driver.RPC.ListenAddr, c.Driver.Caching, ut0311.onTrap); err != nil {
+	if v, err := rpcd.NewRPC(c.Driver.RPC.DialAddr, c.Driver.RPC.ListenAddr, c.Driver.Caching, ut0311.onTrap); err != nil {
 		return nil, err
 	} else {
-		ut0311.breakout = rpc
+		ut0311.breakout = v
 	}
 
-	if rpc, err := events.NewEvents(c.Events.RPC.DialAddr); err != nil {
+	if v, err := events.NewEvents(c.Events.RPC.DialAddr); err != nil {
 		return nil, err
 	} else {
-		ut0311.events = rpc
+		ut0311.events = v
 	}
 
-	if rpc, err := cards.NewCards(c.Cards.RPC.DialAddr); err != nil {
+	if v, err := cards.NewCards(c.Cards.RPC.DialAddr); err != nil {
 		return nil, err
 	} else {
-		ut0311.cards = rpc
+		ut0311.cards = v
+	}
+
+	if v, err := system.NewSystem(c.System.RPC.DialAddr); err != nil {
+		return nil, err
+	} else {
+		ut0311.system = v
 	}
 
 	return &ut0311, nil
@@ -360,10 +364,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 	match := re.FindStringSubmatch(tag)
 	if len(match) > 1 {
 		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			if e := actions.Swipe(timestamp, controller, value, uint8(door), ut0311.cards, ut0311.breakout, ut0311.state); e != nil {
-				ut0311.event(controller, e)
-			}
-
+			ut0311.Swipe(timestamp, controller, value, uint8(door))
 			return
 		}
 	}

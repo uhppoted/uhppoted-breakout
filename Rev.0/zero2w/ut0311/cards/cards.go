@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	"ut0311/log"
-	"ut0311/scmp"
 )
 
 const LOGTAG = "cards"
@@ -15,23 +14,24 @@ type Cards struct {
 		network string
 		address string
 	}
-
-	cards []scmp.Card
 }
 
 func NewCards(dial string) (*Cards, error) {
 	infof("init dial:%v", dial)
 
-	c := Cards{}
-
 	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(dial); len(matches) < 3 {
 		return nil, fmt.Errorf("invalid RPC 'dial' address (%v)", dial)
 	} else {
-		c.dial.network = matches[1]
-		c.dial.address = matches[2]
+		return &Cards{
+			dial: struct {
+				network string
+				address string
+			}{
+				network: matches[1],
+				address: matches[2],
+			},
+		}, nil
 	}
-
-	return &c, nil
 }
 
 func debugf(format string, args ...any) {

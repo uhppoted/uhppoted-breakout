@@ -2,12 +2,37 @@ package system
 
 import (
 	"fmt"
+	"regexp"
 
 	"ut0311/log"
 	"ut0311/scmp"
 )
 
 type System struct {
+	dial struct {
+		network string
+		address string
+	}
+}
+
+const LOGTAG = "system"
+
+func NewSystem(dial string) (*System, error) {
+	infof("init dial:%v", dial)
+
+	if matches := regexp.MustCompile("(tcp|unix)::(.*)").FindStringSubmatch(dial); len(matches) < 3 {
+		return nil, fmt.Errorf("invalid RPC 'dial' address (%v)", dial)
+	} else {
+		return &System{
+			dial: struct {
+				network string
+				address string
+			}{
+				network: matches[1],
+				address: matches[2],
+			},
+		}, nil
+	}
 }
 
 func (sys System) GetUint8(oid scmp.OID) (uint8, error) {
