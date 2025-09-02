@@ -39,7 +39,7 @@ func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, err
 		return messages.SetDoorControlStateResponse{
 			SerialNumber: types.SerialNumber(controller),
 			Door:         door,
-			ControlState: mode,
+			ControlState: uint8(mode),
 			Delay:        delay,
 		}, nil
 	}

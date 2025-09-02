@@ -4,6 +4,8 @@
 
 typedef struct settings {
     struct {
+        uint8_t interlock;
+
         struct {
             uint8_t mode;
             uint8_t delay;

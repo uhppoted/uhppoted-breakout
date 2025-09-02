@@ -152,6 +152,30 @@ int64_t MIB_set_controller_syserror(const char *OID, const value u, value *v) {
     return MIB_get_controller_syserror(OID, v);
 }
 
+int64_t MIB_set_doors_interlock(const char *OID, const value u, value *v) {
+    if (u.tag != VALUE_UINT8 && u.tag != VALUE_UINT32) {
+        return SSMP_ERROR_WRONG_TYPE;
+    }
+
+    if (u.integer != 0 && u.integer != 1 && u.integer != 2 && u.integer != 3 && u.integer != 4 && u.integer != 8) {
+        return SSMP_ERROR_BAD_VALUE;
+    }
+
+    uint8_t interlock = (uint8_t)u.integer;
+
+    if (!doors_set_interlock(interlock)) {
+        return SSMP_ERROR_COMMIT_FAILED;
+    }
+
+    if (doors_get_interlock(&interlock)) {
+        v->tag = VALUE_UINT8;
+        v->integer = interlock;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_INTERNAL;
+}
+
 int64_t MIB_set_door_mode(const char *OID, const value u, value *v) {
     if (u.tag != VALUE_UINT8 && u.tag != VALUE_UINT16 && u.tag != VALUE_UINT32) {
         return SSMP_ERROR_WRONG_TYPE;
@@ -162,15 +186,15 @@ int64_t MIB_set_door_mode(const char *OID, const value u, value *v) {
     }
 
     uint8_t mode = (uint8_t)u.integer;
-    uint8_t door;
+    uint8_t door = 0;
 
-    if (equal(OID, MIB_DOORS_1_MODE)) {
+    if (equal(OID, MIB_DOOR_1_MODE)) {
         door = 1;
-    } else if (equal(OID, MIB_DOORS_2_MODE)) {
+    } else if (equal(OID, MIB_DOOR_2_MODE)) {
         door = 2;
-    } else if (equal(OID, MIB_DOORS_3_MODE)) {
+    } else if (equal(OID, MIB_DOOR_3_MODE)) {
         door = 3;
-    } else if (equal(OID, MIB_DOORS_4_MODE)) {
+    } else if (equal(OID, MIB_DOOR_4_MODE)) {
         door = 4;
     }
 
@@ -195,13 +219,13 @@ int64_t MIB_set_door_delay(const char *OID, const value u, value *v) {
     uint8_t delay = (uint8_t)u.integer;
     uint8_t door;
 
-    if (equal(OID, MIB_DOORS_1_DELAY)) {
+    if (equal(OID, MIB_DOOR_1_DELAY)) {
         door = 1;
-    } else if (equal(OID, MIB_DOORS_2_DELAY)) {
+    } else if (equal(OID, MIB_DOOR_2_DELAY)) {
         door = 2;
-    } else if (equal(OID, MIB_DOORS_3_DELAY)) {
+    } else if (equal(OID, MIB_DOOR_3_DELAY)) {
         door = 3;
-    } else if (equal(OID, MIB_DOORS_4_DELAY)) {
+    } else if (equal(OID, MIB_DOOR_4_DELAY)) {
         door = 4;
     }
 
@@ -226,13 +250,13 @@ int64_t MIB_set_door_unlock(const char *OID, const value u, value *v) {
     bool unlock = (bool)u.boolean;
     uint8_t door;
 
-    if (equal(OID, MIB_DOORS_1_UNLOCKED)) {
+    if (equal(OID, MIB_DOOR_1_UNLOCKED)) {
         door = 1;
-    } else if (equal(OID, MIB_DOORS_2_UNLOCKED)) {
+    } else if (equal(OID, MIB_DOOR_2_UNLOCKED)) {
         door = 2;
-    } else if (equal(OID, MIB_DOORS_3_UNLOCKED)) {
+    } else if (equal(OID, MIB_DOOR_3_UNLOCKED)) {
         door = 3;
-    } else if (equal(OID, MIB_DOORS_4_UNLOCKED)) {
+    } else if (equal(OID, MIB_DOOR_4_UNLOCKED)) {
         door = 4;
     } else {
         return SSMP_ERROR_NO_SUCH_OBJECT;

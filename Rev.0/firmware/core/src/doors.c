@@ -9,6 +9,27 @@ const uint8_t NORMALLY_OPEN = 1;
 const uint8_t NORMALLY_CLOSED = 2;
 const uint8_t CONTROLLED = 3;
 
+const uint8_t NO_INTERLOCK = 0;    // disabled
+const uint8_t INTERLOCK_12 = 1;    // doors (1,2)
+const uint8_t INTERLOCK_34 = 2;    // doors (3,4)
+const uint8_t INTERLOCK_12_34 = 3; // doors (1,2) and (3,4)
+const uint8_t INTERLOCK_123 = 4;   // doors (1,2,3)
+const uint8_t INTERLOCK_1234 = 8;  // doors (1,2,3,4)
+
+bool doors_get_interlock(uint8_t *interlock) {
+    *interlock = SETTINGS.doors.interlock;
+    return true;
+}
+
+bool doors_set_interlock(uint8_t interlock) {
+    if (interlock == 0 || interlock == 1 || interlock == 2 || interlock == 3 || interlock == 4 || interlock == 8) {
+        SETTINGS.doors.interlock = interlock;
+        return true;
+    }
+
+    return false;
+}
+
 bool doors_get_mode(uint8_t door, uint8_t *mode) {
     switch (door) {
     case 1:

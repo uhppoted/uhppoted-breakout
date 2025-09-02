@@ -10,6 +10,7 @@ extern int64_t MIB_get_controller_released(const char *, value *);
 extern int64_t MIB_get_controller_datetime(const char *, value *);
 extern int64_t MIB_get_controller_syserror(const char *, value *);
 extern int64_t MIB_get_controller_sysinfo(const char *, value *);
+extern int64_t MIB_get_doors_interlock(const char *, value *);
 extern int64_t MIB_get_door_mode(const char *, value *);
 extern int64_t MIB_get_door_delay(const char *, value *);
 extern int64_t MIB_get_door_unlocked(const char *, value *);
@@ -20,6 +21,7 @@ extern int64_t MIB_get_alarm_fire_alarm(const char *, value *);
 
 extern int64_t MIB_set_controller_datetime(const char *, const value, value *);
 extern int64_t MIB_set_controller_syserror(const char *, const value, value *);
+extern int64_t MIB_set_doors_interlock(const char *, const value, value *);
 extern int64_t MIB_set_door_mode(const char *, const value, value *);
 extern int64_t MIB_set_door_delay(const char *, const value, value *);
 extern int64_t MIB_set_door_unlock(const char *, const value, value *);
@@ -145,154 +147,161 @@ const MIBItem MIB_CONTROLLER_SYSINFO = {
     .get = MIB_get_controller_sysinfo,
 };
 
-const MIBItem MIB_DOORS_1_MODE = {
+const MIBItem MIB_DOORS_INTERLOCK = {
+    .hash = 4218048110,
+    .OID = "0.1.3.6.1.4.1.65536.3.0.1",
+    .get = MIB_get_doors_interlock,
+    .set = MIB_set_doors_interlock,
+};
+
+const MIBItem MIB_DOOR_1_MODE = {
     .hash = 4218049199,
     .OID = "0.1.3.6.1.4.1.65536.3.1.1",
     .get = MIB_get_door_mode,
     .set = MIB_set_door_mode,
 };
 
-const MIBItem MIB_DOORS_2_MODE = {
+const MIBItem MIB_DOOR_2_MODE = {
     .hash = 4218050288,
     .OID = "0.1.3.6.1.4.1.65536.3.2.1",
     .get = MIB_get_door_mode,
     .set = MIB_set_door_mode,
 };
 
-const MIBItem MIB_DOORS_3_MODE = {
+const MIBItem MIB_DOOR_3_MODE = {
     .hash = 4218051377,
     .OID = "0.1.3.6.1.4.1.65536.3.3.1",
     .get = MIB_get_door_mode,
     .set = MIB_set_door_mode,
 };
 
-const MIBItem MIB_DOORS_4_MODE = {
+const MIBItem MIB_DOOR_4_MODE = {
     .hash = 4218052466,
     .OID = "0.1.3.6.1.4.1.65536.3.4.1",
     .get = MIB_get_door_mode,
     .set = MIB_set_door_mode,
 };
 
-const MIBItem MIB_DOORS_1_DELAY = {
+const MIBItem MIB_DOOR_1_DELAY = {
     .hash = 4218049200,
     .OID = "0.1.3.6.1.4.1.65536.3.1.2",
     .get = MIB_get_door_delay,
     .set = MIB_set_door_delay,
 };
 
-const MIBItem MIB_DOORS_2_DELAY = {
+const MIBItem MIB_DOOR_2_DELAY = {
     .hash = 4218050289,
     .OID = "0.1.3.6.1.4.1.65536.3.2.2",
     .get = MIB_get_door_delay,
     .set = MIB_set_door_delay,
 };
 
-const MIBItem MIB_DOORS_3_DELAY = {
+const MIBItem MIB_DOOR_3_DELAY = {
     .hash = 4218051378,
     .OID = "0.1.3.6.1.4.1.65536.3.3.2",
     .get = MIB_get_door_delay,
     .set = MIB_set_door_delay,
 };
 
-const MIBItem MIB_DOORS_4_DELAY = {
+const MIBItem MIB_DOOR_4_DELAY = {
     .hash = 4218052467,
     .OID = "0.1.3.6.1.4.1.65536.3.4.2",
     .get = MIB_get_door_delay,
     .set = MIB_set_door_delay,
 };
 
-const MIBItem MIB_DOORS_1_UNLOCKED = {
+const MIBItem MIB_DOOR_1_UNLOCKED = {
     .hash = 4218049202,
     .OID = "0.1.3.6.1.4.1.65536.3.1.4",
     .get = MIB_get_door_unlocked,
     .set = MIB_set_door_unlock,
 };
 
-const MIBItem MIB_DOORS_2_UNLOCKED = {
+const MIBItem MIB_DOOR_2_UNLOCKED = {
     .hash = 4218050291,
     .OID = "0.1.3.6.1.4.1.65536.3.2.4",
     .get = MIB_get_door_unlocked,
     .set = MIB_set_door_unlock,
 };
 
-const MIBItem MIB_DOORS_3_UNLOCKED = {
+const MIBItem MIB_DOOR_3_UNLOCKED = {
     .hash = 4218051380,
     .OID = "0.1.3.6.1.4.1.65536.3.3.4",
     .get = MIB_get_door_unlocked,
     .set = MIB_set_door_unlock,
 };
 
-const MIBItem MIB_DOORS_4_UNLOCKED = {
+const MIBItem MIB_DOOR_4_UNLOCKED = {
     .hash = 4218052469,
     .OID = "0.1.3.6.1.4.1.65536.3.4.4",
     .get = MIB_get_door_unlocked,
     .set = MIB_set_door_unlock,
 };
 
-const MIBItem MIB_DOORS_1_OPEN = {
+const MIBItem MIB_DOOR_1_OPEN = {
     .hash = 4218049203,
     .OID = "0.1.3.6.1.4.1.65536.3.1.5",
     .get = MIB_get_door_open,
 };
 
-const MIBItem MIB_DOORS_2_OPEN = {
+const MIBItem MIB_DOOR_2_OPEN = {
     .hash = 4218050292,
     .OID = "0.1.3.6.1.4.1.65536.3.2.5",
     .get = MIB_get_door_open,
 };
 
-const MIBItem MIB_DOORS_3_OPEN = {
+const MIBItem MIB_DOOR_3_OPEN = {
     .hash = 4218051381,
     .OID = "0.1.3.6.1.4.1.65536.3.3.5",
     .get = MIB_get_door_open,
 };
 
-const MIBItem MIB_DOORS_4_OPEN = {
+const MIBItem MIB_DOOR_4_OPEN = {
     .hash = 4218052470,
     .OID = "0.1.3.6.1.4.1.65536.3.4.5",
     .get = MIB_get_door_open,
 };
 
-const MIBItem MIB_DOORS_1_BUTTON = {
+const MIBItem MIB_DOOR_1_BUTTON = {
     .hash = 4218049204,
     .OID = "0.1.3.6.1.4.1.65536.3.1.6",
     .get = MIB_get_door_pushbutton,
 };
 
-const MIBItem MIB_DOORS_2_BUTTON = {
+const MIBItem MIB_DOOR_2_BUTTON = {
     .hash = 4218050293,
     .OID = "0.1.3.6.1.4.1.65536.3.2.6",
     .get = MIB_get_door_pushbutton,
 };
 
-const MIBItem MIB_DOORS_3_BUTTON = {
+const MIBItem MIB_DOOR_3_BUTTON = {
     .hash = 4218051382,
     .OID = "0.1.3.6.1.4.1.65536.3.3.6",
     .get = MIB_get_door_pushbutton,
 };
 
-const MIBItem MIB_DOORS_4_BUTTON = {
+const MIBItem MIB_DOOR_4_BUTTON = {
     .hash = 4218052471,
     .OID = "0.1.3.6.1.4.1.65536.3.4.6",
     .get = MIB_get_door_pushbutton,
 };
 
-const MIBItem MIB_DOORS_1_SWIPE = {
+const MIBItem MIB_DOOR_1_SWIPE = {
     .hash = 4218049205,
     .OID = "0.1.3.6.1.4.1.65536.3.1.7",
 };
 
-const MIBItem MIB_DOORS_2_SWIPE = {
+const MIBItem MIB_DOOR_2_SWIPE = {
     .hash = 4218050294,
     .OID = "0.1.3.6.1.4.1.65536.3.2.7",
 };
 
-const MIBItem MIB_DOORS_3_SWIPE = {
+const MIBItem MIB_DOOR_3_SWIPE = {
     .hash = 4218051383,
     .OID = "0.1.3.6.1.4.1.65536.3.3.7",
 };
 
-const MIBItem MIB_DOORS_4_SWIPE = {
+const MIBItem MIB_DOOR_4_SWIPE = {
     .hash = 4218052472,
     .OID = "0.1.3.6.1.4.1.65536.3.4.7",
 };
@@ -309,7 +318,7 @@ const MIBItem MIB_ALARMS_FIRE_ALARM = {
     .get = MIB_get_alarm_fire_alarm,
 };
 
-const MIBItem OIDs[44] = {
+const MIBItem OIDs[45] = {
     MIB_SYS_BOARD_ID,
     MIB_CONTROLLER_ID,
     MIB_CONTROLLER_VERSION,
@@ -328,30 +337,31 @@ const MIBItem OIDs[44] = {
     MIB_CONTROLLER_SYSERROR_DEBUG,
     MIB_CONTROLLER_SYSERROR_UNKNOWN,
     MIB_CONTROLLER_SYSINFO,
-    MIB_DOORS_1_MODE,
-    MIB_DOORS_2_MODE,
-    MIB_DOORS_3_MODE,
-    MIB_DOORS_4_MODE,
-    MIB_DOORS_1_DELAY,
-    MIB_DOORS_2_DELAY,
-    MIB_DOORS_3_DELAY,
-    MIB_DOORS_4_DELAY,
-    MIB_DOORS_1_UNLOCKED,
-    MIB_DOORS_2_UNLOCKED,
-    MIB_DOORS_3_UNLOCKED,
-    MIB_DOORS_4_UNLOCKED,
-    MIB_DOORS_1_OPEN,
-    MIB_DOORS_2_OPEN,
-    MIB_DOORS_3_OPEN,
-    MIB_DOORS_4_OPEN,
-    MIB_DOORS_1_BUTTON,
-    MIB_DOORS_2_BUTTON,
-    MIB_DOORS_3_BUTTON,
-    MIB_DOORS_4_BUTTON,
-    MIB_DOORS_1_SWIPE,
-    MIB_DOORS_2_SWIPE,
-    MIB_DOORS_3_SWIPE,
-    MIB_DOORS_4_SWIPE,
+    MIB_DOORS_INTERLOCK,
+    MIB_DOOR_1_MODE,
+    MIB_DOOR_2_MODE,
+    MIB_DOOR_3_MODE,
+    MIB_DOOR_4_MODE,
+    MIB_DOOR_1_DELAY,
+    MIB_DOOR_2_DELAY,
+    MIB_DOOR_3_DELAY,
+    MIB_DOOR_4_DELAY,
+    MIB_DOOR_1_UNLOCKED,
+    MIB_DOOR_2_UNLOCKED,
+    MIB_DOOR_3_UNLOCKED,
+    MIB_DOOR_4_UNLOCKED,
+    MIB_DOOR_1_OPEN,
+    MIB_DOOR_2_OPEN,
+    MIB_DOOR_3_OPEN,
+    MIB_DOOR_4_OPEN,
+    MIB_DOOR_1_BUTTON,
+    MIB_DOOR_2_BUTTON,
+    MIB_DOOR_3_BUTTON,
+    MIB_DOOR_4_BUTTON,
+    MIB_DOOR_1_SWIPE,
+    MIB_DOOR_2_SWIPE,
+    MIB_DOOR_3_SWIPE,
+    MIB_DOOR_4_SWIPE,
     MIB_ALARMS_TAMPER_DETECT,
     MIB_ALARMS_FIRE_ALARM,
 };

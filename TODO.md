@@ -5,7 +5,7 @@
       - [x] unlock door
       - [x] door unlock events
       - [x] swipe event
-      - [ ] ReasonCardDeniedDoorNormallyClosed
+      - [x] ReasonCardDeniedDoorNormallyClosed
       - [ ] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback
    - [ ] swipe + PIN
@@ -17,6 +17,8 @@
    - [x] use cached values for door locks
    - [ ] use cached values for alarms 
    - [ ] poll
+      - pack state into byte array and send CRC every e.g. 500ms
+      - ut0311 does the same and fetches packed state if CRCs don't match
    - [ ] clear watchdog error after logging it
    - (?) maybe use state tags like 'controller.405419896.xxxx....'
 
@@ -33,10 +35,10 @@
    - (?) Context.WithTimeout 
    - (?) https://go.dev/blog/synctest
 
-## eventd
+## dbd
    - [ ] monitor interface
    - [ ] wrap DBC in struct that invalidates dbc on fatal error
-   - [ ] commonalise _query_
+   - [x] commonalise _query_
    - [ ] commonalise _delete_
 
 ## breakout
@@ -88,6 +90,7 @@
 
    - [ ] save to flash
       - [ ] door delay/mode
+      - [ ] interlock
 
    - [ ] `DEBUG  DOORS  settings saved` on `set-time`
       - only save if OID in 'save list'
@@ -146,7 +149,7 @@
       - [ ] clear-task-list
       - [ ] refresh-task-list
       - [ ] set-pc-control
-      - [ ] set-interlock
+      - [x] set-interlock
       - [ ] activate-keypads
       - [ ] get-anti-passback
       - [ ] set-anti-passback

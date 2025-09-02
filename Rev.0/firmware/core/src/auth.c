@@ -12,8 +12,8 @@ typedef struct community {
 } community;
 
 const struct {
-    MIBItem const *get[38];
-    MIBItem const *set[13];
+    MIBItem const *get[39];
+    MIBItem const *set[14];
 } PUBLIC = {
     .get = {
         &MIB_CONTROLLER_ID,
@@ -33,30 +33,32 @@ const struct {
         &MIB_CONTROLLER_SYSERROR_UNKNOWN,
         &MIB_CONTROLLER_SYSINFO,
 
-        &MIB_DOORS_1_MODE,
-        &MIB_DOORS_2_MODE,
-        &MIB_DOORS_3_MODE,
-        &MIB_DOORS_4_MODE,
+        &MIB_DOORS_INTERLOCK,
 
-        &MIB_DOORS_1_DELAY,
-        &MIB_DOORS_2_DELAY,
-        &MIB_DOORS_3_DELAY,
-        &MIB_DOORS_4_DELAY,
+        &MIB_DOOR_1_MODE,
+        &MIB_DOOR_2_MODE,
+        &MIB_DOOR_3_MODE,
+        &MIB_DOOR_4_MODE,
 
-        &MIB_DOORS_1_UNLOCKED,
-        &MIB_DOORS_2_UNLOCKED,
-        &MIB_DOORS_3_UNLOCKED,
-        &MIB_DOORS_4_UNLOCKED,
+        &MIB_DOOR_1_DELAY,
+        &MIB_DOOR_2_DELAY,
+        &MIB_DOOR_3_DELAY,
+        &MIB_DOOR_4_DELAY,
 
-        &MIB_DOORS_1_OPEN,
-        &MIB_DOORS_2_OPEN,
-        &MIB_DOORS_3_OPEN,
-        &MIB_DOORS_4_OPEN,
+        &MIB_DOOR_1_UNLOCKED,
+        &MIB_DOOR_2_UNLOCKED,
+        &MIB_DOOR_3_UNLOCKED,
+        &MIB_DOOR_4_UNLOCKED,
 
-        &MIB_DOORS_1_BUTTON,
-        &MIB_DOORS_2_BUTTON,
-        &MIB_DOORS_3_BUTTON,
-        &MIB_DOORS_4_BUTTON,
+        &MIB_DOOR_1_OPEN,
+        &MIB_DOOR_2_OPEN,
+        &MIB_DOOR_3_OPEN,
+        &MIB_DOOR_4_OPEN,
+
+        &MIB_DOOR_1_BUTTON,
+        &MIB_DOOR_2_BUTTON,
+        &MIB_DOOR_3_BUTTON,
+        &MIB_DOOR_4_BUTTON,
 
         &MIB_ALARMS_TAMPER_DETECT,
         &MIB_ALARMS_FIRE_ALARM,
@@ -65,20 +67,22 @@ const struct {
     .set = {
         &MIB_CONTROLLER_DATETIME,
 
-        &MIB_DOORS_1_MODE,
-        &MIB_DOORS_2_MODE,
-        &MIB_DOORS_3_MODE,
-        &MIB_DOORS_4_MODE,
+        &MIB_DOORS_INTERLOCK,
 
-        &MIB_DOORS_1_DELAY,
-        &MIB_DOORS_2_DELAY,
-        &MIB_DOORS_3_DELAY,
-        &MIB_DOORS_4_DELAY,
+        &MIB_DOOR_1_MODE,
+        &MIB_DOOR_2_MODE,
+        &MIB_DOOR_3_MODE,
+        &MIB_DOOR_4_MODE,
 
-        &MIB_DOORS_1_UNLOCKED,
-        &MIB_DOORS_2_UNLOCKED,
-        &MIB_DOORS_3_UNLOCKED,
-        &MIB_DOORS_4_UNLOCKED,
+        &MIB_DOOR_1_DELAY,
+        &MIB_DOOR_2_DELAY,
+        &MIB_DOOR_3_DELAY,
+        &MIB_DOOR_4_DELAY,
+
+        &MIB_DOOR_1_UNLOCKED,
+        &MIB_DOOR_2_UNLOCKED,
+        &MIB_DOOR_3_UNLOCKED,
+        &MIB_DOOR_4_UNLOCKED,
     },
 };
 

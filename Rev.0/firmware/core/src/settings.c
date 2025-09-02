@@ -5,6 +5,8 @@
 
 settings SETTINGS = {
     .doors = {
+        .interlock = 0,
+
         .door1 = {
             .mode = 3,
             .delay = 5,

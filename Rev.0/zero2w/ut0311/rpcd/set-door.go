@@ -29,7 +29,7 @@ func (m DoorMode) String() string {
 	}
 }
 
-func (r RPC) SetDoorMode(controller uint32, door uint8, mode DoorMode) (uint8, error) {
+func (r RPC) SetDoorMode(controller uint32, door uint8, mode DoorMode) (DoorMode, error) {
 	debugf("set-door-mode %v %v %v", controller, door, mode)
 
 	if door < 1 || door > 4 {
@@ -51,10 +51,10 @@ func (r RPC) SetDoorMode(controller uint32, door uint8, mode DoorMode) (uint8, e
 		} else {
 			switch v := reply.(type) {
 			case uint8:
-				return v, nil
+				return DoorMode(v), nil
 
 			case int64:
-				return uint8(v), nil
+				return DoorMode(v), nil
 
 			default:
 				return 0, fmt.Errorf("unrecognized type (%T)", reply)

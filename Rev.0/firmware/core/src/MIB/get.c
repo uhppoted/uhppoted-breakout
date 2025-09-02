@@ -202,17 +202,29 @@ int64_t MIB_get_controller_sysinfo(const char *OID, value *v) {
     return SSMP_ERROR_NONE;
 }
 
+int64_t MIB_get_doors_interlock(const char *OID, value *v) {
+    uint8_t interlock;
+
+    if (doors_get_interlock(&interlock)) {
+        v->tag = VALUE_UINT8;
+        v->integer = interlock;
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_NO_ACCESS;
+}
+
 int64_t MIB_get_door_mode(const char *OID, value *v) {
     uint8_t door;
     uint8_t mode;
 
-    if (equal(OID, MIB_DOORS_1_MODE)) {
+    if (equal(OID, MIB_DOOR_1_MODE)) {
         door = 1;
-    } else if (equal(OID, MIB_DOORS_2_MODE)) {
+    } else if (equal(OID, MIB_DOOR_2_MODE)) {
         door = 2;
-    } else if (equal(OID, MIB_DOORS_3_MODE)) {
+    } else if (equal(OID, MIB_DOOR_3_MODE)) {
         door = 3;
-    } else if (equal(OID, MIB_DOORS_4_MODE)) {
+    } else if (equal(OID, MIB_DOOR_4_MODE)) {
         door = 4;
     }
 
@@ -229,13 +241,13 @@ int64_t MIB_get_door_delay(const char *OID, value *v) {
     uint8_t door;
     uint8_t delay;
 
-    if (equal(OID, MIB_DOORS_1_DELAY)) {
+    if (equal(OID, MIB_DOOR_1_DELAY)) {
         door = 1;
-    } else if (equal(OID, MIB_DOORS_2_DELAY)) {
+    } else if (equal(OID, MIB_DOOR_2_DELAY)) {
         door = 2;
-    } else if (equal(OID, MIB_DOORS_3_DELAY)) {
+    } else if (equal(OID, MIB_DOOR_3_DELAY)) {
         door = 3;
-    } else if (equal(OID, MIB_DOORS_4_DELAY)) {
+    } else if (equal(OID, MIB_DOOR_4_DELAY)) {
         door = 4;
     }
 
@@ -252,13 +264,13 @@ int64_t MIB_get_door_unlocked(const char *OID, value *v) {
     uint8_t door;
     bool unlocked;
 
-    if (equal(OID, MIB_DOORS_1_UNLOCKED)) {
+    if (equal(OID, MIB_DOOR_1_UNLOCKED)) {
         door = 1;
-    } else if (equal(OID, MIB_DOORS_2_UNLOCKED)) {
+    } else if (equal(OID, MIB_DOOR_2_UNLOCKED)) {
         door = 2;
-    } else if (equal(OID, MIB_DOORS_3_UNLOCKED)) {
+    } else if (equal(OID, MIB_DOOR_3_UNLOCKED)) {
         door = 3;
-    } else if (equal(OID, MIB_DOORS_4_UNLOCKED)) {
+    } else if (equal(OID, MIB_DOOR_4_UNLOCKED)) {
         door = 4;
     }
 
@@ -275,13 +287,13 @@ int64_t MIB_get_door_open(const char *OID, value *v) {
     uint8_t door;
     bool open;
 
-    if (equal(OID, MIB_DOORS_1_OPEN)) {
+    if (equal(OID, MIB_DOOR_1_OPEN)) {
         door = 1;
-    } else if (equal(OID, MIB_DOORS_2_OPEN)) {
+    } else if (equal(OID, MIB_DOOR_2_OPEN)) {
         door = 2;
-    } else if (equal(OID, MIB_DOORS_3_OPEN)) {
+    } else if (equal(OID, MIB_DOOR_3_OPEN)) {
         door = 3;
-    } else if (equal(OID, MIB_DOORS_4_OPEN)) {
+    } else if (equal(OID, MIB_DOOR_4_OPEN)) {
         door = 4;
     }
 
@@ -298,13 +310,13 @@ int64_t MIB_get_door_pushbutton(const char *OID, value *v) {
     uint8_t door;
     bool pressed;
 
-    if (equal(OID, MIB_DOORS_1_BUTTON)) {
+    if (equal(OID, MIB_DOOR_1_BUTTON)) {
         door = 1;
-    } else if (equal(OID, MIB_DOORS_2_BUTTON)) {
+    } else if (equal(OID, MIB_DOOR_2_BUTTON)) {
         door = 2;
-    } else if (equal(OID, MIB_DOORS_3_BUTTON)) {
+    } else if (equal(OID, MIB_DOOR_3_BUTTON)) {
         door = 3;
-    } else if (equal(OID, MIB_DOORS_4_BUTTON)) {
+    } else if (equal(OID, MIB_DOOR_4_BUTTON)) {
         door = 4;
     }
 

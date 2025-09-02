@@ -316,6 +316,9 @@ func (ut0311 UT0311) dispatch(ctx context.Context, request any) (any, error) {
 	case *messages.SetDoorPasscodesRequest:
 		return ut0311.setDoorPasscodes(rq)
 
+	case *messages.SetInterlockRequest:
+		return ut0311.setInterlock(rq)
+
 	case *messages.OpenDoorRequest:
 		return ut0311.openDoor(rq)
 

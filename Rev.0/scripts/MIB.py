@@ -119,41 +119,44 @@ OIDs = [
             '0.1.3.6.1.4.1.65536.2.10', 
             'MIB_get_controller_sysinfo'),
 
+    # doors
+    MIBItem('controller.doors.interlock','MIB_DOORS_INTERLOCK', '0.1.3.6.1.4.1.65536.3.0.1', 'MIB_get_doors_interlock', 'MIB_set_doors_interlock'),
+
     # door mode
-    MIBItem('controller.door.1.mode','MIB_DOORS_1_MODE', '0.1.3.6.1.4.1.65536.3.1.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
-    MIBItem('controller.door.2.mode','MIB_DOORS_2_MODE', '0.1.3.6.1.4.1.65536.3.2.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
-    MIBItem('controller.door.3.mode','MIB_DOORS_3_MODE', '0.1.3.6.1.4.1.65536.3.3.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
-    MIBItem('controller.door.4.mode','MIB_DOORS_4_MODE', '0.1.3.6.1.4.1.65536.3.4.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
+    MIBItem('controller.door.1.mode','MIB_DOOR_1_MODE', '0.1.3.6.1.4.1.65536.3.1.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
+    MIBItem('controller.door.2.mode','MIB_DOOR_2_MODE', '0.1.3.6.1.4.1.65536.3.2.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
+    MIBItem('controller.door.3.mode','MIB_DOOR_3_MODE', '0.1.3.6.1.4.1.65536.3.3.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
+    MIBItem('controller.door.4.mode','MIB_DOOR_4_MODE', '0.1.3.6.1.4.1.65536.3.4.1', 'MIB_get_door_mode', 'MIB_set_door_mode'),
 
     # door delay
-    MIBItem('controller.door.1.delay','MIB_DOORS_1_DELAY', '0.1.3.6.1.4.1.65536.3.1.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
-    MIBItem('controller.door.2.delay','MIB_DOORS_2_DELAY', '0.1.3.6.1.4.1.65536.3.2.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
-    MIBItem('controller.door.3.delay','MIB_DOORS_3_DELAY', '0.1.3.6.1.4.1.65536.3.3.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
-    MIBItem('controller.door.4.delay','MIB_DOORS_4_DELAY', '0.1.3.6.1.4.1.65536.3.4.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
+    MIBItem('controller.door.1.delay','MIB_DOOR_1_DELAY', '0.1.3.6.1.4.1.65536.3.1.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
+    MIBItem('controller.door.2.delay','MIB_DOOR_2_DELAY', '0.1.3.6.1.4.1.65536.3.2.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
+    MIBItem('controller.door.3.delay','MIB_DOOR_3_DELAY', '0.1.3.6.1.4.1.65536.3.3.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
+    MIBItem('controller.door.4.delay','MIB_DOOR_4_DELAY', '0.1.3.6.1.4.1.65536.3.4.2', 'MIB_get_door_delay', 'MIB_set_door_delay'),
 
     # door locks
-    MIBItem('controller.door.1.unlocked','MIB_DOORS_1_UNLOCKED', '0.1.3.6.1.4.1.65536.3.1.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
-    MIBItem('controller.door.2.unlocked','MIB_DOORS_2_UNLOCKED', '0.1.3.6.1.4.1.65536.3.2.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
-    MIBItem('controller.door.3.unlocked','MIB_DOORS_3_UNLOCKED', '0.1.3.6.1.4.1.65536.3.3.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
-    MIBItem('controller.door.4.unlocked','MIB_DOORS_4_UNLOCKED', '0.1.3.6.1.4.1.65536.3.4.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
+    MIBItem('controller.door.1.unlocked','MIB_DOOR_1_UNLOCKED', '0.1.3.6.1.4.1.65536.3.1.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
+    MIBItem('controller.door.2.unlocked','MIB_DOOR_2_UNLOCKED', '0.1.3.6.1.4.1.65536.3.2.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
+    MIBItem('controller.door.3.unlocked','MIB_DOOR_3_UNLOCKED', '0.1.3.6.1.4.1.65536.3.3.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
+    MIBItem('controller.door.4.unlocked','MIB_DOOR_4_UNLOCKED', '0.1.3.6.1.4.1.65536.3.4.4', 'MIB_get_door_unlocked', 'MIB_set_door_unlock'),
 
     # door sensors
-    MIBItem('controller.door.1.open','MIB_DOORS_1_OPEN', '0.1.3.6.1.4.1.65536.3.1.5', 'MIB_get_door_open'),
-    MIBItem('controller.door.2.open','MIB_DOORS_2_OPEN', '0.1.3.6.1.4.1.65536.3.2.5', 'MIB_get_door_open'),
-    MIBItem('controller.door.3.open','MIB_DOORS_3_OPEN', '0.1.3.6.1.4.1.65536.3.3.5', 'MIB_get_door_open'),
-    MIBItem('controller.door.4.open','MIB_DOORS_4_OPEN', '0.1.3.6.1.4.1.65536.3.4.5', 'MIB_get_door_open'),
+    MIBItem('controller.door.1.open','MIB_DOOR_1_OPEN', '0.1.3.6.1.4.1.65536.3.1.5', 'MIB_get_door_open'),
+    MIBItem('controller.door.2.open','MIB_DOOR_2_OPEN', '0.1.3.6.1.4.1.65536.3.2.5', 'MIB_get_door_open'),
+    MIBItem('controller.door.3.open','MIB_DOOR_3_OPEN', '0.1.3.6.1.4.1.65536.3.3.5', 'MIB_get_door_open'),
+    MIBItem('controller.door.4.open','MIB_DOOR_4_OPEN', '0.1.3.6.1.4.1.65536.3.4.5', 'MIB_get_door_open'),
 
     # door pushbuttons
-    MIBItem('controller.door.1.button','MIB_DOORS_1_BUTTON', '0.1.3.6.1.4.1.65536.3.1.6', 'MIB_get_door_pushbutton'),
-    MIBItem('controller.door.2.button','MIB_DOORS_2_BUTTON', '0.1.3.6.1.4.1.65536.3.2.6', 'MIB_get_door_pushbutton'),
-    MIBItem('controller.door.3.button','MIB_DOORS_3_BUTTON', '0.1.3.6.1.4.1.65536.3.3.6', 'MIB_get_door_pushbutton'),
-    MIBItem('controller.door.4.button','MIB_DOORS_4_BUTTON', '0.1.3.6.1.4.1.65536.3.4.6', 'MIB_get_door_pushbutton'),
+    MIBItem('controller.door.1.button','MIB_DOOR_1_BUTTON', '0.1.3.6.1.4.1.65536.3.1.6', 'MIB_get_door_pushbutton'),
+    MIBItem('controller.door.2.button','MIB_DOOR_2_BUTTON', '0.1.3.6.1.4.1.65536.3.2.6', 'MIB_get_door_pushbutton'),
+    MIBItem('controller.door.3.button','MIB_DOOR_3_BUTTON', '0.1.3.6.1.4.1.65536.3.3.6', 'MIB_get_door_pushbutton'),
+    MIBItem('controller.door.4.button','MIB_DOOR_4_BUTTON', '0.1.3.6.1.4.1.65536.3.4.6', 'MIB_get_door_pushbutton'),
 
     # card swipes
-    MIBItem('controller.door.1.swipe','MIB_DOORS_1_SWIPE', '0.1.3.6.1.4.1.65536.3.1.7'),
-    MIBItem('controller.door.2.swipe','MIB_DOORS_2_SWIPE', '0.1.3.6.1.4.1.65536.3.2.7'),
-    MIBItem('controller.door.3.swipe','MIB_DOORS_3_SWIPE', '0.1.3.6.1.4.1.65536.3.3.7'),
-    MIBItem('controller.door.4.swipe','MIB_DOORS_4_SWIPE', '0.1.3.6.1.4.1.65536.3.4.7'),
+    MIBItem('controller.door.1.swipe','MIB_DOOR_1_SWIPE', '0.1.3.6.1.4.1.65536.3.1.7'),
+    MIBItem('controller.door.2.swipe','MIB_DOOR_2_SWIPE', '0.1.3.6.1.4.1.65536.3.2.7'),
+    MIBItem('controller.door.3.swipe','MIB_DOOR_3_SWIPE', '0.1.3.6.1.4.1.65536.3.3.7'),
+    MIBItem('controller.door.4.swipe','MIB_DOOR_4_SWIPE', '0.1.3.6.1.4.1.65536.3.4.7'),
 
     # alarms
     MIBItem('controller.alarm.tamper',
