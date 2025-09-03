@@ -328,6 +328,12 @@ func lookup(err int64) string {
 	case 16:
 		return "not writable"
 
+	case 254:
+		return "invalid state"
+
+	case 255:
+		return "internal"
+
 	default:
 		return "unknown"
 	}

@@ -267,7 +267,15 @@ int64_t MIB_set_door_unlock(const char *OID, const value u, value *v) {
     if (!doors_get_mode(door, &mode)) {
         return SSMP_ERROR_INTERNAL;
     } else if (unlock && mode != NORMALLY_OPEN && mode != CONTROLLED) {
-        return SSMP_ERROR_BAD_VALUE;
+        return SSMP_ERROR_INVALID_STATE;
+    }
+
+    // ... interlocked?
+    uint8_t interlock;
+    if (!doors_get_interlock(&interlock)) {
+        return SSMP_ERROR_INTERNAL;
+    } else if (doors_interlocked(door, interlock)) {
+        return SSMP_ERROR_INVALID_STATE;
     }
 
     // ... unlock

@@ -9,6 +9,7 @@ extern const uint8_t CONTROLLED;
 
 bool doors_get_interlock(uint8_t *interlock);
 bool doors_set_interlock(uint8_t interlock);
+bool doors_interlocked(uint8_t door, uint8_t interlock);
 
 bool doors_get_mode(uint8_t door, uint8_t *mode);
 bool doors_get_delay(uint8_t door, uint8_t *delay);

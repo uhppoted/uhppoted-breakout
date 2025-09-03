@@ -6,6 +6,7 @@
       - [x] door unlock events
       - [x] swipe event
       - [x] ReasonCardDeniedDoorNormallyClosed
+      - [ ] dbd.SetDoor
       - [ ] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback
    - [ ] swipe + PIN

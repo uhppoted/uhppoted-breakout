@@ -19,4 +19,5 @@ extern const int64_t SSMP_ERROR_WRONG_TYPE;
 extern const int64_t SSMP_ERROR_COMMIT_FAILED;
 extern const int64_t SSMP_ERROR_AUTHORIZATION;
 extern const int64_t SSMP_ERROR_NOT_WRITABLE;
+extern const int64_t SSMP_ERROR_INVALID_STATE;
 extern const int64_t SSMP_ERROR_INTERNAL;

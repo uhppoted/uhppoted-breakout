@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <U3.h>
 #include <U4.h>
 #include <doors.h>
@@ -16,6 +18,32 @@ const uint8_t INTERLOCK_12_34 = 3; // doors (1,2) and (3,4)
 const uint8_t INTERLOCK_123 = 4;   // doors (1,2,3)
 const uint8_t INTERLOCK_1234 = 8;  // doors (1,2,3,4)
 
+typedef struct {
+    uint8_t interlock;
+    uint8_t door;
+    uint8_t mask;
+} interlock_t;
+
+const interlock_t interlocks[] = {
+    {INTERLOCK_12, 1, 0x02},
+    {INTERLOCK_12, 2, 0x01},
+    {INTERLOCK_34, 3, 0x08},
+    {INTERLOCK_34, 4, 0x04},
+    {INTERLOCK_12_34, 1, 0x02},
+    {INTERLOCK_12_34, 2, 0x01},
+    {INTERLOCK_12_34, 3, 0x08},
+    {INTERLOCK_12_34, 4, 0x04},
+    {INTERLOCK_123, 1, 0x02 | 0x04},
+    {INTERLOCK_123, 2, 0x01 | 0x04},
+    {INTERLOCK_123, 3, 0x01 | 0x02},
+    {INTERLOCK_1234, 1, 0x02 | 0x04 | 0x08},
+    {INTERLOCK_1234, 2, 0x01 | 0x04 | 0x08},
+    {INTERLOCK_1234, 3, 0x01 | 0x02 | 0x08},
+    {INTERLOCK_1234, 4, 0x01 | 0x02 | 0x04},
+};
+
+#define NUM_INTERLOCKS (sizeof(interlocks) / sizeof(interlocks[0]))
+
 bool doors_get_interlock(uint8_t *interlock) {
     *interlock = SETTINGS.doors.interlock;
     return true;
@@ -24,6 +52,61 @@ bool doors_get_interlock(uint8_t *interlock) {
 bool doors_set_interlock(uint8_t interlock) {
     if (interlock == 0 || interlock == 1 || interlock == 2 || interlock == 3 || interlock == 4 || interlock == 8) {
         SETTINGS.doors.interlock = interlock;
+        return true;
+    }
+
+    return false;
+}
+
+bool doors_interlocked(uint8_t door, uint8_t interlock) {
+    // ... invalid interlock?
+    if (interlock != NO_INTERLOCK && interlock != INTERLOCK_12 && interlock != INTERLOCK_34 && interlock != INTERLOCK_12_34 && interlock != INTERLOCK_123 && interlock != INTERLOCK_1234) {
+        return false;
+    }
+
+    // .. no interlock?
+    if (interlock == NO_INTERLOCK) {
+        return false;
+    }
+
+    // ... match interlock against door unlocked/open
+    uint8_t unlocked = 0x00;
+    uint8_t open = 0x00;
+    uint8_t mask = 0x00;
+
+    for (int i = 1; i <= 4; i++) {
+        uint8_t bit = 1u << (i - 1);
+        bool b;
+
+        // fail-safe: if door state can't be read, assume interlock is active
+        if (!doors_get_unlocked(i, &b)) {
+            return true;
+        } else if (b) {
+            unlocked |= bit;
+        }
+
+        // fail-safe: if door state can't be read, assume interlock is active
+        if (!doors_get_open(i, &b)) {
+            return true;
+        } else if (b) {
+            open |= bit;
+        }
+    }
+
+    for (int i = 0; i < NUM_INTERLOCKS; i++) {
+        interlock_t v = interlocks[i];
+
+        if (v.interlock == interlock && v.door == door) {
+            mask = v.mask;
+            break;
+        }
+    }
+
+    if ((mask & unlocked) != 0x00) {
+        return true;
+    }
+
+    if ((mask & open) != 0x00) {
         return true;
     }
 
