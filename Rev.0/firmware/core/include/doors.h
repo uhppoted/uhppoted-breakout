@@ -3,9 +3,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-extern const uint8_t NORMALLY_OPEN;
-extern const uint8_t NORMALLY_CLOSED;
-extern const uint8_t CONTROLLED;
+typedef enum {
+    NORMALLY_OPEN = 1,
+    NORMALLY_CLOSED = 2,
+    CONTROLLED = 3,
+} DoorMode;
+
+typedef enum {
+    NO_INTERLOCK = 0,    // disabled
+    INTERLOCK_12 = 1,    // doors (1,2)
+    INTERLOCK_34 = 2,    // doors (3,4)
+    INTERLOCK_12_34 = 3, // doors (1,2) and (3,4)
+    INTERLOCK_123 = 4,   // doors (1,2,3)
+    INTERLOCK_1234 = 8,  // doors (1,2,3,4)
+} Interlock;
 
 bool doors_get_interlock(uint8_t *interlock);
 bool doors_set_interlock(uint8_t interlock);

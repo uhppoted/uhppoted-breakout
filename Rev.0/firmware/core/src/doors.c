@@ -7,40 +7,35 @@
 
 #define LOGTAG "DOORS"
 
-const uint8_t NORMALLY_OPEN = 1;
-const uint8_t NORMALLY_CLOSED = 2;
-const uint8_t CONTROLLED = 3;
-
-const uint8_t NO_INTERLOCK = 0;    // disabled
-const uint8_t INTERLOCK_12 = 1;    // doors (1,2)
-const uint8_t INTERLOCK_34 = 2;    // doors (3,4)
-const uint8_t INTERLOCK_12_34 = 3; // doors (1,2) and (3,4)
-const uint8_t INTERLOCK_123 = 4;   // doors (1,2,3)
-const uint8_t INTERLOCK_1234 = 8;  // doors (1,2,3,4)
-
 typedef struct {
     uint8_t interlock;
     uint8_t door;
     uint8_t mask;
 } interlock_t;
 
+// clang-format off
 const interlock_t interlocks[] = {
-    {INTERLOCK_12, 1, 0x02},
-    {INTERLOCK_12, 2, 0x01},
-    {INTERLOCK_34, 3, 0x08},
-    {INTERLOCK_34, 4, 0x04},
+    {INTERLOCK_12,    1, 0x02},
+    {INTERLOCK_12,    2, 0x01},
+
+    {INTERLOCK_34,    3, 0x08},
+    {INTERLOCK_34,    4, 0x04},
+
     {INTERLOCK_12_34, 1, 0x02},
     {INTERLOCK_12_34, 2, 0x01},
     {INTERLOCK_12_34, 3, 0x08},
     {INTERLOCK_12_34, 4, 0x04},
-    {INTERLOCK_123, 1, 0x02 | 0x04},
-    {INTERLOCK_123, 2, 0x01 | 0x04},
-    {INTERLOCK_123, 3, 0x01 | 0x02},
-    {INTERLOCK_1234, 1, 0x02 | 0x04 | 0x08},
-    {INTERLOCK_1234, 2, 0x01 | 0x04 | 0x08},
-    {INTERLOCK_1234, 3, 0x01 | 0x02 | 0x08},
-    {INTERLOCK_1234, 4, 0x01 | 0x02 | 0x04},
+
+    {INTERLOCK_123,   1, 0x02 | 0x04},
+    {INTERLOCK_123,   2, 0x01 | 0x04},
+    {INTERLOCK_123,   3, 0x01 | 0x02},
+
+    {INTERLOCK_1234,  1, 0x02 | 0x04 | 0x08},
+    {INTERLOCK_1234,  2, 0x01 | 0x04 | 0x08},
+    {INTERLOCK_1234,  3, 0x01 | 0x02 | 0x08},
+    {INTERLOCK_1234,  4, 0x01 | 0x02 | 0x04},
 };
+// clang-format on
 
 #define NUM_INTERLOCKS (sizeof(interlocks) / sizeof(interlocks[0]))
 

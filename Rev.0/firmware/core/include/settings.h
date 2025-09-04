@@ -2,27 +2,29 @@
 
 #include <stdint.h>
 
+#include <doors.h>
+
 typedef struct settings {
     struct {
-        uint8_t interlock;
+        Interlock interlock;
 
         struct {
-            uint8_t mode;
+            DoorMode mode;
             uint8_t delay;
         } door1;
 
         struct {
-            uint8_t mode;
+            DoorMode mode;
             uint8_t delay;
         } door2;
 
         struct {
-            uint8_t mode;
+            DoorMode mode;
             uint8_t delay;
         } door3;
 
         struct {
-            uint8_t mode;
+            DoorMode mode;
             uint8_t delay;
         } door4;
     } doors;
