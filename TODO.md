@@ -93,10 +93,8 @@
    - [x] save to flash
       - [x] door delay/mode
       - [x] interlock
-
-   - [ ] `DEBUG  DOORS  settings saved` on `set-time`
-      - only save if OID in 'save list'
-      - // FIXME check OID save list
+      - [x] `DEBUG  DOORS  settings saved` on `set-time`
+      - [ ] quite often goes off into the weeds ???
 
    - [ ] GET: multiple OIDs
    - [ ] MIB_find (returns const *MIBItem)

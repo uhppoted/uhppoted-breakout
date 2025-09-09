@@ -262,14 +262,6 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
             SSMP_err(community, rqid, oid, SSMP_ERROR_NO_ACCESS, 1);
         } else if (SSMP_set(community, rqid, oid, request->set.value)) {
             SSMP_touched();
-
-            // FIXME check OID save list
-            message msg = {
-                .message = MSG_SAVE,
-                .tag = MESSAGE_NONE,
-            };
-
-            push(msg);
         }
     }
 

@@ -46,7 +46,10 @@ bool doors_get_interlock(uint8_t *interlock) {
 
 bool doors_set_interlock(uint8_t interlock) {
     if (interlock == 0 || interlock == 1 || interlock == 2 || interlock == 3 || interlock == 4 || interlock == 8) {
-        SETTINGS.doors.interlock = interlock;
+        settings_set((setting){
+            .tag = INTERLOCK,
+            .value.uint8 = interlock,
+        });
         return true;
     }
 
@@ -131,24 +134,14 @@ bool doors_get_mode(uint8_t door, uint8_t *mode) {
 }
 
 bool doors_set_mode(uint8_t door, uint8_t mode) {
-    if (mode == 1 || mode == 2 || mode == 3) {
-        switch (door) {
-        case 1:
-            SETTINGS.doors.door1.mode = mode;
-            return true;
+    SETTING tags[] = {UNKNOWN, DOOR1_MODE, DOOR2_MODE, DOOR3_MODE, DOOR4_MODE};
 
-        case 2:
-            SETTINGS.doors.door2.mode = mode;
-            return true;
-
-        case 3:
-            SETTINGS.doors.door3.mode = mode;
-            return true;
-
-        case 4:
-            SETTINGS.doors.door4.mode = mode;
-            return true;
-        }
+    if ((mode >= 1 && mode <= 3) && (door >= 1 && door <= 4)) {
+        settings_set((setting){
+            .tag = tags[door],
+            .value.uint8 = mode,
+        });
+        return true;
     }
 
     return false;
@@ -177,24 +170,14 @@ bool doors_get_delay(uint8_t door, uint8_t *delay) {
 }
 
 bool doors_set_delay(uint8_t door, uint8_t delay) {
-    if (delay > 0 && delay <= 60) {
-        switch (door) {
-        case 1:
-            SETTINGS.doors.door1.delay = delay;
-            return true;
+    SETTING tags[] = {UNKNOWN, DOOR1_DELAY, DOOR2_DELAY, DOOR3_DELAY, DOOR4_DELAY};
 
-        case 2:
-            SETTINGS.doors.door2.delay = delay;
-            return true;
-
-        case 3:
-            SETTINGS.doors.door3.delay = delay;
-            return true;
-
-        case 4:
-            SETTINGS.doors.door4.delay = delay;
-            return true;
-        }
+    if (delay > 0 && delay <= 60 && door >= 1 && door <= 4) {
+        settings_set((setting){
+            .tag = tags[door],
+            .value.uint8 = delay,
+        });
+        return true;
     }
 
     return false;

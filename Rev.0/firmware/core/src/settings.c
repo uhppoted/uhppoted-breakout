@@ -3,6 +3,7 @@
 #include <hardware/flash.h>
 #include <hardware/sync.h>
 
+#include <breakout.h>
 #include <log.h>
 #include <settings.h>
 
@@ -15,6 +16,8 @@ uint32_t flash_get_version(int page);
 uint32_t crc32(const char *, size_t);
 
 settings SETTINGS = {
+    .version = 0,
+
     .doors = {
         .interlock = NO_INTERLOCK,
 
@@ -37,6 +40,122 @@ settings SETTINGS = {
     },
 };
 
+setting settings_get(SETTING tag) {
+    switch (tag) {
+    case INTERLOCK:
+        return (setting){
+            .tag = INTERLOCK,
+            .value.uint8 = SETTINGS.doors.interlock,
+        };
+        break;
+
+    case DOOR1_MODE:
+        return (setting){
+            .tag = DOOR1_MODE,
+            .value.uint8 = SETTINGS.doors.door1.mode,
+        };
+        break;
+
+    case DOOR2_MODE:
+        return (setting){
+            .tag = DOOR2_MODE,
+            .value.uint8 = SETTINGS.doors.door2.mode,
+        };
+        break;
+
+    case DOOR3_MODE:
+        return (setting){
+            .tag = DOOR3_MODE,
+            .value.uint8 = SETTINGS.doors.door3.mode,
+        };
+        break;
+
+    case DOOR4_MODE:
+        return (setting){
+            .tag = DOOR4_MODE,
+            .value.uint8 = SETTINGS.doors.door4.mode,
+        };
+        break;
+
+    case DOOR1_DELAY:
+        return (setting){
+            .tag = DOOR1_DELAY,
+            .value.uint8 = SETTINGS.doors.door1.delay,
+        };
+        break;
+
+    case DOOR2_DELAY:
+        return (setting){
+            .tag = DOOR2_DELAY,
+            .value.uint8 = SETTINGS.doors.door2.delay,
+        };
+        break;
+
+    case DOOR3_DELAY:
+        return (setting){
+            .tag = DOOR3_DELAY,
+            .value.uint8 = SETTINGS.doors.door3.delay,
+        };
+        break;
+
+    case DOOR4_DELAY:
+        return (setting){
+            .tag = DOOR4_DELAY,
+            .value.uint8 = SETTINGS.doors.door4.delay,
+        };
+        break;
+    }
+
+    return (setting){
+        .tag = UNKNOWN,
+    };
+}
+
+void settings_set(setting v) {
+    switch (v.tag) {
+    case INTERLOCK:
+        SETTINGS.doors.interlock = v.value.uint8;
+        break;
+
+    case DOOR1_MODE:
+        SETTINGS.doors.door1.mode = v.value.uint8;
+        break;
+
+    case DOOR2_MODE:
+        SETTINGS.doors.door2.mode = v.value.uint8;
+        break;
+
+    case DOOR3_MODE:
+        SETTINGS.doors.door3.mode = v.value.uint8;
+        break;
+
+    case DOOR4_MODE:
+        SETTINGS.doors.door4.mode = v.value.uint8;
+        break;
+
+    case DOOR1_DELAY:
+        SETTINGS.doors.door1.delay = v.value.uint8;
+        break;
+
+    case DOOR2_DELAY:
+        SETTINGS.doors.door2.delay = v.value.uint8;
+        break;
+
+    case DOOR3_DELAY:
+        SETTINGS.doors.door3.delay = v.value.uint8;
+        break;
+
+    case DOOR4_DELAY:
+        SETTINGS.doors.door4.delay = v.value.uint8;
+        break;
+    }
+
+    push((message){
+        .message = MSG_SAVE,
+        .tag = MESSAGE_NONE,
+    });
+}
+
 void settings_save() {
     flash_write();
     infof(LOGTAG, "settings saved");
@@ -44,7 +163,7 @@ void settings_save() {
 
 void settings_restore() {
     flash_read();
-    infof(LOGTAG, "settings restored");
+    infof(LOGTAG, "settings restored (v%u)", SETTINGS.version);
 }
 
 // *** FLASH MEMORY ***
@@ -67,8 +186,8 @@ const uint32_t OFFSETS[2] = {
 const int PAGES = sizeof(OFFSETS) / sizeof(uint32_t);
 const uint32_t MAX_VERSION = 16384;
 const uint32_t MAGIC_WORD = 0x53455453u;
-const uint32_t DATA_OFFSET = 32;  // 3 header words + padding
-const size_t DATA_BYTES = 16 * 4; // 9 data words + padding
+const uint32_t DATA_OFFSET = 32;  // 3 header words + some padding
+const size_t DATA_BYTES = 16 * 4; // 9 data words + some padding
 
 /* Reads the settings from the onboard flash.
  *
@@ -78,9 +197,10 @@ void flash_read() {
 
     if (page != -1 && page < PAGES) {
         uint32_t *addr = (uint32_t *)(XIP_BASE + OFFSETS[page]);
+        uint32_t *version = addr + 1;
         uint32_t *p = addr + DATA_OFFSET;
-        uint32_t *q = addr + 0;
 
+        SETTINGS.version = *version;
         SETTINGS.doors.interlock = *p++;
         SETTINGS.doors.door1.mode = *p++;
         SETTINGS.doors.door1.delay = *p++;
