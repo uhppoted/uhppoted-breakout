@@ -45,6 +45,7 @@
 ## breakout
 - [] U4 seems a bit erratic
    - configure unused outputs as inputs/open-collector
+- [ ] occasional crash on SET
 
 ### misc
 
@@ -89,9 +90,9 @@
       - [ ] alarm
       - [ ] //FIXME encode all var types
 
-   - [ ] save to flash
-      - [ ] door delay/mode
-      - [ ] interlock
+   - [x] save to flash
+      - [x] door delay/mode
+      - [x] interlock
 
    - [ ] `DEBUG  DOORS  settings saved` on `set-time`
       - only save if OID in 'save list'

@@ -2,6 +2,8 @@
 
 ## Rev.1
 
+**SERIOUSLY CONSIDER REPLACING THE I2C OUTPUTS WITH A LEVEL CONVERTER**
+
 1.  Renumber Tiny PINS to match WaveShare wiki (and keep copy of pinout in documentation folder)
 2.  Schottkey diodes and resistor for RX8900SA VBAT
     - https://www.diodes.com/assets/Datasheets/SDM03U40.pdf

@@ -451,24 +451,22 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    // swipe *swipe = swipe_alloc();
-    //
-    // if (swipe != NULL) {
-    //     swipe->door = 4;
-    //     snprintf(swipe->card, sizeof(swipe->card), "%-03u%-05u", 100, 58400);
-    //
-    //     message msg = {
-    //         .message = MSG_SWIPE,
-    //         .tag = MESSAGE_SWIPE,
-    //         .swipe = swipe,
-    //     };
-    //
-    //     if (!push(msg)) {
-    //         swipe_free(swipe);
-    //     }
-    // }
+    swipe *swipe = swipe_alloc();
 
-    settings_restore();
+    if (swipe != NULL) {
+        swipe->door = 4;
+        snprintf(swipe->card, sizeof(swipe->card), "%-03u%-05u", 100, 58400);
+
+        message msg = {
+            .message = MSG_SWIPE,
+            .tag = MESSAGE_SWIPE,
+            .swipe = swipe,
+        };
+
+        if (!push(msg)) {
+            swipe_free(swipe);
+        }
+    }
 }
 
 void show_state() {

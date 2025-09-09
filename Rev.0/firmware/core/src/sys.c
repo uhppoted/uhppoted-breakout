@@ -111,7 +111,7 @@ bool sysinit() {
     mutex_init(&SYSTEM.queue.lock);
 
     // ... restore settings
-    settings_restore();
+    // FIXME settings_restore();
 
     // ... USB/UART0 mode
     if (strcasecmp(MODE, "cli") == 0) {
