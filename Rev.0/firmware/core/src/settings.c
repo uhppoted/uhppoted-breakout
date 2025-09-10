@@ -15,6 +15,17 @@ int flash_get_current_page();
 uint32_t flash_get_version(int page);
 uint32_t crc32(const char *, size_t);
 
+const uint32_t OFFSETS[2] = {
+    PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE,
+    PICO_FLASH_SIZE_BYTES - 2 * FLASH_SECTOR_SIZE,
+};
+
+const int PAGES = sizeof(OFFSETS) / sizeof(uint32_t);
+const uint32_t MAX_VERSION = 16384;
+const uint32_t MAGIC_WORD = 0x53455453u;
+const uint32_t DATA_OFFSET = 32;  // 3 header words + some padding
+const size_t DATA_BYTES = 16 * 4; // 9 data words + some padding
+
 settings SETTINGS = {
     .version = 0,
 
@@ -112,53 +123,86 @@ setting settings_get(SETTING tag) {
 }
 
 void settings_set(setting v) {
+    uint32_t version = SETTINGS.version;
+
     switch (v.tag) {
     case INTERLOCK:
-        SETTINGS.doors.interlock = v.value.uint8;
+        if (SETTINGS.doors.interlock != v.value.uint8) {
+            SETTINGS.doors.interlock = v.value.uint8;
+            version++;
+        }
         break;
 
     case DOOR1_MODE:
-        SETTINGS.doors.door1.mode = v.value.uint8;
+        if (SETTINGS.doors.door1.mode != v.value.uint8) {
+            SETTINGS.doors.door1.mode = v.value.uint8;
+            version++;
+        }
         break;
 
     case DOOR2_MODE:
-        SETTINGS.doors.door2.mode = v.value.uint8;
+        if (SETTINGS.doors.door2.mode != v.value.uint8) {
+            SETTINGS.doors.door2.mode = v.value.uint8;
+            version++;
+        }
         break;
 
     case DOOR3_MODE:
-        SETTINGS.doors.door3.mode = v.value.uint8;
+        if (SETTINGS.doors.door3.mode != v.value.uint8) {
+            SETTINGS.doors.door3.mode = v.value.uint8;
+            version++;
+        }
         break;
 
     case DOOR4_MODE:
-        SETTINGS.doors.door4.mode = v.value.uint8;
+        if (SETTINGS.doors.door4.mode != v.value.uint8) {
+            SETTINGS.doors.door4.mode = v.value.uint8;
+            version++;
+        }
         break;
 
     case DOOR1_DELAY:
-        SETTINGS.doors.door1.delay = v.value.uint8;
+        if (SETTINGS.doors.door1.delay != v.value.uint8) {
+            SETTINGS.doors.door1.delay = v.value.uint8;
+            version++;
+        }
         break;
 
     case DOOR2_DELAY:
-        SETTINGS.doors.door2.delay = v.value.uint8;
+        if (SETTINGS.doors.door2.delay != v.value.uint8) {
+            SETTINGS.doors.door2.delay = v.value.uint8;
+            version++;
+        }
         break;
 
     case DOOR3_DELAY:
-        SETTINGS.doors.door3.delay = v.value.uint8;
+        if (SETTINGS.doors.door3.delay != v.value.uint8) {
+            SETTINGS.doors.door3.delay = v.value.uint8;
+            version++;
+        }
         break;
 
     case DOOR4_DELAY:
-        SETTINGS.doors.door4.delay = v.value.uint8;
+        if (SETTINGS.doors.door4.delay != v.value.uint8) {
+            SETTINGS.doors.door4.delay = v.value.uint8;
+            version++;
+        }
         break;
     }
 
-    push((message){
-        .message = MSG_SAVE,
-        .tag = MESSAGE_NONE,
-    });
+    if (version != SETTINGS.version) {
+        SETTINGS.version = version % MAX_VERSION;
+
+        push((message){
+            .message = MSG_SAVE,
+            .tag = MESSAGE_NONE,
+        });
+    }
 }
 
 void settings_save() {
     flash_write();
-    infof(LOGTAG, "settings saved");
+    infof(LOGTAG, "settings saved (v%u)", SETTINGS.version);
 }
 
 void settings_restore() {
@@ -177,17 +221,6 @@ typedef struct header {
 struct {
     uint32_t buffer[FLASH_SECTOR_SIZE / sizeof(uint32_t)];
 } flash_buffer = {};
-
-const uint32_t OFFSETS[2] = {
-    PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE,
-    PICO_FLASH_SIZE_BYTES - 2 * FLASH_SECTOR_SIZE,
-};
-
-const int PAGES = sizeof(OFFSETS) / sizeof(uint32_t);
-const uint32_t MAX_VERSION = 16384;
-const uint32_t MAGIC_WORD = 0x53455453u;
-const uint32_t DATA_OFFSET = 32;  // 3 header words + some padding
-const size_t DATA_BYTES = 16 * 4; // 9 data words + some padding
 
 /* Reads the settings from the onboard flash.
  *
@@ -222,14 +255,11 @@ void flash_read() {
  */
 void flash_write() {
     uint32_t page = flash_get_current_page();
-    uint32_t version = flash_get_version(page);
 
     if (page != -1 && page < PAGES) {
         page = (page + 1) % PAGES;
-        version = (version + 1) % MAX_VERSION;
     } else {
         page = 0;
-        version = 1;
     }
 
     uint32_t offset = OFFSETS[page];
@@ -253,7 +283,7 @@ void flash_write() {
 
     // ... set header
     header.magic = MAGIC_WORD;
-    header.version = version;
+    header.version = SETTINGS.version;
     header.crc = crc32((char *)(buffer + DATA_OFFSET), DATA_BYTES);
 
     // ... copy header to buffer
@@ -263,9 +293,10 @@ void flash_write() {
 
     // ... write to flash
     uint32_t interrupts = save_and_disable_interrupts();
+    size_t bytes = ((DATA_OFFSET * 4 + DATA_BYTES) + 255) & ~((size_t)255); // NTS: must be a multiple of 256
 
     flash_range_erase(offset, FLASH_SECTOR_SIZE);
-    flash_range_program(offset, (uint8_t *)buffer, FLASH_SECTOR_SIZE);
+    flash_range_program(offset, (uint8_t *)buffer, bytes);
     restore_interrupts(interrupts);
 }
 

@@ -470,6 +470,7 @@ void debug() {
 
     settings_restore();
 
+    debugf(LOGTAG, ">> version:%u", SETTINGS.version);
     debugf(LOGTAG, ">> doors.interlock:%d", SETTINGS.doors.interlock);
     debugf(LOGTAG, ">> door.1.mode:%d  door.1.delay:%d", SETTINGS.doors.door1.mode, SETTINGS.doors.door1.delay);
     debugf(LOGTAG, ">> door.2.mode:%d  door.2.delay:%d", SETTINGS.doors.door2.mode, SETTINGS.doors.door2.delay);
