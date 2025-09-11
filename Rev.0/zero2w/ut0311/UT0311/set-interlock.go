@@ -8,15 +8,21 @@ import (
 
 	"ut0311/rpcd"
 	"ut0311/scmp"
+	"ut0311/system"
 )
 
-var interlocks = map[uint8]rpcd.Interlock{
-	0x00: rpcd.NoInterlock,    // disabled
-	0x01: rpcd.Interlock12,    // doors (1,2)
-	0x02: rpcd.Interlock34,    // doors (3,4)
-	0x03: rpcd.Interlock12_34, // doors (1,2) and (3,4)
-	0x04: rpcd.Interlock123,   // doors (1,2,3)
-	0x08: rpcd.Interlock1234,  // doors (1,2,3,4)
+type interlock struct {
+	system system.Interlock
+	rpcd   rpcd.Interlock
+}
+
+var interlocks = map[uint8]interlock{
+	0x00: {system.NoInterlock, rpcd.NoInterlock},       // disabled
+	0x01: {system.Interlock12, rpcd.Interlock12},       // doors (1,2)
+	0x02: {system.Interlock34, rpcd.Interlock34},       // doors (3,4)
+	0x03: {system.Interlock12_34, rpcd.Interlock12_34}, // doors (1,2) and (3,4)
+	0x04: {system.Interlock123, rpcd.Interlock123},     // doors (1,2,3)
+	0x08: {system.Interlock1234, rpcd.Interlock1234},   // doors (1,2,3,4)
 }
 
 func (ut0311 *UT0311) setInterlock(rq *messages.SetInterlockRequest) (any, error) {
@@ -28,9 +34,11 @@ func (ut0311 *UT0311) setInterlock(rq *messages.SetInterlockRequest) (any, error
 		return nil, nil
 	} else if interlock, ok := interlocks[rq.Interlock]; !ok {
 		return nil, fmt.Errorf("invalid interlock (%v)", rq.Interlock)
-	} else if v, err := ut0311.breakout.SetInterlock(controller, interlock); err != nil {
+	} else if _, err := ut0311.system.SetInterlock(controller, interlock.system); err != nil {
 		return nil, err
-	} else if v != interlock {
+	} else if v, err := ut0311.breakout.SetInterlock(controller, interlock.rpcd); err != nil {
+		return nil, err
+	} else if v != interlock.rpcd {
 		ut0311.state.Set(controller, tag, interlock)
 
 		return messages.SetInterlockResponse{

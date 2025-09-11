@@ -45,7 +45,7 @@
 ## breakout
 - [] U4 seems a bit erratic
    - configure unused outputs as inputs/open-collector
-- [ ] occasional crash on settings::save
+- [ ] fairly frequent crash on settings::save
       - queue error maybe??
 ```
 INFO   CLI        >>> queue    error

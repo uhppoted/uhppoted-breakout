@@ -8,9 +8,35 @@ import (
 const service = "system"
 
 var api = struct {
-	getDoor string
+	setInterlock string
+	getDoor      string
 }{
-	getDoor: service + ".GetDoor",
+	setInterlock: service + ".SetInterlock",
+	getDoor:      service + ".GetDoor",
+}
+
+func (s *System) SetInterlock(controller uint32, interlock Interlock) (Interlock, error) {
+	debugf("set-interlock %v %v", controller, interlock)
+
+	var args = struct {
+		Controller uint32
+		Interlock  uint8
+	}{
+		Controller: controller,
+		Interlock:  uint8(interlock),
+	}
+
+	var reply uint8
+
+	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
+		return Unknown, err
+	} else if err := client.Call(api.setInterlock, args, &reply); err != nil {
+		return Unknown, err
+	} else if v, ok := interlocks[reply]; !ok {
+		return Unknown, fmt.Errorf("invalid interlock (%v)", reply)
+	} else {
+		return v, nil
+	}
 }
 
 func (s *System) GetDoor(controller uint32, door uint8) (DoorMode, uint8, error) {
