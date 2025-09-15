@@ -60,7 +60,7 @@ func (db impl) query(sql string, args ...any) (*sql.Rows, error) {
 	return db.driver.query(sql, args...)
 }
 
-func (db impl) insert(sql string, values ...any) (int64, error) {
+func (db impl) upsert(sql string, values ...any) (int64, error) {
 	return db.driver.insert(sql, values...)
 }
 

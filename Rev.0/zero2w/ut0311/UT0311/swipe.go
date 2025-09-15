@@ -79,6 +79,11 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 			denied(card, entities.ReasonUnknown, err)
 		} else if mode == system.NormallyClosed {
 			denied(card, entities.ReasonCardDeniedDoorNormallyClosed, err)
+		} else if interlock, err := u.system.GetInterlock(controller); err != nil {
+			denied(card, entities.ReasonUnknown, err)
+		} else if interlock != system.NoInterlock {
+			// TODO check interlock against doors
+			denied(card, entities.ReasonCardDeniedDoorInterLock, err)
 		} else if ok, err := u.breakout.UnlockDoor(door); err != nil || !ok {
 			denied(card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
 		} else {

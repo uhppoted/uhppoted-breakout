@@ -8,12 +8,16 @@ import (
 
 	"ut0311/rpcd"
 	"ut0311/scmp"
+	"ut0311/system"
 )
 
-var modes = map[uint8]rpcd.DoorMode{
-	1: rpcd.NormallyOpen,
-	2: rpcd.NormallyClosed,
-	3: rpcd.Controlled,
+var modes = map[uint8]struct {
+	breakout rpcd.DoorMode
+	system   system.DoorMode
+}{
+	1: {rpcd.NormallyOpen, system.NormallyOpen},
+	2: {rpcd.NormallyClosed, system.NormallyClosed},
+	3: {rpcd.Controlled, system.Controlled},
 }
 
 func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, error) {
@@ -25,7 +29,9 @@ func (ut0311 *UT0311) setDoor(rq *messages.SetDoorControlStateRequest) (any, err
 		return nil, nil
 	} else if m, ok := modes[rq.ControlState]; !ok {
 		return nil, fmt.Errorf("invalid door control mode (%v)", rq.ControlState)
-	} else if mode, err := ut0311.breakout.SetDoorMode(controller, door, m); err != nil {
+	} else if _, _, err := ut0311.system.SetDoor(controller, door, m.system, rq.Delay); err != nil {
+		return nil, err
+	} else if mode, err := ut0311.breakout.SetDoorMode(controller, door, m.breakout); err != nil {
 		return nil, err
 	} else if delay, err := ut0311.breakout.SetDoorDelay(controller, door, rq.Delay); err != nil {
 		return nil, err

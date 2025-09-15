@@ -118,7 +118,7 @@ func (db impl) PutEvent(controller uint32, event entities.Event) (uint32, error)
 		controller,
 	}
 
-	if id, err := db.insert(sqlPutEvent, values...); err != nil {
+	if id, err := db.upsert(sqlPutEvent, values...); err != nil {
 		return 0, err
 	} else {
 		return uint32(id), nil

@@ -1,26 +1,27 @@
 CREATE TABLE Controller (
     Controller          INTEGER PRIMARY KEY,
-    EventIndex          INTEGER DEFAULT 0,
-    RecordSpecialEvents INTEGER DEFAULT 0);
+    EventIndex          INTEGER NOT NULL DEFAULT 0,
+    RecordSpecialEvents INTEGER NOT NULL DEFAULT 0,
+    Interlock           INTEGER NOT NULL DEFAULT 0);
 
 CREATE TABLE Doors (
     Controller INTEGER NOT NULL,
     Door       INTEGER NOT NULL,
-    Mode       INTEGER DEFAULT 3,
-    Delay      INTEGER DEFAULT 5,
+    Mode       INTEGER NOT NULL DEFAULT 3,
+    Delay      INTEGER NOT NULL DEFAULT 5,
     PRIMARY KEY (Controller, Door));
 
 CREATE TABLE Cards (
     id         INTEGER PRIMARY KEY,
     Controller INTEGER NOT NULL,
     Card       INTEGER NOT NULL,
-    StartDate  DATE NULL,
-    EndDate    DATE NULL,
-    Door1      INTEGER DEFAULT 0,
-    Door2      INTEGER DEFAULT 0,
-    Door3      INTEGER DEFAULT 0,
-    Door4      INTEGER DEFAULT 0,
-    PIN        INTEGER DEFAULT 0,
+    StartDate  DATE    NULL,
+    EndDate    DATE    NULL,
+    Door1      INTEGER NOT NULL DEFAULT 0,
+    Door2      INTEGER NOT NULL DEFAULT 0,
+    Door3      INTEGER NOT NULL DEFAULT 0,
+    Door4      INTEGER NOT NULL DEFAULT 0,
+    PIN        INTEGER NOT NULL DEFAULT 0,
     UNIQUE (Controller, Card));
 
 CREATE TABLE Events (

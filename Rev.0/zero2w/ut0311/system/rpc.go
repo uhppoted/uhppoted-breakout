@@ -8,11 +8,105 @@ import (
 const service = "system"
 
 var api = struct {
-	setInterlock string
+	setDoor      string
 	getDoor      string
+	getInterlock string
+	setInterlock string
 }{
-	setInterlock: service + ".SetInterlock",
+	setDoor:      service + ".SetDoor",
 	getDoor:      service + ".GetDoor",
+	getInterlock: service + ".GetInterlock",
+	setInterlock: service + ".SetInterlock",
+}
+
+func (s *System) GetDoor(controller uint32, door uint8) (DoorMode, uint8, error) {
+	debugf("get-door %v %v", controller, door)
+
+	var args = struct {
+		Controller uint32
+		Door       uint8
+		Mode       uint8
+		Delay      uint8
+	}{
+		Controller: controller,
+		Door:       door,
+	}
+
+	var reply = struct {
+		Controller uint32
+		Door       uint8
+		Mode       uint8
+		Delay      uint8
+	}{}
+
+	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
+		return 0, 0, err
+	} else if err := client.Call(api.getDoor, args, &reply); err != nil {
+		return 0, 0, err
+	} else if mode, ok := modes[reply.Mode]; !ok {
+		return 0, 0, fmt.Errorf("invalid door mode (%v)", reply.Mode)
+	} else {
+		return mode, reply.Delay, nil
+	}
+}
+
+func (s *System) SetDoor(controller uint32, door uint8, mode DoorMode, delay uint8) (DoorMode, uint8, error) {
+	debugf("set-door %v %v %v %v", controller, door, mode, delay)
+
+	var args = struct {
+		Controller uint32
+		Door       uint8
+		Mode       uint8
+		Delay      uint8
+	}{
+		Controller: controller,
+		Door:       door,
+		Mode:       uint8(mode),
+		Delay:      delay,
+	}
+
+	var reply = struct {
+		Controller uint32
+		Door       uint8
+		Mode       uint8
+		Delay      uint8
+	}{}
+
+	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
+		return ModeUnknown, 0, err
+	} else if err := client.Call(api.setDoor, args, &reply); err != nil {
+		return ModeUnknown, 0, err
+	} else if m, ok := modes[reply.Mode]; !ok {
+		return ModeUnknown, 0, fmt.Errorf("invalid door control mode (%v)", reply)
+	} else {
+		return m, reply.Delay, nil
+	}
+}
+
+func (s *System) GetInterlock(controller uint32) (Interlock, error) {
+	debugf("get-interlock %v", controller)
+
+	var args = struct {
+		Controller uint32
+		Interlock  uint8
+	}{
+		Controller: controller,
+	}
+
+	var reply = struct {
+		Controller uint32
+		Interlock  uint8
+	}{}
+
+	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
+		return InterlockUnknown, err
+	} else if err := client.Call(api.getInterlock, args, &reply); err != nil {
+		return InterlockUnknown, err
+	} else if v, ok := interlocks[reply.Interlock]; !ok {
+		return InterlockUnknown, fmt.Errorf("invalid interlock (%v)", reply)
+	} else {
+		return v, nil
+	}
 }
 
 func (s *System) SetInterlock(controller uint32, interlock Interlock) (Interlock, error) {
@@ -26,42 +120,18 @@ func (s *System) SetInterlock(controller uint32, interlock Interlock) (Interlock
 		Interlock:  uint8(interlock),
 	}
 
-	var reply uint8
-
-	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
-		return Unknown, err
-	} else if err := client.Call(api.setInterlock, args, &reply); err != nil {
-		return Unknown, err
-	} else if v, ok := interlocks[reply]; !ok {
-		return Unknown, fmt.Errorf("invalid interlock (%v)", reply)
-	} else {
-		return v, nil
-	}
-}
-
-func (s *System) GetDoor(controller uint32, door uint8) (DoorMode, uint8, error) {
-	debugf("get-door %v %v", controller, door)
-
-	var args = struct {
-		Controller uint32
-		Door       uint8
-	}{
-		Controller: controller,
-		Door:       door,
-	}
-
 	var reply = struct {
-		Mode  uint8
-		Delay uint8
+		Controller uint32
+		Interlock  uint8
 	}{}
 
 	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
-		return 0, 0, err
-	} else if err := client.Call(api.getDoor, args, &reply); err != nil {
-		return 0, 0, err
-	} else if mode, ok := modes[reply.Mode]; !ok {
-		return 0, 0, fmt.Errorf("invalid door mode (%v)", reply.Mode)
+		return InterlockUnknown, err
+	} else if err := client.Call(api.setInterlock, args, &reply); err != nil {
+		return InterlockUnknown, err
+	} else if v, ok := interlocks[reply.Interlock]; !ok {
+		return InterlockUnknown, fmt.Errorf("invalid interlock (%v)", reply)
 	} else {
-		return mode, reply.Delay, nil
+		return v, nil
 	}
 }

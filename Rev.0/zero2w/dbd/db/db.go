@@ -10,6 +10,9 @@ import (
 
 type DB interface {
 	GetDoor(controller uint32, door uint8) (*entities.Door, error)
+	SetDoor(controller uint32, door uint8, mode uint8, delay uint8) (*entities.Door, error)
+	GetInterlock(controller uint32) (*entities.Interlock, error)
+	SetInterlock(controller uint32, interlock uint8) (*entities.Interlock, error)
 
 	GetCards(controller uint32) (uint32, error)
 	GetCard(controller uint32, card uint32) (*entities.Card, error)
@@ -45,6 +48,18 @@ func Init(dsn string) error {
 
 func GetDoor(controller uint32, door uint8) (*entities.Door, error) {
 	return db.GetDoor(controller, door)
+}
+
+func SetDoor(controller uint32, door uint8, mode uint8, delay uint8) (*entities.Door, error) {
+	return db.SetDoor(controller, door, mode, delay)
+}
+
+func GetInterlock(controller uint32) (*entities.Interlock, error) {
+	return db.GetInterlock(controller)
+}
+
+func SetInterlock(controller uint32, interlock uint8) (*entities.Interlock, error) {
+	return db.SetInterlock(controller, interlock)
 }
 
 func GetCards(controller uint32) (uint32, error) {

@@ -196,7 +196,7 @@ func (db impl) PutCard(controller uint32, card entities.Card) (uint32, error) {
 		card.PIN,
 	}
 
-	if id, err := db.insert(sqlPutCard, values...); err != nil {
+	if id, err := db.upsert(sqlPutCard, values...); err != nil {
 		return 0, err
 	} else {
 		return uint32(id), nil

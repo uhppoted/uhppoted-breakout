@@ -451,31 +451,31 @@ void exec(char *cmd) {
 }
 
 void debug() {
-    // swipe *swipe = swipe_alloc();
-    //
-    // if (swipe != NULL) {
-    //     swipe->door = 4;
-    //     snprintf(swipe->card, sizeof(swipe->card), "%-03u%-05u", 100, 58400);
-    //
-    //     message msg = {
-    //         .message = MSG_SWIPE,
-    //         .tag = MESSAGE_SWIPE,
-    //         .swipe = swipe,
-    //     };
-    //
-    //     if (!push(msg)) {
-    //         swipe_free(swipe);
-    //     }
-    // }
+    swipe *swipe = swipe_alloc();
 
-    settings_restore();
+    if (swipe != NULL) {
+        swipe->door = 4;
+        snprintf(swipe->card, sizeof(swipe->card), "%-03u%-05u", 100, 58400);
 
-    debugf(LOGTAG, ">> version:%u", SETTINGS.version);
-    debugf(LOGTAG, ">> doors.interlock:%d", SETTINGS.doors.interlock);
-    debugf(LOGTAG, ">> door.1.mode:%d  door.1.delay:%d", SETTINGS.doors.door1.mode, SETTINGS.doors.door1.delay);
-    debugf(LOGTAG, ">> door.2.mode:%d  door.2.delay:%d", SETTINGS.doors.door2.mode, SETTINGS.doors.door2.delay);
-    debugf(LOGTAG, ">> door.3.mode:%d  door.3.delay:%d", SETTINGS.doors.door3.mode, SETTINGS.doors.door3.delay);
-    debugf(LOGTAG, ">> door.4.mode:%d  door.4.delay:%d", SETTINGS.doors.door4.mode, SETTINGS.doors.door4.delay);
+        message msg = {
+            .message = MSG_SWIPE,
+            .tag = MESSAGE_SWIPE,
+            .swipe = swipe,
+        };
+
+        if (!push(msg)) {
+            swipe_free(swipe);
+        }
+    }
+
+    // settings_restore();
+    //
+    // debugf(LOGTAG, ">> version:%u", SETTINGS.version);
+    // debugf(LOGTAG, ">> doors.interlock:%d", SETTINGS.doors.interlock);
+    // debugf(LOGTAG, ">> door.1.mode:%d  door.1.delay:%d", SETTINGS.doors.door1.mode, SETTINGS.doors.door1.delay);
+    // debugf(LOGTAG, ">> door.2.mode:%d  door.2.delay:%d", SETTINGS.doors.door2.mode, SETTINGS.doors.door2.delay);
+    // debugf(LOGTAG, ">> door.3.mode:%d  door.3.delay:%d", SETTINGS.doors.door3.mode, SETTINGS.doors.door3.delay);
+    // debugf(LOGTAG, ">> door.4.mode:%d  door.4.delay:%d", SETTINGS.doors.door4.mode, SETTINGS.doors.door4.delay);
 }
 
 void show_state() {
