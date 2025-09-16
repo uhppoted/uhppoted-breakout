@@ -38,6 +38,88 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 		return entities.ReasonCardOk
 	}
 
+	get := func(doors ...uint8) (bool, bool, error) {
+		var open bool = false
+		var unlocked bool = false
+		var err error = nil
+
+		for _, d := range doors {
+			if v, e := u.state.DoorOpen(d); e != nil {
+				err = e
+			} else if v {
+				open = true
+			}
+
+			if v, e := u.state.DoorUnlocked(d); e != nil {
+				err = e
+			} else if v {
+				unlocked = true
+			}
+		}
+
+		return open, unlocked, err
+	}
+
+	interlocked := func(interlock system.Interlock, door uint8) bool {
+		doors := []uint8{}
+
+		switch {
+		case interlock == system.NoInterlock:
+			doors = []uint8{}
+
+		case interlock == system.Interlock12 && door == 1:
+			doors = []uint8{2}
+
+		case interlock == system.Interlock12 && door == 2:
+			doors = []uint8{1}
+
+		case interlock == system.Interlock34 && door == 3:
+			doors = []uint8{4}
+
+		case interlock == system.Interlock34 && door == 4:
+			doors = []uint8{3}
+
+		case interlock == system.Interlock12_34 && door == 1:
+			doors = []uint8{2}
+
+		case interlock == system.Interlock12_34 && door == 2:
+			doors = []uint8{1}
+
+		case interlock == system.Interlock12_34 && door == 3:
+			doors = []uint8{4}
+
+		case interlock == system.Interlock12_34 && door == 4:
+			doors = []uint8{3}
+
+		case interlock == system.Interlock123 && door == 1:
+			doors = []uint8{2, 3}
+
+		case interlock == system.Interlock123 && door == 2:
+			doors = []uint8{1, 3}
+
+		case interlock == system.Interlock123 && door == 3:
+			doors = []uint8{1, 2}
+
+		case interlock == system.Interlock1234 && door == 1:
+			doors = []uint8{2, 3, 4}
+
+		case interlock == system.Interlock1234 && door == 2:
+			doors = []uint8{1, 3, 4}
+
+		case interlock == system.Interlock1234 && door == 3:
+			doors = []uint8{1, 2, 4}
+
+		case interlock == system.Interlock1234 && door == 4:
+			doors = []uint8{1, 2, 3}
+		}
+
+		if open, unlocked, err := get(doors...); open || unlocked || err != nil {
+			return true
+		}
+
+		return false
+	}
+
 	denied := func(card uint32, reason entities.EventReason, err error) {
 		warnf("swipe: access denied  controller:%v card:%v door:%v (%v)", controller, card, door, err)
 
@@ -81,19 +163,20 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 			denied(card, entities.ReasonCardDeniedDoorNormallyClosed, err)
 		} else if interlock, err := u.system.GetInterlock(controller); err != nil {
 			denied(card, entities.ReasonUnknown, err)
-		} else if interlock != system.NoInterlock {
-			// TODO check interlock against doors
-			denied(card, entities.ReasonCardDeniedDoorInterLock, err)
-		} else if ok, err := u.breakout.UnlockDoor(door); err != nil || !ok {
+		} else if interlocked(interlock, door) {
+			denied(card, entities.ReasonCardDeniedDoorInterLock, fmt.Errorf("door interlock"))
+		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
+			denied(card, entities.ReasonUnknown, err)
+		} else if !ok {
 			denied(card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
 		} else {
 			granted(card)
 
 			tag := fmt.Sprintf("controller.door.%v.unlocked", door)
 			u.state.Set(controller, tag, true)
-
-			return
 		}
+
+		return
 	}
 
 	warnf("invalid card swipe  controller:%v, card:%v, door:%v,", controller, card, door)

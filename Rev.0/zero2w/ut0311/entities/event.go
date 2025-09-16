@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -65,3 +66,115 @@ const (
 	ReasonDoorUnlocked = 201
 	ReasonDoorLocked   = 202
 )
+
+func (r EventReason) String() string {
+	switch r {
+	case ReasonUnknown:
+		return "unknown"
+
+	case ReasonCardOk:
+		return "card ok"
+
+	case ReasonCardDeniedPCControl:
+		return "card denied (PC control)"
+
+	case ReasonCardDeniedNoAccess:
+		return "card denied (no access)"
+
+	case ReasonCardDeniedPassword:
+		return "card denied (password)"
+
+	case ReasonCardDeniedAntiPassback:
+		return "card denied (anti-passback)"
+
+	case ReasonCardDeniedMoreCards:
+		return "card denied (more cards)"
+
+	case ReasonCardDeniedFirstCardOpen:
+		return "card denied (first card)"
+
+	case ReasonCardDeniedDoorNormallyClosed:
+		return "card denied (door normally closed)"
+
+	case ReasonCardDeniedDoorInterLock:
+		return "card denied (door interlock)"
+
+	case ReasonCardDeniedLimitedTimes:
+		return "card denied (limited times)"
+
+	case ReasonCardDeniedInvalidTimezone:
+		return "card denied (invalid timezone)"
+
+	case ReasonCardDenied:
+		return "card denied"
+
+	case ReasonDoorPushButton:
+		return "door pushbutton"
+
+	case ReasonDoorOpen:
+		return "door open"
+
+	case ReasonDoorClosed:
+		return "door closed"
+
+	case ReasonDoorSupervisorPasswordOpen:
+		return "door open (supervisor)"
+
+	case ReasonControllerPowerOn:
+		return "controller power on"
+
+	case ReasonControllerReset:
+		return "controller reset"
+
+	case ReasonPushbuttonDeniedDisabledByTask:
+		return "pushbutton denied (task disable)"
+
+	case ReasonPushbuttonDeniedForcedLock:
+		return "pushbutton denied (forced lock)"
+
+	case ReasonPushbuttonDeniedNotOnLine:
+		return "pushbutton denied (offline)"
+
+	case ReasonPushButtonDeniedDoorInterLock:
+		return "pushbutton denied (interlock)"
+
+	case ReasonAlarmThreat:
+		return "alarm (threat)"
+
+	case ReasonAlarmOpenTooLong:
+		return "alarm (open too long)"
+
+	case ReasonAlarmForcedOpen:
+		return "alaram (forced open)"
+
+	case ReasonAlarmFire:
+		return "alarm (fire)"
+
+	case ReasonAlarmForcedClose:
+		return "alarm (forced close)"
+
+	case ReasonAlarmTamperDetect:
+		return "alarm (tamper)"
+
+	case ReasonAlarm24x7Zone:
+		return "alarm (24x7 zone)"
+
+	case ReasonAlarmEmergencyCall:
+		return "alarm (emergency call)"
+
+	case ReasonRemoteOpenDoor:
+		return "remote open door"
+
+	case ReasonRemoteOpenDoorUSBReader:
+		return "remote open door (USB)"
+
+	case ReasonDoorUnlocked:
+		return "door unlocked"
+
+	case ReasonDoorLocked:
+		return "door locked"
+
+	default:
+		return fmt.Sprintf("other (%v)", r)
+	}
+}

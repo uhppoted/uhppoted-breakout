@@ -6,8 +6,8 @@
       - [x] door unlock events
       - [x] swipe event
       - [x] ReasonCardDeniedDoorNormallyClosed
-      - [ ] dbd.SetDoor
-      - [ ] ReasonCardDeniedDoorInterLock
+      - [x] dbd.SetDoor
+      - [x] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback
    - [ ] swipe + PIN
    - [ ] passcode
@@ -57,6 +57,7 @@ INFO   CLI        >>> queue    error
 - [ ] make debugf, infof, etc interrupt safe
    - https://embeddedartistry.com/blog/2019/11/06/an-embedded-friendly-printf-implementation
    - https://github.com/LukeShu/pico-fmt
+   - https://mcuoneclipse.com/2023/02/15/you_shall_not_use_printf-how-to-make-sure-no-printf-is-used/
 
 - [ ] USB
     - [ ] picotool reset
@@ -77,6 +78,8 @@ INFO   CLI        >>> queue    error
 
 - [ ] Rework print queue
       - (?) reservoir sampling (https://samwho.dev/reservoir-sampling)
+
+- https://bogdanthegeek.github.io/blog/insights/jlink-rtt-for-the-masses/
 
 ### SSMP
    - [ ] TRAP
