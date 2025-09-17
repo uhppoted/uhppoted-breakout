@@ -9,6 +9,7 @@
       - [x] dbd.SetDoor
       - [x] ReasonCardDeniedDoorInterLock
       - [ ] ReasonCardDeniedAntiPassback
+   - [ ] door open/closed seems to be inverted
    - [ ] swipe + PIN
    - [ ] passcode
    - (?) use pipes

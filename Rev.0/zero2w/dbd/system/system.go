@@ -59,6 +59,18 @@ func (s *System) SetInterlock(args entities.Interlock, record *entities.Interloc
 	return nil
 }
 
+func (s *System) GetAntiPassback(args entities.AntiPassback, record *entities.AntiPassback) error {
+	debugf("get-antipassback %v", args.Controller)
+
+	if v, err := db.GetAntiPassback(args.Controller); err != nil {
+		return err
+	} else if v != nil {
+		*record = *v
+	}
+
+	return nil
+}
+
 func debugf(format string, args ...any) {
 	log.Debugf(LOGTAG, format, args...)
 }

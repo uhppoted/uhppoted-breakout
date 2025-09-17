@@ -2,7 +2,8 @@ CREATE TABLE Controller (
     Controller          INTEGER PRIMARY KEY,
     EventIndex          INTEGER NOT NULL DEFAULT 0,
     RecordSpecialEvents INTEGER NOT NULL DEFAULT 0,
-    Interlock           INTEGER NOT NULL DEFAULT 0);
+    Interlock           INTEGER NOT NULL DEFAULT 0,
+    AntiPassback        INTEGER NOT NULL DEFAULT 0);
 
 CREATE TABLE Doors (
     Controller INTEGER NOT NULL,

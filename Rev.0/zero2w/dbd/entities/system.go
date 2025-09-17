@@ -13,3 +13,8 @@ type Interlock struct {
 	Controller uint32 `json:"controller"`
 	Interlock  uint8  `json:"interlock"`
 }
+
+type AntiPassback struct {
+	Controller   uint32 `json:"controller"`
+	AntiPassback uint8  `json:"antipassback"`
+}

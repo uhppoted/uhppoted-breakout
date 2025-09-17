@@ -8,15 +8,17 @@ import (
 const service = "system"
 
 var api = struct {
-	setDoor      string
-	getDoor      string
-	getInterlock string
-	setInterlock string
+	setDoor         string
+	getDoor         string
+	getInterlock    string
+	setInterlock    string
+	getAntiPassback string
 }{
-	setDoor:      service + ".SetDoor",
-	getDoor:      service + ".GetDoor",
-	getInterlock: service + ".GetInterlock",
-	setInterlock: service + ".SetInterlock",
+	setDoor:         service + ".SetDoor",
+	getDoor:         service + ".GetDoor",
+	getInterlock:    service + ".GetInterlock",
+	setInterlock:    service + ".SetInterlock",
+	getAntiPassback: service + ".GetAntiPassback",
 }
 
 func (s *System) GetDoor(controller uint32, door uint8) (DoorMode, uint8, error) {
@@ -131,6 +133,32 @@ func (s *System) SetInterlock(controller uint32, interlock Interlock) (Interlock
 		return InterlockUnknown, err
 	} else if v, ok := interlocks[reply.Interlock]; !ok {
 		return InterlockUnknown, fmt.Errorf("invalid interlock (%v)", reply)
+	} else {
+		return v, nil
+	}
+}
+
+func (s *System) GetAntiPassback(controller uint32) (AntiPassback, error) {
+	debugf("get-antipassback %v", controller)
+
+	var args = struct {
+		Controller   uint32
+		AntiPassback uint8
+	}{
+		Controller: controller,
+	}
+
+	var reply = struct {
+		Controller   uint32
+		AntiPassback uint8
+	}{}
+
+	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
+		return AntiPassbackUnknown, err
+	} else if err := client.Call(api.getAntiPassback, args, &reply); err != nil {
+		return AntiPassbackUnknown, err
+	} else if v, ok := antipassbacks[reply.AntiPassback]; !ok {
+		return AntiPassbackUnknown, fmt.Errorf("invalid anti-passback (%v)", reply)
 	} else {
 		return v, nil
 	}

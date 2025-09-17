@@ -120,6 +120,10 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 		return false
 	}
 
+	antipassbacked := func(antipassback system.AntiPassback, door uint8, card uint32) bool {
+		return true
+	}
+
 	denied := func(card uint32, reason entities.EventReason, err error) {
 		warnf("swipe: access denied  controller:%v card:%v door:%v (%v)", controller, card, door, err)
 
@@ -165,6 +169,10 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 			denied(card, entities.ReasonUnknown, err)
 		} else if interlocked(interlock, door) {
 			denied(card, entities.ReasonCardDeniedDoorInterLock, fmt.Errorf("door interlock"))
+		} else if antipassback, err := u.system.GetAntiPassback(controller); err != nil {
+			denied(card, entities.ReasonUnknown, err)
+		} else if antipassbacked(antipassback, door, card) {
+			denied(card, entities.ReasonCardDeniedAntiPassback, fmt.Errorf("anti-passback"))
 		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
 			denied(card, entities.ReasonUnknown, err)
 		} else if !ok {

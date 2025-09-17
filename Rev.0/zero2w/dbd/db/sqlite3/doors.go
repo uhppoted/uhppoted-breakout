@@ -19,6 +19,8 @@ const sqlPutInterlock = `INSERT INTO Controller (Controller, Interlock)
         ON CONFLICT(Controller) DO UPDATE SET
         Interlock = excluded.Interlock;`
 
+const sqlGetAntiPassback = `SELECT AntiPassback FROM Controller WHERE Controller=?;`
+
 func (db impl) GetDoor(controller uint32, door uint8) (*entities.Door, error) {
 	if rs, err := db.query(sqlGetDoor, controller, door); err != nil {
 		return nil, err
@@ -102,5 +104,34 @@ func (db impl) SetInterlock(controller uint32, interlock uint8) (*entities.Inter
 			Controller: controller,
 			Interlock:  interlock,
 		}, nil
+	}
+}
+
+func (db impl) GetAntiPassback(controller uint32) (*entities.AntiPassback, error) {
+	if rs, err := db.query(sqlGetAntiPassback, controller); err != nil {
+		return nil, err
+	} else {
+		defer rs.Close()
+
+		for rs.Next() {
+			record := struct {
+				antipassback uint8
+			}{}
+
+			pointers := []any{
+				&record.antipassback,
+			}
+
+			if err := rs.Scan(pointers...); err != nil {
+				return nil, err
+			}
+
+			return &entities.AntiPassback{
+				Controller:   controller,
+				AntiPassback: record.antipassback,
+			}, nil
+		}
+
+		return nil, entities.ErrRecordNotFound
 	}
 }
