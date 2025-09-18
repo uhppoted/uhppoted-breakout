@@ -121,11 +121,77 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 	}
 
 	antipassbacked := func(antipassback system.AntiPassback, door uint8, card uint32) bool {
-		return true
+		if swipe, err := u.system.GetSwipe(controller, card); err != nil {
+			warnf("swipe: anti-passback error  controller:%v door:%v card:%v (%v)", controller, door, card, err)
+		} else {
+			doors := []uint8{}
+
+			switch {
+			case antipassback == system.NoAntiPassback:
+				doors = []uint8{0, 1, 2, 3, 4}
+
+			case antipassback == system.Readers12_34 && door == 1:
+				doors = []uint8{0, 2}
+
+			case antipassback == system.Readers12_34 && door == 2:
+				doors = []uint8{0, 1}
+
+			case antipassback == system.Readers12_34 && door == 3:
+				doors = []uint8{0, 4}
+
+			case antipassback == system.Readers12_34 && door == 4:
+				doors = []uint8{0, 3}
+
+			case antipassback == system.Readers13_24 && door == 1:
+				doors = []uint8{0, 2, 4}
+
+			case antipassback == system.Readers13_24 && door == 2:
+				doors = []uint8{0, 1, 3}
+
+			case antipassback == system.Readers13_24 && door == 3:
+				doors = []uint8{0, 2, 4}
+
+			case antipassback == system.Readers13_24 && door == 4:
+				doors = []uint8{0, 1, 3}
+
+			case antipassback == system.Readers1_23 && door == 1:
+				doors = []uint8{0, 2, 3}
+
+			case antipassback == system.Readers1_23 && door == 2:
+				doors = []uint8{0, 1}
+
+			case antipassback == system.Readers1_23 && door == 3:
+				doors = []uint8{0, 1}
+
+			case antipassback == system.Readers1_234 && door == 1:
+				doors = []uint8{0, 2, 3, 4}
+
+			case antipassback == system.Readers1_234 && door == 2:
+				doors = []uint8{0, 1}
+
+			case antipassback == system.Readers1_234 && door == 3:
+				doors = []uint8{0, 1}
+
+			case antipassback == system.Readers1_234 && door == 4:
+				doors = []uint8{0, 1}
+			}
+
+			fmt.Printf(">>>> antipassback:%v  door:%v   swipe.door:%v   doors:%v\n", antipassback, door, swipe.Door, doors)
+
+			for _, d := range doors {
+				if d == swipe.Door {
+					return false
+				}
+			}
+
+			return true
+		}
+
+		return false
 	}
 
 	denied := func(card uint32, reason entities.EventReason, err error) {
-		warnf("swipe: access denied  controller:%v card:%v door:%v (%v)", controller, card, door, err)
+		warnf("swipe: access denied  controller:%v door:%v card:%v (%v)", controller, door, card, err)
 
 		u.event(controller, &entities.Event{
 			Index:     0,
@@ -140,22 +206,28 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 	}
 
 	granted := func(card uint32) {
-		infof("swipe: access granted  controller:%v card:%v door:%v", controller, card, door)
+		infof("swipe: access granted  controller:%v door:%v card:%v", controller, door, card)
 
-		u.event(controller, &entities.Event{
-			Index:     0,
-			Type:      entities.EventCard,
-			Granted:   true,
-			Door:      door,
-			Direction: 1,
-			Card:      card,
-			Timestamp: timestamp,
-			Reason:    entities.ReasonCardOk,
-		})
+		go func() {
+			u.event(controller, &entities.Event{
+				Index:     0,
+				Type:      entities.EventCard,
+				Granted:   true,
+				Door:      door,
+				Direction: 1,
+				Card:      card,
+				Timestamp: timestamp,
+				Reason:    entities.ReasonCardOk,
+			})
+		}()
+
+		// go func() {
+		// 	u.system.Swiped(controller, door, card, timestamp)
+		// }()
 	}
 
 	if card, err := parse(); err == nil {
-		infof("swipe  controller:%v, card:%v, door:%v,", controller, card, door)
+		infof("swipe  controller:%v door:%v card:%v", controller, door, card)
 
 		if record, err := u.cards.GetCard(controller, card); err != nil {
 			denied(card, entities.ReasonCardDenied, err)
@@ -187,5 +259,5 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 		return
 	}
 
-	warnf("invalid card swipe  controller:%v, card:%v, door:%v,", controller, card, door)
+	warnf("invalid card swipe  controller:%v door:%v card:%v", controller, door, card)
 }

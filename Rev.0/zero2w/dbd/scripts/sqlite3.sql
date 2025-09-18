@@ -37,3 +37,10 @@ CREATE TABLE Events (
     Reason       INTEGER  NULL,
     PRIMARY KEY (Controller, EventID));
 
+CREATE TABLE Swipes (
+    Controller  INTEGER NOT NULL,
+    Card        INTEGER NOT NULL,
+    Door        INTEGER NOT NULL,
+    Timestamp   DATETIME NULL,
+    PRIMARY KEY (Controller, Card));
+

@@ -13,12 +13,14 @@ var api = struct {
 	getInterlock    string
 	setInterlock    string
 	getAntiPassback string
+	getSwipe        string
 }{
 	setDoor:         service + ".SetDoor",
 	getDoor:         service + ".GetDoor",
 	getInterlock:    service + ".GetInterlock",
 	setInterlock:    service + ".SetInterlock",
 	getAntiPassback: service + ".GetAntiPassback",
+	getSwipe:        service + ".GetSwipe",
 }
 
 func (s *System) GetDoor(controller uint32, door uint8) (DoorMode, uint8, error) {
@@ -161,5 +163,24 @@ func (s *System) GetAntiPassback(controller uint32) (AntiPassback, error) {
 		return AntiPassbackUnknown, fmt.Errorf("invalid anti-passback (%v)", reply)
 	} else {
 		return v, nil
+	}
+}
+
+func (s *System) GetSwipe(controller uint32, card uint32) (Swipe, error) {
+	debugf("get-swipe %v %v", controller, card)
+
+	var args = Swipe{
+		Controller: controller,
+		Card:       card,
+	}
+
+	var reply = Swipe{}
+
+	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
+		return Swipe{}, err
+	} else if err := client.Call(api.getSwipe, args, &reply); err != nil {
+		return Swipe{}, err
+	} else {
+		return reply, nil
 	}
 }

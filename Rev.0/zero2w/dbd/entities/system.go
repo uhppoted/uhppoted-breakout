@@ -1,6 +1,8 @@
 package entities
 
-import ()
+import (
+	"time"
+)
 
 type Door struct {
 	Controller uint32 `json:"controller"`
@@ -17,4 +19,11 @@ type Interlock struct {
 type AntiPassback struct {
 	Controller   uint32 `json:"controller"`
 	AntiPassback uint8  `json:"antipassback"`
+}
+
+type Swipe struct {
+	Controller uint32
+	Card       uint32
+	Door       uint8
+	Timestamp  time.Time
 }
