@@ -22,6 +22,12 @@ const sqlPutAntiPassback = `INSERT INTO Controller (Controller, AntiPassback)
 
 const sqlGetSwipe = `SELECT Door,Timestamp FROM Swipes WHERE Controller=? AND Card=?;`
 
+const sqlPutSwipe = `INSERT INTO Swipes (Controller, Card, Door, Timestamp)
+        VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(Controller,Card) DO UPDATE SET
+        Door = excluded.Door,
+        Timestamp = CURRENT_TIMESTAMP;`
+
 func (db impl) GetInterlock(controller uint32) (*entities.Interlock, error) {
 	if rs, err := db.query(sqlGetInterlock, controller); err != nil {
 		return nil, err
@@ -124,10 +130,12 @@ func (db impl) GetSwipe(controller uint32, card uint32) (*entities.Swipe, error)
 			}
 
 			timestamp := time.Time{}
-			if v, err := time.ParseInLocation(time.DateTime, record.timestamp[0:19], time.Local); err != nil {
-				warnf("%v", err)
-			} else {
+			if v, err := time.ParseInLocation(time.DateTime, record.timestamp[0:19], time.Local); err == nil {
 				timestamp = v
+			} else if v, err := time.ParseInLocation("2006-01-02T15:04:05", record.timestamp[0:19], time.Local); err == nil {
+				timestamp = v
+			} else {
+				warnf("error parsing timestamp %v", record.timestamp)
 			}
 
 			return &entities.Swipe{
@@ -139,5 +147,19 @@ func (db impl) GetSwipe(controller uint32, card uint32) (*entities.Swipe, error)
 		}
 
 		return nil, nil
+	}
+}
+
+func (db impl) PutSwipe(controller uint32, card uint32, door uint8) (uint32, error) {
+	values := []any{
+		controller,
+		card,
+		door,
+	}
+
+	if id, err := db.upsert(sqlPutSwipe, values...); err != nil {
+		return 0, err
+	} else {
+		return uint32(id), nil
 	}
 }

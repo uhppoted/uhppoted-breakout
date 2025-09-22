@@ -38,9 +38,9 @@ CREATE TABLE Events (
     PRIMARY KEY (Controller, EventID));
 
 CREATE TABLE Swipes (
-    Controller  INTEGER NOT NULL,
-    Card        INTEGER NOT NULL,
-    Door        INTEGER NOT NULL,
-    Timestamp   DATETIME NULL,
+    Controller  INTEGER  NOT NULL,
+    Card        INTEGER  NOT NULL,
+    Door        INTEGER  NOT NULL,
+    Timestamp   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (Controller, Card));
 

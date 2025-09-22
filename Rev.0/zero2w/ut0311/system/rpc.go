@@ -15,6 +15,7 @@ var api = struct {
 	getAntiPassback string
 	setAntiPassback string
 	getSwipe        string
+	putSwipe        string
 }{
 	setDoor:         service + ".SetDoor",
 	getDoor:         service + ".GetDoor",
@@ -23,6 +24,7 @@ var api = struct {
 	getAntiPassback: service + ".GetAntiPassback",
 	setAntiPassback: service + ".SetAntiPassback",
 	getSwipe:        service + ".GetSwipe",
+	putSwipe:        service + ".PutSwipe",
 }
 
 func (s *System) GetDoor(controller uint32, door uint8) (DoorMode, uint8, error) {
@@ -209,6 +211,26 @@ func (s *System) GetSwipe(controller uint32, card uint32) (Swipe, error) {
 		return Swipe{}, err
 	} else if err := client.Call(api.getSwipe, args, &reply); err != nil {
 		return Swipe{}, err
+	} else {
+		return reply, nil
+	}
+}
+
+func (s *System) PutSwipe(controller uint32, door uint8, card uint32) (bool, error) {
+	debugf("put-swipe %v %v", controller, card)
+
+	var args = Swipe{
+		Controller: controller,
+		Door:       door,
+		Card:       card,
+	}
+
+	var reply bool
+
+	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
+		return false, err
+	} else if err := client.Call(api.putSwipe, args, &reply); err != nil {
+		return false, err
 	} else {
 		return reply, nil
 	}

@@ -95,6 +95,18 @@ func (s *System) GetSwipe(args entities.Swipe, record *entities.Swipe) error {
 	return nil
 }
 
+func (s *System) PutSwipe(args entities.Swipe, ok *bool) error {
+	debugf("put-swipe %v %v %v", args.Controller, args.Door, args.Card)
+
+	if v, err := db.PutSwipe(args.Controller, args.Card, args.Door); err != nil {
+		return err
+	} else {
+		*ok = v
+	}
+
+	return nil
+}
+
 func debugf(format string, args ...any) {
 	log.Debugf(LOGTAG, format, args...)
 }

@@ -17,6 +17,7 @@ type DB interface {
 	GetAntiPassback(controller uint32) (*entities.AntiPassback, error)
 	SetAntiPassback(controller uint32, antipassback uint8) (*entities.AntiPassback, error)
 	GetSwipe(controller uint32, card uint32) (*entities.Swipe, error)
+	PutSwipe(controller uint32, card uint32, door uint8) (uint32, error)
 
 	// ... cardss API
 	GetCards(controller uint32) (uint32, error)
@@ -79,6 +80,14 @@ func SetAntiPassback(controller uint32, antipassback uint8) (*entities.AntiPassb
 
 func GetSwipe(controller uint32, card uint32) (*entities.Swipe, error) {
 	return db.GetSwipe(controller, card)
+}
+
+func PutSwipe(controller uint32, card uint32, door uint8) (bool, error) {
+	if _, err := db.PutSwipe(controller, card, door); err != nil {
+		return false, err
+	} else {
+		return true, err
+	}
 }
 
 // ... cards API

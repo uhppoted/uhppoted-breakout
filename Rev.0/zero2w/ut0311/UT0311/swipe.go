@@ -176,8 +176,6 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 				doors = []uint8{0, 1}
 			}
 
-			fmt.Printf(">>>> antipassback:%v  door:%v   swipe.door:%v   doors:%v\n", antipassback, door, swipe.Door, doors)
-
 			for _, d := range doors {
 				if d == swipe.Door {
 					return false
@@ -221,9 +219,13 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 			})
 		}()
 
-		// go func() {
-		// 	u.system.Swiped(controller, door, card, timestamp)
-		// }()
+		go func() {
+			if ok, err := u.system.PutSwipe(controller, door, card); err != nil {
+				warnf("swipe: error updating 'swipes' list controller:%v door:%v card:%v (%v)", controller, door, card, err)
+			} else if !ok {
+				warnf("swipe: failed updating 'swipes' list  controller:%v door:%v card:%v", controller, door, card)
+			}
+		}()
 	}
 
 	if card, err := parse(); err == nil {
