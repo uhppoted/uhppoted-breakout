@@ -71,6 +71,18 @@ func (s *System) GetAntiPassback(args entities.AntiPassback, record *entities.An
 	return nil
 }
 
+func (s *System) SetAntiPassback(args entities.AntiPassback, record *entities.AntiPassback) error {
+	debugf("set-antipassback %v %v", args.Controller, args.AntiPassback)
+
+	if v, err := db.SetAntiPassback(args.Controller, args.AntiPassback); err != nil {
+		return err
+	} else if v != nil {
+		*record = *v
+	}
+
+	return nil
+}
+
 func (s *System) GetSwipe(args entities.Swipe, record *entities.Swipe) error {
 	debugf("get-swipe %v %v", args.Controller, args.Card)
 

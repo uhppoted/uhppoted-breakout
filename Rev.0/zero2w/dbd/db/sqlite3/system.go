@@ -15,6 +15,11 @@ const sqlPutInterlock = `INSERT INTO Controller (Controller, Interlock)
 
 const sqlGetAntiPassback = `SELECT AntiPassback FROM Controller WHERE Controller=?;`
 
+const sqlPutAntiPassback = `INSERT INTO Controller (Controller, AntiPassback)
+        VALUES (?, ?)
+        ON CONFLICT(Controller) DO UPDATE SET
+        AntiPassback = excluded.AntiPassback;`
+
 const sqlGetSwipe = `SELECT Door,Timestamp FROM Swipes WHERE Controller=? AND Card=?;`
 
 func (db impl) GetInterlock(controller uint32) (*entities.Interlock, error) {
@@ -83,6 +88,17 @@ func (db impl) GetAntiPassback(controller uint32) (*entities.AntiPassback, error
 		}
 
 		return nil, entities.ErrRecordNotFound
+	}
+}
+
+func (db impl) SetAntiPassback(controller uint32, antipassback uint8) (*entities.AntiPassback, error) {
+	if _, err := db.upsert(sqlPutAntiPassback, controller, antipassback); err != nil {
+		return nil, err
+	} else {
+		return &entities.AntiPassback{
+			Controller:   controller,
+			AntiPassback: antipassback,
+		}, nil
 	}
 }
 

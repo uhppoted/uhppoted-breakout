@@ -15,6 +15,7 @@ type DB interface {
 	GetInterlock(controller uint32) (*entities.Interlock, error)
 	SetInterlock(controller uint32, interlock uint8) (*entities.Interlock, error)
 	GetAntiPassback(controller uint32) (*entities.AntiPassback, error)
+	SetAntiPassback(controller uint32, antipassback uint8) (*entities.AntiPassback, error)
 	GetSwipe(controller uint32, card uint32) (*entities.Swipe, error)
 
 	// ... cardss API
@@ -70,6 +71,10 @@ func SetInterlock(controller uint32, interlock uint8) (*entities.Interlock, erro
 
 func GetAntiPassback(controller uint32) (*entities.AntiPassback, error) {
 	return db.GetAntiPassback(controller)
+}
+
+func SetAntiPassback(controller uint32, antipassback uint8) (*entities.AntiPassback, error) {
+	return db.SetAntiPassback(controller, antipassback)
 }
 
 func GetSwipe(controller uint32, card uint32) (*entities.Swipe, error) {
