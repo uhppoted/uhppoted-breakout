@@ -9,9 +9,6 @@
       - [x] dbd.SetDoor
       - [x] ReasonCardDeniedDoorInterLock
       - [x] ReasonCardDeniedAntiPassback
-         - [x] get-antipassback
-         - [x] set-antipassback
-         - [x] system.swipes
    - [ ] door open/closed seems to be inverted
    - [ ] swipe + PIN
    - [ ] passcode
@@ -22,6 +19,7 @@
    - [x] use cached values for door locks
    - [ ] use cached values for alarms 
    - [ ] poll
+      - https://avi.im/blag/2025/setsum
       - pack state into byte array and send CRC every e.g. 500ms
       - ut0311 does the same and fetches packed state if CRCs don't match
    - [ ] clear watchdog error after logging it

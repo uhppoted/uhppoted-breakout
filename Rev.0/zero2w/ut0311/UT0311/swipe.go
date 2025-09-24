@@ -31,8 +31,6 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 			return entities.ReasonCardDeniedNoAccess
 		} else if permissions := record.Permissions[door]; permissions == 0 {
 			return entities.ReasonCardDeniedNoAccess
-		} else if record.PIN != 0 {
-			return entities.ReasonCardDeniedPassword
 		}
 
 		return entities.ReasonCardOk
@@ -234,7 +232,7 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 		if record, err := u.cards.GetCard(controller, card); err != nil {
 			denied(card, entities.ReasonCardDenied, err)
 		} else if reason := validate(record); reason != entities.ReasonCardOk {
-			denied(card, reason, fmt.Errorf("card access permissions"))
+			denied(card, reason, fmt.Errorf("%v", reason))
 		} else if mode, _, err := u.system.GetDoor(controller, door); err != nil {
 			denied(card, entities.ReasonUnknown, err)
 		} else if mode == system.NormallyClosed {
@@ -247,6 +245,8 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 			denied(card, entities.ReasonUnknown, err)
 		} else if antipassbacked(antipassback, door, card) {
 			denied(card, entities.ReasonCardDeniedAntiPassback, fmt.Errorf("anti-passback"))
+		} else if record.PIN != 0 {
+			denied(card, entities.ReasonCardDeniedPassword, fmt.Errorf("*** PIN NOT IMPLEMENTED ***"))
 		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
 			denied(card, entities.ReasonUnknown, err)
 		} else if !ok {
