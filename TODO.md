@@ -11,11 +11,10 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - [x] dbd.SetDoor
       - [x] ReasonCardDeniedDoorInterLock
       - [x] ReasonCardDeniedAntiPassback
-   - [ ] door open/closed seems to be inverted
    - [ ] swipe + PIN
-      - [ ] default door record
-      - [ ] // FIXME use wrapped error ??
+      - [x] default door record
    - [ ] passcode
+   - [ ] door open/closed seems to be inverted
    - (?) use pipes
    - (?) trap handlers
 

@@ -30,33 +30,27 @@ var api = struct {
 func (s *System) GetDoor(controller uint32, door uint8) (DoorMode, uint8, error) {
 	debugf("get-door %v %v", controller, door)
 
-	var args = struct {
+	type D struct {
 		Controller uint32
 		Door       uint8
 		Mode       uint8
 		Delay      uint8
-	}{
+	}
+
+	args := D{
 		Controller: controller,
 		Door:       door,
 	}
 
-	var reply = struct {
-		Controller uint32
-		Door       uint8
-		Mode       uint8
-		Delay      uint8
-	}{}
+	reply := D{}
+	none := D{}
 
 	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
 		return ModeUnknown, 5, err
 	} else if err := client.Call(api.getDoor, args, &reply); err != nil {
-		// FIXME use wrapped error ??
-		println(">>>>>>>>>>>>>>>>> FIXME::use wrapped error")
-		if fmt.Sprintf("%v", err) == "record not found" {
-			return Controlled, 5, nil
-		} else {
-			return ModeUnknown, 5, err
-		}
+		return ModeUnknown, 5, err
+	} else if reply == none {
+		return Controlled, 5, nil
 	} else if mode, ok := modes[reply.Mode]; !ok {
 		return ModeUnknown, 5, fmt.Errorf("invalid door mode (%v)", reply.Mode)
 	} else {

@@ -41,7 +41,7 @@ func (db impl) GetDoor(controller uint32, door uint8) (*entities.Door, error) {
 			}, nil
 		}
 
-		return nil, entities.ErrRecordNotFound
+		return nil, nil
 	}
 }
 
