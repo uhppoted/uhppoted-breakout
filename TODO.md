@@ -1,5 +1,7 @@
 # TODO
 
+https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
+
 - [ ] card swipe
    - [ ] swipe
       - [x] unlock door
@@ -11,6 +13,8 @@
       - [x] ReasonCardDeniedAntiPassback
    - [ ] door open/closed seems to be inverted
    - [ ] swipe + PIN
+      - [ ] default door record
+      - [ ] // FIXME use wrapped error ??
    - [ ] passcode
    - (?) use pipes
    - (?) trap handlers

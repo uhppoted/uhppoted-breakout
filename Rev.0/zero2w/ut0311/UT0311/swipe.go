@@ -3,11 +3,14 @@ package UT0311
 import (
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"ut0311/entities"
 	"ut0311/system"
 )
+
+var pending = sync.Map{}
 
 func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uint8) {
 	parse := func() (uint32, error) {
@@ -246,7 +249,15 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 		} else if antipassbacked(antipassback, door, card) {
 			denied(card, entities.ReasonCardDeniedAntiPassback, fmt.Errorf("anti-passback"))
 		} else if record.PIN != 0 {
-			denied(card, entities.ReasonCardDeniedPassword, fmt.Errorf("*** PIN NOT IMPLEMENTED ***"))
+			p, _ := pending.Swap(card, time.AfterFunc(10*time.Second, func() {
+				denied(card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN required"))
+			}))
+
+			if p != nil {
+				if t, ok := p.(*time.Timer); ok {
+					t.Stop()
+				}
+			}
 		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
 			denied(card, entities.ReasonUnknown, err)
 		} else if !ok {

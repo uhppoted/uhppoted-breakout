@@ -48,11 +48,17 @@ func (s *System) GetDoor(controller uint32, door uint8) (DoorMode, uint8, error)
 	}{}
 
 	if client, err := rpc.DialHTTP(s.dial.network, s.dial.address); err != nil {
-		return 0, 0, err
+		return ModeUnknown, 5, err
 	} else if err := client.Call(api.getDoor, args, &reply); err != nil {
-		return 0, 0, err
+		// FIXME use wrapped error ??
+		println(">>>>>>>>>>>>>>>>> FIXME::use wrapped error")
+		if fmt.Sprintf("%v", err) == "record not found" {
+			return Controlled, 5, nil
+		} else {
+			return ModeUnknown, 5, err
+		}
 	} else if mode, ok := modes[reply.Mode]; !ok {
-		return 0, 0, fmt.Errorf("invalid door mode (%v)", reply.Mode)
+		return ModeUnknown, 5, fmt.Errorf("invalid door mode (%v)", reply.Mode)
 	} else {
 		return mode, reply.Delay, nil
 	}
