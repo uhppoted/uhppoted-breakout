@@ -274,3 +274,7 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 
 	warnf("invalid card swipe  controller:%v door:%v card:%v", controller, door, card)
 }
+
+func (u UT0311) Keycode(timestamp time.Time, controller uint32, code any, door uint8) {
+	fmt.Printf(">>>>>>>>>>>>>>>> KEYCODE controller:%v  door:%v  code:%v\n", controller, door, code)
+}

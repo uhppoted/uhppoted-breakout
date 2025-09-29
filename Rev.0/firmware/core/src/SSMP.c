@@ -414,6 +414,16 @@ void SSMP_trap(EVENT event, void *data) {
                     },
                 };
                 break;
+
+            case TRAP_KEYCODE:
+                trap.trap.var.value = (value){
+                    .tag = VALUE_OCTET_STRING,
+                    .octets = {
+                        .length = strlen((char *)data),
+                        .bytes = strdup((char *)data),
+                    },
+                };
+                break;
             }
         }
     }
