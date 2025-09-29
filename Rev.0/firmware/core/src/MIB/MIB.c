@@ -306,6 +306,26 @@ const MIBItem MIB_DOOR_4_SWIPE = {
     .OID = "0.1.3.6.1.4.1.65536.3.4.7",
 };
 
+const MIBItem MIB_DOOR_1_KEYCODE = {
+    .hash = 4218049206,
+    .OID = "0.1.3.6.1.4.1.65536.3.1.8",
+};
+
+const MIBItem MIB_DOOR_2_KEYCODE = {
+    .hash = 4218050295,
+    .OID = "0.1.3.6.1.4.1.65536.3.2.8",
+};
+
+const MIBItem MIB_DOOR_3_KEYCODE = {
+    .hash = 4218051384,
+    .OID = "0.1.3.6.1.4.1.65536.3.3.8",
+};
+
+const MIBItem MIB_DOOR_4_KEYCODE = {
+    .hash = 4218052473,
+    .OID = "0.1.3.6.1.4.1.65536.3.4.8",
+};
+
 const MIBItem MIB_ALARMS_TAMPER_DETECT = {
     .hash = 2957896913,
     .OID = "0.1.3.6.1.4.1.65536.4.1",
@@ -318,7 +338,7 @@ const MIBItem MIB_ALARMS_FIRE_ALARM = {
     .get = MIB_get_alarm_fire_alarm,
 };
 
-const MIBItem OIDs[45] = {
+const MIBItem OIDs[49] = {
     MIB_SYS_BOARD_ID,
     MIB_CONTROLLER_ID,
     MIB_CONTROLLER_VERSION,
@@ -362,6 +382,10 @@ const MIBItem OIDs[45] = {
     MIB_DOOR_2_SWIPE,
     MIB_DOOR_3_SWIPE,
     MIB_DOOR_4_SWIPE,
+    MIB_DOOR_1_KEYCODE,
+    MIB_DOOR_2_KEYCODE,
+    MIB_DOOR_3_KEYCODE,
+    MIB_DOOR_4_KEYCODE,
     MIB_ALARMS_TAMPER_DETECT,
     MIB_ALARMS_FIRE_ALARM,
 };

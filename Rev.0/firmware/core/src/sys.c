@@ -329,6 +329,24 @@ void dispatch(uint32_t v) {
 
         infof(LOGTAG, "KEYPAD %d  KEYCODE %s", swipe->door, swipe->code);
 
+        switch (swipe->door) {
+        case 1:
+            SSMP_trap(EVENT_DOOR_1_KEYPRESS, swipe->code);
+            break;
+
+        case 2:
+            SSMP_trap(EVENT_DOOR_2_KEYPRESS, swipe->code);
+            break;
+
+        case 3:
+            SSMP_trap(EVENT_DOOR_3_KEYPRESS, swipe->code);
+            break;
+
+        case 4:
+            SSMP_trap(EVENT_DOOR_4_KEYPRESS, swipe->code);
+            break;
+        }
+
         swipe_free(swipe);
     }
 

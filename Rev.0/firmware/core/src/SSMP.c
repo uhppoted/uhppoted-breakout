@@ -40,6 +40,7 @@ const int64_t SSMP_ERROR_INTERNAL = 255;
 typedef enum {
     TRAP_INPUT,
     TRAP_CARD,
+    TRAP_KEYCODE,
     TRAP_UNKNOWN,
 } trap_type;
 
@@ -50,6 +51,7 @@ typedef struct TRAP {
     union {
         bool input;
         char *card;
+        char *code;
     };
 } TRAP;
 
@@ -65,6 +67,7 @@ static const TRAP TRAPS[] = {
     {EVENT_DOOR_1_PRESSED, &MIB_DOOR_1_BUTTON, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_1_RELEASED, &MIB_DOOR_1_BUTTON, TRAP_INPUT, {.input = false}},
     {EVENT_DOOR_1_SWIPE, &MIB_DOOR_1_SWIPE, TRAP_CARD, {.card = NULL}},
+    {EVENT_DOOR_1_KEYPRESS, &MIB_DOOR_1_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
     {EVENT_DOOR_1_UNLOCKED, &MIB_DOOR_1_UNLOCKED, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_1_LOCKED, &MIB_DOOR_1_UNLOCKED, TRAP_INPUT, {.input = false}},
 
@@ -73,6 +76,7 @@ static const TRAP TRAPS[] = {
     {EVENT_DOOR_2_PRESSED, &MIB_DOOR_2_BUTTON, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_2_RELEASED, &MIB_DOOR_2_BUTTON, TRAP_INPUT, {.input = false}},
     {EVENT_DOOR_2_SWIPE, &MIB_DOOR_2_SWIPE, TRAP_CARD, {.card = NULL}},
+    {EVENT_DOOR_2_KEYPRESS, &MIB_DOOR_2_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
     {EVENT_DOOR_2_UNLOCKED, &MIB_DOOR_2_UNLOCKED, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_2_LOCKED, &MIB_DOOR_2_UNLOCKED, TRAP_INPUT, {.input = false}},
 
@@ -81,6 +85,7 @@ static const TRAP TRAPS[] = {
     {EVENT_DOOR_3_PRESSED, &MIB_DOOR_3_BUTTON, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_3_RELEASED, &MIB_DOOR_3_BUTTON, TRAP_INPUT, {.input = false}},
     {EVENT_DOOR_3_SWIPE, &MIB_DOOR_3_SWIPE, TRAP_CARD, {.card = NULL}},
+    {EVENT_DOOR_3_KEYPRESS, &MIB_DOOR_3_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
     {EVENT_DOOR_3_UNLOCKED, &MIB_DOOR_3_UNLOCKED, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_3_LOCKED, &MIB_DOOR_3_UNLOCKED, TRAP_INPUT, {.input = false}},
 
@@ -89,6 +94,7 @@ static const TRAP TRAPS[] = {
     {EVENT_DOOR_4_PRESSED, &MIB_DOOR_4_BUTTON, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_4_RELEASED, &MIB_DOOR_4_BUTTON, TRAP_INPUT, {.input = false}},
     {EVENT_DOOR_4_SWIPE, &MIB_DOOR_4_SWIPE, TRAP_CARD, {.card = NULL}},
+    {EVENT_DOOR_4_KEYPRESS, &MIB_DOOR_4_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
     {EVENT_DOOR_4_UNLOCKED, &MIB_DOOR_4_UNLOCKED, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_4_LOCKED, &MIB_DOOR_4_UNLOCKED, TRAP_INPUT, {.input = false}},
 };

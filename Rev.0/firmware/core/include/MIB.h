@@ -54,7 +54,11 @@ extern const MIBItem MIB_DOOR_1_SWIPE;
 extern const MIBItem MIB_DOOR_2_SWIPE;
 extern const MIBItem MIB_DOOR_3_SWIPE;
 extern const MIBItem MIB_DOOR_4_SWIPE;
+extern const MIBItem MIB_DOOR_1_KEYCODE;
+extern const MIBItem MIB_DOOR_2_KEYCODE;
+extern const MIBItem MIB_DOOR_3_KEYCODE;
+extern const MIBItem MIB_DOOR_4_KEYCODE;
 extern const MIBItem MIB_ALARMS_TAMPER_DETECT;
 extern const MIBItem MIB_ALARMS_FIRE_ALARM;
 
-extern const MIBItem OIDs[45];
+extern const MIBItem OIDs[49];
