@@ -12,10 +12,11 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - [x] ReasonCardDeniedDoorInterLock
       - [x] ReasonCardDeniedAntiPassback
    - [ ] swipe + PIN
+      - [ ] DOOR 1 NOT UNLOCKING ????
       - [x] default door record
       - [ ] keycode trap
           - send keycode on every keypress
-      - [ ] reset timer on keypress
+          - reset timer on keypress
       - [ ] discard pending entry if different card swiped on same controller+door
             - (?) no event/denied event
    - [ ] passcode

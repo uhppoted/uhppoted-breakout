@@ -226,6 +226,10 @@ void SSMP_received(const uint8_t *header, int header_len, const uint8_t *data, i
         char val[64] = {0};
 
         switch (request->set.value.tag) {
+        case VALUE_BOOLEAN:
+            snprintf(val, sizeof(val), "%s", request->set.value.boolean ? "true" : "false");
+            break;
+
         case VALUE_UINT8:
             snprintf(val, sizeof(val), "%d", request->set.value.integer);
             break;

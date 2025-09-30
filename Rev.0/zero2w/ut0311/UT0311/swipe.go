@@ -10,6 +10,14 @@ import (
 	"ut0311/system"
 )
 
+type swiped struct {
+	controller uint32
+	door       uint8
+	card       uint32
+	pin        uint32
+	timer      *time.Timer
+}
+
 var pending = sync.Map{}
 
 func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uint8) {
@@ -189,84 +197,63 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 		return false
 	}
 
-	denied := func(card uint32, reason entities.EventReason, err error) {
-		warnf("swipe: access denied  controller:%v door:%v card:%v (%v)", controller, door, card, err)
-
-		u.event(controller, &entities.Event{
-			Index:     0,
-			Type:      entities.EventCard,
-			Granted:   false,
-			Door:      door,
-			Direction: 1,
-			Card:      card,
-			Timestamp: timestamp,
-			Reason:    reason,
-		})
-	}
-
-	granted := func(card uint32) {
-		infof("swipe: access granted  controller:%v door:%v card:%v", controller, door, card)
-
-		go func() {
-			u.event(controller, &entities.Event{
-				Index:     0,
-				Type:      entities.EventCard,
-				Granted:   true,
-				Door:      door,
-				Direction: 1,
-				Card:      card,
-				Timestamp: timestamp,
-				Reason:    entities.ReasonCardOk,
-			})
-		}()
-
-		go func() {
-			if ok, err := u.system.PutSwipe(controller, door, card); err != nil {
-				warnf("swipe: error updating 'swipes' list controller:%v door:%v card:%v (%v)", controller, door, card, err)
-			} else if !ok {
-				warnf("swipe: failed updating 'swipes' list  controller:%v door:%v card:%v", controller, door, card)
-			}
-		}()
-	}
+	// denied := func(card uint32, reason entities.EventReason, err error) {
+	// 	warnf("swipe: access denied  controller:%v door:%v card:%v (%v)", controller, door, card, err)
+	//
+	// 	u.event(controller, &entities.Event{
+	// 		Index:     0,
+	// 		Type:      entities.EventCard,
+	// 		Granted:   false,
+	// 		Door:      door,
+	// 		Direction: 1,
+	// 		Card:      card,
+	// 		Timestamp: timestamp,
+	// 		Reason:    reason,
+	// 	})
+	// }
 
 	if card, err := parse(); err == nil {
 		infof("swipe  controller:%v door:%v card:%v", controller, door, card)
 
 		if record, err := u.cards.GetCard(controller, card); err != nil {
-			denied(card, entities.ReasonCardDenied, err)
+			u.denied(controller, door, card, entities.ReasonCardDenied, err)
 		} else if reason := validate(record); reason != entities.ReasonCardOk {
-			denied(card, reason, fmt.Errorf("%v", reason))
+			u.denied(controller, door, card, reason, fmt.Errorf("%v", reason))
 		} else if mode, _, err := u.system.GetDoor(controller, door); err != nil {
-			denied(card, entities.ReasonUnknown, err)
+			u.denied(controller, door, card, entities.ReasonUnknown, err)
 		} else if mode == system.NormallyClosed {
-			denied(card, entities.ReasonCardDeniedDoorNormallyClosed, err)
+			u.denied(controller, door, card, entities.ReasonCardDeniedDoorNormallyClosed, err)
 		} else if interlock, err := u.system.GetInterlock(controller); err != nil {
-			denied(card, entities.ReasonUnknown, err)
+			u.denied(controller, door, card, entities.ReasonUnknown, err)
 		} else if interlocked(interlock, door) {
-			denied(card, entities.ReasonCardDeniedDoorInterLock, fmt.Errorf("door interlock"))
+			u.denied(controller, door, card, entities.ReasonCardDeniedDoorInterLock, fmt.Errorf("door interlock"))
 		} else if antipassback, err := u.system.GetAntiPassback(controller); err != nil {
-			denied(card, entities.ReasonUnknown, err)
+			u.denied(controller, door, card, entities.ReasonUnknown, err)
 		} else if antipassbacked(antipassback, door, card) {
-			denied(card, entities.ReasonCardDeniedAntiPassback, fmt.Errorf("anti-passback"))
+			u.denied(controller, door, card, entities.ReasonCardDeniedAntiPassback, fmt.Errorf("anti-passback"))
 		} else if record.PIN != 0 {
-			p, _ := pending.Swap(card, time.AfterFunc(10*time.Second, func() {
-				denied(card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN required"))
-			}))
+			k := fmt.Sprintf("%v.%v", controller, door)
+			v, _ := pending.Swap(k, swiped{
+				controller: controller,
+				door:       door,
+				card:       card,
+				pin:        record.PIN,
+				timer: time.AfterFunc(10*time.Second, func() {
+					u.denied(controller, door, card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN required"))
+				}),
+			})
 
-			if p != nil {
-				if t, ok := p.(*time.Timer); ok {
-					t.Stop()
-				}
+			if p, ok := v.(swiped); ok {
+				fmt.Printf(">>>>>>>>>>>>>>>>>>> PENDING: %v\n", p)
+				p.timer.Stop()
 			}
-		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
-			denied(card, entities.ReasonUnknown, err)
-		} else if !ok {
-			denied(card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
-		} else {
-			granted(card)
 
-			tag := fmt.Sprintf("controller.door.%v.unlocked", door)
-			u.state.Set(controller, tag, true)
+		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
+			u.denied(controller, door, card, entities.ReasonUnknown, err)
+		} else if !ok {
+			u.denied(controller, door, card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
+		} else {
+			u.granted(controller, door, card)
 		}
 
 		return
@@ -276,5 +263,67 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 }
 
 func (u UT0311) Keycode(timestamp time.Time, controller uint32, code any, door uint8) {
-	fmt.Printf(">>>>>>>>>>>>>>>> KEYCODE controller:%v  door:%v  code:%v\n", controller, door, code)
+	k := fmt.Sprintf("%v.%v", controller, door)
+	v, _ := pending.LoadAndDelete(k)
+
+	if p, ok := v.(swiped); ok {
+		p.timer.Stop()
+		if code == fmt.Sprintf("%v#", p.pin) {
+			if ok, err := u.breakout.UnlockDoor(door); err != nil {
+				u.denied(p.controller, p.door, p.card, entities.ReasonUnknown, err)
+			} else if !ok {
+				u.denied(p.controller, p.door, p.card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
+			} else {
+				u.granted(p.controller, p.door, p.card)
+			}
+		}
+	}
+}
+
+func (u UT0311) granted(controller uint32, door uint8, card uint32) {
+	infof("swipe: access granted  controller:%v door:%v card:%v", controller, door, card)
+
+	timestamp := time.Now()
+	tag := fmt.Sprintf("controller.door.%v.unlocked", door)
+
+	go func() {
+		u.event(controller, &entities.Event{
+			Index:     0,
+			Type:      entities.EventCard,
+			Granted:   true,
+			Door:      door,
+			Direction: 1,
+			Card:      card,
+			Timestamp: timestamp,
+			Reason:    entities.ReasonCardOk,
+		})
+	}()
+
+	go func() {
+		if ok, err := u.system.PutSwipe(controller, door, card); err != nil {
+			warnf("swipe: error updating 'swipes' list controller:%v door:%v card:%v (%v)", controller, door, card, err)
+		} else if !ok {
+			warnf("swipe: failed updating 'swipes' list  controller:%v door:%v card:%v", controller, door, card)
+		}
+	}()
+
+	u.state.Set(controller, tag, true)
+}
+
+func (u UT0311) denied(controller uint32, door uint8, card uint32, reason entities.EventReason, err error) {
+	warnf("swipe: access denied  controller:%v door:%v card:%v (%v)", controller, door, card, err)
+
+	timestamp := time.Now()
+
+	u.event(controller, &entities.Event{
+		Index:     0,
+		Type:      entities.EventCard,
+		Granted:   false,
+		Door:      door,
+		Direction: 1,
+		Card:      card,
+		Timestamp: timestamp,
+		Reason:    reason,
+	})
+
 }
