@@ -10,6 +10,8 @@ import (
 	"ut0311/system"
 )
 
+const pinTimeout = 10 * time.Second
+
 type swiped struct {
 	controller uint32
 	door       uint8
@@ -197,21 +199,6 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 		return false
 	}
 
-	// denied := func(card uint32, reason entities.EventReason, err error) {
-	// 	warnf("swipe: access denied  controller:%v door:%v card:%v (%v)", controller, door, card, err)
-	//
-	// 	u.event(controller, &entities.Event{
-	// 		Index:     0,
-	// 		Type:      entities.EventCard,
-	// 		Granted:   false,
-	// 		Door:      door,
-	// 		Direction: 1,
-	// 		Card:      card,
-	// 		Timestamp: timestamp,
-	// 		Reason:    reason,
-	// 	})
-	// }
-
 	if card, err := parse(); err == nil {
 		infof("swipe  controller:%v door:%v card:%v", controller, door, card)
 
@@ -238,20 +225,20 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 				door:       door,
 				card:       card,
 				pin:        record.PIN,
-				timer: time.AfterFunc(10*time.Second, func() {
+				timer: time.AfterFunc(pinTimeout, func() {
 					u.denied(controller, door, card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN required"))
 				}),
 			})
 
 			if p, ok := v.(swiped); ok {
-				fmt.Printf(">>>>>>>>>>>>>>>>>>> PENDING: %v\n", p)
 				p.timer.Stop()
+				u.denied(controller, door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN required"))
 			}
 
 		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
 			u.denied(controller, door, card, entities.ReasonUnknown, err)
-		} else if !ok {
-			u.denied(controller, door, card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
+			} else if !ok {
+				u.denied(controller, door, card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
 		} else {
 			u.granted(controller, door, card)
 		}

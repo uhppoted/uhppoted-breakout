@@ -3,22 +3,13 @@
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
 - [ ] card swipe
-   - [ ] swipe
-      - [x] unlock door
-      - [x] door unlock events
-      - [x] swipe event
-      - [x] ReasonCardDeniedDoorNormallyClosed
-      - [x] dbd.SetDoor
-      - [x] ReasonCardDeniedDoorInterLock
-      - [x] ReasonCardDeniedAntiPassback
+   - [x] swipe
    - [ ] swipe + PIN
-      - [ ] DOOR 1 NOT UNLOCKING ????
       - [x] default door record
+      - [x] discard pending entry if different card swiped on same controller+door
       - [ ] keycode trap
           - send keycode on every keypress
           - reset timer on keypress
-      - [ ] discard pending entry if different card swiped on same controller+door
-            - (?) no event/denied event
    - [ ] passcode
    - [ ] door open/closed seems to be inverted
    - (?) use pipes
@@ -50,11 +41,11 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 ## dbd
    - [ ] monitor interface
    - [ ] wrap DBC in struct that invalidates dbc on fatal error
-   - [x] commonalise _query_
    - [ ] commonalise _delete_
 
 ## breakout
 - [] U4 seems a bit erratic
+   - door 1 not unlocking
    - configure unused outputs as inputs/open-collector
 - [ ] fairly frequent crash on settings::save
       - queue error maybe??
@@ -169,8 +160,8 @@ INFO   CLI        >>> queue    error
       - [ ] set-pc-control
       - [x] set-interlock
       - [ ] activate-keypads
-      - [ ] get-anti-passback
-      - [ ] set-anti-passback
+      - [x] get-anti-passback
+      - [x] set-anti-passback
       - [ ] restore-default-parameters
 
    - [ ] events
