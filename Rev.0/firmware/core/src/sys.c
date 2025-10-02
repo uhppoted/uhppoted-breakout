@@ -34,10 +34,11 @@ const uint32_t MSG_DEBUG = 0x00000000;
 const uint32_t MSG_WIO = 0x10000000;
 const uint32_t MSG_SWIPE = 0x20000000;
 const uint32_t MSG_KEYCODE = 0x30000000;
-const uint32_t MSG_U3 = 0x40000000;
-const uint32_t MSG_RX = 0x50000000;
-const uint32_t MSG_SAVE = 0x60000000;
-const uint32_t MSG_EVENT = 0x70000000;
+const uint32_t MSG_KEYPRESS = 0x40000000;
+const uint32_t MSG_U3 = 0x50000000;
+const uint32_t MSG_RX = 0x60000000;
+const uint32_t MSG_SAVE = 0x70000000;
+const uint32_t MSG_EVENT = 0x80000000;
 const uint32_t MSG_TTY = 0xb0000000;
 const uint32_t MSG_TRACE = 0xc0000000;
 const uint32_t MSG_LOG = 0xd0000000;
@@ -331,23 +332,49 @@ void dispatch(uint32_t v) {
 
         switch (swipe->door) {
         case 1:
-            SSMP_trap(EVENT_DOOR_1_KEYPRESS, swipe->code);
+            SSMP_trap(EVENT_DOOR_1_KEYCODE, swipe->code);
             break;
 
         case 2:
-            SSMP_trap(EVENT_DOOR_2_KEYPRESS, swipe->code);
+            SSMP_trap(EVENT_DOOR_2_KEYCODE, swipe->code);
             break;
 
         case 3:
-            SSMP_trap(EVENT_DOOR_3_KEYPRESS, swipe->code);
+            SSMP_trap(EVENT_DOOR_3_KEYCODE, swipe->code);
             break;
 
         case 4:
-            SSMP_trap(EVENT_DOOR_4_KEYPRESS, swipe->code);
+            SSMP_trap(EVENT_DOOR_4_KEYCODE, swipe->code);
             break;
         }
 
         swipe_free(swipe);
+    }
+
+    if ((v & MSG) == MSG_KEYPRESS) {
+        uint32_t u32 = (uint32_t)(SRAM_BASE | (v & 0x0fffffff));
+        uint8_t door = (u32 & 0x0000ff00) >> 8;
+        unsigned char key = (u32 & 0x000000ff) >> 0;
+
+        infof(LOGTAG, "KEYPAD %d  KEY PRESS %c", door, key);
+
+        switch (door) {
+        case 1:
+            SSMP_trap(EVENT_DOOR_1_KEYPRESS, &key);
+            break;
+
+        case 2:
+            SSMP_trap(EVENT_DOOR_2_KEYPRESS, &key);
+            break;
+
+        case 3:
+            SSMP_trap(EVENT_DOOR_3_KEYPRESS, &key);
+            break;
+
+        case 4:
+            SSMP_trap(EVENT_DOOR_4_KEYPRESS, &key);
+            break;
+        }
     }
 
     if ((v & MSG) == MSG_U3) {

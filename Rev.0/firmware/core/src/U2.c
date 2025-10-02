@@ -382,6 +382,12 @@ void U2_on_keypad_digit(uint8_t door, uint32_t v) {
                         keypad->timer = 0;
                     } else {
                         keypad->timer = 0;
+
+                        push((message){
+                            .message = MSG_KEYPRESS,
+                            .tag = MESSAGE_UINT32,
+                            .u32 = (((uint32_t)door << 8) & 0x0000ff00) | ((uint32_t)digit & 0x000000ff),
+                        });
                     }
                 }
 

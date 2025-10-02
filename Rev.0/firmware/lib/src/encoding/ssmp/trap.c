@@ -79,6 +79,11 @@ slice ssmp_encode_trap(packet p) {
         item_value.octets.length = p.trap.var.value.octets.length;
         item_value.octets.octets = strdup(p.trap.var.value.octets.bytes);
         break;
+
+    case VALUE_UINT8:
+        item_value.tag = FIELD_INTEGER;
+        item_value.integer.value = p.trap.var.value.integer;
+        break;
     }
 
     field var = {

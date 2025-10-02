@@ -164,6 +164,12 @@ OIDs = [
     MIBItem('controller.door.3.keycode','MIB_DOOR_3_KEYCODE', '0.1.3.6.1.4.1.65536.3.3.8'),
     MIBItem('controller.door.4.keycode','MIB_DOOR_4_KEYCODE', '0.1.3.6.1.4.1.65536.3.4.8'),
 
+    # key press
+    MIBItem('controller.door.1.keypress','MIB_DOOR_1_KEYPRESS', '0.1.3.6.1.4.1.65536.3.1.9'),
+    MIBItem('controller.door.2.keypress','MIB_DOOR_2_KEYPRESS', '0.1.3.6.1.4.1.65536.3.2.9'),
+    MIBItem('controller.door.3.keypress','MIB_DOOR_3_KEYPRESS', '0.1.3.6.1.4.1.65536.3.3.9'),
+    MIBItem('controller.door.4.keypress','MIB_DOOR_4_KEYPRESS', '0.1.3.6.1.4.1.65536.3.4.9'),
+
     # alarms
     MIBItem('controller.alarm.tamper',
             'MIB_ALARMS_TAMPER_DETECT', 

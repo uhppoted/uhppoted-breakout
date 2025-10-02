@@ -407,7 +407,7 @@ func unpack_TRAP(tag byte, bytes []byte) (trap, []byte, error) {
 			} else {
 				for _, vv := range vars {
 					if seq, ok := vv.(sequence); !ok || len(seq) != 2 {
-						return trap{}, nil, fmt.Errorf("invalid trap var (%v)", seq)
+						return trap{}, nil, fmt.Errorf("invalid trap var (%v) <ok:%v, len:%v>", seq, ok, len(seq))
 					} else if oid, ok := seq[0].(OID); !ok {
 						return trap{}, nil, fmt.Errorf("invalid trap var (%v)", seq)
 					} else {

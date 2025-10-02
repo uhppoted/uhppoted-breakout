@@ -41,6 +41,7 @@ typedef enum {
     TRAP_INPUT,
     TRAP_CARD,
     TRAP_KEYCODE,
+    TRAP_KEYPRESS,
     TRAP_UNKNOWN,
 } trap_type;
 
@@ -52,6 +53,7 @@ typedef struct TRAP {
         bool input;
         char *card;
         char *code;
+        char key;
     };
 } TRAP;
 
@@ -63,40 +65,49 @@ static const TRAP TRAPS[] = {
 
     // ... door open/close, button press/release
     {EVENT_DOOR_1_OPEN, &MIB_DOOR_1_OPEN, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_1_CLOSE, &MIB_DOOR_1_OPEN, TRAP_INPUT, {.input = false}},
-    {EVENT_DOOR_1_PRESSED, &MIB_DOOR_1_BUTTON, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_1_RELEASED, &MIB_DOOR_1_BUTTON, TRAP_INPUT, {.input = false}},
-    {EVENT_DOOR_1_SWIPE, &MIB_DOOR_1_SWIPE, TRAP_CARD, {.card = NULL}},
-    {EVENT_DOOR_1_KEYPRESS, &MIB_DOOR_1_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
-    {EVENT_DOOR_1_UNLOCKED, &MIB_DOOR_1_UNLOCKED, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_1_LOCKED, &MIB_DOOR_1_UNLOCKED, TRAP_INPUT, {.input = false}},
-
     {EVENT_DOOR_2_OPEN, &MIB_DOOR_2_OPEN, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_2_CLOSE, &MIB_DOOR_2_OPEN, TRAP_INPUT, {.input = false}},
-    {EVENT_DOOR_2_PRESSED, &MIB_DOOR_2_BUTTON, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_2_RELEASED, &MIB_DOOR_2_BUTTON, TRAP_INPUT, {.input = false}},
-    {EVENT_DOOR_2_SWIPE, &MIB_DOOR_2_SWIPE, TRAP_CARD, {.card = NULL}},
-    {EVENT_DOOR_2_KEYPRESS, &MIB_DOOR_2_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
-    {EVENT_DOOR_2_UNLOCKED, &MIB_DOOR_2_UNLOCKED, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_2_LOCKED, &MIB_DOOR_2_UNLOCKED, TRAP_INPUT, {.input = false}},
-
     {EVENT_DOOR_3_OPEN, &MIB_DOOR_3_OPEN, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_3_CLOSE, &MIB_DOOR_3_OPEN, TRAP_INPUT, {.input = false}},
-    {EVENT_DOOR_3_PRESSED, &MIB_DOOR_3_BUTTON, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_3_RELEASED, &MIB_DOOR_3_BUTTON, TRAP_INPUT, {.input = false}},
-    {EVENT_DOOR_3_SWIPE, &MIB_DOOR_3_SWIPE, TRAP_CARD, {.card = NULL}},
-    {EVENT_DOOR_3_KEYPRESS, &MIB_DOOR_3_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
-    {EVENT_DOOR_3_UNLOCKED, &MIB_DOOR_3_UNLOCKED, TRAP_INPUT, {.input = true}},
-    {EVENT_DOOR_3_LOCKED, &MIB_DOOR_3_UNLOCKED, TRAP_INPUT, {.input = false}},
-
     {EVENT_DOOR_4_OPEN, &MIB_DOOR_4_OPEN, TRAP_INPUT, {.input = true}},
+
+    {EVENT_DOOR_1_CLOSE, &MIB_DOOR_1_OPEN, TRAP_INPUT, {.input = false}},
+    {EVENT_DOOR_2_CLOSE, &MIB_DOOR_2_OPEN, TRAP_INPUT, {.input = false}},
+    {EVENT_DOOR_3_CLOSE, &MIB_DOOR_3_OPEN, TRAP_INPUT, {.input = false}},
     {EVENT_DOOR_4_CLOSE, &MIB_DOOR_4_OPEN, TRAP_INPUT, {.input = false}},
+
+    {EVENT_DOOR_1_PRESSED, &MIB_DOOR_1_BUTTON, TRAP_INPUT, {.input = true}},
+    {EVENT_DOOR_2_PRESSED, &MIB_DOOR_2_BUTTON, TRAP_INPUT, {.input = true}},
+    {EVENT_DOOR_3_PRESSED, &MIB_DOOR_3_BUTTON, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_4_PRESSED, &MIB_DOOR_4_BUTTON, TRAP_INPUT, {.input = true}},
+
+    {EVENT_DOOR_1_RELEASED, &MIB_DOOR_1_BUTTON, TRAP_INPUT, {.input = false}},
+    {EVENT_DOOR_2_RELEASED, &MIB_DOOR_2_BUTTON, TRAP_INPUT, {.input = false}},
+    {EVENT_DOOR_3_RELEASED, &MIB_DOOR_3_BUTTON, TRAP_INPUT, {.input = false}},
     {EVENT_DOOR_4_RELEASED, &MIB_DOOR_4_BUTTON, TRAP_INPUT, {.input = false}},
-    {EVENT_DOOR_4_SWIPE, &MIB_DOOR_4_SWIPE, TRAP_CARD, {.card = NULL}},
-    {EVENT_DOOR_4_KEYPRESS, &MIB_DOOR_4_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
+
+    {EVENT_DOOR_1_UNLOCKED, &MIB_DOOR_1_UNLOCKED, TRAP_INPUT, {.input = true}},
+    {EVENT_DOOR_2_UNLOCKED, &MIB_DOOR_2_UNLOCKED, TRAP_INPUT, {.input = true}},
+    {EVENT_DOOR_3_UNLOCKED, &MIB_DOOR_3_UNLOCKED, TRAP_INPUT, {.input = true}},
     {EVENT_DOOR_4_UNLOCKED, &MIB_DOOR_4_UNLOCKED, TRAP_INPUT, {.input = true}},
+
+    {EVENT_DOOR_1_LOCKED, &MIB_DOOR_1_UNLOCKED, TRAP_INPUT, {.input = false}},
+    {EVENT_DOOR_2_LOCKED, &MIB_DOOR_2_UNLOCKED, TRAP_INPUT, {.input = false}},
+    {EVENT_DOOR_3_LOCKED, &MIB_DOOR_3_UNLOCKED, TRAP_INPUT, {.input = false}},
     {EVENT_DOOR_4_LOCKED, &MIB_DOOR_4_UNLOCKED, TRAP_INPUT, {.input = false}},
+
+    {EVENT_DOOR_1_SWIPE, &MIB_DOOR_1_SWIPE, TRAP_CARD, {.card = NULL}},
+    {EVENT_DOOR_2_SWIPE, &MIB_DOOR_2_SWIPE, TRAP_CARD, {.card = NULL}},
+    {EVENT_DOOR_3_SWIPE, &MIB_DOOR_3_SWIPE, TRAP_CARD, {.card = NULL}},
+    {EVENT_DOOR_4_SWIPE, &MIB_DOOR_4_SWIPE, TRAP_CARD, {.card = NULL}},
+
+    {EVENT_DOOR_1_KEYCODE, &MIB_DOOR_1_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
+    {EVENT_DOOR_2_KEYCODE, &MIB_DOOR_2_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
+    {EVENT_DOOR_3_KEYCODE, &MIB_DOOR_3_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
+    {EVENT_DOOR_4_KEYCODE, &MIB_DOOR_4_KEYCODE, TRAP_KEYCODE, {.code = NULL}},
+
+    {EVENT_DOOR_1_KEYPRESS, &MIB_DOOR_1_KEYPRESS, TRAP_KEYPRESS, {.key = ' '}},
+    {EVENT_DOOR_2_KEYPRESS, &MIB_DOOR_2_KEYPRESS, TRAP_KEYPRESS, {.key = ' '}},
+    {EVENT_DOOR_3_KEYPRESS, &MIB_DOOR_3_KEYPRESS, TRAP_KEYPRESS, {.key = ' '}},
+    {EVENT_DOOR_4_KEYPRESS, &MIB_DOOR_4_KEYPRESS, TRAP_KEYPRESS, {.key = ' '}},
 };
 // clang-format on
 
@@ -426,6 +437,13 @@ void SSMP_trap(EVENT event, void *data) {
                         .length = strlen((char *)data),
                         .bytes = strdup((char *)data),
                     },
+                };
+                break;
+
+            case TRAP_KEYPRESS:
+                trap.trap.var.value = (value){
+                    .tag = VALUE_UINT8,
+                    .integer = (int64_t)(*(unsigned char *)data),
                 };
                 break;
             }

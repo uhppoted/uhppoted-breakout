@@ -237,8 +237,8 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 
 		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
 			u.denied(controller, door, card, entities.ReasonUnknown, err)
-			} else if !ok {
-				u.denied(controller, door, card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
+		} else if !ok {
+			u.denied(controller, door, card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
 		} else {
 			u.granted(controller, door, card)
 		}

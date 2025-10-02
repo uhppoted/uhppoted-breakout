@@ -7,9 +7,9 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
    - [ ] swipe + PIN
       - [x] default door record
       - [x] discard pending entry if different card swiped on same controller+door
-      - [ ] keycode trap
-          - send keycode on every keypress
-          - reset timer on keypress
+      - [x] keycode trap
+      - [x] keypress trap
+      - [ ] reset timer on keypress
    - [ ] passcode
    - [ ] door open/closed seems to be inverted
    - (?) use pipes
