@@ -51,10 +51,11 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
    - [ ] commonalise _delete_
 
 ## breakout
-- [] U4 seems a bit erratic
+- [ ] fix I2C address weirdness in scan (needs a right shift)
+- [ ] U4 seems a bit erratic
    - door 1 not unlocking
    - configure unused outputs as inputs/open-collector
-   - open drain ????
+   - ~~open drain~~
    - set unused pins to outputs and drive low
 
 - [ ] fairly frequent crash on settings::save

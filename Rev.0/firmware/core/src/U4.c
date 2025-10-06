@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <pico/stdlib.h>
 #include <pico/sync.h>
 
@@ -152,40 +154,78 @@ bool U4_tick(repeating_timer_t *rt);
 void U4_init() {
     infof(LOGTAG, "init");
 
+    mutex_init(&U4x.guard);
+
     // ... configure PCAL6416A
+    int delay = 100;
     int err;
 
     if ((err = PCAL6416A_init(U4)) != ERR_OK) {
         syserr_set(ERR_U4, LOGTAG, "error initialising (%d)", err);
     }
 
+    sleep_ms(delay);
+
+    uint16_t configuration;
+    if ((err = PCAL6416A_get_configuration(U4, &configuration)) != ERR_OK) {
+        syserr_set(ERR_U4, LOGTAG, "error reading PCAL6416A configuration (%d)", err);
+    } else {
+        debugf(LOGTAG, "PCAL6416A configuration (0): %04x", configuration);
+    }
+
+    sleep_ms(delay);
+
     if ((err = PCAL6416A_set_open_drain(U4, false, false)) != ERR_OK) {
         syserr_set(ERR_U4, LOGTAG, "error configuring PCAL6416A open drain outputs (%d)", err);
     }
+
+    sleep_ms(delay);
 
     if ((err = PCAL6416A_set_polarity(U4, 0x0000)) != ERR_OK) {
         syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A polarity (%d)", err);
     }
 
+    sleep_ms(delay);
+
     if ((err = PCAL6416A_set_latched(U4, 0x0000)) != ERR_OK) {
         syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A latches (%d)", err);
     }
+
+    sleep_ms(delay);
 
     if ((err = PCAL6416A_set_pullups(U4, U4_PULLUPS)) != ERR_OK) {
         syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A pullups (%d)", err);
     }
 
+    sleep_ms(delay);
+
     if ((err = PCAL6416A_write(U4, (U4x.outputs ^ U4x.polarity) & MASK)) != ERR_OK) {
-        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A output polarity (%d)", err);
     }
 
+    sleep_ms(delay);
+
     if ((err = PCAL6416A_set_output_drive(U4, U4_OUTPUT_DRIVE)) != ERR_OK) {
-        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A outputs (%d)", err);
+        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A output drive (%d)", err);
     }
+
+    sleep_ms(delay);
 
     if ((err = PCAL6416A_set_configuration(U4, 0xf800)) != ERR_OK) {
         syserr_set(ERR_U4, LOGTAG, "error configuring PCAL6416A (%d)", err);
     }
+
+    sleep_ms(delay);
+
+    if ((err = PCAL6416A_get_configuration(U4, &configuration)) != ERR_OK) {
+        syserr_set(ERR_U4, LOGTAG, "error reading PCAL6416A configuration (%d)", err);
+    } else if (configuration != 0xf80) {
+        syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A configuration - expected:%04x, got:%04x", 0xf800, configuration);
+    } else {
+        debugf(LOGTAG, "PCAL6416A configuration (2): %04x", configuration);
+    }
+
+    sleep_ms(delay);
 
     uint16_t outputs;
     if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
@@ -194,15 +234,13 @@ void U4_init() {
         syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:%04x, got:%04x", U4x.outputs, outputs);
     }
 
-    mutex_init(&U4x.guard);
-
     debugf(LOGTAG, "initialised state %04x %011b", outputs ^ U4x.polarity, outputs ^ U4x.polarity);
 }
 
 void U4_start() {
     infof(LOGTAG, "start");
 
-    add_repeating_timer_ms(U4_TICK, U4_tick, NULL, &U4x.timer);
+    // add_repeating_timer_ms(U4_TICK, U4_tick, NULL, &U4x.timer);
 }
 
 /*
@@ -501,6 +539,8 @@ void U4_blink_SYS(int count, uint16_t interval) {
 inline void U4_set(uint16_t mask) {
     U4x.outputs |= mask;
     U4x.write = true;
+
+    printf(">>>>>>>>>>>>>>>> SET %04x", mask);
 }
 
 inline void U4_clear(uint16_t mask) {

@@ -71,17 +71,21 @@ int I2C_read_all(I2C dev, uint8_t reg, uint8_t *data, int N) {
 
     if ((err = i2c_write_blocking(dev.bus, dev.addr >> 1, &reg, 1, true)) != 1) {
         if ((err == PICO_ERROR_GENERIC) || (err == PICO_ERROR_TIMEOUT)) {
+            printf(">>> AWOOGAH/1\n");
             return ERR_I2C;
         }
 
+        printf(">>> AWOOGAH/2\n");
         return ERR_UNKNOWN;
     }
 
     if ((err = i2c_read_blocking(dev.bus, dev.addr >> 1, data, N, false)) != N) {
         if ((err == PICO_ERROR_GENERIC) || (err == PICO_ERROR_TIMEOUT)) {
+            printf(">>> AWOOGAH/3\n");
             return ERR_I2C;
         }
 
+        printf(">>> AWOOGAH/4\n");
         return ERR_UNKNOWN;
     }
 

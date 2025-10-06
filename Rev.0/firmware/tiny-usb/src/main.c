@@ -79,17 +79,17 @@ int main() {
 
     multicore_launch_core1(I2C0_run);
 
-    // ... initialise RTC, IO expanders and serial port
-    RTC_init();
-    IOX_init();
-    SSMP_init();
+    // // ... initialise RTC, IO expanders and serial port
+    // RTC_init();
+    // IOX_init();
+    // SSMP_init();
 
     sleep_ms(2500); // FIXME remove - delay to let USB initialise
 
-    // ... good to go, start RTC, IO expanders and serial port
-    RTC_start();
-    IOX_start();
-    SSMP_start();
+    // // ... good to go, start RTC, IO expanders and serial port
+    // RTC_start();
+    // IOX_start();
+    // SSMP_start();
 
     // ... POR events
     push((message){

@@ -6,6 +6,7 @@
 #include "lib.h"
 
 extern int PCAL6416A_init(I2C dev);
+extern int PCAL6416A_get_configuration(I2C dev, uint16_t *configuration);
 extern int PCAL6416A_set_configuration(I2C dev, uint16_t configuration);
 extern int PCAL6416A_set_polarity(I2C dev, uint16_t polarity);
 extern int PCAL6416A_set_latched(I2C dev, uint16_t latched);

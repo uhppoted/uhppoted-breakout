@@ -36,13 +36,56 @@ int PCAL6416A_init(I2C dev) {
     return ERR_OK;
 }
 
+int PCAL6416A_get_configuration(I2C dev, uint16_t *configuration) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read(dev, PCAL6416A.CONFIGURATION, &buffer[0])) != ERR_OK) {
+        return err;
+    } else if ((err = I2C_read(dev, PCAL6416A.CONFIGURATION + 1, &buffer[1])) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = buffer[1];
+        uint16_t lo = buffer[0];
+
+        *configuration = ((hi << 8) & 0xff00) | ((lo << 0) & 0x00ff);
+
+        return ERR_OK;
+    }
+
+    // if ((err = I2C_read_all(dev, PCAL6416A.CONFIGURATION, buffer, 2)) != ERR_OK) {
+    //     return err;
+    // } else {
+    //     uint16_t hi = buffer[1];
+    //     uint16_t lo = buffer[0];
+    //
+    //     *configuration = ((hi << 8) & 0xff00) | ((lo << 0) & 0x00ff);
+    //
+    //     return ERR_OK;
+    // }
+}
+
 int PCAL6416A_set_configuration(I2C dev, uint16_t configuration) {
     uint8_t data[] = {
         (uint8_t)((configuration >> 0) & 0x00ff),
         (uint8_t)((configuration >> 8) & 0x00ff),
     };
+    int err;
 
-    return I2C_write_all(dev, PCAL6416A.CONFIGURATION, data, 2);
+    if ((err = I2C_write(dev, PCAL6416A.CONFIGURATION, data[0])) != ERR_OK) {
+        return err;
+    } else if ((err = I2C_write(dev, PCAL6416A.CONFIGURATION + 1, data[1])) != ERR_OK) {
+        return err;
+    } else {
+        return ERR_OK;
+    }
+
+    // uint8_t data[] = {
+    //     (uint8_t)((configuration >> 0) & 0x00ff),
+    //     (uint8_t)((configuration >> 8) & 0x00ff),
+    // };
+    //
+    // return I2C_write_all(dev, PCAL6416A.CONFIGURATION, data, 2);
 }
 
 int PCAL6416A_set_polarity(I2C dev, uint16_t polarity) {

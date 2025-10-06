@@ -11,6 +11,7 @@
 
 #include <I2C0.h>
 #include <I2C1.h>
+#include <PCAL6416A.h>
 #include <RTC.h>
 #include <U2.h>
 #include <U3.h>
@@ -450,7 +451,7 @@ void exec(char *cmd) {
     }
 }
 
-void debug() {
+void debug_swipe() {
     swipe *swipe = swipe_alloc();
 
     if (swipe != NULL) {
@@ -467,15 +468,34 @@ void debug() {
             swipe_free(swipe);
         }
     }
+}
 
-    // settings_restore();
-    //
-    // debugf(LOGTAG, ">> version:%u", SETTINGS.version);
-    // debugf(LOGTAG, ">> doors.interlock:%d", SETTINGS.doors.interlock);
-    // debugf(LOGTAG, ">> door.1.mode:%d  door.1.delay:%d", SETTINGS.doors.door1.mode, SETTINGS.doors.door1.delay);
-    // debugf(LOGTAG, ">> door.2.mode:%d  door.2.delay:%d", SETTINGS.doors.door2.mode, SETTINGS.doors.door2.delay);
-    // debugf(LOGTAG, ">> door.3.mode:%d  door.3.delay:%d", SETTINGS.doors.door3.mode, SETTINGS.doors.door3.delay);
-    // debugf(LOGTAG, ">> door.4.mode:%d  door.4.delay:%d", SETTINGS.doors.door4.mode, SETTINGS.doors.door4.delay);
+void debug_settings() {
+    settings_restore();
+
+    debugf(LOGTAG, ">> version:%u", SETTINGS.version);
+    debugf(LOGTAG, ">> doors.interlock:%d", SETTINGS.doors.interlock);
+    debugf(LOGTAG, ">> door.1.mode:%d  door.1.delay:%d", SETTINGS.doors.door1.mode, SETTINGS.doors.door1.delay);
+    debugf(LOGTAG, ">> door.2.mode:%d  door.2.delay:%d", SETTINGS.doors.door2.mode, SETTINGS.doors.door2.delay);
+    debugf(LOGTAG, ">> door.3.mode:%d  door.3.delay:%d", SETTINGS.doors.door3.mode, SETTINGS.doors.door3.delay);
+    debugf(LOGTAG, ">> door.4.mode:%d  door.4.delay:%d", SETTINGS.doors.door4.mode, SETTINGS.doors.door4.delay);
+}
+
+void debug() {
+    int err;
+
+    U4_init();
+    sleep_ms(250);
+
+    // U4_set_LED(4);
+    err = PCAL6416A_write(U4, 0x0080);
+    debugf(LOGTAG, ">> PCAL6416A write:%d", err);
+
+    // } else if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
+    //     syserr_set(ERR_U4, LOGTAG, "error reading back PCAL6416A outputs (%d)", err);
+    // } else if ((outputs & MASK) != (op->write.outputs & MASK)) {
+    //     syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
+    // }
 }
 
 void show_state() {
