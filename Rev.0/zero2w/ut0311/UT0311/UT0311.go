@@ -374,7 +374,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 	match := re.FindStringSubmatch(tag)
 	if len(match) > 1 {
 		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			ut0311.Swipe(timestamp, controller, value, uint8(door))
+			ut0311.swipe(timestamp, controller, uint8(door), value)
 			return
 		}
 	}
@@ -384,7 +384,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 	match = re.FindStringSubmatch(tag)
 	if len(match) > 1 {
 		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			ut0311.Keycode(timestamp, controller, value, uint8(door))
+			ut0311.keyCode(timestamp, controller, uint8(door), value)
 			return
 		}
 	}
@@ -394,7 +394,7 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 	match = re.FindStringSubmatch(tag)
 	if len(match) > 1 {
 		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			fmt.Printf(">>>>>>>>>>>>>>>>>>>>>>>> KEYPRESS DOOR:%v KEY:%c\n", door, value)
+			ut0311.keyPress(timestamp, controller, uint8(door), value)
 			return
 		}
 	}

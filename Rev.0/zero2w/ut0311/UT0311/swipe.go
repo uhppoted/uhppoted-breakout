@@ -22,7 +22,7 @@ type swiped struct {
 
 var pending = sync.Map{}
 
-func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uint8) {
+func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card any) {
 	parse := func() (uint32, error) {
 		switch v := card.(type) {
 		case string:
@@ -226,6 +226,7 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 				card:       card,
 				pin:        record.PIN,
 				timer: time.AfterFunc(pinTimeout, func() {
+					println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> KEYPAD TIMEOUT")
 					u.denied(controller, door, card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN required"))
 				}),
 			})
@@ -249,7 +250,7 @@ func (u UT0311) Swipe(timestamp time.Time, controller uint32, card any, door uin
 	warnf("invalid card swipe  controller:%v door:%v card:%v", controller, door, card)
 }
 
-func (u UT0311) Keycode(timestamp time.Time, controller uint32, code any, door uint8) {
+func (u UT0311) keyCode(timestamp time.Time, controller uint32, door uint8, code any) {
 	k := fmt.Sprintf("%v.%v", controller, door)
 	v, _ := pending.LoadAndDelete(k)
 
@@ -263,6 +264,16 @@ func (u UT0311) Keycode(timestamp time.Time, controller uint32, code any, door u
 			} else {
 				u.granted(p.controller, p.door, p.card)
 			}
+		}
+	}
+}
+
+func (u UT0311) keyPress(timestamp time.Time, controller uint32, door uint8, key any) {
+	k := fmt.Sprintf("%v.%v", controller, door)
+
+	if v, ok := pending.Load(k); ok {
+		if p, ok := v.(swiped); ok {
+			p.timer.Reset(pinTimeout)
 		}
 	}
 }

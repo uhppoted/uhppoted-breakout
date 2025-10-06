@@ -9,7 +9,14 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - [x] discard pending entry if different card swiped on same controller+door
       - [x] keycode trap
       - [x] keypress trap
-      - [ ] reset timer on keypress
+      - [ ] reset timer on keypress -OR-
+          - breakout: append '#' to keycode
+          - breakout: maybe start/restart keypad timer on every swipe and send empty keycode
+          - breakout: rethink 2.5s keypad timeout
+      - [ ] unexpected context cancelled
+```
+      2025-10-06 11:29:35 WARN   UT0311           swipe: anti-passback error  controller:405419896 door:1 card:10058400 (context canceled)
+```
    - [ ] passcode
    - [ ] door open/closed seems to be inverted
    - (?) use pipes
@@ -47,6 +54,9 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 - [] U4 seems a bit erratic
    - door 1 not unlocking
    - configure unused outputs as inputs/open-collector
+   - open drain ????
+   - set unused pins to outputs and drive low
+
 - [ ] fairly frequent crash on settings::save
       - queue error maybe??
 ```
