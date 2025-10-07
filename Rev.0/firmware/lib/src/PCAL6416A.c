@@ -36,6 +36,22 @@ int PCAL6416A_init(I2C dev) {
     return ERR_OK;
 }
 
+int PCAL6416A_get_configuration(I2C dev, uint16_t *configuration) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PCAL6416A.CONFIGURATION, buffer, 2)) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = ((uint16_t)buffer[1] << 8) & 0x00ff;
+        uint16_t lo = ((uint16_t)buffer[0] << 0) & 0x00ff;
+
+        *configuration = hi | lo;
+
+        return ERR_OK;
+    }
+}
+
 int PCAL6416A_set_configuration(I2C dev, uint16_t configuration) {
     uint8_t data[] = {
         (uint8_t)((configuration >> 0) & 0x00ff),
@@ -45,6 +61,22 @@ int PCAL6416A_set_configuration(I2C dev, uint16_t configuration) {
     return I2C_write_all(dev, PCAL6416A.CONFIGURATION, data, 2);
 }
 
+int PCAL6416A_get_polarity(I2C dev, uint16_t *polarity) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PCAL6416A.POLARITY, buffer, 2)) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = ((uint16_t)buffer[1] << 8) & 0x00ff;
+        uint16_t lo = ((uint16_t)buffer[0] << 0) & 0x00ff;
+
+        *polarity = hi | lo;
+
+        return ERR_OK;
+    }
+}
+
 int PCAL6416A_set_polarity(I2C dev, uint16_t polarity) {
     uint8_t data[] = {
         (uint8_t)((polarity >> 0) & 0x00ff),
@@ -52,6 +84,22 @@ int PCAL6416A_set_polarity(I2C dev, uint16_t polarity) {
     };
 
     return I2C_write_all(dev, PCAL6416A.POLARITY, data, 2);
+}
+
+int PCAL6416A_get_latched(I2C dev, uint16_t *latched) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PCAL6416A.LATCH, buffer, 2)) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = ((uint16_t)buffer[1] << 8) & 0x00ff;
+        uint16_t lo = ((uint16_t)buffer[0] << 0) & 0x00ff;
+
+        *latched = hi | lo;
+
+        return ERR_OK;
+    }
 }
 
 int PCAL6416A_set_latched(I2C dev, uint16_t latched) {
@@ -126,6 +174,22 @@ int PCAL6416A_set_output_drive(I2C dev, const float drive[16]) {
     };
 
     return I2C_write_all(dev, PCAL6416A.DRIVE, data, 4);
+}
+
+int PCAL6416A_get_interrupts(I2C dev, uint16_t *interrupts) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PCAL6416A.INTERRUPTS, buffer, 2)) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = ((uint16_t)buffer[1] << 8) & 0x00ff;
+        uint16_t lo = ((uint16_t)buffer[0] << 0) & 0x00ff;
+
+        *interrupts = hi | lo;
+
+        return ERR_OK;
+    }
 }
 
 int PCAL6416A_set_interrupts(I2C dev, uint16_t interrupts) {
