@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <PCAL6416A.h>
 
 #include <breakout.h>
@@ -33,6 +35,7 @@ const uint32_t PCAL6416A_DRIVE_0_5 = 0x55555555;
 const uint32_t PCAL6416A_DRIVE_0_25 = 0x00000000;
 
 int PCAL6416A_init(I2C dev) {
+    // return PCAL6416A_set_configuration(dev, 0xffff);
     return ERR_OK;
 }
 
@@ -40,29 +43,16 @@ int PCAL6416A_get_configuration(I2C dev, uint16_t *configuration) {
     uint8_t buffer[] = {0, 0};
     int err;
 
-    if ((err = I2C_read(dev, PCAL6416A.CONFIGURATION, &buffer[0])) != ERR_OK) {
-        return err;
-    } else if ((err = I2C_read(dev, PCAL6416A.CONFIGURATION + 1, &buffer[1])) != ERR_OK) {
+    if ((err = I2C_read_all(dev, PCAL6416A.CONFIGURATION, buffer, 2)) != ERR_OK) {
         return err;
     } else {
-        uint16_t hi = buffer[1];
-        uint16_t lo = buffer[0];
+        uint16_t hi = ((uint16_t)buffer[1] & 0x00ff) << 8;
+        uint16_t lo = ((uint16_t)buffer[0] & 0x00ff) << 0;
 
-        *configuration = ((hi << 8) & 0xff00) | ((lo << 0) & 0x00ff);
+        *configuration = hi | lo;
 
         return ERR_OK;
     }
-
-    // if ((err = I2C_read_all(dev, PCAL6416A.CONFIGURATION, buffer, 2)) != ERR_OK) {
-    //     return err;
-    // } else {
-    //     uint16_t hi = buffer[1];
-    //     uint16_t lo = buffer[0];
-    //
-    //     *configuration = ((hi << 8) & 0xff00) | ((lo << 0) & 0x00ff);
-    //
-    //     return ERR_OK;
-    // }
 }
 
 int PCAL6416A_set_configuration(I2C dev, uint16_t configuration) {
@@ -70,22 +60,24 @@ int PCAL6416A_set_configuration(I2C dev, uint16_t configuration) {
         (uint8_t)((configuration >> 0) & 0x00ff),
         (uint8_t)((configuration >> 8) & 0x00ff),
     };
+
+    return I2C_write_allx(dev, PCAL6416A.CONFIGURATION, data, 2);
+}
+
+int PCAL6416A_get_polarity(I2C dev, uint16_t *polarity) {
+    uint8_t buffer[] = {0, 0};
     int err;
 
-    if ((err = I2C_write(dev, PCAL6416A.CONFIGURATION, data[0])) != ERR_OK) {
-        return err;
-    } else if ((err = I2C_write(dev, PCAL6416A.CONFIGURATION + 1, data[1])) != ERR_OK) {
+    if ((err = I2C_read_all(dev, PCAL6416A.POLARITY, buffer, 2)) != ERR_OK) {
         return err;
     } else {
+        uint16_t hi = ((uint16_t)buffer[1] & 0x00ff) << 8;
+        uint16_t lo = ((uint16_t)buffer[0] & 0x00ff) << 0;
+
+        *polarity = hi | lo;
+
         return ERR_OK;
     }
-
-    // uint8_t data[] = {
-    //     (uint8_t)((configuration >> 0) & 0x00ff),
-    //     (uint8_t)((configuration >> 8) & 0x00ff),
-    // };
-    //
-    // return I2C_write_all(dev, PCAL6416A.CONFIGURATION, data, 2);
 }
 
 int PCAL6416A_set_polarity(I2C dev, uint16_t polarity) {
@@ -97,6 +89,22 @@ int PCAL6416A_set_polarity(I2C dev, uint16_t polarity) {
     return I2C_write_all(dev, PCAL6416A.POLARITY, data, 2);
 }
 
+int PCAL6416A_get_latched(I2C dev, uint16_t *latched) {
+    uint8_t buffer[] = {0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PCAL6416A.LATCH, buffer, 2)) != ERR_OK) {
+        return err;
+    } else {
+        uint16_t hi = ((uint16_t)buffer[1] & 0x00ff) << 8;
+        uint16_t lo = ((uint16_t)buffer[0] & 0x00ff) << 0;
+
+        *latched = hi | lo;
+
+        return ERR_OK;
+    }
+}
+
 int PCAL6416A_set_latched(I2C dev, uint16_t latched) {
     uint8_t data[] = {
         (uint8_t)((latched >> 0) & 0x00ff),
@@ -104,6 +112,26 @@ int PCAL6416A_set_latched(I2C dev, uint16_t latched) {
     };
 
     return I2C_write_all(dev, PCAL6416A.LATCH, data, 2);
+}
+
+int PCAL6416A_get_pullups(I2C dev, uint32_t *pullups) {
+    uint8_t buffer[] = {0, 0, 0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PCAL6416A.PULLUPS, buffer, 4)) != ERR_OK) {
+        return err;
+    } else {
+        uint32_t word = 0x00000000;
+
+        word |= ((uint32_t)buffer[3] & 0x00ff) << 24;
+        word |= ((uint32_t)buffer[2] & 0x00ff) << 16;
+        word |= ((uint32_t)buffer[1] & 0x00ff) << 8;
+        word |= ((uint32_t)buffer[0] & 0x00ff) << 0;
+
+        *pullups = word;
+
+        return ERR_OK;
+    }
 }
 
 int PCAL6416A_set_pullups(I2C dev, const PULLUP pullups[16]) {
@@ -134,6 +162,10 @@ int PCAL6416A_set_pullups(I2C dev, const PULLUP pullups[16]) {
     return I2C_write_all(dev, PCAL6416A.PULLUPS, data, 4);
 }
 
+int PCAL6416A_get_open_drain(I2C dev, uint8_t *data) {
+    return I2C_read(dev, PCAL6416A.OUTPUT_CONFIG, data);
+}
+
 int PCAL6416A_set_open_drain(I2C dev, bool port0, bool port1) {
     uint8_t data = 0x00;
 
@@ -141,6 +173,26 @@ int PCAL6416A_set_open_drain(I2C dev, bool port0, bool port1) {
     data |= port1 ? 0x02 : 0x00;
 
     return I2C_write(dev, PCAL6416A.OUTPUT_CONFIG, data);
+}
+
+int PCAL6416A_get_output_drive(I2C dev, uint32_t *drive) {
+    uint8_t buffer[] = {0, 0, 0, 0};
+    int err;
+
+    if ((err = I2C_read_all(dev, PCAL6416A.DRIVE, buffer, 4)) != ERR_OK) {
+        return err;
+    } else {
+        uint32_t word = 0x00000000;
+
+        word |= ((uint32_t)buffer[3] & 0x00ff) << 24;
+        word |= ((uint32_t)buffer[2] & 0x00ff) << 16;
+        word |= ((uint32_t)buffer[1] & 0x00ff) << 8;
+        word |= ((uint32_t)buffer[0] & 0x00ff) << 0;
+
+        *drive = word;
+
+        return ERR_OK;
+    }
 }
 
 int PCAL6416A_set_output_drive(I2C dev, const float drive[16]) {
@@ -203,8 +255,8 @@ int PCAL6416A_read(I2C dev, uint16_t *data) {
     if ((err = I2C_read_all(dev, PCAL6416A.INPUTS, buffer, 2)) != ERR_OK) {
         return err;
     } else {
-        uint16_t hi = ((uint16_t)buffer[1] << 8) & 0x00ff;
-        uint16_t lo = ((uint16_t)buffer[0] << 0) & 0x00ff;
+        uint16_t hi = ((uint16_t)buffer[1] & 0x00ff) << 8;
+        uint16_t lo = ((uint16_t)buffer[0] & 0x00ff) << 0;
 
         *data = hi | lo;
 
@@ -228,10 +280,10 @@ int PCAL6416A_readback(I2C dev, uint16_t *data) {
     if ((err = I2C_read_all(dev, PCAL6416A.OUTPUTS, buffer, 2)) != ERR_OK) {
         return err;
     } else {
-        uint16_t hi = buffer[1];
-        uint16_t lo = buffer[0];
+        uint16_t hi = ((uint16_t)buffer[1] & 0x00ff) << 8;
+        uint16_t lo = ((uint16_t)buffer[0] & 0x00ff) << 0;
 
-        *data = ((hi << 8) & 0xff00) | ((lo << 0) & 0x00ff);
+        *data = hi | lo;
 
         return ERR_OK;
     }

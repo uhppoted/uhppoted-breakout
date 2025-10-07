@@ -21,9 +21,9 @@ void IOX_init() {
     gpio_put(IOX_RESET, 1);
     sleep_us(25);
 
-    U2_init();
-    U3_init();
-    U4_init();
+    // U2_init();
+    // U3_init();
+    // U4_init();
 
     infof("IOX", "initialised");
 }

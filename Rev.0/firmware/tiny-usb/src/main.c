@@ -63,25 +63,24 @@ int main() {
         return -1;
     }
 
-    syserr_set(ERR_RESTART, LOGTAG, "power-on");
-
-    if (watchdog_caused_reboot()) {
-        syserr_set(ERR_WATCHDOG, LOGTAG, "watchdog reboot");
-    }
-
-    if (strcmp(WATCHDOG, "disabled") != 0) {
-        watchdog_enable(WATCHDOG_TIMEOUT, true);
-    }
+    // syserr_set(ERR_RESTART, LOGTAG, "power-on");
+    //
+    // if (watchdog_caused_reboot()) {
+    //     syserr_set(ERR_WATCHDOG, LOGTAG, "watchdog reboot");
+    // }
+    //
+    // if (strcmp(WATCHDOG, "disabled") != 0) {
+    //     watchdog_enable(WATCHDOG_TIMEOUT, true);
+    // }
 
     // ... initialise FIFO, timers and I2C
     I2C0_init();
     I2C1_init();
-
-    multicore_launch_core1(I2C0_run);
+    // multicore_launch_core1(I2C0_run);
 
     // // ... initialise RTC, IO expanders and serial port
     // RTC_init();
-    // IOX_init();
+    IOX_init();
     // SSMP_init();
 
     sleep_ms(2500); // FIXME remove - delay to let USB initialise
@@ -91,20 +90,20 @@ int main() {
     // IOX_start();
     // SSMP_start();
 
-    // ... POR events
-    push((message){
-        .message = MSG_EVENT,
-        .tag = MESSAGE_EVENT,
-        .event = EVENT_SYS_START,
-    });
-
-    if (watchdog_caused_reboot()) {
-        push((message){
-            .message = MSG_EVENT,
-            .tag = MESSAGE_EVENT,
-            .event = EVENT_SYS_RESET,
-        });
-    }
+    // // ... POR events
+    // push((message){
+    //     .message = MSG_EVENT,
+    //     .tag = MESSAGE_EVENT,
+    //     .event = EVENT_SYS_START,
+    // });
+    //
+    // if (watchdog_caused_reboot()) {
+    //     push((message){
+    //         .message = MSG_EVENT,
+    //         .tag = MESSAGE_EVENT,
+    //         .event = EVENT_SYS_RESET,
+    //     });
+    // }
 
     // ... run loop
     while (true) {

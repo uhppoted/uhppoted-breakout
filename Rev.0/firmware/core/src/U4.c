@@ -160,6 +160,8 @@ void U4_init() {
     int delay = 100;
     int err;
 
+    sleep_ms(delay);
+
     if ((err = PCAL6416A_init(U4)) != ERR_OK) {
         syserr_set(ERR_U4, LOGTAG, "error initialising (%d)", err);
     }
@@ -199,42 +201,42 @@ void U4_init() {
 
     sleep_ms(delay);
 
-    if ((err = PCAL6416A_write(U4, (U4x.outputs ^ U4x.polarity) & MASK)) != ERR_OK) {
-        syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A output polarity (%d)", err);
-    }
-
-    sleep_ms(delay);
-
     if ((err = PCAL6416A_set_output_drive(U4, U4_OUTPUT_DRIVE)) != ERR_OK) {
         syserr_set(ERR_U4, LOGTAG, "error setting PCAL6416A output drive (%d)", err);
     }
 
     sleep_ms(delay);
 
-    if ((err = PCAL6416A_set_configuration(U4, 0xf800)) != ERR_OK) {
-        syserr_set(ERR_U4, LOGTAG, "error configuring PCAL6416A (%d)", err);
-    }
+    // if ((err = PCAL6416A_write(U4, (U4x.outputs ^ U4x.polarity) & MASK)) != ERR_OK) {
+    //     syserr_set(ERR_U4, LOGTAG, "error initialising PCAL6416A outputs (%d)", err);
+    // }
+    //
+    // sleep_ms(delay);
 
-    sleep_ms(delay);
+    // if ((err = PCAL6416A_set_configuration(U4, 0xf800)) != ERR_OK) {
+    //     syserr_set(ERR_U4, LOGTAG, "error configuring PCAL6416A (%d)", err);
+    // }
+    //
+    // sleep_ms(delay);
 
-    if ((err = PCAL6416A_get_configuration(U4, &configuration)) != ERR_OK) {
-        syserr_set(ERR_U4, LOGTAG, "error reading PCAL6416A configuration (%d)", err);
-    } else if (configuration != 0xf80) {
-        syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A configuration - expected:%04x, got:%04x", 0xf800, configuration);
-    } else {
-        debugf(LOGTAG, "PCAL6416A configuration (2): %04x", configuration);
-    }
+    // if ((err = PCAL6416A_get_configuration(U4, &configuration)) != ERR_OK) {
+    //     syserr_set(ERR_U4, LOGTAG, "error reading PCAL6416A configuration (%d)", err);
+    // } else if (configuration != 0xf80) {
+    //     syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A configuration - expected:%04x, got:%04x", 0xf800, configuration);
+    // } else {
+    //     debugf(LOGTAG, "PCAL6416A configuration (2): %04x", configuration);
+    // }
+    //
+    // sleep_ms(delay);
 
-    sleep_ms(delay);
+    // uint16_t outputs;
+    // if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
+    //     syserr_set(ERR_U4, LOGTAG, "error reading PCAL6416A outputs (%d)", err);
+    // } else if ((outputs & MASK) != ((U4x.outputs ^ U4x.polarity) & MASK)) {
+    //     syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:%04x, got:%04x", U4x.outputs, outputs);
+    // }
 
-    uint16_t outputs;
-    if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-        syserr_set(ERR_U4, LOGTAG, "error reading PCAL6416A outputs (%d)", err);
-    } else if ((outputs & MASK) != ((U4x.outputs ^ U4x.polarity) & MASK)) {
-        syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:%04x, got:%04x", U4x.outputs, outputs);
-    }
-
-    debugf(LOGTAG, "initialised state %04x %011b", outputs ^ U4x.polarity, outputs ^ U4x.polarity);
+    // debugf(LOGTAG, "initialised state %04x %011b", outputs ^ U4x.polarity, outputs ^ U4x.polarity);
 }
 
 void U4_start() {

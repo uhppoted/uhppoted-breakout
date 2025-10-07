@@ -482,20 +482,72 @@ void debug_settings() {
 }
 
 void debug() {
+    uint8_t open_drain;
+    uint16_t polarity;
+    uint16_t latched;
+    uint16_t configuration;
+    uint16_t configuration2;
+    uint32_t pullups;
+    uint32_t drive;
+    uint16_t outputs;
     int err;
 
     U4_init();
     sleep_ms(250);
 
-    // U4_set_LED(4);
-    err = PCAL6416A_write(U4, 0x0080);
-    debugf(LOGTAG, ">> PCAL6416A write:%d", err);
+    if ((err = PCAL6416A_get_configuration(U4, &configuration)) != ERR_OK) {
+        infof(LOGTAG, "error reading PCAL6416A configuration (%d)", err);
+    } else {
+        infof(LOGTAG, "PCAL6416A configuration:        0x%02x", configuration);
+    }
 
-    // } else if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
-    //     syserr_set(ERR_U4, LOGTAG, "error reading back PCAL6416A outputs (%d)", err);
-    // } else if ((outputs & MASK) != (op->write.outputs & MASK)) {
-    //     syserr_set(ERR_U4, LOGTAG, "invalid PCAL6416A output state - expected:04x, got:%04x", op->write.outputs & MASK, outputs & MASK);
-    // }
+    if ((err = PCAL6416A_get_open_drain(U4, &open_drain)) != ERR_OK) {
+        infof(LOGTAG, "error reading PCAL6416A output configuration (%d)", err);
+    } else {
+        infof(LOGTAG, "PCAL6416A output configuration: 0x%02x", open_drain);
+    }
+
+    if ((err = PCAL6416A_get_polarity(U4, &polarity)) != ERR_OK) {
+        infof(LOGTAG, "error reading PCAL6416A input polarity (%d)", err);
+    } else {
+        infof(LOGTAG, "PCAL6416A input polarity:       0x%04x", polarity);
+    }
+
+    if ((err = PCAL6416A_get_latched(U4, &latched)) != ERR_OK) {
+        infof(LOGTAG, "error reading PCAL6416A input latch (%d)", err);
+    } else {
+        infof(LOGTAG, "PCAL6416A input latch:          0x%04x", latched);
+    }
+
+    if ((err = PCAL6416A_get_pullups(U4, &pullups)) != ERR_OK) {
+        infof(LOGTAG, "error reading PCAL6416A output pullups (%d)", err);
+    } else {
+        infof(LOGTAG, "PCAL6416A output pullups:       0x%08x", pullups);
+    }
+
+    if ((err = PCAL6416A_get_output_drive(U4, &drive)) != ERR_OK) {
+        infof(LOGTAG, "error reading PCAL6416A output drive (%d)", err);
+    } else {
+        infof(LOGTAG, "PCAL6416A output drive:         0x%08x", drive);
+    }
+
+    if ((err = PCAL6416A_readback(U4, &outputs)) != ERR_OK) {
+        infof(LOGTAG, "error reading PCAL6416A outputs (%d)", err);
+    } else {
+        infof(LOGTAG, "PCAL6416A outputs:              0x%04x", outputs);
+    }
+
+    sleep_ms(100);
+    if ((err = PCAL6416A_set_configuration(U4, 0xfffe)) != ERR_OK) {
+        infof(LOGTAG, "error configuring PCAL6416A (%d)", err);
+    }
+
+    sleep_ms(100);
+    if ((err = PCAL6416A_get_configuration(U4, &configuration2)) != ERR_OK) {
+        infof(LOGTAG, "error reading PCAL6416A configuration (%d)", err);
+    } else {
+        infof(LOGTAG, "PCAL6416A configuration:        0x%02x", configuration2);
+    }
 }
 
 void show_state() {

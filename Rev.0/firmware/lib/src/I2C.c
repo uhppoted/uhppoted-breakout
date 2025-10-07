@@ -3,7 +3,10 @@
 
 #include <I2C.h>
 #include <breakout.h>
+#include <log.h>
 #include <sys.h>
+
+#define LOGTAG "I2C"
 
 bool reserved_addr(uint8_t addr);
 
@@ -39,7 +42,49 @@ int I2C_write_all(I2C dev, uint8_t reg, uint8_t data[], int N) {
         return ERR_UNKNOWN;
     }
 
-    return 0;
+    return ERR_OK;
+}
+
+// Writes a block of bytes to an I2C address + register.
+int I2C_write_allx(I2C dev, uint8_t reg, uint8_t data[], int N) {
+    uint8_t bytes[N + 1];
+    int err;
+
+    bytes[0] = reg;
+    memmove(&bytes[1], data, N);
+
+    debugf(LOGTAG, "write-all: data(%d)    %02x %02x", N, data[0], data[1]);
+    debugf(LOGTAG, "write-all: address    %02x %02x", dev.addr, dev.addr >> 1);
+    debugf(LOGTAG, "write-all: command(%d) %02x %02x %02x", N + 1, bytes[0], bytes[1], bytes[2]);
+
+    if ((err = i2c_write_blocking(dev.bus, dev.addr >> 1, bytes, N + 1, true)) != N + 1) {
+        if ((err == PICO_ERROR_GENERIC) || (err == PICO_ERROR_TIMEOUT)) {
+            return ERR_I2C;
+        }
+
+        return ERR_UNKNOWN;
+    }
+
+    // uint8_t lo[2] = {reg, data[0]};
+    // uint8_t hi[2] = {reg + 1, data[1]};
+    //
+    // if ((err = i2c_write_blocking(dev.bus, dev.addr >> 1, lo, 2, false)) != 2) {
+    //     if ((err == PICO_ERROR_GENERIC) || (err == PICO_ERROR_TIMEOUT)) {
+    //         return ERR_I2C;
+    //     }
+    //
+    //     return ERR_UNKNOWN;
+    // }
+    //
+    // if ((err = i2c_write_blocking(dev.bus, dev.addr >> 1, hi, 2, true)) != 2) {
+    //     if ((err == PICO_ERROR_GENERIC) || (err == PICO_ERROR_TIMEOUT)) {
+    //         return ERR_I2C;
+    //     }
+    //
+    //     return ERR_UNKNOWN;
+    // }
+
+    return ERR_OK;
 }
 
 // Reads a single byte from an address + register.
@@ -54,7 +99,7 @@ int I2C_read(I2C dev, uint8_t reg, uint8_t *data) {
         return ERR_UNKNOWN;
     }
 
-    if ((err = i2c_read_blocking(dev.bus, dev.addr >> 1, data, 1, false)) != 1) {
+    if ((err = i2c_read_blocking(dev.bus, dev.addr >> 1, data, 1, true)) != 1) {
         if ((err == PICO_ERROR_GENERIC) || (err == PICO_ERROR_TIMEOUT)) {
             return ERR_I2C;
         }
@@ -71,21 +116,17 @@ int I2C_read_all(I2C dev, uint8_t reg, uint8_t *data, int N) {
 
     if ((err = i2c_write_blocking(dev.bus, dev.addr >> 1, &reg, 1, true)) != 1) {
         if ((err == PICO_ERROR_GENERIC) || (err == PICO_ERROR_TIMEOUT)) {
-            printf(">>> AWOOGAH/1\n");
             return ERR_I2C;
         }
 
-        printf(">>> AWOOGAH/2\n");
         return ERR_UNKNOWN;
     }
 
-    if ((err = i2c_read_blocking(dev.bus, dev.addr >> 1, data, N, false)) != N) {
+    if ((err = i2c_read_blocking(dev.bus, dev.addr >> 1, data, N, true)) != N) {
         if ((err == PICO_ERROR_GENERIC) || (err == PICO_ERROR_TIMEOUT)) {
-            printf(">>> AWOOGAH/3\n");
             return ERR_I2C;
         }
 
-        printf(">>> AWOOGAH/4\n");
         return ERR_UNKNOWN;
     }
 
