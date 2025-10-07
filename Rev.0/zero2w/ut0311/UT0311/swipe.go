@@ -2,25 +2,30 @@ package UT0311
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"ut0311/entities"
 	"ut0311/system"
 )
 
-const pinTimeout = 10 * time.Second
+const pinTimeout = 2500 * time.Millisecond
 
 type swiped struct {
+	ID         uint32
 	controller uint32
 	door       uint8
 	card       uint32
 	pin        uint32
+	code       *string
 	timer      *time.Timer
 }
 
 var pending = sync.Map{}
+var id = atomic.Uint32{}
 
 func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card any) {
 	parse := func() (uint32, error) {
@@ -202,6 +207,8 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 	if card, err := parse(); err == nil {
 		infof("swipe  controller:%v door:%v card:%v", controller, door, card)
 
+		key := fmt.Sprintf("%v.%v", controller, door)
+
 		if record, err := u.cards.GetCard(controller, card); err != nil {
 			u.denied(controller, door, card, entities.ReasonCardDenied, err)
 		} else if reason := validate(record); reason != entities.ReasonCardOk {
@@ -218,30 +225,34 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 			u.denied(controller, door, card, entities.ReasonUnknown, err)
 		} else if antipassbacked(antipassback, door, card) {
 			u.denied(controller, door, card, entities.ReasonCardDeniedAntiPassback, fmt.Errorf("anti-passback"))
-		} else if record.PIN != 0 {
-			k := fmt.Sprintf("%v.%v", controller, door)
-			v, _ := pending.Swap(k, swiped{
-				controller: controller,
-				door:       door,
-				card:       card,
-				pin:        record.PIN,
-				timer: time.AfterFunc(pinTimeout, func() {
-					println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> KEYPAD TIMEOUT")
-					u.denied(controller, door, card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN required"))
-				}),
-			})
-
-			if p, ok := v.(swiped); ok {
-				p.timer.Stop()
-				u.denied(controller, door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN required"))
+		} else {
+			if v, ok := pending.LoadAndDelete(key); ok {
+				if p, ok := v.(swiped); ok {
+					p.timer.Stop()
+					u.denied(controller, door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("expecting PIN, got swipe"))
+				}
 			}
 
-		} else if ok, err := u.breakout.UnlockDoor(door); err != nil {
-			u.denied(controller, door, card, entities.ReasonUnknown, err)
-		} else if !ok {
-			u.denied(controller, door, card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
-		} else {
-			u.granted(controller, door, card)
+			code := ""
+
+			if record.PIN != 0 {
+				record := swiped{
+					ID:         id.Add(1),
+					controller: controller,
+					door:       door,
+					card:       card,
+					pin:        record.PIN,
+					code:       &code,
+				}
+
+				record.timer = time.AfterFunc(pinTimeout, func() {
+					u.denied(controller, door, card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN timeout"))
+				})
+
+				pending.Store(key, record)
+			} else {
+				u.unlock(controller, door, card)
+			}
 		}
 
 		return
@@ -251,29 +262,48 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 }
 
 func (u UT0311) keyCode(timestamp time.Time, controller uint32, door uint8, code any) {
-	k := fmt.Sprintf("%v.%v", controller, door)
-	v, _ := pending.LoadAndDelete(k)
-
-	if p, ok := v.(swiped); ok {
-		p.timer.Stop()
-		if code == fmt.Sprintf("%v#", p.pin) {
-			if ok, err := u.breakout.UnlockDoor(door); err != nil {
-				u.denied(p.controller, p.door, p.card, entities.ReasonUnknown, err)
-			} else if !ok {
-				u.denied(p.controller, p.door, p.card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
-			} else {
-				u.granted(p.controller, p.door, p.card)
-			}
-		}
-	}
+	debugf("keycode controller:%v, door:%v, code:%v", controller, door, code)
+	// k := fmt.Sprintf("%v.%v", controller, door)
+	// v, _ := pending.LoadAndDelete(k)
+	//
+	// if p, ok := v.(swiped); ok {
+	// 	p.timer.Stop()
+	// 	if code == fmt.Sprintf("%v#", p.pin) {
+	// 		if ok, err := u.breakout.UnlockDoor(door); err != nil {
+	// 			u.denied(p.controller, p.door, p.card, entities.ReasonUnknown, err)
+	// 		} else if !ok {
+	// 			u.denied(p.controller, p.door, p.card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
+	// 		} else {
+	// 			u.granted(p.controller, p.door, p.card)
+	// 		}
+	// 	}
+	// }
 }
 
-func (u UT0311) keyPress(timestamp time.Time, controller uint32, door uint8, key any) {
-	k := fmt.Sprintf("%v.%v", controller, door)
+func (u UT0311) keyPress(timestamp time.Time, controller uint32, door uint8, digit any) {
+	digits := []int64{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '*', '#'}
+	key := fmt.Sprintf("%v.%v", controller, door)
 
-	if v, ok := pending.Load(k); ok {
-		if p, ok := v.(swiped); ok {
-			p.timer.Reset(pinTimeout)
+	if i64, ok := digit.(int64); ok && slices.Contains(digits, i64) {
+		v := rune(i64)
+		if record, ok := pending.Load(key); ok {
+			if p, ok := record.(swiped); ok {
+				if v == '*' || v == '#' {
+					p.timer.Stop()
+
+					pending.Delete(key)
+
+					if code, err := strconv.ParseUint(*p.code, 10, 32); err == nil && uint32(code) == p.pin {
+						u.unlock(p.controller, p.door, p.card)
+					} else {
+						u.denied(p.controller, p.door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("incorrect PIN %v", code))
+					}
+				} else {
+					*p.code = *p.code + string(v)
+
+					p.timer.Reset(pinTimeout)
+				}
+			}
 		}
 	}
 }
@@ -324,4 +354,14 @@ func (u UT0311) denied(controller uint32, door uint8, card uint32, reason entiti
 		Reason:    reason,
 	})
 
+}
+
+func (u UT0311) unlock(controller uint32, door uint8, card uint32) {
+	if ok, err := u.breakout.UnlockDoor(door); err != nil {
+		u.denied(controller, door, card, entities.ReasonUnknown, err)
+	} else if !ok {
+		u.denied(controller, door, card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
+	} else {
+		u.granted(controller, door, card)
+	}
 }

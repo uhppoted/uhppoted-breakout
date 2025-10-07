@@ -369,6 +369,12 @@ void U2_on_keypad_digit(uint8_t door, uint32_t v) {
             if (KEYCODES[i].code4 == keycode || KEYCODES[i].code8 == keycode) {
                 char digit = KEYCODES[i].digit;
 
+                push((message){
+                    .message = MSG_KEYPRESS,
+                    .tag = MESSAGE_UINT32,
+                    .u32 = (((uint32_t)door << 8) & 0x0000ff00) | ((uint32_t)digit & 0x000000ff),
+                });
+
                 if (keypad->index < sizeof(keypad->code)) {
                     keypad->code[keypad->index++] = digit;
 
@@ -382,12 +388,6 @@ void U2_on_keypad_digit(uint8_t door, uint32_t v) {
                         keypad->timer = 0;
                     } else {
                         keypad->timer = 0;
-
-                        push((message){
-                            .message = MSG_KEYPRESS,
-                            .tag = MESSAGE_UINT32,
-                            .u32 = (((uint32_t)door << 8) & 0x0000ff00) | ((uint32_t)digit & 0x000000ff),
-                        });
                     }
                 }
 

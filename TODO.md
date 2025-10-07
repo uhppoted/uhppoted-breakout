@@ -9,7 +9,8 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - [x] discard pending entry if different card swiped on same controller+door
       - [x] keycode trap
       - [x] keypress trap
-      - [ ] reset timer on keypress -OR-
+      - [x] reset timer on keypress -OR-
+      - [ ] (???) use breakout keycode
           - breakout: append '#' to keycode
           - breakout: maybe start/restart keypad timer on every swipe and send empty keycode
           - breakout: rethink 2.5s keypad timeout
