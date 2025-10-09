@@ -24,8 +24,13 @@ type swiped struct {
 	timer      *time.Timer
 }
 
-var pending = sync.Map{}
-var id = atomic.Uint32{}
+var swipes = struct {
+	pending sync.Map
+	ID      atomic.Uint32
+}{
+	pending: sync.Map{},
+	ID:      atomic.Uint32{},
+}
 
 func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card any) {
 	parse := func() (uint32, error) {
@@ -226,7 +231,7 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 		} else if antipassbacked(antipassback, door, card) {
 			u.denied(controller, door, card, entities.ReasonCardDeniedAntiPassback, fmt.Errorf("anti-passback"))
 		} else {
-			if v, ok := pending.LoadAndDelete(key); ok {
+			if v, ok := swipes.pending.LoadAndDelete(key); ok {
 				if p, ok := v.(swiped); ok {
 					p.timer.Stop()
 					u.denied(controller, door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("expecting PIN, got swipe"))
@@ -237,7 +242,7 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 
 			if record.PIN != 0 {
 				record := swiped{
-					ID:         id.Add(1),
+					ID:         swipes.ID.Add(1),
 					controller: controller,
 					door:       door,
 					card:       card,
@@ -249,7 +254,7 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 					u.denied(controller, door, card, entities.ReasonCardDeniedPassword, fmt.Errorf("PIN timeout"))
 				})
 
-				pending.Store(key, record)
+				swipes.pending.Store(key, record)
 			} else {
 				u.unlock(controller, door, card)
 			}
@@ -286,12 +291,12 @@ func (u UT0311) keyPress(timestamp time.Time, controller uint32, door uint8, dig
 
 	if i64, ok := digit.(int64); ok && slices.Contains(digits, i64) {
 		v := rune(i64)
-		if record, ok := pending.Load(key); ok {
+		if record, ok := swipes.pending.Load(key); ok {
 			if p, ok := record.(swiped); ok {
 				if v == '*' || v == '#' {
 					p.timer.Stop()
 
-					pending.Delete(key)
+					swipes.pending.Delete(key)
 
 					if code, err := strconv.ParseUint(*p.code, 10, 32); err == nil && uint32(code) == p.pin {
 						u.unlock(p.controller, p.door, p.card)

@@ -3,6 +3,7 @@
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
 - [ ] set-time
+   - https://stackoverflow.com/questions/48906483/how-to-set-systems-date-and-time-via-go-syscall
 
 - [ ] card swipe
    - [x] swipe
