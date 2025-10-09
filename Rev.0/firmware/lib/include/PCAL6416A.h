@@ -16,8 +16,13 @@ extern int PCAL6416A_set_polarity(I2C dev, uint16_t polarity);
 extern int PCAL6416A_get_latched(I2C dev, uint16_t *latched);
 extern int PCAL6416A_set_latched(I2C dev, uint16_t latched);
 
+extern int PCAL6416A_get_pullups(I2C dev, uint32_t *pullups);
 extern int PCAL6416A_set_pullups(I2C dev, const PULLUP pullups[16]);
+
+extern int PCAL6416A_get_open_drain(I2C dev, uint8_t *byte);
 extern int PCAL6416A_set_open_drain(I2C dev, bool port0, bool port1);
+
+extern int PCAL6416A_get_output_drive(I2C dev, uint32_t *drive);
 extern int PCAL6416A_set_output_drive(I2C dev, const float drive[16]);
 
 extern int PCAL6416A_get_interrupts(I2C dev, uint16_t *interrupts);

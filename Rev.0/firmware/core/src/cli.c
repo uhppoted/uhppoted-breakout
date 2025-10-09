@@ -482,14 +482,7 @@ void debug_settings() {
 }
 
 void debug() {
-    int err;
-    uint16_t configuration;
-
-    if ((err = PCAL6416A_get_configuration(U4, &configuration)) != ERR_OK) {
-        infof(LOGTAG, "error reading PCAL6416A configuration (%d)", err);
-    } else {
-        infof(LOGTAG, "PCAL6416A configuration %04x", configuration);
-    }
+    debug_swipe();
 }
 
 void show_state() {

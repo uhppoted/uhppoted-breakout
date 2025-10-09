@@ -9,7 +9,8 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - [x] discard pending entry if different card swiped on same controller+door
       - [x] keycode trap
       - [x] keypress trap
-      - [x] reset timer on keypress -OR-
+      - [x] reset timer on keypress
+      - [ ] reader LED
       - [ ] (???) use breakout keycode
           - breakout: append '#' to keycode
           - breakout: maybe start/restart keypad timer on every swipe and send empty keycode
@@ -52,11 +53,13 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
    - [ ] commonalise _delete_
 
 ## breakout
-- [] U4 seems a bit erratic
-   - door 1 not unlocking
-   - configure unused outputs as inputs/open-collector
-   - open drain ????
-   - set unused pins to outputs and drive low
+- [] U4 erratic as hell
+    - https://community.nxp.com/t5/Other-NXP-Products/Unable-to-write-Port-1-in-PCAL6416A/m-p/1154460?profile.language=en
+    - https://github.com/BenjamimKrug/PCAL6416A
+    - https://e2e.ti.com/support/interface-group/interface/f/interface-forum/1254274/tca6416a-output-pin-is-not-sending-the-desired-value
+    - https://forums.raspberrypi.com/viewtopic.php?t=312340
+    - https://forum.pycom.io/topic/6589/working-with-i2c-and-port-expander
+    - https://raspberrypi.stackexchange.com/questions/139178/libgpiod-read-value-operation-not-permitted
 
 - [ ] fairly frequent crash on settings::save
       - queue error maybe??
