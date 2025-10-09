@@ -2,6 +2,8 @@
 
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
+- [ ] set-time
+
 - [ ] card swipe
    - [x] swipe
    - [ ] swipe + PIN

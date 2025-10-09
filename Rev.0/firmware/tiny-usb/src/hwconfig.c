@@ -48,23 +48,23 @@ const uint UART1_RX = GPIO_5;
 // U2 PCAL6408A
 const struct I2C U2 = {
     .bus = i2c1,
-    .addr = 0x40,
+    .addr = 0x20,
 };
 
 // U3 PCAL6408A
 const struct I2C U3 = {
     .bus = i2c0,
-    .addr = 0x42,
+    .addr = 0x21,
 };
 
 // U4 PCAL6416A
 const struct I2C U4 = {
     .bus = i2c0,
-    .addr = 0x40,
+    .addr = 0x20,
 };
 
 // U5 RX8900SA
 const struct I2C U5 = {
     .bus = i2c0,
-    .addr = 0x64,
+    .addr = 0x32,
 };

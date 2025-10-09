@@ -321,7 +321,14 @@ void U2_wio(uint8_t inputs) {
 void U2_on_card_read(uint8_t door, uint32_t v) {
     if (door >= 1 && door <= 4) {
         struct reader *reader = U2x.readers + (door - 1);
+        struct keypad *keypad = U2x.keypads + (door - 1);
 
+        // ... reset keypad
+        keypad->index = 0;
+        keypad->timer = 0;
+        keypad->locked = 0;
+
+        // ... swipe
         if (reader->locked > 0) {
             debugf("U2", "READER %d  LOCKED", door);
         } else {
