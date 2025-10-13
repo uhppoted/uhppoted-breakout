@@ -9,6 +9,7 @@
 #include <MIB.h>
 #include <RTC.h>
 #include <SSMP.h>
+#include <U4.h>
 #include <breakout.h>
 #include <doors.h>
 #include <log.h>
@@ -295,4 +296,45 @@ int64_t MIB_set_door_unlock(const char *OID, const value u, value *v) {
     }
 
     return SSMP_ERROR_NO_ACCESS;
+}
+
+int64_t MIB_set_door_access(const char *OID, const value u, value *v) {
+    uint8_t door;
+
+    if (equal(OID, MIB_DOOR_1_ACCESS)) {
+        door = 1;
+    } else if (equal(OID, MIB_DOOR_2_ACCESS)) {
+        door = 2;
+    } else if (equal(OID, MIB_DOOR_3_ACCESS)) {
+        door = 3;
+    } else if (equal(OID, MIB_DOOR_4_ACCESS)) {
+        door = 4;
+    } else {
+        return SSMP_ERROR_NO_SUCH_OBJECT;
+    }
+
+    if (u.tag == VALUE_UINT8 || u.tag == VALUE_UINT32) {
+        uint8_t val = (uint8_t)u.integer;
+
+        v->tag = VALUE_UINT8;
+        v->integer = 0;
+
+        switch (val) {
+        case 1:
+            v->tag = VALUE_UINT8;
+            v->integer = (uint8_t)1;
+            U4_blink_LED(door, 1, 1000);
+            break;
+
+        case 255:
+            v->tag = VALUE_UINT8;
+            v->integer = (uint8_t)255;
+            U4_blink_LED(door, 5, 500);
+            break;
+        }
+
+        return SSMP_ERROR_NONE;
+    }
+
+    return SSMP_ERROR_WRONG_TYPE;
 }

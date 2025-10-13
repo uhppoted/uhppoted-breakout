@@ -52,6 +52,10 @@ var m = map[string]string{
 	"controller.door.2.keypress":        "0.1.3.6.1.4.1.65536.3.2.9",
 	"controller.door.3.keypress":        "0.1.3.6.1.4.1.65536.3.3.9",
 	"controller.door.4.keypress":        "0.1.3.6.1.4.1.65536.3.4.9",
+	"controller.door.1.access":          "0.1.3.6.1.4.1.65536.3.1.10",
+	"controller.door.2.access":          "0.1.3.6.1.4.1.65536.3.2.10",
+	"controller.door.3.access":          "0.1.3.6.1.4.1.65536.3.3.10",
+	"controller.door.4.access":          "0.1.3.6.1.4.1.65536.3.4.10",
 	"controller.alarm.tamper":           "0.1.3.6.1.4.1.65536.4.1",
 	"controller.alarm.fire":             "0.1.3.6.1.4.1.65536.4.2",
 }
@@ -108,6 +112,10 @@ var r = map[string]string{
 	"0.1.3.6.1.4.1.65536.3.2.9":  "controller.door.2.keypress",
 	"0.1.3.6.1.4.1.65536.3.3.9":  "controller.door.3.keypress",
 	"0.1.3.6.1.4.1.65536.3.4.9":  "controller.door.4.keypress",
+	"0.1.3.6.1.4.1.65536.3.1.10": "controller.door.1.access",
+	"0.1.3.6.1.4.1.65536.3.2.10": "controller.door.2.access",
+	"0.1.3.6.1.4.1.65536.3.3.10": "controller.door.3.access",
+	"0.1.3.6.1.4.1.65536.3.4.10": "controller.door.4.access",
 	"0.1.3.6.1.4.1.65536.4.1":    "controller.alarm.tamper",
 	"0.1.3.6.1.4.1.65536.4.2":    "controller.alarm.fire",
 }

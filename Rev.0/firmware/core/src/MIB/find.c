@@ -11,7 +11,7 @@ bool MIB_has(const char *OID) {
     for (int i = 0; i < N; i++) {
         MIBItem item = OIDs[i];
 
-        if ((hash == item.hash) && (strcmp(OID, item.OID) == 0) && (item.get != NULL)) {
+        if ((hash == item.hash) && (strcmp(OID, item.OID) == 0) && (item.get != NULL || item.set != NULL)) {
             return true;
         }
     }

@@ -14,6 +14,11 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - [x] keypress trap
       - [x] reset timer on keypress
       - [ ] reader LED
+          - don't send denied to breakout if swipe while waiting for PIN
+          - lock/discard swipes 'server side' after swipe (to prevent serial swiping)
+          - lock keypad/ignore keypresses after swipe denied
+          - // FIXME: rethink U4_blink_LED - not going to work correctly with different intervals
+
       - [ ] (???) use breakout keycode
           - breakout: append '#' to keycode
           - breakout: maybe start/restart keypad timer on every swipe and send empty keycode

@@ -447,14 +447,15 @@ void U4_toggle_LED(int LED) {
 }
 
 // NTS: adds the number of blinks to the current 'blink count'
+// FIXME: rethink - not going to work correctly with different intervals
 void U4_blink_LED(int LED, int count, uint16_t interval) {
     mutex_enter_blocking(&U4x.guard);
 
     for (struct LED *l = U4x.LEDs.LEDs; l < U4x.LEDs.LEDs + U4x.LEDs.N; l++) {
         if (l->id == LED) {
             // FIXME handle inverted polarity for SYS, IN and ERR
-            l->timer = interval;
-            l->interval = 1000;
+            l->timer = 250;
+            l->interval = interval;
             l->blinks = clamp(l->blinks + 2 * count, 0, 64);
         }
     }

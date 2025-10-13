@@ -48,11 +48,17 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 	}
 
 	validate := func(record entities.Card) entities.EventReason {
-		if timestamp.Before(record.StartDate) {
+		if record.Card == 0 {
+			warnf("card %v - no record")
+			return entities.ReasonCardDeniedNoAccess
+		} else if timestamp.Before(record.StartDate) {
+			warnf("card %v - invalid start date (%v)", record.Card, record.StartDate)
 			return entities.ReasonCardDeniedNoAccess
 		} else if timestamp.After(record.EndDate.Add(24 * time.Hour)) {
+			warnf("card %v - invalid end date (%v)", record.Card, record.EndDate)
 			return entities.ReasonCardDeniedNoAccess
 		} else if permissions := record.Permissions[door]; permissions == 0 {
+			warnf("card %v - invalid permissions (%v)", record.Card, record.Permissions)
 			return entities.ReasonCardDeniedNoAccess
 		}
 
@@ -234,7 +240,11 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 			if v, ok := swipes.pending.LoadAndDelete(key); ok {
 				if p, ok := v.(swiped); ok {
 					p.timer.Stop()
-					u.denied(controller, door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("expecting PIN, got swipe"))
+					// NTS: rethink this!
+					//      Sending a 'denied' here causes all kinds of weirdness e.g. unexpected 'denied' messages in the
+					//      logs, reader access denied indications, etc.
+					//
+					// u.denied(controller, door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("expecting PIN, got swipe"))
 				}
 			}
 
@@ -340,6 +350,10 @@ func (u UT0311) granted(controller uint32, door uint8, card uint32) {
 		}
 	}()
 
+	go func() {
+		u.breakout.Granted(controller, door)
+	}()
+
 	u.state.Set(controller, tag, true)
 }
 
@@ -348,17 +362,23 @@ func (u UT0311) denied(controller uint32, door uint8, card uint32, reason entiti
 
 	timestamp := time.Now()
 
-	u.event(controller, &entities.Event{
-		Index:     0,
-		Type:      entities.EventCard,
-		Granted:   false,
-		Door:      door,
-		Direction: 1,
-		Card:      card,
-		Timestamp: timestamp,
-		Reason:    reason,
-	})
+	go func() {
 
+		u.event(controller, &entities.Event{
+			Index:     0,
+			Type:      entities.EventCard,
+			Granted:   false,
+			Door:      door,
+			Direction: 1,
+			Card:      card,
+			Timestamp: timestamp,
+			Reason:    reason,
+		})
+	}()
+
+	go func() {
+		u.breakout.Denied(controller, door)
+	}()
 }
 
 func (u UT0311) unlock(controller uint32, door uint8, card uint32) {

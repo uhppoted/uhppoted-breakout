@@ -25,6 +25,7 @@ extern int64_t MIB_set_doors_interlock(const char *, const value, value *);
 extern int64_t MIB_set_door_mode(const char *, const value, value *);
 extern int64_t MIB_set_door_delay(const char *, const value, value *);
 extern int64_t MIB_set_door_unlock(const char *, const value, value *);
+extern int64_t MIB_set_door_access(const char *, const value, value *);
 
 const MIBItem MIB_SYS_BOARD_ID = {
     .hash = 2957893646,
@@ -346,6 +347,30 @@ const MIBItem MIB_DOOR_4_KEYPRESS = {
     .OID = "0.1.3.6.1.4.1.65536.3.4.9",
 };
 
+const MIBItem MIB_DOOR_1_ACCESS = {
+    .hash = 1756670143,
+    .OID = "0.1.3.6.1.4.1.65536.3.1.10",
+    .set = MIB_set_door_access,
+};
+
+const MIBItem MIB_DOOR_2_ACCESS = {
+    .hash = 1756706080,
+    .OID = "0.1.3.6.1.4.1.65536.3.2.10",
+    .set = MIB_set_door_access,
+};
+
+const MIBItem MIB_DOOR_3_ACCESS = {
+    .hash = 1756742017,
+    .OID = "0.1.3.6.1.4.1.65536.3.3.10",
+    .set = MIB_set_door_access,
+};
+
+const MIBItem MIB_DOOR_4_ACCESS = {
+    .hash = 1756777954,
+    .OID = "0.1.3.6.1.4.1.65536.3.4.10",
+    .set = MIB_set_door_access,
+};
+
 const MIBItem MIB_ALARMS_TAMPER_DETECT = {
     .hash = 2957896913,
     .OID = "0.1.3.6.1.4.1.65536.4.1",
@@ -358,7 +383,7 @@ const MIBItem MIB_ALARMS_FIRE_ALARM = {
     .get = MIB_get_alarm_fire_alarm,
 };
 
-const MIBItem OIDs[53] = {
+const MIBItem OIDs[57] = {
     MIB_SYS_BOARD_ID,
     MIB_CONTROLLER_ID,
     MIB_CONTROLLER_VERSION,
@@ -410,6 +435,10 @@ const MIBItem OIDs[53] = {
     MIB_DOOR_2_KEYPRESS,
     MIB_DOOR_3_KEYPRESS,
     MIB_DOOR_4_KEYPRESS,
+    MIB_DOOR_1_ACCESS,
+    MIB_DOOR_2_ACCESS,
+    MIB_DOOR_3_ACCESS,
+    MIB_DOOR_4_ACCESS,
     MIB_ALARMS_TAMPER_DETECT,
     MIB_ALARMS_FIRE_ALARM,
 };

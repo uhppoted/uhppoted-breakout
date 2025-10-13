@@ -13,7 +13,7 @@ typedef struct community {
 
 const struct {
     MIBItem const *get[39];
-    MIBItem const *set[14];
+    MIBItem const *set[18];
 } PUBLIC = {
     .get = {
         &MIB_CONTROLLER_ID,
@@ -83,6 +83,11 @@ const struct {
         &MIB_DOOR_2_UNLOCKED,
         &MIB_DOOR_3_UNLOCKED,
         &MIB_DOOR_4_UNLOCKED,
+
+        &MIB_DOOR_1_ACCESS,
+        &MIB_DOOR_2_ACCESS,
+        &MIB_DOOR_3_ACCESS,
+        &MIB_DOOR_4_ACCESS,
     },
 };
 
