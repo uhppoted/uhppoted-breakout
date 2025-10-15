@@ -56,6 +56,7 @@ bool usb_init() {
     mutex_init(&USB.guard.usb0);
     mutex_init(&USB.guard.usb1);
 
+    // FIXME reduce to e.g. 5ms
     add_repeating_timer_ms(50, on_usb_rx, NULL, &USB.usb_timer);
 
     infof(LOGTAG, "initialised");
@@ -64,6 +65,7 @@ bool usb_init() {
 }
 
 bool usb_write(const uint8_t *bytes, int len) {
+    int retries = 0;
     bool ok = true;
 
     mutex_enter_blocking(&USB.guard.usb1);
@@ -72,18 +74,22 @@ bool usb_write(const uint8_t *bytes, int len) {
         for (int ix = 0; ix < len;) {
             uint32_t N = tud_cdc_n_write(CDC1, &bytes[ix], len - ix);
 
-            if (N == 0) {
+            if (N == 0 && retries > 5) {
                 warnf(LOGTAG, "*** write error %u of %d", ix, len);
                 ok = false;
                 break;
+            } else if (N == 0) {
+                retries++;
+                sleep_ms(1); // FIXME proper queue
+                tud_task();
             } else {
+                tud_cdc_n_write_flush(CDC1);
+
                 debugf(LOGTAG, "write %u of %d", N, len - ix);
                 ix += N;
+                retries = 0;
             }
         }
-
-        tud_cdc_n_write_flush(CDC1);
-
     } else {
         ok = false;
         warnf(LOGTAG, "write error: USB not connected");

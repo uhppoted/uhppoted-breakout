@@ -5,6 +5,10 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 - [ ] `*** write error 23 of 104`
     - consistently happens with keycode + # (because keypress message immediately followed by keycode message)
     - ditto for 6 digit code
+    - [ ] reduce poll interval to e.g. <5ms
+    - [ ] queue writes
+
+- [ ] uhppote-cli::get-events
 
 - [ ] set-time
    - https://stackoverflow.com/questions/48906483/how-to-set-systems-date-and-time-via-go-syscall
@@ -46,7 +50,6 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - [ ] ReasonOpenDeniedDoorInterLock
 
 
-- [ ] uhppote-cli::get-events
 
 
 ## RPCD
