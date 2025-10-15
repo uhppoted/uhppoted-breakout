@@ -44,6 +44,8 @@ const int32_t U2_CODE_TIMEOUT = 2500; // ms
 const int32_t U2_CARD_LOCK = 1250;    // ms
 const int32_t U2_CODE_LOCK = 1250;    // ms
 
+const int PINSIZE = 6;
+
 typedef struct reader {
     uint64_t data;
     uint8_t count;
@@ -52,7 +54,7 @@ typedef struct reader {
 } reader;
 
 typedef struct keypad {
-    char code[16];
+    char code[16]; // NB: must be greater than PINSIZE + 1
     uint32_t index;
     uint16_t timer;
     int16_t locked;
@@ -249,7 +251,14 @@ void U2_tick_keypad(uint8_t door, struct keypad *keypad) {
         keypad->timer += U2_TICK;
 
         if (keypad->timer >= U2_CODE_TIMEOUT) {
-            U2_on_keycode(door, keypad->code, keypad->index);
+            if (keypad->index < PINSIZE) {
+                keypad->code[keypad->index++] = '#';
+                U2_on_keycode(door, keypad->code, keypad->index);
+            } else {
+                keypad->code[PINSIZE] = '#';
+                U2_on_keycode(door, keypad->code, PINSIZE + 1);
+            }
+
             keypad->index = 0;
             keypad->timer = 0;
         }
@@ -385,8 +394,9 @@ void U2_on_keypad_digit(uint8_t door, uint32_t v) {
                 if (keypad->index < sizeof(keypad->code)) {
                     keypad->code[keypad->index++] = digit;
 
-                    if (keypad->index >= sizeof(keypad->code)) {
-                        U2_on_keycode(door, keypad->code, keypad->index);
+                    if (keypad->index >= PINSIZE) {
+                        keypad->code[PINSIZE] = '#';
+                        U2_on_keycode(door, keypad->code, PINSIZE + 1);
                         keypad->index = 0;
                         keypad->timer = 0;
                     } else if (digit == '*' || digit == '#') {

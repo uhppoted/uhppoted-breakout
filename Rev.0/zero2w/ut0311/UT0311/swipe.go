@@ -20,7 +20,7 @@ type swiped struct {
 	door       uint8
 	card       uint32
 	pin        uint32
-	code       *string
+	code       *[]rune
 	timer      *time.Timer
 }
 
@@ -220,6 +220,17 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 
 		key := fmt.Sprintf("%v.%v", controller, door)
 
+		if v, ok := swipes.pending.LoadAndDelete(key); ok {
+			if p, ok := v.(swiped); ok {
+				p.timer.Stop()
+				// NTS: rethink this!
+				//      Sending a 'denied' here causes all kinds of weirdness e.g. unexpected 'denied' messages in the
+				//      logs, reader access denied indications, etc.
+				//
+				// u.denied(controller, door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("expecting PIN, got swipe"))
+			}
+		}
+
 		if record, err := u.cards.GetCard(controller, card); err != nil {
 			u.denied(controller, door, card, entities.ReasonCardDenied, err)
 		} else if reason := validate(record); reason != entities.ReasonCardOk {
@@ -237,19 +248,6 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 		} else if antipassbacked(antipassback, door, card) {
 			u.denied(controller, door, card, entities.ReasonCardDeniedAntiPassback, fmt.Errorf("anti-passback"))
 		} else {
-			if v, ok := swipes.pending.LoadAndDelete(key); ok {
-				if p, ok := v.(swiped); ok {
-					p.timer.Stop()
-					// NTS: rethink this!
-					//      Sending a 'denied' here causes all kinds of weirdness e.g. unexpected 'denied' messages in the
-					//      logs, reader access denied indications, etc.
-					//
-					// u.denied(controller, door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("expecting PIN, got swipe"))
-				}
-			}
-
-			code := ""
-
 			if record.PIN != 0 {
 				record := swiped{
 					ID:         swipes.ID.Add(1),
@@ -257,7 +255,7 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 					door:       door,
 					card:       card,
 					pin:        record.PIN,
-					code:       &code,
+					code:       &[]rune{},
 				}
 
 				record.timer = time.AfterFunc(pinTimeout, func() {
@@ -308,14 +306,13 @@ func (u UT0311) keyPress(timestamp time.Time, controller uint32, door uint8, dig
 
 					swipes.pending.Delete(key)
 
-					if code, err := strconv.ParseUint(*p.code, 10, 32); err == nil && uint32(code) == p.pin {
+					if code, err := strconv.ParseUint(string(*p.code), 10, 32); err == nil && uint32(code) == p.pin {
 						u.unlock(p.controller, p.door, p.card)
 					} else {
 						u.denied(p.controller, p.door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("incorrect PIN %v", code))
 					}
 				} else {
-					*p.code = *p.code + string(v)
-
+					*p.code = append(*p.code, v)
 					p.timer.Reset(pinTimeout)
 				}
 			}

@@ -32,7 +32,7 @@
 22. [Memory usage](https://forums.raspberrypi.com/viewtopic.php?t=347638)
 23. https://electronics.stackexchange.com/questions/742062/robust-communication-between-%c2%b5p-board-and-i-o-expander-over-3-5-meters
 24. [OTA/UART](https://pfister.dev/blog/2025/rp2350-uart-bl.html)
-
+25. (?) prevent power from I/O
 
 ## WaveShare RP2040-Tiny
 1. https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero

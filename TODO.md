@@ -2,32 +2,28 @@
 
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
+- [ ] `*** write error 23 of 104`
+    - consistently happens with keycode + # (because keypress message immediately followed by keycode message)
+    - ditto for 6 digit code
+
 - [ ] set-time
    - https://stackoverflow.com/questions/48906483/how-to-set-systems-date-and-time-via-go-syscall
 
 - [ ] card swipe
-   - [x] swipe
    - [ ] swipe + PIN
-      - [x] default door record
-      - [x] discard pending entry if different card swiped on same controller+door
-      - [x] keycode trap
-      - [x] keypress trap
-      - [x] reset timer on keypress
-      - [ ] reader LED
-          - don't send denied to breakout if swipe while waiting for PIN
-          - lock/discard swipes 'server side' after swipe (to prevent serial swiping)
-          - lock keypad/ignore keypresses after swipe denied
-          - // FIXME: rethink U4_blink_LED - not going to work correctly with different intervals
+      - [x] reader LED
+          - [x] don't send denied to breakout if swipe while waiting for PIN
+          - [x] ignore keypresses after swipe denied
 
       - [ ] (???) use breakout keycode
-          - breakout: append '#' to keycode
-          - breakout: maybe start/restart keypad timer on every swipe and send empty keycode
+          - [x] breakout: append '#' to 6 digit keycode
+          - [x] breakout: append '#' to timeout keycode
+          - [ ] breakout: maybe send keycode rather than keypresses
           - breakout: rethink 2.5s keypad timeout
       - [ ] unexpected context cancelled
 ```
       2025-10-06 11:29:35 WARN   UT0311           swipe: anti-passback error  controller:405419896 door:1 card:10058400 (context canceled)
 ```
-   - [ ] passcode
    - [ ] door open/closed seems to be inverted
    - (?) use pipes
    - (?) trap handlers
@@ -42,10 +38,13 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
    - [ ] clear watchdog error after logging it
    - (?) maybe use state tags like 'controller.405419896.xxxx....'
 
+- [ ] passcode
+- [ ] pushbutton
 - [ ] open-door
       - [ ] event
       - [ ] ReasonOpenDeniedDoorNormallyClosed
       - [ ] ReasonOpenDeniedDoorInterLock
+
 
 - [ ] uhppote-cli::get-events
 
@@ -61,6 +60,9 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
    - [ ] commonalise _delete_
 
 ## breakout
+- [ ] // FIXME: rethink U4_blink_LED - not going to work correctly with different intervals
+    - queue ?
+
 - [] U4 erratic as hell
     - https://community.nxp.com/t5/Other-NXP-Products/Unable-to-write-Port-1-in-PCAL6416A/m-p/1154460?profile.language=en
     - https://github.com/BenjamimKrug/PCAL6416A
