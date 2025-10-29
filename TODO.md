@@ -2,11 +2,8 @@
 
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
-- [ ] `*** write error 23 of 104`
-    - consistently happens with keycode + # (because keypress message immediately followed by keycode message)
-    - ditto for 6 digit code
-    - [ ] reduce poll interval to e.g. <5ms
-    - [ ] queue writes
+- [x] USB write buffer
+    - [ ] remove/reduce retries (?)
 
 - [ ] uhppote-cli::get-events
 
@@ -50,8 +47,6 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - [ ] ReasonOpenDeniedDoorInterLock
 
 
-
-
 ## RPCD
    - [ ] monitor interface
    - (?) Context.WithTimeout 
@@ -63,6 +58,9 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
    - [ ] commonalise _delete_
 
 ## breakout
+- [ ] perfect hashing
+      - https://blog.sesse.net/blog/tech/2025-10-23-21-23_modern_perfect_hashing.html
+
 - [ ] // FIXME: rethink U4_blink_LED - not going to work correctly with different intervals
     - queue ?
 
@@ -79,6 +77,9 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 ```
 INFO   CLI        >>> queue    error
 ```
+
+- [ ] USB
+    - https://forums.raspberrypi.com/viewtopic.php?t=313998
 
 ### misc
 

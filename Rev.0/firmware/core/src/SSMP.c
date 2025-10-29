@@ -494,7 +494,7 @@ void SSMP_err(const char *community, int64_t rqid, const char *OID, int64_t erro
  */
 bool SSMP_write(const uint8_t *buffer, int N) {
     if (ssmp.USB) {
-        return usb_write(buffer, N);
+        return usb1_write(buffer, N);
     } else {
         return uart1_write(buffer, N);
     }
