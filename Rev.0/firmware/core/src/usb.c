@@ -7,7 +7,6 @@
 #include <usb.h>
 
 #define LOGTAG "USB"
-#define TX_BUFFER_SIZE 1024
 
 const uint8_t CDC1 = 1;
 
@@ -18,15 +17,6 @@ struct {
         circular_buffer cli;
         circular_buffer ssmp;
     } buffers;
-
-    struct {
-        struct {
-            volatile uint32_t head;
-            volatile uint32_t tail;
-            volatile uint32_t free;
-            uint8_t buffer[TX_BUFFER_SIZE];
-        } ssmp;
-    } fifo;
 
     struct {
         bool usb0;
@@ -50,14 +40,6 @@ struct {
         },
     },
 
-    .fifo = {
-        .ssmp = {
-            .head = 0,
-            .tail = 0,
-            .free = TX_BUFFER_SIZE,
-        },
-    },
-
     .connected = {
         .usb0 = false,
         .usb1 = false,
@@ -73,11 +55,7 @@ bool usb_init() {
     mutex_init(&USB.guard.usb0);
     mutex_init(&USB.guard.usb1);
 
-    // NTS: should be in the region of 2-10ms:
-    //      - 50ms works but is sluggish
-    //      - 10ms allows for 5 retries with some leeway
-    //      - TBH haven't ever seen a retry
-    add_repeating_timer_ms(10, usb_tick, NULL, &USB.usb_timer);
+    add_repeating_timer_ms(25, usb_tick, NULL, &USB.usb_timer);
 
     infof(LOGTAG, "initialised");
 
@@ -107,81 +85,53 @@ bool usb_tick(repeating_timer_t *rt) {
         infof(LOGTAG, "USB.1 disconnected");
     }
 
-    if (tud_cdc_n_connected(1) && USB.fifo.ssmp.tail != USB.fifo.ssmp.head) {
-        int head = USB.fifo.ssmp.head;
-        int tail = USB.fifo.ssmp.tail;
-        int pending = (head + TX_BUFFER_SIZE - tail) % TX_BUFFER_SIZE;
-        int len = pending < 64 ? pending : 64;
-        uint8_t buffer[64];
-
-        for (int i = 0; i < len; i++) {
-            buffer[i] = USB.fifo.ssmp.buffer[tail];
-            tail = (tail + 1) % TX_BUFFER_SIZE;
-        }
-
-        mutex_enter_blocking(&USB.guard.usb1);
-        USB.fifo.ssmp.tail = tail;
-        USB.fifo.ssmp.free += len;
-        mutex_exit(&USB.guard.usb1);
-
-        int retries = 0;
-
-        while (true) {
-            uint32_t N = tud_cdc_n_write(CDC1, buffer, len);
-
-            if (N == 0 && retries > 5) {
-                warnf(LOGTAG, "*** write error %u of %d", 0, len);
-                break;
-            } else if (N == 0) {
-                warnf(LOGTAG, "*** write error - retrying");
-                retries++;
-                sleep_ms(1);
-                tud_task();
-            } else {
-                tud_cdc_n_write_flush(CDC1);
-
-                debugf(LOGTAG, "write %u of %d", N, len);
-                break;
-            }
-        }
-    }
-
     tud_task();
 
     return true;
 }
 
-// USB.1 only - use stdout for USB.0
+// Synchronous write (USB.1 only - use stdout for USB.0).
+//
+// NTS: sadly buffered write introduces a world of complication - partial
+//      messages, the poll loop has to run faster, messages get sent in drips
+//      and drabs, etc, etc. A synchronous write doesn't really cost anything
+//      here because SSMP is processing a request anyway.
+//
+// NTS: retries don't seem to be necessary - leaving in for the interim.
 bool usb1_write(const uint8_t *bytes, int len) {
-    // ... connected ?
-    if (!USB.connected.usb1) {
-        warnf(LOGTAG, "write error: USB not connected");
-        return false;
-    }
-
-    // ... sufficient space in FIFO ?
-    if (USB.fifo.ssmp.free < len) {
-        warnf(LOGTAG, "write error: insufficient buffer space");
-        return false;
-    }
-
-    // ... copy to TX buffer
-    uint32_t head = USB.fifo.ssmp.head;
-    uint32_t tail = USB.fifo.ssmp.tail;
-    for (int i = 0; i < len; i++) {
-        USB.fifo.ssmp.buffer[head] = bytes[i];
-
-        head = (head + 1) % TX_BUFFER_SIZE;
-    }
+    int retries = 0;
+    bool ok = true;
 
     mutex_enter_blocking(&USB.guard.usb1);
-    USB.fifo.ssmp.head = head;
-    USB.fifo.ssmp.free -= len;
+
+    if (USB.connected.usb1) {
+        for (int ix = 0; ix < len;) {
+            uint32_t N = tud_cdc_n_write(CDC1, &bytes[ix], len - ix);
+
+            if (N == 0 && retries > 5) {
+                warnf(LOGTAG, "*** write error %u of %d", ix, len);
+                ok = false;
+                break;
+            } else if (N == 0) {
+                retries++;
+                sleep_ms(1); 
+                tud_task();
+            } else {
+                tud_cdc_n_write_flush(CDC1);
+
+                debugf(LOGTAG, "write %u of %d", N, len - ix);
+                ix += N;
+                retries = 0;
+            }
+        }
+    } else {
+        ok = false;
+        warnf(LOGTAG, "write error: USB not connected");
+    }
+
     mutex_exit(&USB.guard.usb1);
 
-    debugf(LOGTAG, "queued  head:%d  tail:%d  len:%d", head, tail, len);
-
-    return true;
+    return ok;
 }
 
 // tinyusb callback for received data
