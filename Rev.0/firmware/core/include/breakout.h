@@ -11,7 +11,6 @@ extern const uint32_t MSG_TTY;
 extern const uint32_t MSG_WIO;
 extern const uint32_t MSG_SWIPE;
 extern const uint32_t MSG_KEYCODE;
-extern const uint32_t MSG_KEYPRESS;
 extern const uint32_t MSG_U3;
 extern const uint32_t MSG_TICK;
 extern const uint32_t MSG_EVENT;
@@ -101,11 +100,6 @@ typedef enum {
     EVENT_DOOR_2_KEYCODE,
     EVENT_DOOR_3_KEYCODE,
     EVENT_DOOR_4_KEYCODE,
-
-    EVENT_DOOR_1_KEYPRESS,
-    EVENT_DOOR_2_KEYPRESS,
-    EVENT_DOOR_3_KEYPRESS,
-    EVENT_DOOR_4_KEYPRESS,
 } EVENT;
 
 typedef enum {

@@ -3,7 +3,6 @@
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
 - [x] USB write buffer
-    - [ ] remove/reduce retries (?)
 
 - [ ] uhppote-cli::get-events
 
@@ -13,14 +12,10 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 - [ ] card swipe
    - [ ] swipe + PIN
       - [x] reader LED
-          - [x] don't send denied to breakout if swipe while waiting for PIN
-          - [x] ignore keypresses after swipe denied
-
-      - [ ] (???) use breakout keycode
+      - [x] use breakout keycode
           - [x] breakout: append '#' to 6 digit keycode
           - [x] breakout: append '#' to timeout keycode
-          - [ ] breakout: maybe send keycode rather than keypresses
-          - breakout: rethink 2.5s keypad timeout
+          - [x] breakout: maybe send keycode rather than keypresses
       - [ ] unexpected context cancelled
 ```
       2025-10-06 11:29:35 WARN   UT0311           swipe: anti-passback error  controller:405419896 door:1 card:10058400 (context canceled)

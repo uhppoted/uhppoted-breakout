@@ -2,8 +2,8 @@ package UT0311
 
 import (
 	"fmt"
-	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -20,7 +20,6 @@ type swiped struct {
 	door       uint8
 	card       uint32
 	pin        uint32
-	code       *[]rune
 	timer      *time.Timer
 }
 
@@ -255,7 +254,6 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 					door:       door,
 					card:       card,
 					pin:        record.PIN,
-					code:       &[]rune{},
 				}
 
 				record.timer = time.AfterFunc(pinTimeout, func() {
@@ -274,45 +272,23 @@ func (u UT0311) swipe(timestamp time.Time, controller uint32, door uint8, card a
 	warnf("invalid card swipe  controller:%v door:%v card:%v", controller, door, card)
 }
 
-func (u UT0311) keyCode(timestamp time.Time, controller uint32, door uint8, code any) {
-	debugf("keycode controller:%v, door:%v, code:%v", controller, door, code)
-	// k := fmt.Sprintf("%v.%v", controller, door)
-	// v, _ := pending.LoadAndDelete(k)
-	//
-	// if p, ok := v.(swiped); ok {
-	// 	p.timer.Stop()
-	// 	if code == fmt.Sprintf("%v#", p.pin) {
-	// 		if ok, err := u.breakout.UnlockDoor(door); err != nil {
-	// 			u.denied(p.controller, p.door, p.card, entities.ReasonUnknown, err)
-	// 		} else if !ok {
-	// 			u.denied(p.controller, p.door, p.card, entities.ReasonUnknown, fmt.Errorf("error unlocking door"))
-	// 		} else {
-	// 			u.granted(p.controller, p.door, p.card)
-	// 		}
-	// 	}
-	// }
-}
-
-func (u UT0311) keyPress(timestamp time.Time, controller uint32, door uint8, digit any) {
-	digits := []int64{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '*', '#'}
+func (u UT0311) keyCode(timestamp time.Time, controller uint32, door uint8, v any) {
 	key := fmt.Sprintf("%v.%v", controller, door)
 
-	if i64, ok := digit.(int64); ok && slices.Contains(digits, i64) {
-		v := rune(i64)
+	if code, ok := v.(string); ok {
 		if record, ok := swipes.pending.Load(key); ok {
 			if p, ok := record.(swiped); ok {
-				if v == '*' || v == '#' {
+				if strings.HasSuffix(code, "*") || strings.HasSuffix(code, "#") {
 					p.timer.Stop()
-
 					swipes.pending.Delete(key)
 
-					if code, err := strconv.ParseUint(string(*p.code), 10, 32); err == nil && uint32(code) == p.pin {
+					code = strings.TrimRight(code, "#*")
+					if PIN, err := strconv.ParseUint(code, 10, 32); err == nil && uint32(PIN) == p.pin {
 						u.unlock(p.controller, p.door, p.card)
 					} else {
 						u.denied(p.controller, p.door, p.card, entities.ReasonCardDeniedPassword, fmt.Errorf("incorrect PIN %v", code))
 					}
 				} else {
-					*p.code = append(*p.code, v)
 					p.timer.Reset(pinTimeout)
 				}
 			}

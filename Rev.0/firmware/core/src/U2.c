@@ -253,9 +253,13 @@ void U2_tick_keypad(uint8_t door, struct keypad *keypad) {
         if (keypad->timer >= U2_CODE_TIMEOUT) {
             if (keypad->index < PINSIZE) {
                 keypad->code[keypad->index++] = '#';
+                keypad->locked = U2_CODE_LOCK;
+
                 U2_on_keycode(door, keypad->code, keypad->index);
             } else {
                 keypad->code[PINSIZE] = '#';
+                keypad->locked = U2_CODE_LOCK;
+
                 U2_on_keycode(door, keypad->code, PINSIZE + 1);
             }
 
@@ -385,25 +389,26 @@ void U2_on_keypad_digit(uint8_t door, uint32_t v) {
             if (KEYCODES[i].code4 == keycode || KEYCODES[i].code8 == keycode) {
                 char digit = KEYCODES[i].digit;
 
-                push((message){
-                    .message = MSG_KEYPRESS,
-                    .tag = MESSAGE_UINT32,
-                    .u32 = (((uint32_t)door << 8) & 0x0000ff00) | ((uint32_t)digit & 0x000000ff),
-                });
-
                 if (keypad->index < sizeof(keypad->code)) {
                     keypad->code[keypad->index++] = digit;
 
                     if (keypad->index >= PINSIZE) {
                         keypad->code[PINSIZE] = '#';
+                        keypad->locked = U2_CODE_LOCK;
+
                         U2_on_keycode(door, keypad->code, PINSIZE + 1);
                         keypad->index = 0;
                         keypad->timer = 0;
+
                     } else if (digit == '*' || digit == '#') {
+                        keypad->locked = U2_CODE_LOCK;
+
                         U2_on_keycode(door, keypad->code, keypad->index);
                         keypad->index = 0;
                         keypad->timer = 0;
-                    } else {
+
+                    } else if (keypad->locked == 0) {
+                        U2_on_keycode(door, keypad->code, keypad->index);
                         keypad->timer = 0;
                     }
                 }
@@ -418,27 +423,21 @@ void U2_on_keycode(uint8_t door, const char *code, int length) {
     if (length > 0 && door >= 1 && door <= 4) {
         struct keypad *keypad = U2x.keypads + (door - 1);
 
-        if (keypad->locked > 0) {
-            debugf("U2", "KEYPAD %d  LOCKED", door);
-        } else {
-            swipe *swipe = swipe_alloc();
+        swipe *swipe = swipe_alloc();
 
-            if (swipe != NULL) {
-                swipe->door = door;
-                snprintf(swipe->code, length + 1 < sizeof(swipe->code) ? length + 1 : sizeof(swipe->code), "%s", code);
+        if (swipe != NULL) {
+            swipe->door = door;
+            snprintf(swipe->code, length + 1 < sizeof(swipe->code) ? length + 1 : sizeof(swipe->code), "%s", code);
 
-                message msg = {
-                    .message = MSG_KEYCODE,
-                    .tag = MESSAGE_SWIPE,
-                    .swipe = swipe,
-                };
+            message msg = {
+                .message = MSG_KEYCODE,
+                .tag = MESSAGE_SWIPE,
+                .swipe = swipe,
+            };
 
-                if (!push(msg)) {
-                    swipe_free(swipe);
-                }
+            if (!push(msg)) {
+                swipe_free(swipe);
             }
-
-            keypad->locked = U2_CODE_LOCK;
         }
     }
 }

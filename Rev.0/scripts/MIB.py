@@ -164,17 +164,11 @@ OIDs = [
     MIBItem('controller.door.3.keycode','MIB_DOOR_3_KEYCODE', '0.1.3.6.1.4.1.65536.3.3.8'),
     MIBItem('controller.door.4.keycode','MIB_DOOR_4_KEYCODE', '0.1.3.6.1.4.1.65536.3.4.8'),
 
-    # key press
-    MIBItem('controller.door.1.keypress','MIB_DOOR_1_KEYPRESS', '0.1.3.6.1.4.1.65536.3.1.9'),
-    MIBItem('controller.door.2.keypress','MIB_DOOR_2_KEYPRESS', '0.1.3.6.1.4.1.65536.3.2.9'),
-    MIBItem('controller.door.3.keypress','MIB_DOOR_3_KEYPRESS', '0.1.3.6.1.4.1.65536.3.3.9'),
-    MIBItem('controller.door.4.keypress','MIB_DOOR_4_KEYPRESS', '0.1.3.6.1.4.1.65536.3.4.9'),
-
     # access
-    MIBItem('controller.door.1.access','MIB_DOOR_1_ACCESS', '0.1.3.6.1.4.1.65536.3.1.10',None,'MIB_set_door_access'),
-    MIBItem('controller.door.2.access','MIB_DOOR_2_ACCESS', '0.1.3.6.1.4.1.65536.3.2.10',None,'MIB_set_door_access'),
-    MIBItem('controller.door.3.access','MIB_DOOR_3_ACCESS', '0.1.3.6.1.4.1.65536.3.3.10',None,'MIB_set_door_access'),
-    MIBItem('controller.door.4.access','MIB_DOOR_4_ACCESS', '0.1.3.6.1.4.1.65536.3.4.10',None,'MIB_set_door_access'),
+    MIBItem('controller.door.1.access','MIB_DOOR_1_ACCESS', '0.1.3.6.1.4.1.65536.3.1.9',None,'MIB_set_door_access'),
+    MIBItem('controller.door.2.access','MIB_DOOR_2_ACCESS', '0.1.3.6.1.4.1.65536.3.2.9',None,'MIB_set_door_access'),
+    MIBItem('controller.door.3.access','MIB_DOOR_3_ACCESS', '0.1.3.6.1.4.1.65536.3.3.9',None,'MIB_set_door_access'),
+    MIBItem('controller.door.4.access','MIB_DOOR_4_ACCESS', '0.1.3.6.1.4.1.65536.3.4.9',None,'MIB_set_door_access'),
 
     # alarms
     MIBItem('controller.alarm.tamper',

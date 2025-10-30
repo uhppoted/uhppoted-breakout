@@ -114,7 +114,7 @@ bool usb1_write(const uint8_t *bytes, int len) {
                 break;
             } else if (N == 0) {
                 retries++;
-                sleep_ms(1); 
+                sleep_ms(1);
                 tud_task();
             } else {
                 tud_cdc_n_write_flush(CDC1);

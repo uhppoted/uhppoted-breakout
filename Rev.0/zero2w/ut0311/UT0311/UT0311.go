@@ -389,16 +389,6 @@ func (ut0311 *UT0311) onTrap(controller uint32, timestamp time.Time, tag string,
 		}
 	}
 
-	// ... reader keypress?
-	re = regexp.MustCompile(`controller\.door\.([1-4]).keypress`)
-	match = re.FindStringSubmatch(tag)
-	if len(match) > 1 {
-		if door, err := strconv.ParseUint(match[1], 10, 8); err == nil {
-			ut0311.keyPress(timestamp, controller, uint8(door), value)
-			return
-		}
-	}
-
 	// ... state update (probably)
 	if e := ut0311.state.Update(timestamp, controller, tag, value); e != nil {
 		ut0311.event(controller, e)
