@@ -2,20 +2,13 @@
 
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
-- [x] USB write buffer
-
 - [ ] uhppote-cli::get-events
-
-- [ ] set-time
-   - https://stackoverflow.com/questions/48906483/how-to-set-systems-date-and-time-via-go-syscall
 
 - [ ] card swipe
    - [ ] swipe + PIN
       - [x] reader LED
       - [x] use breakout keycode
-          - [x] breakout: append '#' to 6 digit keycode
-          - [x] breakout: append '#' to timeout keycode
-          - [x] breakout: maybe send keycode rather than keypresses
+      - [x] USB write errors
       - [ ] unexpected context cancelled
 ```
       2025-10-06 11:29:35 WARN   UT0311           swipe: anti-passback error  controller:405419896 door:1 card:10058400 (context canceled)
@@ -23,6 +16,17 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
    - [ ] door open/closed seems to be inverted
    - (?) use pipes
    - (?) trap handlers
+
+- [ ] passcode
+    - [ ] set-door-passcodes
+    - [ ] unlock door
+    - [ ] events
+
+- [ ] pushbutton
+- [ ] open-door
+      - [ ] event
+      - [ ] ReasonOpenDeniedDoorNormallyClosed
+      - [ ] ReasonOpenDeniedDoorInterLock
 
 - [ ] _get-status_
    - [x] use cached values for door locks
@@ -33,13 +37,6 @@ https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
       - ut0311 does the same and fetches packed state if CRCs don't match
    - [ ] clear watchdog error after logging it
    - (?) maybe use state tags like 'controller.405419896.xxxx....'
-
-- [ ] passcode
-- [ ] pushbutton
-- [ ] open-door
-      - [ ] event
-      - [ ] ReasonOpenDeniedDoorNormallyClosed
-      - [ ] ReasonOpenDeniedDoorInterLock
 
 
 ## RPCD
@@ -142,11 +139,13 @@ INFO   CLI        >>> queue    error
       - /dev/shm
       - tmpfs
 
+- [ ] set-time
+   - https://stackoverflow.com/questions/48906483/how-to-set-systems-date-and-time-via-go-syscall
+s
 ### UT0311
    - [x] open door on card swipe
    - [ ] open door on PB
    - [ ] rework with text tags
-
 
    - [ ] eventd
       - [ ] remove unnecessary OID stuff
@@ -232,6 +231,7 @@ INFO   CLI        >>> queue    error
 - https://mazzo.li/posts/fast-pipes.html
 - Nerves
 - Embassy (Rust)
+- [Lean](https://kuruczgy.com/blog/2024/07/31/lean-esp32)
 - [protothreads](https://dunkels.com/adam/pt/index.html)
 - https://interrupt.memfault.com/blog/diving-into-jtag-part-6
 - https://pwy.io/posts/marching-events/
@@ -250,7 +250,10 @@ INFO   CLI        >>> queue    error
 - OCDSP
    - https://github.com/bytedreamer/Aporta
 - Mongoose Wizard
-   - https://mongoose.ws/wizard/#/
+   - https://mongoose.ws/wizard/#
+
+- [Ocre/WASM](https://lfedge.org/projects/ocre)
+- [atym/WASM](https://www.atym.io)
 
 ### Rust
 - https://rtic.rs/1/book/en/preface.html
