@@ -183,5 +183,8 @@ error:-0.077   error:-0.044   error:-0.121   error:-0.038
    - https://www.adafruit.com/product/1385
 
    ## Relays
-1. https://uk.rs-online.com/web/p/signal-relays/6839851
+   1. https://uk.rs-online.com/web/p/signal-relays/6839851
+
+2. WiFi
+   - https://github.com/piersfinlayson/airfrog
 

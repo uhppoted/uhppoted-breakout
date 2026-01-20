@@ -72,6 +72,8 @@ INFO   CLI        >>> queue    error
 
 - [ ] USB
     - https://forums.raspberrypi.com/viewtopic.php?t=313998
+    - https://github.com/piersfinlayson/tinyusb-vendor-example
+    - https://github.com/piersfinlayson/picoboot
 
 ### misc
 
