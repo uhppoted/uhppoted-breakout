@@ -2,6 +2,10 @@
 
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
+- [ ] ethernet adapter
+    - https://www.microchip.com/en-us/development-tool/AC320004-3#Overview
+    - https://github.com/Essenceia/Teapot
+
 - [ ] uhppote-cli::get-events
 
 - [ ] card swipe
@@ -143,7 +147,7 @@ INFO   CLI        >>> queue    error
 
 - [ ] set-time
    - https://stackoverflow.com/questions/48906483/how-to-set-systems-date-and-time-via-go-syscall
-s
+
 ### UT0311
    - [x] open door on card swipe
    - [ ] open door on PB
@@ -261,6 +265,13 @@ s
 - https://rtic.rs/1/book/en/preface.html
 - https://github.com/embassy-rs/embassy
 
+### Ada
+- https://github.com/RREE/Pico-Setup-Ada
+- https://github.com/RREE/Ada_Drivers_Library?tab=readme-ov-file
+- https://github.com/RREE/pico_bsp
+- https://sourceforge.net/p/avr-ada/wiki/Introductory%20Tutorial/
+- https://github.com/RREE/AVRAda_Examples/blob/main/getting_started.md
+
 ## Notes
 1. https://github.com/yaqwsx/PcbDraw
 2. https://yaqwsx.github.io/Pinion/
@@ -275,3 +286,4 @@ s
 14. https://hackaday.com/2024/04/17/human-interfacing-devices-hid-over-i2c
 15, https://github.com/raspberrypi/pico-sdk/issues/224
 16. https://github.com/raspberrypi/pico-sdk/issues/997
+17. [The Smallest, Ultimate Security Board](https://hackaday.io/project/205407-the-smallest-ultimate-security-board)
