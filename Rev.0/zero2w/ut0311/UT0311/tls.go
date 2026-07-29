@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
-	"github.com/uhppoted/uhppote-core/messages"
+	codec "codeberg.org/uhppoted/uhppoted-core/encoding/UTO311-L0x"
+	"codeberg.org/uhppoted/uhppoted-core/messages"
 )
 
 const TLS_READ_TIMEOUT = 30000 * time.Millisecond

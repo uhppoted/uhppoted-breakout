@@ -5,8 +5,8 @@ import (
 	"net/netip"
 	"sync"
 
-	codec "github.com/uhppoted/uhppote-core/encoding/UTO311-L0x"
-	"github.com/uhppoted/uhppote-core/messages"
+	codec "codeberg.org/uhppoted/uhppoted-core/encoding/UTO311-L0x"
+	"codeberg.org/uhppoted/uhppoted-core/messages"
 )
 
 type UDP struct {

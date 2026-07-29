@@ -8,7 +8,7 @@ IMPORTS
 
 uhppotedSSMP MODULE-IDENTITY
     LAST-UPDATED "202407290000Z"
-    ORGANIZATION "github.com/uhppoted"
+    ORGANIZATION "codeberg.org/uhppoted"
     CONTACT-INFO    
         "email: uhppoted.development@gmail.com"
     DESCRIPTION

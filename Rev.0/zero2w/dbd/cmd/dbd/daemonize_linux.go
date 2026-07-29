@@ -122,7 +122,7 @@ func (d daemonize) exec() error {
 		info := info{
 			Service:       SERVICE,
 			Description:   "uhppoted-breakout-dbd service/daemon ",
-			Documentation: "https://github.com/uhppoted/uhppoted-breakout",
+			Documentation: "https://codeberg.org/uhppoted/uhppoted-breakout",
 			Executable:    executable,
 			PID:           filepath.Join(d.workdir, fmt.Sprintf("%v.pid", SERVICE)),
 			User:          "uhppoted",

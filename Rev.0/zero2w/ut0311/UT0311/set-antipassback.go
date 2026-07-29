@@ -3,8 +3,8 @@ package UT0311
 import (
 	"fmt"
 
-	"github.com/uhppoted/uhppote-core/messages"
-	"github.com/uhppoted/uhppote-core/types"
+	"codeberg.org/uhppoted/uhppoted-core/messages"
+	"codeberg.org/uhppoted/uhppoted-core/types"
 
 	"ut0311/scmp"
 	"ut0311/system"

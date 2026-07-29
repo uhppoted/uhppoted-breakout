@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/netip"
 
-	lib "github.com/uhppoted/uhppote-core/types"
+	lib "codeberg.org/uhppoted/uhppoted-core/types"
 )
 
 type GetV interface {

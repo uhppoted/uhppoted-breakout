@@ -2,7 +2,7 @@
 
 update:
 #	go get -u ./...
-	go get -u github.com/uhppoted/uhppote-core@main
+	go get -u codeberg.org/uhppoted/uhppoted-core@main
 	go mod tidy
 
 format:

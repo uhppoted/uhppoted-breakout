@@ -1,5 +1,9 @@
 .PHONY: build-all
 
+push:
+	git push
+	git push bitbucket
+
 build-all:
 	cd Rev.0/zero2w/ut0311      && make build
 	cd Rev.0/firmware/tiny-uart && make clean && make build

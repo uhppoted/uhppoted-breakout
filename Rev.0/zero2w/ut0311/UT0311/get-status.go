@@ -1,8 +1,8 @@
 package UT0311
 
 import (
-	"github.com/uhppoted/uhppote-core/messages"
-	lib "github.com/uhppoted/uhppote-core/types"
+	"codeberg.org/uhppoted/uhppoted-core/messages"
+	lib "codeberg.org/uhppoted/uhppoted-core/types"
 
 	"ut0311/entities"
 	"ut0311/scmp"
