@@ -38,7 +38,7 @@ void bisync_decode(struct bisync *codec, const uint8_t ch) {
     // ... CRC?
     if (codec->CRC) {
         codec->crc.CRC <<= 8;
-        codec->crc.CRC |= (uint16_t)(ch)&0x00ff;
+        codec->crc.CRC |= (uint16_t)(ch) & 0x00ff;
         codec->crc.ix++;
 
         if (codec->crc.ix >= 2) {

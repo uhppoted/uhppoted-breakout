@@ -1,7 +1,7 @@
 module logging
 
-go 1.23.0
+go 1.27
 
 require github.com/pkg/term v1.1.0
 
-require golang.org/x/sys v0.1.0 // indirect
+require golang.org/x/sys v0.48.0 // indirect

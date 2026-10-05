@@ -140,7 +140,8 @@ bool auth_validate(const char *community, uint32_t code) {
             counter++;
 
             if (hotp_validate(private.key, private.keysize, counter, code)) {
-                private.counter = counter;
+              private
+                .counter = counter;
                 return true;
             }
         }
@@ -163,9 +164,12 @@ void auth_setkey(const char *community, const uint8_t *key, size_t length) {
             memmove(newkey, key, length);
         }
 
-        private.counter = 0;
-        private.key = newkey;
-        private.keysize = N;
+      private
+        .counter = 0;
+      private
+        .key = newkey;
+      private
+        .keysize = N;
 
         free(oldkey);
     }

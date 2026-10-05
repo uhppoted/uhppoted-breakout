@@ -1,4 +1,4 @@
-codeberg.org/uhppoted/uhppoted-core v0.9.1-0.20260909191420-3b7392bce0ce h1:FYeM9fReQuyw3VcgEyosmsceuSO/Ooayu+V5EBBTWBo=
-codeberg.org/uhppoted/uhppoted-core v0.9.1-0.20260909191420-3b7392bce0ce/go.mod h1:MoeCM7GWMq72F2tUs6/lBt9tlnBoOsMFT6effpitLRs=
+codeberg.org/uhppoted/uhppoted-core v0.9.1-0.20261001173143-860675f9c219 h1:1vO4vcCMWMz2XjtXDNO8MU0xErrMSv5Z3gLJvoruZtU=
+codeberg.org/uhppoted/uhppoted-core v0.9.1-0.20261001173143-860675f9c219/go.mod h1:EVFvPdCbbCe6svMwMNBYO8SuA/MxGfWo4blhZIJICZc=
 golang.org/x/time v0.16.0 h1:vMb6ptszcQMkcwiRTAuNNU50gom6++Q/6gY2hDM6VDE=
 golang.org/x/time v0.16.0/go.mod h1:rVKOqvZeKvrDKTQiAHJ7wmwP0RzleSphoEA9RcdLA0s=
