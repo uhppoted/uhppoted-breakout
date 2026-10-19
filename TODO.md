@@ -1,6 +1,9 @@
 # TODO
 
-- [x] Migrate to codeberg.org (cf. https://codeberg.org/uhppoted/uhppoted/issues/1)
+## In Progress
+
+
+## To Be Done
 
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
 
