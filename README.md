@@ -1,6 +1,15 @@
 ![build](https://github.com/uhppoted/uhppoted-breakout/workflows/build/badge.svg)
 
 
+<div align="center">
+
+_The primary repository for this project is hosted on codeberg: https://codeberg.org/uhppoted/uhppoted-app-breakout_
+
+_The [github repository](https://github.com/uhppoted/uhppoted-app-breakout) will be kept up to date and maintained as a courtesy and for archival
+releases but please use _codeberg_ for reporting issues, etc._
+</div>
+
+
 # uhppoted-breakout
 
 Breakout board for the UHPPOTE TCP/IP Wiegand 26 access controllers. 
