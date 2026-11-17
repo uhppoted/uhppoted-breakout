@@ -6,6 +6,7 @@
 ## To Be Done
 
 https://fgiesen.wordpress.com/2025/09/25/ceiling-division-and-mip-map-sizes/
+https://hackaday.com/2026/11/12/just-use-qwiic-already/
 
 - [ ] ethernet adapter
     - https://www.microchip.com/en-us/development-tool/AC320004-3#Overview
